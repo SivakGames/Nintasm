@@ -13,11 +13,11 @@ func main() {
 
 func process() {
 	start := time.Now()
-	//lines := []string{" lda [1], y "}
-	lines := make([]string, 84000)
-	for i := range lines {
-		lines[i] = " lda [1], y "
-	}
+	lines := []string{" lda [1], y "}
+	//lines := make([]string, 84000)
+	//for i := range lines {
+	//	lines[i] = " lda [1], y "
+	//}
 
 	lineInitParzival := parser.NewInitialLineParser()
 	lineOperationParzival := parser.NewOperationParser()

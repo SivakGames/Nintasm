@@ -8,6 +8,8 @@ import (
 	"strconv"
 )
 
+type Node = operandFactory.Node
+
 // General type for other operand parsers to borrow from
 type OperandParser struct {
 	operandLine     string
@@ -17,8 +19,8 @@ type OperandParser struct {
 
 // Used by instructions.  Will just get the first operand found (if any)
 // Doing it this way will make parsing potential indexes earier
-func (p *OperandParser) GetFirstOperandOnly() (operandFactory.Node, error) {
-	var firstOperand operandFactory.Node = operandFactory.EmptyNode()
+func (p *OperandParser) GetFirstOperandOnly() (Node, error) {
+	var firstOperand Node = operandFactory.EmptyNode()
 
 	//No operands at all
 	if p.lookaheadType == tokenizerSpec.None {
@@ -44,8 +46,8 @@ func (p *OperandParser) GetFirstOperandOnly() (operandFactory.Node, error) {
 //=============================================
 
 // Used by most operations.  Will go through and separate operands by commas returning each one as an AST
-func (p *OperandParser) GetOperandList() ([]operandFactory.Node, error) {
-	operandList := []operandFactory.Node{}
+func (p *OperandParser) GetOperandList() ([]Node, error) {
+	operandList := []Node{}
 	operandCount := 0
 
 	//No operands at all
@@ -84,12 +86,12 @@ func (p *OperandParser) GetOperandList() ([]operandFactory.Node, error) {
 }
 
 // =============================================
-func (p *OperandParser) operandStatementList() (operandFactory.Node, error) {
+func (p *OperandParser) operandStatementList() (Node, error) {
 	return p.statementList(tokenizerSpec.DELIMITER_comma)
 }
 
 // Get statements
-func (p *OperandParser) statementList(stopTokenType tokenizerSpec.TokenType) (operandFactory.Node, error) {
+func (p *OperandParser) statementList(stopTokenType tokenizerSpec.TokenType) (Node, error) {
 	statementList, err := p.Statement()
 	if err != nil {
 		return statementList, err
@@ -103,7 +105,7 @@ func (p *OperandParser) statementList(stopTokenType tokenizerSpec.TokenType) (op
 	return statementList, nil
 }
 
-func (p *OperandParser) Statement() (operandFactory.Node, error) {
+func (p *OperandParser) Statement() (Node, error) {
 	if p.lookaheadType == tokenizerSpec.None {
 		return operandFactory.EmptyNode(), nil
 	}
@@ -127,59 +129,59 @@ func (p *OperandParser) Statement() (operandFactory.Node, error) {
 */
 
 // || expression
-func (p *OperandParser) logicalOrExpression() (operandFactory.Node, error) {
+func (p *OperandParser) logicalOrExpression() (Node, error) {
 	return p._logicalExpression(p.logicalAndExpression, tokenizerSpec.OPERATOR_logicalOr)
 }
 
 // && expression
-func (p *OperandParser) logicalAndExpression() (operandFactory.Node, error) {
+func (p *OperandParser) logicalAndExpression() (Node, error) {
 	return p._logicalExpression(p.bitwiseOrExpression, tokenizerSpec.OPERATOR_logicalAnd)
 }
 
 // | expression
-func (p *OperandParser) bitwiseOrExpression() (operandFactory.Node, error) {
+func (p *OperandParser) bitwiseOrExpression() (Node, error) {
 	return p._logicalExpression(p.bitwiseXorExpression, tokenizerSpec.OPERATOR_bitwiseOr)
 }
 
 // ^ expression
-func (p *OperandParser) bitwiseXorExpression() (operandFactory.Node, error) {
+func (p *OperandParser) bitwiseXorExpression() (Node, error) {
 	return p._logicalExpression(p.bitwiseAndExpression, tokenizerSpec.OPERATOR_bitwiseXor)
 }
 
 // & expression
-func (p *OperandParser) bitwiseAndExpression() (operandFactory.Node, error) {
+func (p *OperandParser) bitwiseAndExpression() (Node, error) {
 	return p._logicalExpression(p.equalityExpression, tokenizerSpec.OPERATOR_bitwiseAnd)
 }
 
 // ==, != expression
-func (p *OperandParser) equalityExpression() (operandFactory.Node, error) {
+func (p *OperandParser) equalityExpression() (Node, error) {
 	return p._logicalExpression(p.shiftExpression, tokenizerSpec.OPERATOR_equality)
 }
 
 // <<, >> expression
-func (p *OperandParser) shiftExpression() (operandFactory.Node, error) {
+func (p *OperandParser) shiftExpression() (Node, error) {
 	return p._logicalExpression(p.relationalExpression, tokenizerSpec.OPERATOR_shift)
 }
 
 // <,<=,>=,> expression
-func (p *OperandParser) relationalExpression() (operandFactory.Node, error) {
+func (p *OperandParser) relationalExpression() (Node, error) {
 	return p._logicalExpression(p.additiveExpression, tokenizerSpec.OPERATOR_relational)
 }
 
 // +,- expression
-func (p *OperandParser) additiveExpression() (operandFactory.Node, error) {
+func (p *OperandParser) additiveExpression() (Node, error) {
 	return p._logicalExpression(p.multiplicativeExpression, tokenizerSpec.OPERATOR_additive)
 }
 
 // *,/,% expression
-func (p *OperandParser) multiplicativeExpression() (operandFactory.Node, error) {
+func (p *OperandParser) multiplicativeExpression() (Node, error) {
 	return p._logicalExpression(p.unaryExpression, tokenizerSpec.OPERATOR_multiplicative)
 }
 
 //---------------------
 
 // Preceding -,~,! expression
-func (p *OperandParser) unaryExpression() (operandFactory.Node, error) {
+func (p *OperandParser) unaryExpression() (Node, error) {
 	if p.lookaheadType != tokenizerSpec.None {
 		switch p.lookaheadType {
 		case tokenizerSpec.OPERATOR_additive,
@@ -203,7 +205,7 @@ func (p *OperandParser) unaryExpression() (operandFactory.Node, error) {
 
 //---------------------
 
-func (p *OperandParser) callMemberExpression() (operandFactory.Node, error) {
+func (p *OperandParser) callMemberExpression() (Node, error) {
 	callMemberValue := p.lookaheadValue
 	callMemberType := p.lookaheadType
 
@@ -229,7 +231,7 @@ func _checkValidAssignmentTarget(assignmentType tokenizerSpec.TokenType) bool {
 
 // ---------------------
 // Functions
-func (p *OperandParser) _callExpression(callee string) (operandFactory.Node, error) {
+func (p *OperandParser) _callExpression(callee string) (Node, error) {
 	arguments, err := p.arguments()
 	if err != nil {
 		return operandFactory.ErrorNode(p.lookaheadValue), err // ❌ Fails
@@ -252,8 +254,8 @@ func (p *OperandParser) _callExpression(callee string) (operandFactory.Node, err
 
 //--------------------
 
-func (p *OperandParser) arguments() ([]operandFactory.Node, error) {
-	var argumentList []operandFactory.Node
+func (p *OperandParser) arguments() ([]Node, error) {
+	var argumentList []Node
 	var err error = nil
 
 	p.eatAndAdvance(tokenizerSpec.DELIMITER_leftParenthesis)
@@ -277,8 +279,8 @@ func (p *OperandParser) arguments() ([]operandFactory.Node, error) {
 
 //--------------------
 
-func (p *OperandParser) argumentList() ([]operandFactory.Node, error) {
-	argumentList := []operandFactory.Node{}
+func (p *OperandParser) argumentList() ([]Node, error) {
+	argumentList := []Node{}
 	firstArgument, err := p.Statement()
 	if err != nil {
 		return argumentList, err // ❌ Fails
@@ -303,7 +305,7 @@ func (p *OperandParser) argumentList() ([]operandFactory.Node, error) {
 //--------------------------
 //Things such as dots before labels
 
-func (p *OperandParser) memberExpression() (operandFactory.Node, error) {
+func (p *OperandParser) memberExpression() (Node, error) {
 	//The parent label
 	parent := p.lookaheadValue
 
@@ -351,7 +353,7 @@ func (p *OperandParser) memberExpression() (operandFactory.Node, error) {
 
 // !!!!!!!!!!!!!!!!!!!!!!!
 // Top of the food chain - highest precedence
-func (p *OperandParser) primaryExpression() (operandFactory.Node, error) {
+func (p *OperandParser) primaryExpression() (Node, error) {
 	if p.lookaheadType == tokenizerSpec.None {
 		return operandFactory.ErrorNode(p.lookaheadValue), errors.New("THERE'S NO PRIMARY EXPR!!!") // ❌ Fails
 	}
@@ -378,9 +380,9 @@ func (p *OperandParser) primaryExpression() (operandFactory.Node, error) {
 
 // ++++++++++++++++++++++++++++
 // Helper for logical expressions
-func (p *OperandParser) _logicalExpression(builderName func() (operandFactory.Node, error), operatorToken tokenizerSpec.TokenType) (operandFactory.Node, error) {
-	var left operandFactory.Node
-	var right operandFactory.Node
+func (p *OperandParser) _logicalExpression(builderName func() (Node, error), operatorToken tokenizerSpec.TokenType) (Node, error) {
+	var left Node
+	var right Node
 	var err error = nil
 	left, err = builderName()
 	if err != nil {
@@ -422,7 +424,7 @@ func (p *OperandParser) _isLiteral(tokenType tokenizerSpec.TokenType) bool {
 }
 
 // ((((((((((((((((
-func (p *OperandParser) parenthesizedExpression() (operandFactory.Node, error) {
+func (p *OperandParser) parenthesizedExpression() (Node, error) {
 	err := p.eatFreelyAndAdvance(tokenizerSpec.DELIMITER_leftParenthesis)
 	if err != nil {
 		return operandFactory.ErrorNode(p.lookaheadValue), err // ❌ Fails
@@ -442,7 +444,7 @@ func (p *OperandParser) parenthesizedExpression() (operandFactory.Node, error) {
 }
 
 // -----------------
-func (p *OperandParser) literal() (operandFactory.Node, error) {
+func (p *OperandParser) literal() (Node, error) {
 	literalType := p.lookaheadType
 	literalValue := p.lookaheadValue
 	err := p.eatFreelyAndAdvance(p.lookaheadType)
@@ -477,7 +479,7 @@ func (p *OperandParser) literal() (operandFactory.Node, error) {
 }
 
 // -----------------
-func (p *OperandParser) identifier() (operandFactory.Node, error) {
+func (p *OperandParser) identifier() (Node, error) {
 	literalType := p.lookaheadType
 	literalValue := p.lookaheadValue
 	err := p.eatFreelyAndAdvance(tokenizerSpec.IDENTIFIER)

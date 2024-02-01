@@ -6,7 +6,9 @@ import (
 	"strings"
 )
 
-type Node struct {
+type Node = NodeStruct
+
+type NodeStruct struct {
 	NodeType     tokenizerSpec.TokenType
 	NodeValue    string
 	Left         *Node
@@ -17,8 +19,8 @@ type Node struct {
 	Alternate    *Node
 }
 
-func newNode(nodeType tokenizerSpec.TokenType, nodeValue string) Node {
-	return Node{
+func newNode(nodeType tokenizerSpec.TokenType, nodeValue string) NodeStruct {
+	return NodeStruct{
 		NodeType:  nodeType,
 		NodeValue: nodeValue,
 	}

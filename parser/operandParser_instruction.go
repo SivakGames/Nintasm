@@ -71,18 +71,18 @@ func (p *InstructionOperandParser) Process(operationValue string) {
 
 	_ = operand
 
-	//fmt.Println("SUCCESS")
-	//fmt.Println(instructionMode, operand, instructionIndex)
+	fmt.Println("SUCCESS")
+	fmt.Println(instructionMode, operand, instructionIndex)
 
 	return
 }
 
 // See what token (if any) precedes the operand. This will determine general mode...
-func (p *InstructionOperandParser) getOperandModeByLeadToken(isBranch bool) (instructionData.InstructionModes, operandFactory.Node, tokenizerSpec.TokenType, error) {
+func (p *InstructionOperandParser) getOperandModeByLeadToken(isBranch bool) (instructionData.InstructionModes, Node, tokenizerSpec.TokenType, error) {
 	instructionMode := instructionData.None
 	instructionXYindex := tokenizerSpec.None
 	var err error = nil
-	var operand operandFactory.Node = operandFactory.EmptyNode()
+	var operand Node = operandFactory.EmptyNode()
 
 	switch p.lookaheadType {
 
