@@ -47,9 +47,6 @@ func (p *InstructionOperandParser) Process(operationValue string) {
 			fmt.Println(err) // ❌ Fails
 			return
 		}
-		if p.lookaheadType != tokenizerSpec.None {
-			fmt.Println("No more tokens are allowed after A")
-		}
 	default:
 		isBranch = p.checkIfBranchInstruction(&allowedModesForInstruction.Modes)
 		instructionMode, operand, instructionIndex, err = p.getOperandModeByLeadToken(isBranch)
