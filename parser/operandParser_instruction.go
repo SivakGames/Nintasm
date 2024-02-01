@@ -69,8 +69,10 @@ func (p *InstructionOperandParser) Process(operationValue string) {
 
 	// Check if instruction itself supports mode
 
-	fmt.Println("SUCCESS")
-	fmt.Println(instructionMode, operand, instructionIndex)
+	_ = operand
+
+	//fmt.Println("SUCCESS")
+	//fmt.Println(instructionMode, operand, instructionIndex)
 
 	return
 }
