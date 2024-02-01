@@ -25,14 +25,17 @@ func newNode(nodeType tokenizerSpec.TokenType, nodeValue string) Node {
 }
 
 func EmptyNode() Node {
-	return newNode(tokenizerSpec.None, "")
+	node := newNode(tokenizerSpec.None, "")
+	return node
 }
 
 // Used for errors during parsing
 func ErrorNode(nodeValue string) Node {
-	return newNode(tokenizerSpec.None, nodeValue)
+	node := newNode(tokenizerSpec.None, nodeValue)
+	return node
 }
 
+/*
 // """Operand for .func expressions"""
 func FunctionOperand(numArgs int, operands []string) (int, []string) {
 	return numArgs, operands
@@ -42,7 +45,7 @@ func FunctionOperand(numArgs int, operands []string) (int, []string) {
 func InterpretedInstructionBytes(opcode []string, value []string) []string {
 	//return opcode, ...value
 	return opcode
-}
+} */
 
 // """Calling a function"""
 func CallExpression(callee string, arguments []Node) Node {
