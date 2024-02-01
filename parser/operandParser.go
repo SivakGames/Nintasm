@@ -68,8 +68,7 @@ func (p *OperandParser) GetOperandList() ([]operandFactory.Node, error) {
 
 	//From here, operands are comma separated
 	for p.lookaheadType != tokenizerSpec.None && p.lookaheadType == tokenizerSpec.DELIMITER_comma {
-		p.eat(tokenizerSpec.DELIMITER_comma)
-		err = p.advanceToNext()
+		err = p.eatFreelyAndAdvance(tokenizerSpec.DELIMITER_comma)
 		if err != nil {
 			return operandList, err // ❌ Fails
 		}
@@ -188,8 +187,7 @@ func (p *OperandParser) unaryExpression() (operandFactory.Node, error) {
 			tokenizerSpec.OPERATOR_negate:
 			unaryType := p.lookaheadType
 			unaryValue := p.lookaheadValue
-			p.eat(p.lookaheadType)
-			err := p.advanceToNext()
+			err := p.eatFreelyAndAdvance(p.lookaheadType)
 			if err != nil {
 				return operandFactory.ErrorNode(p.lookaheadValue), err // ❌ Fails
 			}
@@ -328,8 +326,7 @@ func (p *OperandParser) memberExpression() (operandFactory.Node, error) {
 
 	//A dot indicates member
 	if p.lookaheadType == tokenizerSpec.DELIMITER_period {
-		p.eat(tokenizerSpec.DELIMITER_period)
-		err = p.advanceToNext()
+		err = p.eatFreelyAndAdvance(tokenizerSpec.DELIMITER_period)
 		if err != nil {
 			return operandFactory.ErrorNode(p.lookaheadValue), err // ❌ Fails
 		}
@@ -392,8 +389,7 @@ func (p *OperandParser) _logicalExpression(builderName func() (operandFactory.No
 	for p.lookaheadType != tokenizerSpec.None && p.lookaheadType == operatorToken {
 		logicalExpressionType := p.lookaheadType
 		logicalExpressionValue := p.lookaheadValue
-		p.eat(operatorToken)
-		err = p.advanceToNext()
+		err = p.eatFreelyAndAdvance(operatorToken)
 		if err != nil {
 			return operandFactory.ErrorNode(p.lookaheadValue), err // ❌ Fails
 		}
@@ -426,8 +422,7 @@ func (p *OperandParser) _isLiteral(tokenType tokenizerSpec.TokenType) bool {
 
 // ((((((((((((((((
 func (p *OperandParser) parenthesizedExpression() (operandFactory.Node, error) {
-	p.eat(tokenizerSpec.DELIMITER_leftParenthesis)
-	err := p.advanceToNext()
+	err := p.eatFreelyAndAdvance(tokenizerSpec.DELIMITER_leftParenthesis)
 	if err != nil {
 		return operandFactory.ErrorNode(p.lookaheadValue), err // ❌ Fails
 	}
@@ -437,11 +432,7 @@ func (p *OperandParser) parenthesizedExpression() (operandFactory.Node, error) {
 		return operandFactory.ErrorNode(p.lookaheadValue), err // ❌ Fails
 	}
 
-	err = p.eat(tokenizerSpec.DELIMITER_rightParenthesis)
-	if err != nil {
-		return operandFactory.ErrorNode(p.lookaheadValue), err // ❌ Fails
-	}
-	err = p.advanceToNext()
+	err = p.eatAndAdvance(tokenizerSpec.DELIMITER_rightParenthesis)
 	if err != nil {
 		return operandFactory.ErrorNode(p.lookaheadValue), err // ❌ Fails
 	}
@@ -453,8 +444,7 @@ func (p *OperandParser) parenthesizedExpression() (operandFactory.Node, error) {
 func (p *OperandParser) literal() (operandFactory.Node, error) {
 	literalType := p.lookaheadType
 	literalValue := p.lookaheadValue
-	p.eat(p.lookaheadType)
-	err := p.advanceToNext()
+	err := p.eatFreelyAndAdvance(p.lookaheadType)
 	if err != nil {
 		return operandFactory.EmptyNode(), err
 	}
@@ -489,8 +479,7 @@ func (p *OperandParser) literal() (operandFactory.Node, error) {
 func (p *OperandParser) identifier() (operandFactory.Node, error) {
 	literalType := p.lookaheadType
 	literalValue := p.lookaheadValue
-	p.eat(tokenizerSpec.IDENTIFIER)
-	err := p.advanceToNext()
+	err := p.eatFreelyAndAdvance(tokenizerSpec.IDENTIFIER)
 	if err != nil {
 		return operandFactory.ErrorNode(p.lookaheadValue), err // ❌ Fails
 	}
