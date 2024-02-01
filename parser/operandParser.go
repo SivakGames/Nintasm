@@ -222,8 +222,9 @@ func (p *OperandParser) callMemberExpression() (operandFactory.Node, error) {
 	return member, nil
 }
 
+// Call expressions MUST begin with an identifier
 func _checkValidAssignmentTarget(assignmentType tokenizerSpec.TokenType) bool {
-	return (assignmentType != tokenizerSpec.IDENTIFIER)
+	return (assignmentType == tokenizerSpec.IDENTIFIER)
 }
 
 // ---------------------

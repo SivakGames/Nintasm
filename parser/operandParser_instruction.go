@@ -56,7 +56,7 @@ func (p *InstructionOperandParser) Process(operationValue string) {
 	}
 
 	if p.lookaheadType != tokenizerSpec.None {
-		fmt.Println("NO MORE TOKENS") // ❌ Fails
+		fmt.Println("NO MORE TOKENS allowed", p.lookaheadValue) // ❌ Fails
 		return
 	}
 

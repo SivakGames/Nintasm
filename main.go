@@ -13,7 +13,7 @@ func main() {
 
 func process() {
 	start := time.Now()
-	lines := []string{" lsr 1,x"}
+	lines := []string{" lsr abank(5,7,234)"}
 	//lines := make([]string, 84000)
 	//for i := range lines {
 	//	lines[i] = " lda 5"
