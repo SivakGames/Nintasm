@@ -30,7 +30,7 @@ var InstructionModeDetails = map[InstructionModes]ModeInfo{
 	ABS:   {abbrev: "ABS", description: "Absolute"},
 	ABS_X: {abbrev: "ABS_X", description: "Absolute,X"},
 	ABS_Y: {abbrev: "ABS_Y", description: "Absolute,Y"},
-	IMM:   {abbrev: "ABS_Y", description: "Immediate"},
+	IMM:   {abbrev: "IMM", description: "Immediate"},
 	IMPL:  {abbrev: "IMPL", description: "Implied"},
 	IND:   {abbrev: "IND", description: "Indirect"},
 	IND_X: {abbrev: "IND_X", description: "Indirect,X"},

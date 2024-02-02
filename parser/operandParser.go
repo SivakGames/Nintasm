@@ -3,6 +3,7 @@ package parser
 import (
 	"errors"
 	"fmt"
+	"misc/nintasm/instructionData"
 	"misc/nintasm/parser/operandFactory"
 	"misc/nintasm/tokenizer/tokenizerSpec"
 	"strconv"
@@ -12,34 +13,12 @@ type Node = operandFactory.Node
 
 // General type for other operand parsers to borrow from
 type OperandParser struct {
-	operandLine     string
-	operandPosition int
+	operandLine             string
+	operandPosition         int
+	ShouldParseInstructions bool
+	instructionMode         instructionData.InstructionModes
+	instructionXYIndex      tokenizerSpec.TokenType
 	Parser
-}
-
-// Used by instructions.  Will just get the first operand found (if any)
-// Doing it this way will make parsing potential indexes earier
-func (p *OperandParser) GetFirstOperandOnly() ([]Node, error) {
-	operandList := []Node{}
-
-	var firstOperand Node = operandFactory.EmptyNode()
-
-	//No operands at all
-	if p.lookaheadType == tokenizerSpec.None {
-		return operandList, nil // 🟢 Succeeds
-	}
-	//No commas at the beginning...
-	if p.lookaheadType == tokenizerSpec.DELIMITER_comma {
-		return operandList, errors.New("First operand cannot be a comma!") // ❌ Fails
-	}
-
-	firstOperand, err := p.operandStatementList()
-	if err != nil {
-		return operandList, err // ❌ Fails
-	}
-	operandList = append(operandList, firstOperand)
-
-	return operandList, nil // 🟢 Succeeds
 }
 
 //=============================================
@@ -112,7 +91,149 @@ func (p *OperandParser) Statement() (Node, error) {
 	if p.lookaheadType == tokenizerSpec.None {
 		return operandFactory.EmptyNode(), nil
 	}
-	return p.logicalOrExpression()
+
+	if p.ShouldParseInstructions {
+		return p.instructionPrefix()
+	}
+	return p.bitwiseOrExpression()
+
+}
+
+// -------------------------------------------
+
+func (p *OperandParser) instructionPrefix() (Node, error) {
+	p.instructionMode = instructionData.ABS
+	p.instructionXYIndex = tokenizerSpec.None
+	nextFunction := p.logicalOrExpression
+	xyIndex := tokenizerSpec.None
+	checkXYfollowup := false
+	var statement Node
+	var err error
+
+	switch p.lookaheadType {
+
+	//[][][][][][][][][][][][][][][][][][][][][]
+	//Indirect
+
+	case tokenizerSpec.DELIMITER_leftSquareBracket:
+		p.instructionMode = instructionData.IND
+		err = p.eatFreelyAndAdvance(tokenizerSpec.DELIMITER_leftSquareBracket)
+		if err != nil {
+			return operandFactory.ErrorNode(p.lookaheadValue), err // ❌ Fails
+		}
+		statement, err = nextFunction()
+		if err != nil {
+			return statement, err // ❌ Fails
+		}
+		// For indirect X
+		if p.lookaheadType == tokenizerSpec.DELIMITER_comma {
+			xyIndex, err = p.checkInstructionXYIndex()
+			if err != nil {
+				return statement, err // ❌ Fails
+			}
+			if xyIndex != tokenizerSpec.REGISTER_X {
+				return statement, errors.New("Must use X index for this kind of indirect addressing")
+			}
+			err = p.eatFreelyAndAdvance(tokenizerSpec.DELIMITER_rightSquareBracket)
+			if err != nil {
+				return statement, err // ❌ Fails
+			}
+		} else {
+			err = p.eatFreelyAndAdvance(tokenizerSpec.DELIMITER_rightSquareBracket)
+			if err != nil {
+				return statement, err // ❌ Fails
+			}
+			if p.lookaheadType == tokenizerSpec.DELIMITER_comma {
+				xyIndex, err = p.checkInstructionXYIndex()
+				if err != nil {
+					return statement, err // ❌ Fails
+				}
+				if xyIndex != tokenizerSpec.REGISTER_Y {
+					return statement, errors.New("Must use Y index for this kind of indirect addressing")
+				}
+			}
+		}
+
+	//######################################
+	//Immediate mode
+
+	case tokenizerSpec.DELIMITER_hash:
+		p.instructionMode = instructionData.IMM
+		err = p.eatFreelyAndAdvance(tokenizerSpec.DELIMITER_hash)
+		if err != nil {
+			return operandFactory.ErrorNode(p.lookaheadValue), err // ❌ Fails
+		}
+		statement, err = nextFunction()
+		if err != nil {
+			return operandFactory.ErrorNode(p.lookaheadValue), err // ❌ Fails
+		}
+
+	//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+	//Explicit ZP mode
+
+	case tokenizerSpec.OPERATOR_relational:
+		if p.lookaheadValue == "<" {
+			p.instructionMode = instructionData.ZP
+			err = p.eatFreelyAndAdvance(tokenizerSpec.OPERATOR_relational)
+			if err != nil {
+				return operandFactory.ErrorNode(p.lookaheadValue), err // ❌ Fails
+			}
+		}
+		statement, err = nextFunction()
+		if err != nil {
+			return operandFactory.ErrorNode(p.lookaheadValue), err // ❌ Fails
+		}
+		checkXYfollowup = true
+
+		//-------------------------------------
+		//Absolute mode
+
+	default:
+		statement, err = nextFunction()
+		if err != nil {
+			return operandFactory.ErrorNode(p.lookaheadValue), err // ❌ Fails
+		}
+		checkXYfollowup = true
+	}
+
+	//---------------------
+
+	if checkXYfollowup && p.lookaheadType == tokenizerSpec.DELIMITER_comma {
+		xyIndex, err = p.checkInstructionXYIndex()
+		if err != nil {
+			return operandFactory.ErrorNode(p.lookaheadValue), err // ❌ Fails
+		}
+	}
+	p.instructionXYIndex = xyIndex
+
+	if p.lookaheadType != tokenizerSpec.None {
+		fmt.Println(p.lookaheadValue)
+		return statement, errors.New("No more tokens can follow this instruction's operands!")
+	}
+
+	return statement, nil // 🟢 Succeeds
+}
+
+// ++++++++++++++++++++++++++++++++
+
+func (p *OperandParser) checkInstructionXYIndex() (tokenizerSpec.TokenType, error) {
+	err := p.eatFreelyAndAdvance(tokenizerSpec.DELIMITER_comma)
+	targetIndex := tokenizerSpec.None
+	if err != nil {
+		return targetIndex, err // ❌ Fails
+	}
+
+	if p.lookaheadType != tokenizerSpec.REGISTER_X && p.lookaheadType != tokenizerSpec.REGISTER_Y {
+		return targetIndex, errors.New("BAD INDEX!")
+	}
+
+	targetIndex = p.lookaheadType
+	err = p.eatFreelyAndAdvance(p.lookaheadType)
+	if err != nil {
+		return targetIndex, err // ❌ Fails
+	}
+
+	return targetIndex, nil
 }
 
 /*
