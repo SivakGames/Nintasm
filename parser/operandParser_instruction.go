@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"misc/nintasm/instructionData"
-	"misc/nintasm/parser/operandFactory"
+	"misc/nintasm/interpreter"
 	"misc/nintasm/tokenizer"
 	"misc/nintasm/tokenizer/tokenizerSpec"
 	"strings"
@@ -22,7 +22,7 @@ func NewInstructionOperandParser() InstructionOperandParser {
 }
 
 func (p *InstructionOperandParser) Process(operationValue string) {
-	operand := operandFactory.EmptyNode()
+	operandList := []Node{}
 	instructionIndex := tokenizerSpec.None
 	// The instruction itself (in upper case)
 	instruction := strings.ToUpper(operationValue)
@@ -49,7 +49,7 @@ func (p *InstructionOperandParser) Process(operationValue string) {
 		}
 	default:
 		isBranch = p.checkIfBranchInstruction(&allowedModesForInstruction.Modes)
-		instructionMode, operand, instructionIndex, err = p.getOperandModeByLeadToken(isBranch)
+		instructionMode, operandList, instructionIndex, err = p.getOperandModeByLeadToken(isBranch)
 	}
 
 	if p.lookaheadType != tokenizerSpec.None {
@@ -60,7 +60,11 @@ func (p *InstructionOperandParser) Process(operationValue string) {
 	//If index is present, see if it's usable with desired mode
 
 	if instructionIndex == tokenizerSpec.REGISTER_X || instructionIndex == tokenizerSpec.REGISTER_Y {
-		p.checkModeSupportsXY(instructionMode, instructionIndex)
+		instructionMode, err = p.checkModeSupportsXY(instructionMode, instructionIndex)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
 	} else if instructionIndex != tokenizerSpec.None {
 		fmt.Println("MAJOR ERROR!!!")
 	}
@@ -69,20 +73,19 @@ func (p *InstructionOperandParser) Process(operationValue string) {
 
 	// Check if instruction itself supports mode
 
-	_ = operand
-
-	fmt.Println("SUCCESS")
-	fmt.Println(instructionMode, operand, instructionIndex)
+	nodez := interpreter.InterpretOperands(operandList)
+	_ = nodez
+	//fmt.Println("PARSING SUCCESS", nodez[0])
 
 	return
 }
 
 // See what token (if any) precedes the operand. This will determine general mode...
-func (p *InstructionOperandParser) getOperandModeByLeadToken(isBranch bool) (instructionData.InstructionModes, Node, tokenizerSpec.TokenType, error) {
+func (p *InstructionOperandParser) getOperandModeByLeadToken(isBranch bool) (instructionData.InstructionModes, []Node, tokenizerSpec.TokenType, error) {
 	instructionMode := instructionData.None
 	instructionXYindex := tokenizerSpec.None
 	var err error = nil
-	var operand Node = operandFactory.EmptyNode()
+	var operandList []Node
 
 	switch p.lookaheadType {
 
@@ -93,55 +96,57 @@ func (p *InstructionOperandParser) getOperandModeByLeadToken(isBranch bool) (ins
 
 	case tokenizerSpec.DELIMITER_leftSquareBracket:
 		instructionMode = instructionData.IND
+		var operand Node
 
 		err = p.eatFreelyAndAdvance(tokenizerSpec.DELIMITER_leftSquareBracket)
 		if err != nil {
-			return instructionMode, operand, instructionXYindex, err // ❌ Fails
+			return instructionMode, operandList, instructionXYindex, err // ❌ Fails
 		}
 
 		//Get the operand
 		operand, err = p.Statement()
 		if err != nil {
-			return instructionMode, operand, instructionXYindex, err // ❌ Fails
+			return instructionMode, operandList, instructionXYindex, err // ❌ Fails
 		}
+		operandList = append(operandList, operand)
 
 		switch p.lookaheadType {
 		case tokenizerSpec.None:
-			return instructionMode, operand, instructionXYindex, errors.New("Indirect End of input") // ❌ Fails
+			return instructionMode, operandList, instructionXYindex, errors.New("Indirect End of input") // ❌ Fails
 
 		// xxxxxxxxxxxxxxx
 		// Indirect X
 		case tokenizerSpec.DELIMITER_comma:
 			err = p.checkValidXYIndexes(tokenizerSpec.REGISTER_X)
 			if err != nil {
-				return instructionMode, operand, instructionXYindex, err // ❌ Fails
+				return instructionMode, operandList, instructionXYindex, err // ❌ Fails
 			}
 			err = p.eatFreelyAndAdvance(tokenizerSpec.DELIMITER_rightSquareBracket)
 			if err != nil {
-				return instructionMode, operand, instructionXYindex, err // ❌ Fails
+				return instructionMode, operandList, instructionXYindex, err // ❌ Fails
 			}
 			instructionXYindex = tokenizerSpec.REGISTER_X
 			//instructionMode = instructionData.IND_X
-			return instructionMode, operand, instructionXYindex, nil // 🟢 Indirect X Succeeds
+			return instructionMode, operandList, instructionXYindex, nil // 🟢 Indirect X Succeeds
 
 		// yyyyyyyyyyyyyy
 		// Indirect only or Indirect Y
 		case tokenizerSpec.DELIMITER_rightSquareBracket:
 			err = p.eatFreelyAndAdvance(tokenizerSpec.DELIMITER_rightSquareBracket)
 			if err != nil {
-				return instructionMode, operand, instructionXYindex, err // ❌ Fails
+				return instructionMode, operandList, instructionXYindex, err // ❌ Fails
 			}
 			if p.lookaheadType != tokenizerSpec.None {
 				err = p.checkValidXYIndexes(tokenizerSpec.REGISTER_Y)
 				if err != nil {
-					return instructionMode, operand, instructionXYindex, err // ❌ Fails
+					return instructionMode, operandList, instructionXYindex, err // ❌ Fails
 				}
 				instructionXYindex = tokenizerSpec.REGISTER_Y
 			}
-			return instructionMode, operand, instructionXYindex, nil // 🟢 Indirect or Indirect Y Succeeds
+			return instructionMode, operandList, instructionXYindex, nil // 🟢 Indirect or Indirect Y Succeeds
 
 		default:
-			return instructionMode, operand, instructionXYindex, errors.New("Unknown token for indirect op") // ❌ Fails
+			return instructionMode, operandList, instructionXYindex, errors.New("Unknown token for indirect op") // ❌ Fails
 		}
 
 	// --------------------------------------------------------
@@ -150,7 +155,7 @@ func (p *InstructionOperandParser) getOperandModeByLeadToken(isBranch bool) (ins
 	case tokenizerSpec.DELIMITER_hash:
 		err = p.eatFreelyAndAdvance(tokenizerSpec.DELIMITER_hash)
 		if err != nil {
-			return instructionMode, operand, instructionXYindex, err // ❌ Fails
+			return instructionMode, operandList, instructionXYindex, err // ❌ Fails
 		}
 		instructionMode = instructionData.IMM
 
@@ -161,7 +166,7 @@ func (p *InstructionOperandParser) getOperandModeByLeadToken(isBranch bool) (ins
 		if p.lookaheadValue == "<" {
 			err = p.eatFreelyAndAdvance(tokenizerSpec.OPERATOR_relational)
 			if err != nil {
-				return instructionMode, operand, instructionXYindex, err // ❌ Fails
+				return instructionMode, operandList, instructionXYindex, err // ❌ Fails
 			}
 			instructionMode = instructionData.ZP
 		}
@@ -181,9 +186,9 @@ func (p *InstructionOperandParser) getOperandModeByLeadToken(isBranch bool) (ins
 	// ````````````````````````````````````````````````````````
 	// Finally, parse the operand for non-indirect modes
 
-	operand, err = p.GetFirstOperandOnly()
+	operandList, err = p.GetFirstOperandOnly()
 	if err != nil {
-		return instructionMode, operand, instructionXYindex, err // ❌ Fails
+		return instructionMode, operandList, instructionXYindex, err // ❌ Fails
 	}
 
 	// --------------------------------------------------------
@@ -191,26 +196,26 @@ func (p *InstructionOperandParser) getOperandModeByLeadToken(isBranch bool) (ins
 
 	switch p.lookaheadType {
 	case tokenizerSpec.None:
-		return instructionMode, operand, instructionXYindex, nil // 🟢 No index Succeeds
+		return instructionMode, operandList, instructionXYindex, nil // 🟢 No index Succeeds
 	case tokenizerSpec.DELIMITER_comma:
 		err = p.eatAndAdvance(tokenizerSpec.DELIMITER_comma)
 		if err != nil {
-			return instructionMode, operand, instructionXYindex, err // ❌ Fails
+			return instructionMode, operandList, instructionXYindex, err // ❌ Fails
 		}
 		err = p.checkIfXYIndes()
 		if err != nil {
-			return instructionMode, operand, instructionXYindex, err // ❌ Fails
+			return instructionMode, operandList, instructionXYindex, err // ❌ Fails
 		}
 		instructionXYindex = p.lookaheadType
 		err = p.eatAndAdvance(instructionXYindex)
 		if err != nil {
-			return instructionMode, operand, instructionXYindex, err // ❌ Fails
+			return instructionMode, operandList, instructionXYindex, err // ❌ Fails
 		}
-		return instructionMode, operand, instructionXYindex, nil // 🟢 Index Succeeds
+		return instructionMode, operandList, instructionXYindex, nil // 🟢 Index Succeeds
 
 	}
 
-	return instructionMode, operand, instructionXYindex, nil // 🟢 Succeeds for now
+	return instructionMode, operandList, instructionXYindex, nil // 🟢 Succeeds for now
 
 }
 
@@ -266,24 +271,14 @@ func (p *InstructionOperandParser) checkIfXYIndes() error {
 // +++++++++++++++++
 // Operand wants to use an X/Y index. See if index is used properly and eat it
 func (p *InstructionOperandParser) checkModeSupportsXY(instructionMode instructionData.InstructionModes, instructionIndex tokenizerSpec.TokenType) (instructionData.InstructionModes, error) {
-	switch instructionMode {
-	case instructionData.ABS:
-		if instructionIndex == tokenizerSpec.REGISTER_X {
-			return instructionData.ABS_X, nil
-		}
-		return instructionData.ABS_Y, nil
-	case instructionData.IND:
-		if instructionIndex == tokenizerSpec.REGISTER_X {
-			return instructionData.IND_X, nil
-		}
-		return instructionData.IND_Y, nil
-	case instructionData.ZP:
-		if instructionIndex == tokenizerSpec.REGISTER_X {
-			return instructionData.ZP_X, nil
-		}
-		return instructionData.ZP_Y, nil
+	xyMode, ok := instructionData.ModesWithXYIndexes[instructionMode]
 
-	default:
-		return instructionMode, errors.New("Index cannot be used with target mode")
+	if ok {
+		if instructionIndex == tokenizerSpec.REGISTER_X {
+			return xyMode.X, nil
+		}
+		return xyMode.Y, nil
 	}
+
+	return instructionMode, errors.New("X or Y indexes cannot be used with target mode")
 }

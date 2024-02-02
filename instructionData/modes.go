@@ -41,6 +41,17 @@ var InstructionModeDetails = map[InstructionModes]ModeInfo{
 	ZP_Y:  {abbrev: "ZP_Y", description: "Zero Page,Y"},
 }
 
+type xyConvert struct {
+	X InstructionModes
+	Y InstructionModes
+}
+
+var ModesWithXYIndexes = map[InstructionModes]xyConvert{
+	ABS: {X: ABS_X, Y: ABS_Y},
+	IND: {X: IND_X, Y: IND_Y},
+	ZP:  {X: ZP_X, Y: ZP_Y},
+}
+
 var impliedModes = []InstructionModes{IMPL}
 var branchModes = []InstructionModes{REL, IMM}
 var accumModModes = []InstructionModes{IMM, ZP, ZP_X, ABS, ABS_X, ABS_Y, IND_X, IND_Y}

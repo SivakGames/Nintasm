@@ -19,24 +19,27 @@ type OperandParser struct {
 
 // Used by instructions.  Will just get the first operand found (if any)
 // Doing it this way will make parsing potential indexes earier
-func (p *OperandParser) GetFirstOperandOnly() (Node, error) {
+func (p *OperandParser) GetFirstOperandOnly() ([]Node, error) {
+	operandList := []Node{}
+
 	var firstOperand Node = operandFactory.EmptyNode()
 
 	//No operands at all
 	if p.lookaheadType == tokenizerSpec.None {
-		return firstOperand, nil // 🟢 Succeeds
+		return operandList, nil // 🟢 Succeeds
 	}
 	//No commas at the beginning...
 	if p.lookaheadType == tokenizerSpec.DELIMITER_comma {
-		return firstOperand, errors.New("First operand cannot be a comma!") // ❌ Fails
+		return operandList, errors.New("First operand cannot be a comma!") // ❌ Fails
 	}
 
 	firstOperand, err := p.operandStatementList()
 	if err != nil {
-		return firstOperand, err // ❌ Fails
+		return operandList, err // ❌ Fails
 	}
+	operandList = append(operandList, firstOperand)
 
-	return firstOperand, nil // 🟢 Succeeds
+	return operandList, nil // 🟢 Succeeds
 }
 
 //=============================================
@@ -400,7 +403,7 @@ func (p *OperandParser) _logicalExpression(builderName func() (Node, error), ope
 		if err != nil {
 			return operandFactory.ErrorNode(p.lookaheadValue), err // ❌ Fails
 		}
-		left = operandFactory.LogicalExpression(logicalExpressionType, logicalExpressionValue, left, right)
+		left = operandFactory.BinaryExpression(logicalExpressionType, logicalExpressionValue, left, right)
 	}
 
 	return left, nil
@@ -454,15 +457,14 @@ func (p *OperandParser) literal() (Node, error) {
 
 	switch literalType {
 	case tokenizerSpec.NUMBER_hex:
-		asInt, _ := strconv.ParseInt(literalValue[1:], 16, 64)
-		literalValue := fmt.Sprintf("%d", asInt)
-		return operandFactory.NumericLiteral(literalType, literalValue), nil
+		asNumber, _ := strconv.ParseInt(literalValue[1:], 16, 64)
+		return operandFactory.NumericLiteral(literalType, literalValue, asNumber), nil
 	case tokenizerSpec.NUMBER_binary:
-		asInt, _ := strconv.ParseInt(literalValue[1:], 2, 64)
-		literalValue := fmt.Sprintf("%d", asInt)
-		return operandFactory.NumericLiteral(literalType, literalValue), nil
+		asNumber, _ := strconv.ParseInt(literalValue[1:], 2, 64)
+		return operandFactory.NumericLiteral(literalType, literalValue, asNumber), nil
 	case tokenizerSpec.NUMBER_decimal:
-		return operandFactory.NumericLiteral(literalType, literalValue), nil
+		asNumber, _ := strconv.ParseInt(literalValue, 10, 64)
+		return operandFactory.NumericLiteral(literalType, literalValue, asNumber), nil
 	case tokenizerSpec.STRING:
 		return operandFactory.StringLiteral(literalType, literalValue), nil
 	case tokenizerSpec.BACKTICK_STRING:
