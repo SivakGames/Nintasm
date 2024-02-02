@@ -30,7 +30,7 @@ type NodeStruct struct {
 	NodeValue     string
 	NodeType      nodeType
 	AsBool        bool
-	AsNumber      int64
+	AsNumber      int
 	Left          *Node
 	Right         *Node
 	ArgumentList  *[]Node
@@ -123,7 +123,7 @@ func BacktickStringLiteral(nodeType tokenizerSpec.TokenType, nodeValue string) N
 	return node
 }
 
-func NumericLiteral(nodeType tokenizerSpec.TokenType, nodeValue string, asNumber int64) Node {
+func NumericLiteral(nodeType tokenizerSpec.TokenType, nodeValue string, asNumber int) Node {
 	node := newNode(nodeType, nodeValue, NodeTypeNumericLiteral)
 	node.AsNumber = asNumber
 	node.AsBool = asNumber != 0

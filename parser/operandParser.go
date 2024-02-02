@@ -458,13 +458,13 @@ func (p *OperandParser) literal() (Node, error) {
 	switch literalType {
 	case tokenizerSpec.NUMBER_hex:
 		asNumber, _ := strconv.ParseInt(literalValue[1:], 16, 64)
-		return operandFactory.NumericLiteral(literalType, literalValue, asNumber), nil
+		return operandFactory.NumericLiteral(literalType, literalValue, int(asNumber)), nil
 	case tokenizerSpec.NUMBER_binary:
 		asNumber, _ := strconv.ParseInt(literalValue[1:], 2, 64)
-		return operandFactory.NumericLiteral(literalType, literalValue, asNumber), nil
+		return operandFactory.NumericLiteral(literalType, literalValue, int(asNumber)), nil
 	case tokenizerSpec.NUMBER_decimal:
 		asNumber, _ := strconv.ParseInt(literalValue, 10, 64)
-		return operandFactory.NumericLiteral(literalType, literalValue, asNumber), nil
+		return operandFactory.NumericLiteral(literalType, literalValue, int(asNumber)), nil
 	case tokenizerSpec.STRING:
 		return operandFactory.StringLiteral(literalType, literalValue), nil
 	case tokenizerSpec.BACKTICK_STRING:

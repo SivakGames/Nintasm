@@ -1,6 +1,8 @@
 package interpreter
 
 import (
+	"fmt"
+	"misc/nintasm/interpreter/environment"
 	"misc/nintasm/parser/operandFactory"
 )
 
@@ -23,6 +25,10 @@ func evaluate(node Node) Node {
 		operandFactory.NodeTypeStringLiteral,
 		operandFactory.NodeTypeNumericLiteral:
 		return node
+
+	case operandFactory.NodeTypeIdentifier,
+		operandFactory.NodeTypeMemberExpression:
+		return environment.LookupInEnvironment(node.NodeValue)
 
 	case operandFactory.NodeTypeBinaryExpression:
 		left := evaluate(*node.Left)
@@ -83,7 +89,8 @@ func evaluate(node Node) Node {
 		case "!":
 			node.AsBool = !right.AsBool
 		}
-
+	default:
+		fmt.Println("UNKNOWN NODE!!!")
 	}
 
 	return node
