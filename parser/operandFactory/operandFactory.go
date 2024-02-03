@@ -73,14 +73,14 @@ func InterpretedInstructionBytes(opcode []string, value []string) []string {
 } */
 
 // """Calling a function"""
-func CallExpression(callee string, arguments []Node) Node {
+func CreateCallExpressionNode(callee string, arguments []Node) Node {
 	node := newNode(tokenizerSpec.IDENTIFIER, callee, NodeTypeCallExpression)
 	node.ArgumentList = &arguments
 	return node
 }
 
 // """Label.label expressions"""
-func MemberExpression(parent string, key string, computed bool) Node {
+func CreateMemberExpressionNode(parent string, key string, computed bool) Node {
 	var parentKey string
 	if !computed {
 		parentKey = fmt.Sprintf("%v.%v", parent, key)
@@ -94,7 +94,7 @@ func MemberExpression(parent string, key string, computed bool) Node {
 
 // """Standard binary expression"""
 // nodeValue is the operator
-func BinaryExpression(nodeType tokenizerSpec.TokenType, nodeValue string, left Node, right Node) Node {
+func CreateBinaryExpressionNode(nodeType tokenizerSpec.TokenType, nodeValue string, left Node, right Node) Node {
 	node := newNode(nodeType, nodeValue, NodeTypeBinaryExpression)
 	node.Left = &left
 	node.Right = &right
@@ -102,7 +102,7 @@ func BinaryExpression(nodeType tokenizerSpec.TokenType, nodeValue string, left N
 }
 
 // """Standard unary expression"""
-func UnaryExpression(nodeType tokenizerSpec.TokenType, nodeValue string, argument Node) Node {
+func CreateUnaryExpressionNode(nodeType tokenizerSpec.TokenType, nodeValue string, argument Node) Node {
 	node := newNode(nodeType, nodeValue, NodeTypeUnaryExpression)
 	node.Right = &argument
 	return node
@@ -111,13 +111,13 @@ func UnaryExpression(nodeType tokenizerSpec.TokenType, nodeValue string, argumen
 //===================================================
 //Types of identifiers
 
-func Identifier(nodeType tokenizerSpec.TokenType, nodeValue string) Node {
+func CreateIdentifierNode(nodeType tokenizerSpec.TokenType, nodeValue string) Node {
 	node := newNode(nodeType, nodeValue, NodeTypeIdentifier)
 	return node
 }
 
 // """Substitutions for arguments passed to macros or functions"""
-func SubstitutionId(nodeType tokenizerSpec.TokenType, nodeValue string) Node {
+func CreateSubstitutionIdNode(nodeType tokenizerSpec.TokenType, nodeValue string) Node {
 	capturedString := nodeValue[1:]
 	adjustedString := fmt.Sprintf("\\%v", capturedString)
 	node := newNode(nodeType, adjustedString, NodeTypeSubstitutionID)
@@ -128,12 +128,31 @@ func SubstitutionId(nodeType tokenizerSpec.TokenType, nodeValue string) Node {
 //Literals
 
 // Numbers
-func NumericLiteral(nodeType tokenizerSpec.TokenType, nodeValue string, asNumber int) Node {
+func CreateNumericLiteralNode(nodeType tokenizerSpec.TokenType, nodeValue string, asNumber int) Node {
 	node := newNode(nodeType, nodeValue, NodeTypeNumericLiteral)
 	node.AsNumber = asNumber
 	node.Resolved = true
 	return node
 }
+
+// Any string in 'single' or "double" quotes
+func CreateStringLiteralNode(nodeType tokenizerSpec.TokenType, nodeValue string) Node {
+	capturedString := nodeValue[1 : len(nodeValue)-1]
+	node := newNode(nodeType, capturedString, NodeTypeStringLiteral)
+	node.Resolved = true
+	return node
+}
+
+// Any string in `backticks` - These will still need to be resolved via interpreter
+func CreateBacktickStringLiteralNode(nodeType tokenizerSpec.TokenType, nodeValue string) Node {
+	capturedString := nodeValue[1 : len(nodeValue)-1]
+	capturedString = strings.TrimSpace(capturedString)
+	node := newNode(nodeType, capturedString, NodeTypeBacktickStringLiteral)
+	return node
+}
+
+//->->->->->->->->->->->->->->->->->->->->->->->->->->
+// Conversions
 
 func ConvertNodeToNumericLiteral(node *Node) {
 	node.NodeType = NodeTypeNumericLiteral
@@ -155,20 +174,4 @@ func ConvertNodeToBooleanLiteral(node *Node) {
 	}
 	node.Resolved = true
 	return
-}
-
-// Any string in 'single' or "double" quotes
-func StringLiteral(nodeType tokenizerSpec.TokenType, nodeValue string) Node {
-	capturedString := nodeValue[1 : len(nodeValue)-1]
-	node := newNode(nodeType, capturedString, NodeTypeStringLiteral)
-	node.Resolved = true
-	return node
-}
-
-// Any string in `backticks` - These will still need to be resolved via interpreter
-func BacktickStringLiteral(nodeType tokenizerSpec.TokenType, nodeValue string) Node {
-	capturedString := nodeValue[1 : len(nodeValue)-1]
-	capturedString = strings.TrimSpace(capturedString)
-	node := newNode(nodeType, capturedString, NodeTypeBacktickStringLiteral)
-	return node
 }

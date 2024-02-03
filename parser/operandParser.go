@@ -203,7 +203,8 @@ func (p *OperandParser) instructionPrefix() (Node, error) {
 		checkXYfollowup = true
 	}
 
-	//---------------------
+	//-------------------------------------
+	//-------------------------------------
 
 	if checkXYfollowup && p.lookaheadType == tokenizerSpec.DELIMITER_comma {
 		xyIndex, err = p.checkInstructionXYIndex()
@@ -327,7 +328,7 @@ func (p *OperandParser) unaryExpression() (Node, error) {
 			if err != nil {
 				return operandFactory.ErrorNode(p.lookaheadValue), err // ❌ Fails
 			}
-			return operandFactory.UnaryExpression(unaryType, unaryValue, argument), nil
+			return operandFactory.CreateUnaryExpressionNode(unaryType, unaryValue, argument), nil
 		}
 	}
 	return p.callMemberExpression()
@@ -367,7 +368,7 @@ func (p *OperandParser) _callExpression(callee string) (Node, error) {
 		return operandFactory.ErrorNode(p.lookaheadValue), err // ❌ Fails
 	}
 
-	callExpr := operandFactory.CallExpression(callee, arguments)
+	callExpr := operandFactory.CreateCallExpressionNode(callee, arguments)
 
 	// ⚠️ TODO: I forgot why this was in the original assembler...
 	/* if p.lookaheadType == tokenizerSpec.DELIMITER_leftParenthesis {
@@ -474,7 +475,7 @@ func (p *OperandParser) memberExpression() (Node, error) {
 		if err != nil {
 			return operandFactory.ErrorNode(p.lookaheadValue), err // ❌ Fails
 		}
-		return operandFactory.MemberExpression(parent, key, false), nil
+		return operandFactory.CreateMemberExpressionNode(parent, key, false), nil
 	}
 
 	return result, nil
@@ -530,7 +531,7 @@ func (p *OperandParser) _logicalExpression(builderName func() (Node, error), ope
 		if err != nil {
 			return operandFactory.ErrorNode(p.lookaheadValue), err // ❌ Fails
 		}
-		left = operandFactory.BinaryExpression(logicalExpressionType, logicalExpressionValue, left, right)
+		left = operandFactory.CreateBinaryExpressionNode(logicalExpressionType, logicalExpressionValue, left, right)
 	}
 
 	return left, nil
@@ -585,23 +586,23 @@ func (p *OperandParser) literal() (Node, error) {
 	switch literalType {
 	case tokenizerSpec.NUMBER_hex:
 		asNumber, _ := strconv.ParseInt(literalValue[1:], 16, 64)
-		return operandFactory.NumericLiteral(literalType, literalValue, int(asNumber)), nil
+		return operandFactory.CreateNumericLiteralNode(literalType, literalValue, int(asNumber)), nil
 	case tokenizerSpec.NUMBER_binary:
 		asNumber, _ := strconv.ParseInt(literalValue[1:], 2, 64)
-		return operandFactory.NumericLiteral(literalType, literalValue, int(asNumber)), nil
+		return operandFactory.CreateNumericLiteralNode(literalType, literalValue, int(asNumber)), nil
 	case tokenizerSpec.NUMBER_decimal:
 		asNumber, _ := strconv.ParseInt(literalValue, 10, 64)
-		return operandFactory.NumericLiteral(literalType, literalValue, int(asNumber)), nil
+		return operandFactory.CreateNumericLiteralNode(literalType, literalValue, int(asNumber)), nil
 	case tokenizerSpec.STRING:
-		return operandFactory.StringLiteral(literalType, literalValue), nil
+		return operandFactory.CreateStringLiteralNode(literalType, literalValue), nil
 	case tokenizerSpec.BACKTICK_STRING:
-		return operandFactory.BacktickStringLiteral(literalType, literalValue), nil
+		return operandFactory.CreateBacktickStringLiteralNode(literalType, literalValue), nil
 	case tokenizerSpec.SUBSTITUTION_numericID:
-		return operandFactory.SubstitutionId(literalType, literalValue), nil
+		return operandFactory.CreateSubstitutionIdNode(literalType, literalValue), nil
 	case tokenizerSpec.SUBSTITUTION_stringID:
-		return operandFactory.SubstitutionId(literalType, literalValue), nil
+		return operandFactory.CreateSubstitutionIdNode(literalType, literalValue), nil
 	case tokenizerSpec.SUBSTITUTION_numMacroArgs:
-		return operandFactory.SubstitutionId(literalType, literalValue), nil
+		return operandFactory.CreateSubstitutionIdNode(literalType, literalValue), nil
 	}
 	// ❌ Fails
 	return operandFactory.ErrorNode(p.lookaheadValue), errors.New("\x1b[31mERROR!!!!!!!!\x1b[0m")
@@ -616,5 +617,5 @@ func (p *OperandParser) identifier() (Node, error) {
 		return operandFactory.ErrorNode(p.lookaheadValue), err // ❌ Fails
 	}
 
-	return operandFactory.Identifier(literalType, literalValue), nil
+	return operandFactory.CreateIdentifierNode(literalType, literalValue), nil
 }

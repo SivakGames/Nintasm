@@ -13,11 +13,11 @@ func main() {
 
 func process() {
 	start := time.Now()
-	lines := []string{" lda 5>2"}
-	//lines := make([]string, 84000)
-	//for i := range lines {
-	//	lines[i] = " lda [1+2*5/4*8+166--3], y "
-	//}
+	//lines := []string{" lda 23423"}
+	lines := make([]string, 35000)
+	for i := range lines {
+		lines[i] = " lda [24], x "
+	}
 
 	lineInitParzival := parser.NewInitialLineParser()
 	lineOperationParzival := parser.NewOperationParser()
@@ -54,7 +54,12 @@ func process() {
 				fmt.Println(operandParserErr)
 				return
 			}
-			instructionOperandParzival.Process(operationValue)
+			operandParserErr = instructionOperandParzival.Process(operationValue)
+			if operandParserErr != nil {
+				fmt.Println(operandParserErr)
+				return
+			}
+
 		//	case parserTypes.Macro:
 		//		fmt.Println("Mack")
 		//		fmt.Println(optype, opval, opPos)

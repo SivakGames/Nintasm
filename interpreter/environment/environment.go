@@ -23,7 +23,7 @@ func NewEnvironment(envName string) Environment {
 // ----------------------------------
 
 func generateNumericNodeForEnvironment(number int) Node {
-	return operandFactory.NumericLiteral(tokenizerSpec.NUMBER_decimal, fmt.Sprintf("%d", number), number)
+	return operandFactory.CreateNumericLiteralNode(tokenizerSpec.NUMBER_decimal, fmt.Sprintf("%d", number), number)
 }
 
 // ----------------------------------
