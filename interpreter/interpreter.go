@@ -2,6 +2,7 @@ package interpreter
 
 import (
 	"fmt"
+	enumNodeTypes "misc/nintasm/enums/nodeTypes"
 	"misc/nintasm/interpreter/environment"
 	"misc/nintasm/parser/operandFactory"
 )
@@ -10,16 +11,16 @@ type Node = operandFactory.Node
 
 func EvaluateNode(node Node) Node {
 	switch node.NodeType {
-	case operandFactory.NodeTypeEmpty,
-		operandFactory.NodeTypeStringLiteral,
-		operandFactory.NodeTypeNumericLiteral:
+	case enumNodeTypes.Empty,
+		enumNodeTypes.StringLiteral,
+		enumNodeTypes.NumericLiteral:
 		return node
 
-	case operandFactory.NodeTypeIdentifier,
-		operandFactory.NodeTypeMemberExpression:
+	case enumNodeTypes.Identifier,
+		enumNodeTypes.MemberExpression:
 		return environment.LookupInEnvironment(node.NodeValue)
 
-	case operandFactory.NodeTypeBinaryExpression:
+	case enumNodeTypes.BinaryExpression:
 		left := EvaluateNode(*node.Left)
 		right := EvaluateNode(*node.Right)
 		operation := node.NodeValue
@@ -72,7 +73,7 @@ func EvaluateNode(node Node) Node {
 			operandFactory.ConvertNodeToBooleanLiteral(&node)
 		}
 
-	case operandFactory.NodeTypeUnaryExpression:
+	case enumNodeTypes.UnaryExpression:
 		right := EvaluateNode(*node.Right)
 		operation := node.NodeValue
 		node.Right = nil

@@ -1,84 +1,69 @@
 package instructionData
 
-type InstructionModes int
+import enumInstructionModes "misc/nintasm/enums/instructionModes"
 
-const (
-	None InstructionModes = iota + 0
-	A
-	ABS
-	ABS_X
-	ABS_Y
-	IMM
-	IMPL
-	IND
-	IND_X
-	IND_Y
-	REL
-	ZP
-	ZP_X
-	ZP_Y
-)
+type instModes = enumInstructionModes.Def
 
 type modeDetailsKeys struct {
 	abbrev      string
 	description string
 }
 
-var InstructionModeDetails = map[InstructionModes]modeDetailsKeys{
-	None:  {abbrev: "", description: ""},
-	A:     {abbrev: "A", description: "Accumulator"},
-	ABS:   {abbrev: "ABS", description: "Absolute"},
-	ABS_X: {abbrev: "ABS_X", description: "Absolute,X"},
-	ABS_Y: {abbrev: "ABS_Y", description: "Absolute,Y"},
-	IMM:   {abbrev: "IMM", description: "Immediate"},
-	IMPL:  {abbrev: "IMPL", description: "Implied"},
-	IND:   {abbrev: "IND", description: "Indirect"},
-	IND_X: {abbrev: "IND_X", description: "Indirect,X"},
-	IND_Y: {abbrev: "IND_Y", description: "Indirect,Y"},
-	REL:   {abbrev: "REL", description: "Releative"},
-	ZP:    {abbrev: "ZP", description: "Zero Page"},
-	ZP_X:  {abbrev: "ZP_X", description: "Zero Page,X"},
-	ZP_Y:  {abbrev: "ZP_Y", description: "Zero Page,Y"},
+var InstructionModeDetails = map[enumInstructionModes.Def]modeDetailsKeys{
+	enumInstructionModes.None:  {abbrev: "", description: ""},
+	enumInstructionModes.A:     {abbrev: "A", description: "Accumulator"},
+	enumInstructionModes.ABS:   {abbrev: "ABS", description: "Absolute"},
+	enumInstructionModes.ABS_X: {abbrev: "ABS_X", description: "Absolute,X"},
+	enumInstructionModes.ABS_Y: {abbrev: "ABS_Y", description: "Absolute,Y"},
+	enumInstructionModes.IMM:   {abbrev: "IMM", description: "Immediate"},
+	enumInstructionModes.IMPL:  {abbrev: "IMPL", description: "Implied"},
+	enumInstructionModes.IND:   {abbrev: "IND", description: "Indirect"},
+	enumInstructionModes.IND_X: {abbrev: "IND_X", description: "Indirect,X"},
+	enumInstructionModes.IND_Y: {abbrev: "IND_Y", description: "Indirect,Y"},
+	enumInstructionModes.REL:   {abbrev: "REL", description: "Releative"},
+	enumInstructionModes.ZP:    {abbrev: "ZP", description: "Zero Page"},
+	enumInstructionModes.ZP_X:  {abbrev: "ZP_X", description: "Zero Page,X"},
+	enumInstructionModes.ZP_Y:  {abbrev: "ZP_Y", description: "Zero Page,Y"},
 }
 
 type xyConvert struct {
-	X InstructionModes
-	Y InstructionModes
+	X enumInstructionModes.Def
+	Y enumInstructionModes.Def
 }
 
 // The X/Y indexing modes of supported modes
-var ModesWithXYIndexes = map[InstructionModes]xyConvert{
-	ABS: {X: ABS_X, Y: ABS_Y},
-	IND: {X: IND_X, Y: IND_Y},
-	ZP:  {X: ZP_X, Y: ZP_Y},
+var ModesWithXYIndexes = map[enumInstructionModes.Def]xyConvert{
+	enumInstructionModes.ABS: {X: enumInstructionModes.ABS_X, Y: enumInstructionModes.ABS_Y},
+	enumInstructionModes.IND: {X: enumInstructionModes.IND_X, Y: enumInstructionModes.IND_Y},
+	enumInstructionModes.ZP:  {X: enumInstructionModes.ZP_X, Y: enumInstructionModes.ZP_Y},
 }
 
 // The zero page equivalent of an absolute mode
-var ABStoZP = map[InstructionModes]InstructionModes{
-	ABS:   ZP,
-	ABS_X: ZP_X,
-	ABS_Y: ZP_Y,
+var ABStoZP = map[instModes]instModes{
+	enumInstructionModes.ABS:   enumInstructionModes.ZP,
+	enumInstructionModes.ABS_X: enumInstructionModes.ZP_X,
+	enumInstructionModes.ABS_Y: enumInstructionModes.ZP_Y,
 }
 
-var impliedModes = []InstructionModes{IMPL}
-var branchModes = []InstructionModes{REL, IMM}
-var accumModModes = []InstructionModes{IMM, ZP, ZP_X, ABS, ABS_X, ABS_Y, IND_X, IND_Y}
-var shiftModes = []InstructionModes{A, ZP, ZP_X, ABS, ABS_X}
-var compareXYModes = []InstructionModes{IMM, ZP, ABS}
-var incDecModes = []InstructionModes{ZP, ZP_X, ABS, ABS_X}
-var bitModes = []InstructionModes{ZP, ABS}
-var jmpModes = []InstructionModes{ABS, IND}
-var jsrModes = []InstructionModes{ABS}
-var ldxModes = []InstructionModes{IMM, ZP, ZP_Y, ABS, ABS_Y}
-var ldyModes = []InstructionModes{IMM, ZP, ZP_X, ABS, ABS_X}
-var staModes = []InstructionModes{ZP, ZP_X, ABS, ABS_X, ABS_Y, IND_X, IND_Y}
-var stxModes = []InstructionModes{ZP, ZP_Y, ABS}
-var styModes = []InstructionModes{ZP, ZP_X, ABS}
+var impliedModes = []instModes{enumInstructionModes.IMPL}
+var branchModes = []instModes{enumInstructionModes.REL, enumInstructionModes.IMM}
+var accumModModes = []instModes{enumInstructionModes.IMM, enumInstructionModes.ZP, enumInstructionModes.ZP_X, enumInstructionModes.ABS, enumInstructionModes.ABS_X, enumInstructionModes.ABS_Y, enumInstructionModes.IND_X, enumInstructionModes.IND_Y}
+var shiftModes = []instModes{enumInstructionModes.A, enumInstructionModes.ZP, enumInstructionModes.ZP_X, enumInstructionModes.ABS, enumInstructionModes.ABS_X}
+var compareXYModes = []instModes{enumInstructionModes.IMM, enumInstructionModes.ZP, enumInstructionModes.ABS}
+var incDecModes = []instModes{enumInstructionModes.ZP, enumInstructionModes.ZP_X, enumInstructionModes.ABS, enumInstructionModes.ABS_X}
+var bitModes = []instModes{enumInstructionModes.ZP, enumInstructionModes.ABS}
+var jmpModes = []instModes{enumInstructionModes.ABS, enumInstructionModes.IND}
+var jsrModes = []instModes{enumInstructionModes.ABS}
+var ldxModes = []instModes{enumInstructionModes.IMM, enumInstructionModes.ZP, enumInstructionModes.ZP_Y, enumInstructionModes.ABS, enumInstructionModes.ABS_Y}
+var ldyModes = []instModes{enumInstructionModes.IMM, enumInstructionModes.ZP, enumInstructionModes.ZP_X, enumInstructionModes.ABS, enumInstructionModes.ABS_X}
+var staModes = []instModes{enumInstructionModes.ZP, enumInstructionModes.ZP_X, enumInstructionModes.ABS, enumInstructionModes.ABS_X, enumInstructionModes.ABS_Y, enumInstructionModes.IND_X, enumInstructionModes.IND_Y}
+var stxModes = []instModes{enumInstructionModes.ZP, enumInstructionModes.ZP_Y, enumInstructionModes.ABS}
+var styModes = []instModes{enumInstructionModes.ZP, enumInstructionModes.ZP_X, enumInstructionModes.ABS}
 
 // ======================================
 type instructionOpcodeAndSupportedModes struct {
 	BaseOpcode uint8
-	Modes      *[]InstructionModes
+	Modes      *[]instModes
 }
 
 // ======================================

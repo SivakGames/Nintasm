@@ -3,13 +3,14 @@ package parser
 import (
 	"errors"
 	"fmt"
-	"misc/nintasm/instructionData"
+	enumInstructionModes "misc/nintasm/enums/instructionModes"
 	"misc/nintasm/interpreter"
 	"misc/nintasm/parser/operandFactory"
 	"misc/nintasm/tokenizer/tokenizerSpec"
 	"strconv"
 )
 
+type instModes = enumInstructionModes.Def
 type Node = operandFactory.Node
 
 // General type for other operand parsers to borrow from
@@ -17,7 +18,7 @@ type OperandParser struct {
 	operandLine             string
 	operandPosition         int
 	ShouldParseInstructions bool
-	instructionMode         instructionData.InstructionModes
+	instructionMode         instModes
 	instructionXYIndex      tokenizerSpec.TokenType
 	Parser
 }
@@ -108,7 +109,7 @@ func (p *OperandParser) Statement() (Node, error) {
 // -------------------------------------------
 
 func (p *OperandParser) instructionPrefix() (Node, error) {
-	p.instructionMode = instructionData.ABS
+	p.instructionMode = enumInstructionModes.ABS
 	p.instructionXYIndex = tokenizerSpec.None
 	nextFunction := p.logicalOrExpression
 	xyIndex := tokenizerSpec.None
@@ -122,7 +123,7 @@ func (p *OperandParser) instructionPrefix() (Node, error) {
 	//Indirect
 
 	case tokenizerSpec.DELIMITER_leftSquareBracket:
-		p.instructionMode = instructionData.IND
+		p.instructionMode = enumInstructionModes.IND
 		err = p.eatFreelyAndAdvance(tokenizerSpec.DELIMITER_leftSquareBracket)
 		if err != nil {
 			return operandFactory.ErrorNode(p.lookaheadValue), err // ❌ Fails
@@ -164,7 +165,7 @@ func (p *OperandParser) instructionPrefix() (Node, error) {
 	//Immediate mode
 
 	case tokenizerSpec.DELIMITER_hash:
-		p.instructionMode = instructionData.IMM
+		p.instructionMode = enumInstructionModes.IMM
 		err = p.eatFreelyAndAdvance(tokenizerSpec.DELIMITER_hash)
 		if err != nil {
 			return operandFactory.ErrorNode(p.lookaheadValue), err // ❌ Fails
@@ -180,7 +181,7 @@ func (p *OperandParser) instructionPrefix() (Node, error) {
 
 	case tokenizerSpec.OPERATOR_relational:
 		if p.lookaheadValue == "<" {
-			p.instructionMode = instructionData.ZP
+			p.instructionMode = enumInstructionModes.ZP
 			err = p.eatFreelyAndAdvance(tokenizerSpec.OPERATOR_relational)
 			if err != nil {
 				return operandFactory.ErrorNode(p.lookaheadValue), err // ❌ Fails
