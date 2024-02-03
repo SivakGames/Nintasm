@@ -8,18 +8,7 @@ import (
 
 type Node = operandFactory.Node
 
-type EvaluateType int
-
-func InterpretOperands(nodes []Node) []Node {
-	for i, n := range nodes {
-		newNode := evaluate(n)
-		nodes[i] = newNode
-	}
-
-	return nodes
-}
-
-func evaluate(node Node) Node {
+func EvaluateNode(node Node) Node {
 	switch node.NodeType {
 	case operandFactory.NodeTypeEmpty,
 		operandFactory.NodeTypeStringLiteral,
@@ -31,8 +20,8 @@ func evaluate(node Node) Node {
 		return environment.LookupInEnvironment(node.NodeValue)
 
 	case operandFactory.NodeTypeBinaryExpression:
-		left := evaluate(*node.Left)
-		right := evaluate(*node.Right)
+		left := EvaluateNode(*node.Left)
+		right := EvaluateNode(*node.Right)
 		operation := node.NodeValue
 		node.Left = nil
 		node.Right = nil
@@ -73,10 +62,18 @@ func evaluate(node Node) Node {
 			node.AsBool = left.AsBool && right.AsBool
 		case "||":
 			node.AsBool = left.AsBool || right.AsBool
+		default:
+			fmt.Println("SOMETHING IS VERY WRONG")
+		}
+		switch operation {
+		case "+", "-", "*", "/", "%", "|", "&", "^", "<<", ">>":
+			operandFactory.ConvertNodeToNumericLiteral(&node)
+		case "<", "<=", ">", ">=", "==", "!=", "&&", "||":
+			operandFactory.ConvertNodeToBooleanLiteral(&node)
 		}
 
 	case operandFactory.NodeTypeUnaryExpression:
-		right := evaluate(*node.Right)
+		right := EvaluateNode(*node.Right)
 		operation := node.NodeValue
 		node.Right = nil
 		switch operation {
@@ -88,7 +85,17 @@ func evaluate(node Node) Node {
 			node.AsNumber = ^right.AsNumber
 		case "!":
 			node.AsBool = !right.AsBool
+		default:
+			fmt.Println("SOMETHING IS VERY WRONG")
 		}
+
+		switch operation {
+		case "+", "-", "~":
+			operandFactory.ConvertNodeToNumericLiteral(&node)
+		case "!":
+			operandFactory.ConvertNodeToBooleanLiteral(&node)
+		}
+
 	default:
 		fmt.Println("UNKNOWN NODE!!!")
 	}

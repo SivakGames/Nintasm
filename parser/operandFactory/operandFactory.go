@@ -18,17 +18,20 @@ const (
 	NodeTypeLogicalExpression
 	NodeTypeMemberExpression
 	NodeTypeUnaryExpression
+
 	NodeTypeBacktickStringLiteral
+	NodeTypeBooleanLiteral
+	NodeTypeIdentifier
 	NodeTypeNumericLiteral
 	NodeTypeStringLiteral
-	NodeTypeIdentifier
 	NodeTypeSubstitutionID
 )
 
 type NodeStruct struct {
+	NodeType      nodeType
+	Resolved      bool
 	NodeTokenType tokenizerSpec.TokenType
 	NodeValue     string
-	NodeType      nodeType
 	AsBool        bool
 	AsNumber      int
 	Left          *Node
@@ -106,29 +109,7 @@ func UnaryExpression(nodeType tokenizerSpec.TokenType, nodeValue string, argumen
 }
 
 //===================================================
-//Literals
-
-// """Any string in single or double quotes"""
-func StringLiteral(nodeType tokenizerSpec.TokenType, nodeValue string) Node {
-	capturedString := nodeValue[1 : len(nodeValue)-1]
-	node := newNode(nodeType, capturedString, NodeTypeStringLiteral)
-	return node
-}
-
-// """Any string in `backticks`"""
-func BacktickStringLiteral(nodeType tokenizerSpec.TokenType, nodeValue string) Node {
-	capturedString := nodeValue[1 : len(nodeValue)-1]
-	capturedString = strings.TrimSpace(capturedString)
-	node := newNode(nodeType, capturedString, NodeTypeBacktickStringLiteral)
-	return node
-}
-
-func NumericLiteral(nodeType tokenizerSpec.TokenType, nodeValue string, asNumber int) Node {
-	node := newNode(nodeType, nodeValue, NodeTypeNumericLiteral)
-	node.AsNumber = asNumber
-	node.AsBool = asNumber != 0
-	return node
-}
+//Types of identifiers
 
 func Identifier(nodeType tokenizerSpec.TokenType, nodeValue string) Node {
 	node := newNode(nodeType, nodeValue, NodeTypeIdentifier)
@@ -140,5 +121,54 @@ func SubstitutionId(nodeType tokenizerSpec.TokenType, nodeValue string) Node {
 	capturedString := nodeValue[1:]
 	adjustedString := fmt.Sprintf("\\%v", capturedString)
 	node := newNode(nodeType, adjustedString, NodeTypeSubstitutionID)
+	return node
+}
+
+//===================================================
+//Literals
+
+// Numbers
+func NumericLiteral(nodeType tokenizerSpec.TokenType, nodeValue string, asNumber int) Node {
+	node := newNode(nodeType, nodeValue, NodeTypeNumericLiteral)
+	node.AsNumber = asNumber
+	node.Resolved = true
+	return node
+}
+
+func ConvertNodeToNumericLiteral(node *Node) {
+	node.NodeType = NodeTypeNumericLiteral
+	node.NodeTokenType = tokenizerSpec.NUMBER_decimal
+	node.NodeValue = fmt.Sprintf("%d", node.AsNumber)
+	node.Resolved = true
+	return
+}
+
+func ConvertNodeToBooleanLiteral(node *Node) {
+	node.NodeType = NodeTypeBooleanLiteral
+	node.NodeTokenType = tokenizerSpec.None
+	if node.AsBool {
+		node.NodeValue = "1"
+		node.AsNumber = 1
+	} else {
+		node.NodeValue = "0"
+		node.AsNumber = 0
+	}
+	node.Resolved = true
+	return
+}
+
+// Any string in 'single' or "double" quotes
+func StringLiteral(nodeType tokenizerSpec.TokenType, nodeValue string) Node {
+	capturedString := nodeValue[1 : len(nodeValue)-1]
+	node := newNode(nodeType, capturedString, NodeTypeStringLiteral)
+	node.Resolved = true
+	return node
+}
+
+// Any string in `backticks` - These will still need to be resolved via interpreter
+func BacktickStringLiteral(nodeType tokenizerSpec.TokenType, nodeValue string) Node {
+	capturedString := nodeValue[1 : len(nodeValue)-1]
+	capturedString = strings.TrimSpace(capturedString)
+	node := newNode(nodeType, capturedString, NodeTypeBacktickStringLiteral)
 	return node
 }

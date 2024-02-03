@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"misc/nintasm/instructionData"
-	"misc/nintasm/interpreter"
 	"misc/nintasm/tokenizer/tokenizerSpec"
 	"strings"
 )
@@ -22,10 +21,10 @@ func (p *InstructionOperandParser) Process(operationValue string) {
 	var instructionMode instructionData.InstructionModes
 
 	operandList := []Node{}
-	// The instruction itself (in upper case)
-	instruction := strings.ToUpper(operationValue)
+	// The instructionName itself (in upper case)
+	instructionName := strings.ToUpper(operationValue)
 	// What modes this instruction can use
-	allowedModesForInstruction := instructionData.AllowedModes[instruction]
+	allowedModesForInstruction := instructionData.AllowedModes[instructionName]
 
 	isBranch := false
 	instructionXYIndex := tokenizerSpec.None
@@ -69,149 +68,15 @@ func (p *InstructionOperandParser) Process(operationValue string) {
 	}
 
 	fmt.Println(instructionData.InstructionModeDetails[instructionMode])
+	fmt.Println(operandList)
 
 	// TODO: Convert to ZP?
 	// TODO: Check if instruction itself supports mode
 
-	nodez := interpreter.InterpretOperands(operandList)
-	_ = nodez
 	//fmt.Println("PARSING SUCCESS", nodez[0])
 
 	return
 }
-
-// See what token (if any) precedes the operand. This will determine general mode...
-//func (p *InstructionOperandParser) getOperandModeByLeadToken(isBranch bool) (instructionData.InstructionModes, []Node, tokenizerSpec.TokenType, error) {
-//instructionMode := instructionData.None
-//instructionXYindex := tokenizerSpec.None
-//var err error = nil
-//var operandList []Node
-
-//switch p.lookaheadType {
-
-// --------------------------------------------------------
-// [ for indirect addressing.
-// *This is more complex in assuming an operand wrapped in braces
-//  so most handling is done here.  This will also directly return the operand
-
-//	case tokenizerSpec.DELIMITER_leftSquareBracket:
-//		instructionMode = instructionData.IND
-//		var operand Node
-//
-//		err = p.eatFreelyAndAdvance(tokenizerSpec.DELIMITER_leftSquareBracket)
-//		if err != nil {
-//			return instructionMode, operandList, instructionXYindex, err // ❌ Fails
-//		}
-//
-//		//Get the operand
-//		operand, err = p.Statement()
-//		if err != nil {
-//			return instructionMode, operandList, instructionXYindex, err // ❌ Fails
-//		}
-//		operandList = append(operandList, operand)
-//
-//		switch p.lookaheadType {
-//		case tokenizerSpec.None:
-//			return instructionMode, operandList, instructionXYindex, errors.New("Indirect End of input") // ❌ Fails
-//
-//		// xxxxxxxxxxxxxxx
-//		// Indirect X
-//		case tokenizerSpec.DELIMITER_comma:
-//			err = p.checkValidXYIndexes(tokenizerSpec.REGISTER_X)
-//			if err != nil {
-//				return instructionMode, operandList, instructionXYindex, err // ❌ Fails
-//			}
-//			err = p.eatFreelyAndAdvance(tokenizerSpec.DELIMITER_rightSquareBracket)
-//			if err != nil {
-//				return instructionMode, operandList, instructionXYindex, err // ❌ Fails
-//			}
-//			instructionXYindex = tokenizerSpec.REGISTER_X
-//			//instructionMode = instructionData.IND_X
-//			return instructionMode, operandList, instructionXYindex, nil // 🟢 Indirect X Succeeds
-//
-//		// yyyyyyyyyyyyyy
-//		// Indirect only or Indirect Y
-//		case tokenizerSpec.DELIMITER_rightSquareBracket:
-//			err = p.eatFreelyAndAdvance(tokenizerSpec.DELIMITER_rightSquareBracket)
-//			if err != nil {
-//				return instructionMode, operandList, instructionXYindex, err // ❌ Fails
-//			}
-//			if p.lookaheadType != tokenizerSpec.None {
-//				err = p.checkValidXYIndexes(tokenizerSpec.REGISTER_Y)
-//				if err != nil {
-//					return instructionMode, operandList, instructionXYindex, err // ❌ Fails
-//				}
-//				instructionXYindex = tokenizerSpec.REGISTER_Y
-//			}
-//			return instructionMode, operandList, instructionXYindex, nil // 🟢 Indirect or Indirect Y Succeeds
-//
-//		default:
-//			return instructionMode, operandList, instructionXYindex, errors.New("Unknown token for indirect op") // ❌ Fails
-//		}
-
-// --------------------------------------------------------
-//# for immediate mode
-
-//	case tokenizerSpec.DELIMITER_hash:
-//		err = p.eatFreelyAndAdvance(tokenizerSpec.DELIMITER_hash)
-//		if err != nil {
-//			return instructionMode, operandList, instructionXYindex, err // ❌ Fails
-//		}
-//		instructionMode = instructionData.IMM
-
-// --------------------------------------------------------
-// < for enforced ZP (if auto ZP is off this will still force ZP if desired)
-
-//	case tokenizerSpec.OPERATOR_relational:
-//		if p.lookaheadValue == "<" {
-//			err = p.eatFreelyAndAdvance(tokenizerSpec.OPERATOR_relational)
-//			if err != nil {
-//				return instructionMode, operandList, instructionXYindex, err // ❌ Fails
-//			}
-//			instructionMode = instructionData.ZP
-//		}
-// ❌ Will fail later - main parser will catch the bad token
-
-// --------------------------------------------------------
-// Anything else is absolute or relative (branches)
-
-/* default:
-	if isBranch {
-		instructionMode = instructionData.REL
-	} else {
-		instructionMode = instructionData.ABS
-	}
-} */
-
-// ````````````````````````````````````````````````````````
-// Finally, parse the operand for non-indirect modes
-
-// --------------------------------------------------------
-// Check for followups (X,Y indexes)
-
-/*	switch p.lookaheadType {
-	case tokenizerSpec.None:
-		return instructionMode, operandList, instructionXYindex, nil // 🟢 No index Succeeds
-	case tokenizerSpec.DELIMITER_comma:
-		err = p.eatAndAdvance(tokenizerSpec.DELIMITER_comma)
-		if err != nil {
-			return instructionMode, operandList, instructionXYindex, err // ❌ Fails
-		}
-		err = p.checkIfXYIndes()
-		if err != nil {
-			return instructionMode, operandList, instructionXYindex, err // ❌ Fails
-		}
-		instructionXYindex = p.lookaheadType
-		err = p.eatAndAdvance(instructionXYindex)
-		if err != nil {
-			return instructionMode, operandList, instructionXYindex, err // ❌ Fails
-		}
-		return instructionMode, operandList, instructionXYindex, nil // 🟢 Index Succeeds
-	} */
-
-//return instructionMode, operandList, instructionXYindex, nil // 🟢 Succeeds for now
-
-//}
 
 // +++++++++++++++++
 
@@ -224,43 +89,6 @@ func (p *InstructionOperandParser) checkIfBranchInstruction(modes *[]instruction
 	}
 	return false
 }
-
-// +++++++++++++++++
-
-// Operand wants to use an X/Y index. See if index is used properly and eat it
-/* func (p *InstructionOperandParser) checkValidXYIndexes(targetIndex tokenizerSpec.TokenType) error {
-
-	err := p.eatAndAdvance(tokenizerSpec.DELIMITER_comma)
-	if err != nil {
-		return err
-	}
-	if p.lookaheadType == tokenizerSpec.None {
-		return errors.New("Index is MISSING!")
-	}
-	err = p.checkIfXYIndes()
-	if err != nil {
-		return err
-	}
-	if p.lookaheadType != targetIndex {
-		return errors.New("Wrong index used for operation")
-	}
-	err = p.eatAndAdvance(targetIndex)
-	if err != nil {
-		return err
-	}
-
-	return nil
-} */
-
-// +++++++++++++++++
-
-// Operand wants to use an X/Y index. See if index is used properly and eat it
-/* func (p *InstructionOperandParser) checkIfXYIndes() error {
-	if p.lookaheadType != tokenizerSpec.REGISTER_X && p.lookaheadType != tokenizerSpec.REGISTER_Y {
-		return errors.New("Invalid index value")
-	}
-	return nil
-}*/
 
 // +++++++++++++++++
 // Operand wants to use an X/Y index. See if index is used properly and eat it

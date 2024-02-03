@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"misc/nintasm/instructionData"
+	"misc/nintasm/interpreter"
 	"misc/nintasm/parser/operandFactory"
 	"misc/nintasm/tokenizer/tokenizerSpec"
 	"strconv"
@@ -72,12 +73,15 @@ func (p *OperandParser) operandStatementList() (Node, error) {
 	return p.statementList(tokenizerSpec.DELIMITER_comma)
 }
 
+// =============================================
 // Get statements
 func (p *OperandParser) statementList(stopTokenType tokenizerSpec.TokenType) (Node, error) {
 	statementList, err := p.Statement()
 	if err != nil {
 		return statementList, err
 	}
+
+	statementList = interpreter.EvaluateNode(statementList)
 
 	//Subsequent operands
 	for p.lookaheadType != tokenizerSpec.None && p.lookaheadType != stopTokenType {
@@ -86,6 +90,8 @@ func (p *OperandParser) statementList(stopTokenType tokenizerSpec.TokenType) (No
 
 	return statementList, nil
 }
+
+// =============================================
 
 func (p *OperandParser) Statement() (Node, error) {
 	if p.lookaheadType == tokenizerSpec.None {
@@ -167,6 +173,7 @@ func (p *OperandParser) instructionPrefix() (Node, error) {
 		if err != nil {
 			return operandFactory.ErrorNode(p.lookaheadValue), err // ❌ Fails
 		}
+		checkXYfollowup = true
 
 	//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 	//Explicit ZP mode
@@ -185,8 +192,8 @@ func (p *OperandParser) instructionPrefix() (Node, error) {
 		}
 		checkXYfollowup = true
 
-		//-------------------------------------
-		//Absolute mode
+	//-------------------------------------
+	//Absolute mode
 
 	default:
 		statement, err = nextFunction()
@@ -207,7 +214,6 @@ func (p *OperandParser) instructionPrefix() (Node, error) {
 	p.instructionXYIndex = xyIndex
 
 	if p.lookaheadType != tokenizerSpec.None {
-		fmt.Println(p.lookaheadValue)
 		return statement, errors.New("No more tokens can follow this instruction's operands!")
 	}
 
