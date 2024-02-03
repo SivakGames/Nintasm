@@ -3,15 +3,17 @@ package parser
 import (
 	"errors"
 	"fmt"
+	enumTokenTypes "misc/nintasm/enums/tokenTypes"
 	"misc/nintasm/tokenizer"
-	"misc/nintasm/tokenizer/tokenizerSpec"
 )
+
+type tokenEnum = enumTokenTypes.Def
 
 const OPERAND_TARGET_TOKENIZER = "operand"
 
 type Parser struct {
 	hasMore        bool
-	lookaheadType  tokenizerSpec.TokenType
+	lookaheadType  tokenEnum
 	lookaheadValue string
 	tokenizer      tokenizer.Tokenizer
 }
@@ -19,7 +21,7 @@ type Parser struct {
 func New() Parser {
 	return Parser{
 		hasMore:        false,
-		lookaheadType:  tokenizerSpec.None,
+		lookaheadType:  enumTokenTypes.None,
 		lookaheadValue: "",
 		tokenizer:      tokenizer.New(),
 	}
@@ -47,8 +49,8 @@ func (p *Parser) advanceToNext() error {
 }
 
 // See if the next token type is the desired token to follow
-func (p *Parser) eat(desiredTokenType tokenizerSpec.TokenType) error {
-	if p.lookaheadType == tokenizerSpec.None {
+func (p *Parser) eat(desiredTokenType tokenEnum) error {
+	if p.lookaheadType == enumTokenTypes.None {
 		return errors.New("UNEXPECTED END OF INPUT")
 	}
 	if p.lookaheadType != desiredTokenType {
@@ -58,7 +60,7 @@ func (p *Parser) eat(desiredTokenType tokenizerSpec.TokenType) error {
 	return nil
 }
 
-func (p *Parser) eatAndAdvance(desiredTokenType tokenizerSpec.TokenType) error {
+func (p *Parser) eatAndAdvance(desiredTokenType tokenEnum) error {
 	err := p.eat(desiredTokenType)
 	if err != nil {
 		return err
@@ -71,7 +73,7 @@ func (p *Parser) eatAndAdvance(desiredTokenType tokenizerSpec.TokenType) error {
 }
 
 // The token is guaranteed
-func (p *Parser) eatFreelyAndAdvance(desiredTokenType tokenizerSpec.TokenType) error {
+func (p *Parser) eatFreelyAndAdvance(desiredTokenType tokenEnum) error {
 	_ = p.eat(desiredTokenType)
 	err := p.advanceToNext()
 	if err != nil {

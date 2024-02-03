@@ -3,8 +3,8 @@ package parser
 import (
 	"errors"
 	"fmt"
+	enumTokenTypes "misc/nintasm/enums/tokenTypes"
 	"misc/nintasm/parser/parserTypes"
-	"misc/nintasm/tokenizer/tokenizerSpec"
 )
 
 const LINE_OPERATION_TARGET_TOKENIZER = "startLine"
@@ -13,7 +13,7 @@ const LINE_OPERATION_TARGET_TOKENIZER = "startLine"
 type OperationParser struct {
 	Parser
 	operationLabel       string
-	operationType        tokenizerSpec.TokenType
+	operationType        tokenEnum
 	operationValue       string
 	operationSimpleType  parserTypes.SimpleOperation
 	operandStartPosition int
@@ -23,7 +23,7 @@ type OperationParser struct {
 func NewOperationParser() OperationParser {
 	return OperationParser{
 		operationLabel:       "",
-		operationType:        tokenizerSpec.None,
+		operationType:        enumTokenTypes.None,
 		operationValue:       "",
 		operationSimpleType:  parserTypes.None,
 		operandStartPosition: 0,
@@ -32,14 +32,14 @@ func NewOperationParser() OperationParser {
 
 // ++++++++++++++++++++++
 // 🛠️ Get info about the successfully-parsed operation
-func (p *OperationParser) GetOperationDetails() (tokenizerSpec.TokenType, parserTypes.SimpleOperation, string, string, int) {
+func (p *OperationParser) GetOperationDetails() (tokenEnum, parserTypes.SimpleOperation, string, string, int) {
 	return p.operationType, p.operationSimpleType, p.operationValue, p.operationLabel, p.operandStartPosition
 }
 
 // ====================================================================
 func (p *OperationParser) Process(line string) (err error) {
 	p.operationLabel = ""
-	p.operationType = tokenizerSpec.None
+	p.operationType = enumTokenTypes.None
 	p.operationValue = ""
 	p.operationSimpleType = parserTypes.None
 	p.operandStartPosition = 0
@@ -62,7 +62,7 @@ func (p *OperationParser) Process(line string) (err error) {
 
 // ====================================================================
 func (p *OperationParser) determineLabelOrOperation() error {
-	if p.lookaheadType != tokenizerSpec.WHITESPACE {
+	if p.lookaheadType != enumTokenTypes.WHITESPACE {
 		return p.getLabelOperation()
 	}
 	return p.getRegularOperation()
@@ -73,29 +73,29 @@ func (p *OperationParser) determineLabelOrOperation() error {
 // There IS whitespace at the start
 
 func (p *OperationParser) getRegularOperation() error {
-	p.eat(tokenizerSpec.WHITESPACE)
+	p.eat(enumTokenTypes.WHITESPACE)
 	p.advanceToNext()
 
 	var operationSimpleType parserTypes.SimpleOperation
 
 	switch p.lookaheadType {
 
-	case tokenizerSpec.INSTRUCTION:
+	case enumTokenTypes.INSTRUCTION:
 		operationSimpleType = parserTypes.Instruction
 		break
 
-	case tokenizerSpec.DELIMITER_period:
-		p.eat(tokenizerSpec.DELIMITER_period)
+	case enumTokenTypes.DELIMITER_period:
+		p.eat(enumTokenTypes.DELIMITER_period)
 		p.advanceToNext()
-		if p.lookaheadType > tokenizerSpec.DIRECTIVE_RANGE_START && p.lookaheadType < tokenizerSpec.DIRECTIVE_RANGE_END {
+		if p.lookaheadType > enumTokenTypes.DIRECTIVE_RANGE_START && p.lookaheadType < enumTokenTypes.DIRECTIVE_RANGE_END {
 			operationSimpleType = parserTypes.Directive
 			break
 		}
 		return errors.New("UNKNOWN DIRECTIVE")
-	case tokenizerSpec.IDENTIFIER:
+	case enumTokenTypes.IDENTIFIER:
 		operationSimpleType = parserTypes.Macro
 		break
-	case tokenizerSpec.None:
+	case enumTokenTypes.None:
 		return errors.New("UNEXPECTED EMPTY OPERATION???")
 	default:
 		return errors.New("UNKNOWN OPERATION")
@@ -112,7 +112,7 @@ func (p *OperationParser) getRegularOperation() error {
 	}
 
 	// 🟢 Operation parsing succeeds
-	if p.lookaheadType == tokenizerSpec.WHITESPACE || p.lookaheadType == tokenizerSpec.None {
+	if p.lookaheadType == enumTokenTypes.WHITESPACE || p.lookaheadType == enumTokenTypes.None {
 		p.operationValue = operationValue
 		p.operationType = operationType
 		p.operationSimpleType = operationSimpleType
@@ -132,9 +132,9 @@ func (p *OperationParser) getRegularOperation() error {
 func (p *OperationParser) getLabelOperation() error {
 
 	// Check for local label
-	isLocal := p.lookaheadType == tokenizerSpec.DELIMITER_period
+	isLocal := p.lookaheadType == enumTokenTypes.DELIMITER_period
 	if isLocal {
-		p.eat(tokenizerSpec.DELIMITER_period)
+		p.eat(enumTokenTypes.DELIMITER_period)
 		p.advanceToNext()
 	}
 
@@ -145,7 +145,7 @@ func (p *OperationParser) getLabelOperation() error {
 	}
 
 	//Will expect an identifier to signify a label
-	err := p.eat(tokenizerSpec.IDENTIFIER)
+	err := p.eat(enumTokenTypes.IDENTIFIER)
 	if err != nil {
 		//⚠️ In the case of a LOCAL label, other label-likes are allowed
 		if !isLocal || !p.tokenizer.IsTokenIdentifierLike(operationLabel) {
@@ -160,17 +160,17 @@ func (p *OperationParser) getLabelOperation() error {
 
 	//See what follows the label
 	switch p.lookaheadType {
-	case tokenizerSpec.None:
+	case enumTokenTypes.None:
 		// ❌ Fails if NO colon
 		return errors.New("LABEL IS INCOMPLETE - WHERE'S YOUR COLON!?")
 
-	case tokenizerSpec.DELIMITER_colon:
-		p.eat(tokenizerSpec.DELIMITER_colon)
+	case enumTokenTypes.DELIMITER_colon:
+		p.eat(enumTokenTypes.DELIMITER_colon)
 		p.advanceToNext()
-		if p.lookaheadType == tokenizerSpec.None {
+		if p.lookaheadType == enumTokenTypes.None {
 			// 🟢 Label parsing succeeds
 			p.operationLabel = operationLabel
-			p.operationType = tokenizerSpec.IDENTIFIER
+			p.operationType = enumTokenTypes.IDENTIFIER
 			p.operationValue = ""
 			p.operationSimpleType = parserTypes.Label
 			return nil
@@ -187,49 +187,49 @@ func (p *OperationParser) getLabelOperation() error {
 
 // Labeled directive
 func (p *OperationParser) getLabelFollowup(operationLabel string, hadWhitespace bool) error {
-	if p.lookaheadType == tokenizerSpec.WHITESPACE {
-		p.eat(tokenizerSpec.WHITESPACE)
+	if p.lookaheadType == enumTokenTypes.WHITESPACE {
+		p.eat(enumTokenTypes.WHITESPACE)
 		p.advanceToNext()
-		if p.lookaheadType != tokenizerSpec.None {
+		if p.lookaheadType != enumTokenTypes.None {
 			return p.getLabelFollowup(operationLabel, true)
 		}
 	}
 
 	var operationValue string
-	var operationType tokenizerSpec.TokenType
+	var operationType tokenEnum
 
 	switch p.lookaheadType {
 
 	//Equals sign
-	case tokenizerSpec.ASSIGN_simple:
+	case enumTokenTypes.ASSIGN_simple:
 		operationType = p.lookaheadType
 		operationValue = p.lookaheadValue
-		p.eat(tokenizerSpec.ASSIGN_simple)
+		p.eat(enumTokenTypes.ASSIGN_simple)
 		p.advanceToNext()
 
 	//EQU
-	case tokenizerSpec.ASSIGN_EQU:
+	case enumTokenTypes.ASSIGN_EQU:
 		operationType = p.lookaheadType
 		operationValue = p.lookaheadValue
-		p.eat(tokenizerSpec.ASSIGN_EQU)
+		p.eat(enumTokenTypes.ASSIGN_EQU)
 		p.advanceToNext()
-		err := p.eat(tokenizerSpec.WHITESPACE)
+		err := p.eat(enumTokenTypes.WHITESPACE)
 		if err != nil {
 			return err
 		}
 
 	//Actual directive
-	case tokenizerSpec.DELIMITER_period:
+	case enumTokenTypes.DELIMITER_period:
 		if !hadWhitespace {
 			return errors.New("need spacing for labeled directive")
 		}
-		p.eat(tokenizerSpec.DELIMITER_period)
+		p.eat(enumTokenTypes.DELIMITER_period)
 		p.advanceToNext()
 
 		switch p.lookaheadType {
-		case tokenizerSpec.DIRECTIVE_labeled,
-			tokenizerSpec.DIRECTIVE_labeledBlockStart,
-			tokenizerSpec.DIRECTIVE_labeledBlockEnd:
+		case enumTokenTypes.DIRECTIVE_labeled,
+			enumTokenTypes.DIRECTIVE_labeledBlockStart,
+			enumTokenTypes.DIRECTIVE_labeledBlockEnd:
 			operationType = p.lookaheadType
 			operationValue = p.lookaheadValue
 			p.eat(p.lookaheadType)
@@ -238,9 +238,9 @@ func (p *OperationParser) getLabelFollowup(operationLabel string, hadWhitespace 
 				return err
 			}
 
-			if p.lookaheadType != tokenizerSpec.None && p.lookaheadType != tokenizerSpec.WHITESPACE {
+			if p.lookaheadType != enumTokenTypes.None && p.lookaheadType != enumTokenTypes.WHITESPACE {
 				// ❌ Fails
-				err := p.eat(tokenizerSpec.WHITESPACE)
+				err := p.eat(enumTokenTypes.WHITESPACE)
 				return err
 			}
 

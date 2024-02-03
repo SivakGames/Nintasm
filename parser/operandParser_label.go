@@ -2,7 +2,7 @@ package parser
 
 import (
 	"fmt"
-	"misc/nintasm/tokenizer/tokenizerSpec"
+	enumTokenTypes "misc/nintasm/enums/tokenTypes"
 	"strings"
 )
 
@@ -17,11 +17,11 @@ func NewLabelOperandParser() LabelOperandParser {
 	}
 }
 
-func (p *LabelOperandParser) Process(operationType tokenizerSpec.TokenType, operationValue string, operationLabel string) {
+func (p *LabelOperandParser) Process(operationType tokenEnum, operationValue string, operationLabel string) {
 	isLocal := strings.HasPrefix(operationLabel, ".")
 
 	switch operationType {
-	case tokenizerSpec.IDENTIFIER:
+	case enumTokenTypes.IDENTIFIER:
 		if isLocal {
 			if p.parentLabel == "" {
 				fmt.Println("No parent label!")
@@ -30,13 +30,13 @@ func (p *LabelOperandParser) Process(operationType tokenizerSpec.TokenType, oper
 			p.parentLabel = operationLabel
 		}
 
-	case tokenizerSpec.ASSIGN_EQU, tokenizerSpec.ASSIGN_simple:
+	case enumTokenTypes.ASSIGN_EQU, enumTokenTypes.ASSIGN_simple:
 		//fmt.Println("assigning stuff")
-	case tokenizerSpec.DIRECTIVE_labeled:
+	case enumTokenTypes.DIRECTIVE_labeled:
 		//fmt.Println("label dir")
-	case tokenizerSpec.DIRECTIVE_labeledBlockStart:
+	case enumTokenTypes.DIRECTIVE_labeledBlockStart:
 		fmt.Println("label dir st")
-	case tokenizerSpec.DIRECTIVE_labeledBlockEnd:
+	case enumTokenTypes.DIRECTIVE_labeledBlockEnd:
 		fmt.Println("label dir en")
 	default:
 		fmt.Println("BAD LABEL OPERATION TYPE!!!")

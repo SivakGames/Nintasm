@@ -1,7 +1,7 @@
 package parser
 
 import (
-	"misc/nintasm/tokenizer/tokenizerSpec"
+	enumTokenTypes "misc/nintasm/enums/tokenTypes"
 	"strings"
 )
 
@@ -27,7 +27,7 @@ func (p *InitialLineParser) Process(line string) (string, error) {
 	reformattedString := ""
 
 	for p.hasMore {
-		if p.lookaheadType == tokenizerSpec.WHITESPACE {
+		if p.lookaheadType == enumTokenTypes.WHITESPACE {
 			reformattedString += " "
 		} else {
 			reformattedString += p.lookaheadValue

@@ -2,8 +2,8 @@ package environment
 
 import (
 	"fmt"
+	enumTokenTypes "misc/nintasm/enums/tokenTypes"
 	"misc/nintasm/parser/operandFactory"
-	"misc/nintasm/tokenizer/tokenizerSpec"
 )
 
 type Node = operandFactory.Node
@@ -23,7 +23,7 @@ func NewEnvironment(envName string) Environment {
 // ----------------------------------
 
 func generateNumericNodeForEnvironment(number int) Node {
-	return operandFactory.CreateNumericLiteralNode(tokenizerSpec.NUMBER_decimal, fmt.Sprintf("%d", number), number)
+	return operandFactory.CreateNumericLiteralNode(enumTokenTypes.NUMBER_decimal, fmt.Sprintf("%d", number), number)
 }
 
 // ----------------------------------

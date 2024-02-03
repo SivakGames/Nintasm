@@ -4,9 +4,9 @@ import (
 	"errors"
 	"fmt"
 	enumInstructionModes "misc/nintasm/enums/instructionModes"
+	enumTokenTypes "misc/nintasm/enums/tokenTypes"
 	"misc/nintasm/interpreter"
 	"misc/nintasm/parser/operandFactory"
-	"misc/nintasm/tokenizer/tokenizerSpec"
 	"strconv"
 )
 
@@ -19,7 +19,7 @@ type OperandParser struct {
 	operandPosition         int
 	ShouldParseInstructions bool
 	instructionMode         instModes
-	instructionXYIndex      tokenizerSpec.TokenType
+	instructionXYIndex      tokenEnum
 	Parser
 }
 
@@ -35,12 +35,12 @@ func (p *OperandParser) GetOperandList() ([]Node, error) {
 	operandCount := 0
 
 	//No operands at all
-	if p.lookaheadType == tokenizerSpec.None {
+	if p.lookaheadType == enumTokenTypes.None {
 		return operandList, nil // 🟢 Succeeds
 	}
 
 	//No commas at the beginning...
-	if p.lookaheadType == tokenizerSpec.DELIMITER_comma {
+	if p.lookaheadType == enumTokenTypes.DELIMITER_comma {
 		return operandList, errors.New("Operand list cannot start with a comma!") // ❌ Fails
 	}
 
@@ -53,8 +53,8 @@ func (p *OperandParser) GetOperandList() ([]Node, error) {
 	operandList = append(operandList, firstOperand)
 
 	//From here, operands are comma separated
-	for p.lookaheadType != tokenizerSpec.None && p.lookaheadType == tokenizerSpec.DELIMITER_comma {
-		err = p.eatFreelyAndAdvance(tokenizerSpec.DELIMITER_comma)
+	for p.lookaheadType != enumTokenTypes.None && p.lookaheadType == enumTokenTypes.DELIMITER_comma {
+		err = p.eatFreelyAndAdvance(enumTokenTypes.DELIMITER_comma)
 		if err != nil {
 			return operandList, err // ❌ Fails
 		}
@@ -71,12 +71,12 @@ func (p *OperandParser) GetOperandList() ([]Node, error) {
 
 // =============================================
 func (p *OperandParser) operandStatementList() (Node, error) {
-	return p.statementList(tokenizerSpec.DELIMITER_comma)
+	return p.statementList(enumTokenTypes.DELIMITER_comma)
 }
 
 // =============================================
 // Get statements
-func (p *OperandParser) statementList(stopTokenType tokenizerSpec.TokenType) (Node, error) {
+func (p *OperandParser) statementList(stopTokenType tokenEnum) (Node, error) {
 	statementList, err := p.Statement()
 	if err != nil {
 		return statementList, err
@@ -85,7 +85,7 @@ func (p *OperandParser) statementList(stopTokenType tokenizerSpec.TokenType) (No
 	statementList = interpreter.EvaluateNode(statementList)
 
 	//Subsequent operands
-	for p.lookaheadType != tokenizerSpec.None && p.lookaheadType != stopTokenType {
+	for p.lookaheadType != enumTokenTypes.None && p.lookaheadType != stopTokenType {
 		return p.Statement()
 	}
 
@@ -95,7 +95,7 @@ func (p *OperandParser) statementList(stopTokenType tokenizerSpec.TokenType) (No
 // =============================================
 
 func (p *OperandParser) Statement() (Node, error) {
-	if p.lookaheadType == tokenizerSpec.None {
+	if p.lookaheadType == enumTokenTypes.None {
 		return operandFactory.EmptyNode(), nil
 	}
 
@@ -110,9 +110,9 @@ func (p *OperandParser) Statement() (Node, error) {
 
 func (p *OperandParser) instructionPrefix() (Node, error) {
 	p.instructionMode = enumInstructionModes.ABS
-	p.instructionXYIndex = tokenizerSpec.None
+	p.instructionXYIndex = enumTokenTypes.None
 	nextFunction := p.logicalOrExpression
-	xyIndex := tokenizerSpec.None
+	xyIndex := enumTokenTypes.None
 	checkXYfollowup := false
 	var statement Node
 	var err error
@@ -122,9 +122,9 @@ func (p *OperandParser) instructionPrefix() (Node, error) {
 	//[][][][][][][][][][][][][][][][][][][][][]
 	//Indirect
 
-	case tokenizerSpec.DELIMITER_leftSquareBracket:
+	case enumTokenTypes.DELIMITER_leftSquareBracket:
 		p.instructionMode = enumInstructionModes.IND
-		err = p.eatFreelyAndAdvance(tokenizerSpec.DELIMITER_leftSquareBracket)
+		err = p.eatFreelyAndAdvance(enumTokenTypes.DELIMITER_leftSquareBracket)
 		if err != nil {
 			return operandFactory.ErrorNode(p.lookaheadValue), err // ❌ Fails
 		}
@@ -133,29 +133,29 @@ func (p *OperandParser) instructionPrefix() (Node, error) {
 			return statement, err // ❌ Fails
 		}
 		// For indirect X
-		if p.lookaheadType == tokenizerSpec.DELIMITER_comma {
+		if p.lookaheadType == enumTokenTypes.DELIMITER_comma {
 			xyIndex, err = p.checkInstructionXYIndex()
 			if err != nil {
 				return statement, err // ❌ Fails
 			}
-			if xyIndex != tokenizerSpec.REGISTER_X {
+			if xyIndex != enumTokenTypes.REGISTER_X {
 				return statement, errors.New("Must use X index for this kind of indirect addressing")
 			}
-			err = p.eatFreelyAndAdvance(tokenizerSpec.DELIMITER_rightSquareBracket)
+			err = p.eatFreelyAndAdvance(enumTokenTypes.DELIMITER_rightSquareBracket)
 			if err != nil {
 				return statement, err // ❌ Fails
 			}
 		} else {
-			err = p.eatFreelyAndAdvance(tokenizerSpec.DELIMITER_rightSquareBracket)
+			err = p.eatFreelyAndAdvance(enumTokenTypes.DELIMITER_rightSquareBracket)
 			if err != nil {
 				return statement, err // ❌ Fails
 			}
-			if p.lookaheadType == tokenizerSpec.DELIMITER_comma {
+			if p.lookaheadType == enumTokenTypes.DELIMITER_comma {
 				xyIndex, err = p.checkInstructionXYIndex()
 				if err != nil {
 					return statement, err // ❌ Fails
 				}
-				if xyIndex != tokenizerSpec.REGISTER_Y {
+				if xyIndex != enumTokenTypes.REGISTER_Y {
 					return statement, errors.New("Must use Y index for this kind of indirect addressing")
 				}
 			}
@@ -164,9 +164,9 @@ func (p *OperandParser) instructionPrefix() (Node, error) {
 	//######################################
 	//Immediate mode
 
-	case tokenizerSpec.DELIMITER_hash:
+	case enumTokenTypes.DELIMITER_hash:
 		p.instructionMode = enumInstructionModes.IMM
-		err = p.eatFreelyAndAdvance(tokenizerSpec.DELIMITER_hash)
+		err = p.eatFreelyAndAdvance(enumTokenTypes.DELIMITER_hash)
 		if err != nil {
 			return operandFactory.ErrorNode(p.lookaheadValue), err // ❌ Fails
 		}
@@ -179,10 +179,10 @@ func (p *OperandParser) instructionPrefix() (Node, error) {
 	//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 	//Explicit ZP mode
 
-	case tokenizerSpec.OPERATOR_relational:
+	case enumTokenTypes.OPERATOR_relational:
 		if p.lookaheadValue == "<" {
 			p.instructionMode = enumInstructionModes.ZP
-			err = p.eatFreelyAndAdvance(tokenizerSpec.OPERATOR_relational)
+			err = p.eatFreelyAndAdvance(enumTokenTypes.OPERATOR_relational)
 			if err != nil {
 				return operandFactory.ErrorNode(p.lookaheadValue), err // ❌ Fails
 			}
@@ -207,7 +207,7 @@ func (p *OperandParser) instructionPrefix() (Node, error) {
 	//-------------------------------------
 	//-------------------------------------
 
-	if checkXYfollowup && p.lookaheadType == tokenizerSpec.DELIMITER_comma {
+	if checkXYfollowup && p.lookaheadType == enumTokenTypes.DELIMITER_comma {
 		xyIndex, err = p.checkInstructionXYIndex()
 		if err != nil {
 			return operandFactory.ErrorNode(p.lookaheadValue), err // ❌ Fails
@@ -215,7 +215,7 @@ func (p *OperandParser) instructionPrefix() (Node, error) {
 	}
 	p.instructionXYIndex = xyIndex
 
-	if p.lookaheadType != tokenizerSpec.None {
+	if p.lookaheadType != enumTokenTypes.None {
 		return statement, errors.New("No more tokens can follow this instruction's operands!")
 	}
 
@@ -224,14 +224,14 @@ func (p *OperandParser) instructionPrefix() (Node, error) {
 
 // ++++++++++++++++++++++++++++++++
 
-func (p *OperandParser) checkInstructionXYIndex() (tokenizerSpec.TokenType, error) {
-	err := p.eatFreelyAndAdvance(tokenizerSpec.DELIMITER_comma)
-	targetIndex := tokenizerSpec.None
+func (p *OperandParser) checkInstructionXYIndex() (tokenEnum, error) {
+	err := p.eatFreelyAndAdvance(enumTokenTypes.DELIMITER_comma)
+	targetIndex := enumTokenTypes.None
 	if err != nil {
 		return targetIndex, err // ❌ Fails
 	}
 
-	if p.lookaheadType != tokenizerSpec.REGISTER_X && p.lookaheadType != tokenizerSpec.REGISTER_Y {
+	if p.lookaheadType != enumTokenTypes.REGISTER_X && p.lookaheadType != enumTokenTypes.REGISTER_Y {
 		return targetIndex, errors.New("BAD INDEX!")
 	}
 
@@ -262,63 +262,63 @@ func (p *OperandParser) checkInstructionXYIndex() (tokenizerSpec.TokenType, erro
 
 // || expression
 func (p *OperandParser) logicalOrExpression() (Node, error) {
-	return p._logicalExpression(p.logicalAndExpression, tokenizerSpec.OPERATOR_logicalOr)
+	return p._logicalExpression(p.logicalAndExpression, enumTokenTypes.OPERATOR_logicalOr)
 }
 
 // && expression
 func (p *OperandParser) logicalAndExpression() (Node, error) {
-	return p._logicalExpression(p.bitwiseOrExpression, tokenizerSpec.OPERATOR_logicalAnd)
+	return p._logicalExpression(p.bitwiseOrExpression, enumTokenTypes.OPERATOR_logicalAnd)
 }
 
 // | expression
 func (p *OperandParser) bitwiseOrExpression() (Node, error) {
-	return p._logicalExpression(p.bitwiseXorExpression, tokenizerSpec.OPERATOR_bitwiseOr)
+	return p._logicalExpression(p.bitwiseXorExpression, enumTokenTypes.OPERATOR_bitwiseOr)
 }
 
 // ^ expression
 func (p *OperandParser) bitwiseXorExpression() (Node, error) {
-	return p._logicalExpression(p.bitwiseAndExpression, tokenizerSpec.OPERATOR_bitwiseXor)
+	return p._logicalExpression(p.bitwiseAndExpression, enumTokenTypes.OPERATOR_bitwiseXor)
 }
 
 // & expression
 func (p *OperandParser) bitwiseAndExpression() (Node, error) {
-	return p._logicalExpression(p.equalityExpression, tokenizerSpec.OPERATOR_bitwiseAnd)
+	return p._logicalExpression(p.equalityExpression, enumTokenTypes.OPERATOR_bitwiseAnd)
 }
 
 // ==, != expression
 func (p *OperandParser) equalityExpression() (Node, error) {
-	return p._logicalExpression(p.shiftExpression, tokenizerSpec.OPERATOR_equality)
+	return p._logicalExpression(p.shiftExpression, enumTokenTypes.OPERATOR_equality)
 }
 
 // <<, >> expression
 func (p *OperandParser) shiftExpression() (Node, error) {
-	return p._logicalExpression(p.relationalExpression, tokenizerSpec.OPERATOR_shift)
+	return p._logicalExpression(p.relationalExpression, enumTokenTypes.OPERATOR_shift)
 }
 
 // <,<=,>=,> expression
 func (p *OperandParser) relationalExpression() (Node, error) {
-	return p._logicalExpression(p.additiveExpression, tokenizerSpec.OPERATOR_relational)
+	return p._logicalExpression(p.additiveExpression, enumTokenTypes.OPERATOR_relational)
 }
 
 // +,- expression
 func (p *OperandParser) additiveExpression() (Node, error) {
-	return p._logicalExpression(p.multiplicativeExpression, tokenizerSpec.OPERATOR_additive)
+	return p._logicalExpression(p.multiplicativeExpression, enumTokenTypes.OPERATOR_additive)
 }
 
 // *,/,% expression
 func (p *OperandParser) multiplicativeExpression() (Node, error) {
-	return p._logicalExpression(p.unaryExpression, tokenizerSpec.OPERATOR_multiplicative)
+	return p._logicalExpression(p.unaryExpression, enumTokenTypes.OPERATOR_multiplicative)
 }
 
 //---------------------
 
 // Preceding -,~,! expression
 func (p *OperandParser) unaryExpression() (Node, error) {
-	if p.lookaheadType != tokenizerSpec.None {
+	if p.lookaheadType != enumTokenTypes.None {
 		switch p.lookaheadType {
-		case tokenizerSpec.OPERATOR_additive,
-			tokenizerSpec.OPERATOR_logicalNot,
-			tokenizerSpec.OPERATOR_negate:
+		case enumTokenTypes.OPERATOR_additive,
+			enumTokenTypes.OPERATOR_logicalNot,
+			enumTokenTypes.OPERATOR_negate:
 			unaryType := p.lookaheadType
 			unaryValue := p.lookaheadValue
 			err := p.eatFreelyAndAdvance(p.lookaheadType)
@@ -346,7 +346,7 @@ func (p *OperandParser) callMemberExpression() (Node, error) {
 		return operandFactory.ErrorNode(p.lookaheadValue), err // ❌ Fails
 	}
 
-	if p.lookaheadType == tokenizerSpec.DELIMITER_leftParenthesis {
+	if p.lookaheadType == enumTokenTypes.DELIMITER_leftParenthesis {
 		if !_checkValidAssignmentTarget(callMemberType) {
 			badCallee := fmt.Sprintf("Illegal functional callee name: %v", callMemberValue)
 			return operandFactory.ErrorNode(p.lookaheadValue), errors.New(badCallee) // ❌ Fails
@@ -357,8 +357,8 @@ func (p *OperandParser) callMemberExpression() (Node, error) {
 }
 
 // Call expressions MUST begin with an identifier
-func _checkValidAssignmentTarget(assignmentType tokenizerSpec.TokenType) bool {
-	return (assignmentType == tokenizerSpec.IDENTIFIER)
+func _checkValidAssignmentTarget(assignmentType tokenEnum) bool {
+	return (assignmentType == enumTokenTypes.IDENTIFIER)
 }
 
 // ---------------------
@@ -390,19 +390,19 @@ func (p *OperandParser) arguments() ([]Node, error) {
 	var argumentList []Node
 	var err error = nil
 
-	p.eatAndAdvance(tokenizerSpec.DELIMITER_leftParenthesis)
+	p.eatAndAdvance(enumTokenTypes.DELIMITER_leftParenthesis)
 	if err != nil {
 		return argumentList, err // ❌ Fails
 	}
 
-	if p.lookaheadType != tokenizerSpec.DELIMITER_rightParenthesis {
+	if p.lookaheadType != enumTokenTypes.DELIMITER_rightParenthesis {
 		argumentList, err = p.argumentList()
 		if err != nil {
 			return argumentList, err // ❌ Fails
 		}
 	}
 
-	err = p.eatAndAdvance(tokenizerSpec.DELIMITER_rightParenthesis)
+	err = p.eatAndAdvance(enumTokenTypes.DELIMITER_rightParenthesis)
 	if err != nil {
 		return argumentList, err // ❌ Fails
 	}
@@ -419,8 +419,8 @@ func (p *OperandParser) argumentList() ([]Node, error) {
 	}
 	argumentList = append(argumentList, firstArgument)
 
-	for p.lookaheadType == tokenizerSpec.DELIMITER_comma {
-		err = p.eatAndAdvance(tokenizerSpec.DELIMITER_comma)
+	for p.lookaheadType == enumTokenTypes.DELIMITER_comma {
+		err = p.eatAndAdvance(enumTokenTypes.DELIMITER_comma)
 		if err != nil {
 			return argumentList, err // ❌ Fails
 		}
@@ -447,7 +447,7 @@ func (p *OperandParser) memberExpression() (Node, error) {
 	}
 
 	//If nothing else, just exit
-	if p.lookaheadType == tokenizerSpec.None {
+	if p.lookaheadType == enumTokenTypes.None {
 		return result, nil // 🟢 Succeeds
 	}
 
@@ -455,19 +455,19 @@ func (p *OperandParser) memberExpression() (Node, error) {
 		return operandFactory.ErrorNode(p.lookaheadValue), errors.New("Misplaced literal") // ❌ Fails
 	}
 
-	if p.lookaheadType == tokenizerSpec.IDENTIFIER {
+	if p.lookaheadType == enumTokenTypes.IDENTIFIER {
 		return operandFactory.ErrorNode(p.lookaheadValue), errors.New("Misplaced identifier") // ❌ Fails
 	}
 
 	//A dot indicates member
-	if p.lookaheadType == tokenizerSpec.DELIMITER_period {
-		err = p.eatFreelyAndAdvance(tokenizerSpec.DELIMITER_period)
+	if p.lookaheadType == enumTokenTypes.DELIMITER_period {
+		err = p.eatFreelyAndAdvance(enumTokenTypes.DELIMITER_period)
 		if err != nil {
 			return operandFactory.ErrorNode(p.lookaheadValue), err // ❌ Fails
 		}
-		if p.lookaheadType != tokenizerSpec.IDENTIFIER {
+		if p.lookaheadType != enumTokenTypes.IDENTIFIER {
 			if p.tokenizer.IsTokenIdentifierLike(p.lookaheadValue) {
-				p.lookaheadType = tokenizerSpec.IDENTIFIER
+				p.lookaheadType = enumTokenTypes.IDENTIFIER
 			}
 		}
 
@@ -486,7 +486,7 @@ func (p *OperandParser) memberExpression() (Node, error) {
 // !!!!!!!!!!!!!!!!!!!!!!!
 // Top of the food chain - highest precedence
 func (p *OperandParser) primaryExpression() (Node, error) {
-	if p.lookaheadType == tokenizerSpec.None {
+	if p.lookaheadType == enumTokenTypes.None {
 		return operandFactory.ErrorNode(p.lookaheadValue), errors.New("THERE'S NO PRIMARY EXPR!!!") // ❌ Fails
 	}
 	if p._isLiteral(p.lookaheadType) {
@@ -494,14 +494,14 @@ func (p *OperandParser) primaryExpression() (Node, error) {
 	}
 
 	switch p.lookaheadType {
-	case tokenizerSpec.DELIMITER_leftParenthesis:
+	case enumTokenTypes.DELIMITER_leftParenthesis:
 		return p.parenthesizedExpression()
 
-	case tokenizerSpec.DELIMITER_period:
+	case enumTokenTypes.DELIMITER_period:
 		// ⚠️ TODO: Add period checker for local labels
 		return operandFactory.ErrorNode(p.lookaheadValue), errors.New("Period doesn't exist yet") // ❌ Fails
 
-	case tokenizerSpec.IDENTIFIER:
+	case enumTokenTypes.IDENTIFIER:
 		return p.identifier()
 	}
 
@@ -512,7 +512,7 @@ func (p *OperandParser) primaryExpression() (Node, error) {
 
 // ++++++++++++++++++++++++++++
 // Helper for logical expressions
-func (p *OperandParser) _logicalExpression(builderName func() (Node, error), operatorToken tokenizerSpec.TokenType) (Node, error) {
+func (p *OperandParser) _logicalExpression(builderName func() (Node, error), operatorToken tokenEnum) (Node, error) {
 	var left Node
 	var right Node
 	var err error = nil
@@ -521,7 +521,7 @@ func (p *OperandParser) _logicalExpression(builderName func() (Node, error), ope
 		return operandFactory.ErrorNode(p.lookaheadValue), err // ❌ Fails
 	}
 
-	for p.lookaheadType != tokenizerSpec.None && p.lookaheadType == operatorToken {
+	for p.lookaheadType != enumTokenTypes.None && p.lookaheadType == operatorToken {
 		logicalExpressionType := p.lookaheadType
 		logicalExpressionValue := p.lookaheadValue
 		err = p.eatFreelyAndAdvance(operatorToken)
@@ -540,16 +540,16 @@ func (p *OperandParser) _logicalExpression(builderName func() (Node, error), ope
 
 // ++++++++++++++++++++++++++++++
 // Helper to see if value is one of the literal types
-func (p *OperandParser) _isLiteral(tokenType tokenizerSpec.TokenType) bool {
+func (p *OperandParser) _isLiteral(tokenType tokenEnum) bool {
 	switch tokenType {
-	case tokenizerSpec.NUMBER_binary,
-		tokenizerSpec.NUMBER_decimal,
-		tokenizerSpec.NUMBER_hex,
-		tokenizerSpec.STRING,
-		tokenizerSpec.BACKTICK_STRING,
-		tokenizerSpec.SUBSTITUTION_numMacroArgs,
-		tokenizerSpec.SUBSTITUTION_stringID,
-		tokenizerSpec.SUBSTITUTION_numericID:
+	case enumTokenTypes.NUMBER_binary,
+		enumTokenTypes.NUMBER_decimal,
+		enumTokenTypes.NUMBER_hex,
+		enumTokenTypes.STRING,
+		enumTokenTypes.BACKTICK_STRING,
+		enumTokenTypes.SUBSTITUTION_numMacroArgs,
+		enumTokenTypes.SUBSTITUTION_stringID,
+		enumTokenTypes.SUBSTITUTION_numericID:
 		return true
 	}
 	return false
@@ -557,7 +557,7 @@ func (p *OperandParser) _isLiteral(tokenType tokenizerSpec.TokenType) bool {
 
 // ((((((((((((((((
 func (p *OperandParser) parenthesizedExpression() (Node, error) {
-	err := p.eatFreelyAndAdvance(tokenizerSpec.DELIMITER_leftParenthesis)
+	err := p.eatFreelyAndAdvance(enumTokenTypes.DELIMITER_leftParenthesis)
 	if err != nil {
 		return operandFactory.ErrorNode(p.lookaheadValue), err // ❌ Fails
 	}
@@ -567,7 +567,7 @@ func (p *OperandParser) parenthesizedExpression() (Node, error) {
 		return operandFactory.ErrorNode(p.lookaheadValue), err // ❌ Fails
 	}
 
-	err = p.eatAndAdvance(tokenizerSpec.DELIMITER_rightParenthesis)
+	err = p.eatAndAdvance(enumTokenTypes.DELIMITER_rightParenthesis)
 	if err != nil {
 		return operandFactory.ErrorNode(p.lookaheadValue), err // ❌ Fails
 	}
@@ -585,24 +585,24 @@ func (p *OperandParser) literal() (Node, error) {
 	}
 
 	switch literalType {
-	case tokenizerSpec.NUMBER_hex:
+	case enumTokenTypes.NUMBER_hex:
 		asNumber, _ := strconv.ParseInt(literalValue[1:], 16, 64)
 		return operandFactory.CreateNumericLiteralNode(literalType, literalValue, int(asNumber)), nil
-	case tokenizerSpec.NUMBER_binary:
+	case enumTokenTypes.NUMBER_binary:
 		asNumber, _ := strconv.ParseInt(literalValue[1:], 2, 64)
 		return operandFactory.CreateNumericLiteralNode(literalType, literalValue, int(asNumber)), nil
-	case tokenizerSpec.NUMBER_decimal:
+	case enumTokenTypes.NUMBER_decimal:
 		asNumber, _ := strconv.ParseInt(literalValue, 10, 64)
 		return operandFactory.CreateNumericLiteralNode(literalType, literalValue, int(asNumber)), nil
-	case tokenizerSpec.STRING:
+	case enumTokenTypes.STRING:
 		return operandFactory.CreateStringLiteralNode(literalType, literalValue), nil
-	case tokenizerSpec.BACKTICK_STRING:
+	case enumTokenTypes.BACKTICK_STRING:
 		return operandFactory.CreateBacktickStringLiteralNode(literalType, literalValue), nil
-	case tokenizerSpec.SUBSTITUTION_numericID:
+	case enumTokenTypes.SUBSTITUTION_numericID:
 		return operandFactory.CreateSubstitutionIdNode(literalType, literalValue), nil
-	case tokenizerSpec.SUBSTITUTION_stringID:
+	case enumTokenTypes.SUBSTITUTION_stringID:
 		return operandFactory.CreateSubstitutionIdNode(literalType, literalValue), nil
-	case tokenizerSpec.SUBSTITUTION_numMacroArgs:
+	case enumTokenTypes.SUBSTITUTION_numMacroArgs:
 		return operandFactory.CreateSubstitutionIdNode(literalType, literalValue), nil
 	}
 	// ❌ Fails
@@ -613,7 +613,7 @@ func (p *OperandParser) literal() (Node, error) {
 func (p *OperandParser) identifier() (Node, error) {
 	literalType := p.lookaheadType
 	literalValue := p.lookaheadValue
-	err := p.eatFreelyAndAdvance(tokenizerSpec.IDENTIFIER)
+	err := p.eatFreelyAndAdvance(enumTokenTypes.IDENTIFIER)
 	if err != nil {
 		return operandFactory.ErrorNode(p.lookaheadValue), err // ❌ Fails
 	}

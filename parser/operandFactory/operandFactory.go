@@ -3,17 +3,18 @@ package operandFactory
 import (
 	"fmt"
 	enumNodeTypes "misc/nintasm/enums/nodeTypes"
-	"misc/nintasm/tokenizer/tokenizerSpec"
+	enumTokenTypes "misc/nintasm/enums/tokenTypes"
 	"strings"
 )
 
 type Node = NodeStruct
 type nodeEnum = enumNodeTypes.Def
+type tokenEnum = enumTokenTypes.Def
 
 type NodeStruct struct {
 	NodeType      nodeEnum
 	Resolved      bool
-	NodeTokenType tokenizerSpec.TokenType
+	NodeTokenType tokenEnum
 	NodeValue     string
 	AsBool        bool
 	AsNumber      int
@@ -24,7 +25,7 @@ type NodeStruct struct {
 	//Alternate     *Node
 }
 
-func newNode(nodeType tokenizerSpec.TokenType, nodeValue string, nType nodeEnum) NodeStruct {
+func newNode(nodeType tokenEnum, nodeValue string, nType nodeEnum) NodeStruct {
 	return NodeStruct{
 		NodeTokenType: nodeType,
 		NodeValue:     nodeValue,
@@ -33,13 +34,13 @@ func newNode(nodeType tokenizerSpec.TokenType, nodeValue string, nType nodeEnum)
 }
 
 func EmptyNode() Node {
-	node := newNode(tokenizerSpec.None, "", enumNodeTypes.Empty)
+	node := newNode(enumTokenTypes.None, "", enumNodeTypes.Empty)
 	return node
 }
 
 // Used for errors during parsing
 func ErrorNode(nodeValue string) Node {
-	node := newNode(tokenizerSpec.None, nodeValue, enumNodeTypes.Error)
+	node := newNode(enumTokenTypes.None, nodeValue, enumNodeTypes.Error)
 	return node
 }
 
@@ -57,7 +58,7 @@ func InterpretedInstructionBytes(opcode []string, value []string) []string {
 
 // """Calling a function"""
 func CreateCallExpressionNode(callee string, arguments []Node) Node {
-	node := newNode(tokenizerSpec.IDENTIFIER, callee, enumNodeTypes.CallExpression)
+	node := newNode(enumTokenTypes.IDENTIFIER, callee, enumNodeTypes.CallExpression)
 	node.ArgumentList = &arguments
 	return node
 }
@@ -71,13 +72,13 @@ func CreateMemberExpressionNode(parent string, key string, computed bool) Node {
 		parentKey = fmt.Sprintf("%v[%v]", parent, key)
 	}
 
-	node := newNode(tokenizerSpec.IDENTIFIER, parentKey, enumNodeTypes.MemberExpression)
+	node := newNode(enumTokenTypes.IDENTIFIER, parentKey, enumNodeTypes.MemberExpression)
 	return node
 }
 
 // """Standard binary expression"""
 // nodeValue is the operator
-func CreateBinaryExpressionNode(nodeType tokenizerSpec.TokenType, nodeValue string, left Node, right Node) Node {
+func CreateBinaryExpressionNode(nodeType tokenEnum, nodeValue string, left Node, right Node) Node {
 	node := newNode(nodeType, nodeValue, enumNodeTypes.BinaryExpression)
 	node.Left = &left
 	node.Right = &right
@@ -85,7 +86,7 @@ func CreateBinaryExpressionNode(nodeType tokenizerSpec.TokenType, nodeValue stri
 }
 
 // """Standard unary expression"""
-func CreateUnaryExpressionNode(nodeType tokenizerSpec.TokenType, nodeValue string, argument Node) Node {
+func CreateUnaryExpressionNode(nodeType tokenEnum, nodeValue string, argument Node) Node {
 	node := newNode(nodeType, nodeValue, enumNodeTypes.UnaryExpression)
 	node.Right = &argument
 	return node
@@ -94,13 +95,13 @@ func CreateUnaryExpressionNode(nodeType tokenizerSpec.TokenType, nodeValue strin
 //===================================================
 //Types of identifiers
 
-func CreateIdentifierNode(nodeType tokenizerSpec.TokenType, nodeValue string) Node {
+func CreateIdentifierNode(nodeType tokenEnum, nodeValue string) Node {
 	node := newNode(nodeType, nodeValue, enumNodeTypes.Identifier)
 	return node
 }
 
 // """Substitutions for arguments passed to macros or functions"""
-func CreateSubstitutionIdNode(nodeType tokenizerSpec.TokenType, nodeValue string) Node {
+func CreateSubstitutionIdNode(nodeType tokenEnum, nodeValue string) Node {
 	capturedString := nodeValue[1:]
 	adjustedString := fmt.Sprintf("\\%v", capturedString)
 	node := newNode(nodeType, adjustedString, enumNodeTypes.SubstitutionID)
@@ -111,7 +112,7 @@ func CreateSubstitutionIdNode(nodeType tokenizerSpec.TokenType, nodeValue string
 //Literals
 
 // Numbers
-func CreateNumericLiteralNode(nodeType tokenizerSpec.TokenType, nodeValue string, asNumber int) Node {
+func CreateNumericLiteralNode(nodeType tokenEnum, nodeValue string, asNumber int) Node {
 	node := newNode(nodeType, nodeValue, enumNodeTypes.NumericLiteral)
 	node.AsNumber = asNumber
 	node.Resolved = true
@@ -119,7 +120,7 @@ func CreateNumericLiteralNode(nodeType tokenizerSpec.TokenType, nodeValue string
 }
 
 // Any string in 'single' or "double" quotes
-func CreateStringLiteralNode(nodeType tokenizerSpec.TokenType, nodeValue string) Node {
+func CreateStringLiteralNode(nodeType tokenEnum, nodeValue string) Node {
 	capturedString := nodeValue[1 : len(nodeValue)-1]
 	node := newNode(nodeType, capturedString, enumNodeTypes.StringLiteral)
 	node.Resolved = true
@@ -127,7 +128,7 @@ func CreateStringLiteralNode(nodeType tokenizerSpec.TokenType, nodeValue string)
 }
 
 // Any string in `backticks` - These will still need to be resolved via interpreter
-func CreateBacktickStringLiteralNode(nodeType tokenizerSpec.TokenType, nodeValue string) Node {
+func CreateBacktickStringLiteralNode(nodeType tokenEnum, nodeValue string) Node {
 	capturedString := nodeValue[1 : len(nodeValue)-1]
 	capturedString = strings.TrimSpace(capturedString)
 	node := newNode(nodeType, capturedString, enumNodeTypes.BacktickStringLiteral)
@@ -139,7 +140,7 @@ func CreateBacktickStringLiteralNode(nodeType tokenizerSpec.TokenType, nodeValue
 
 func ConvertNodeToNumericLiteral(node *Node) {
 	node.NodeType = enumNodeTypes.NumericLiteral
-	node.NodeTokenType = tokenizerSpec.NUMBER_decimal
+	node.NodeTokenType = enumTokenTypes.NUMBER_decimal
 	node.NodeValue = fmt.Sprintf("%d", node.AsNumber)
 	node.Resolved = true
 	return
@@ -147,7 +148,7 @@ func ConvertNodeToNumericLiteral(node *Node) {
 
 func ConvertNodeToBooleanLiteral(node *Node) {
 	node.NodeType = enumNodeTypes.BooleanLiteral
-	node.NodeTokenType = tokenizerSpec.None
+	node.NodeTokenType = enumTokenTypes.None
 	if node.AsBool {
 		node.NodeValue = "1"
 		node.AsNumber = 1

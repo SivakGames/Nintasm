@@ -4,8 +4,8 @@ import (
 	"errors"
 	"fmt"
 	enumInstructionModes "misc/nintasm/enums/instructionModes"
+	enumTokenTypes "misc/nintasm/enums/tokenTypes"
 	"misc/nintasm/instructionData"
-	"misc/nintasm/tokenizer/tokenizerSpec"
 	"strings"
 )
 
@@ -25,23 +25,23 @@ func (p *InstructionOperandParser) Process(operationValue string) error {
 	instructionName := strings.ToUpper(operationValue)
 
 	isBranch := false
-	instructionXYIndex := tokenizerSpec.None
+	instructionXYIndex := enumTokenTypes.None
 	opcodesAndSupportedModes := instructionData.OpcodesAndSupportedModes[instructionName]
 	operandList := []Node{}
 	useInstructionMode, useInstructionZPMode := enumInstructionModes.None, enumInstructionModes.None
 
 	switch p.lookaheadType {
 	//Try no operand
-	case tokenizerSpec.None:
+	case enumTokenTypes.None:
 		instructionMode = enumInstructionModes.IMPL
 	//Try A (for shifts)
-	case tokenizerSpec.REGISTER_A:
+	case enumTokenTypes.REGISTER_A:
 		instructionMode = enumInstructionModes.A
-		err = p.eatFreelyAndAdvance(tokenizerSpec.REGISTER_A)
+		err = p.eatFreelyAndAdvance(enumTokenTypes.REGISTER_A)
 		if err != nil {
 			return err // ❌ Fails
 		}
-		if p.lookaheadType != tokenizerSpec.None {
+		if p.lookaheadType != enumTokenTypes.None {
 			return errors.New("No tokens can follow the A")
 		}
 
@@ -59,12 +59,12 @@ func (p *InstructionOperandParser) Process(operationValue string) error {
 	}
 
 	//If an index is present, see if it's usable with desired mode and set it
-	if instructionXYIndex == tokenizerSpec.REGISTER_X || instructionXYIndex == tokenizerSpec.REGISTER_Y {
+	if instructionXYIndex == enumTokenTypes.REGISTER_X || instructionXYIndex == enumTokenTypes.REGISTER_Y {
 		instructionMode, err = checkModeSupportsXY(instructionMode, instructionXYIndex)
 		if err != nil {
 			return err // ❌ Fails
 		}
-	} else if instructionXYIndex != tokenizerSpec.None {
+	} else if instructionXYIndex != enumTokenTypes.None {
 		panic("MAJOR ERROR with XY index checks!!!")
 	}
 
@@ -118,11 +118,11 @@ func checkIfBranchInstruction(instructionName string) bool {
 // +++++++++++++++++
 
 // Operand wants to use an X/Y index. See if index is used properly and eat it
-func checkModeSupportsXY(instructionMode instModes, instructionIndex tokenizerSpec.TokenType) (instModes, error) {
+func checkModeSupportsXY(instructionMode instModes, instructionIndex tokenEnum) (instModes, error) {
 	xyMode, ok := instructionData.ModesWithXYIndexes[instructionMode]
 
 	if ok {
-		if instructionIndex == tokenizerSpec.REGISTER_X {
+		if instructionIndex == enumTokenTypes.REGISTER_X {
 			return xyMode.X, nil
 		}
 		return xyMode.Y, nil

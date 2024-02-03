@@ -3,10 +3,13 @@ package tokenizer
 import (
 	"errors"
 	"fmt"
+	enumTokenTypes "misc/nintasm/enums/tokenTypes"
 	"regexp"
 
 	"misc/nintasm/tokenizer/tokenizerSpec"
 )
+
+type tokenEnum = enumTokenTypes.Def
 
 // ***********************************************
 // Main struct
@@ -42,9 +45,9 @@ func (t *Tokenizer) hasMoreTokens() bool {
 }
 
 // ================================================
-func (t *Tokenizer) GetNextToken() (hasMore bool, tokenType tokenizerSpec.TokenType, tokenValue string, err error) {
+func (t *Tokenizer) GetNextToken() (hasMore bool, tokenType tokenEnum, tokenValue string, err error) {
 	if !t.hasMoreTokens() {
-		return false, tokenizerSpec.None, "", nil
+		return false, enumTokenTypes.None, "", nil
 	}
 	stringSegment := t.text[t.cursor:]
 
@@ -57,7 +60,7 @@ func (t *Tokenizer) GetNextToken() (hasMore bool, tokenType tokenizerSpec.TokenT
 		//Advance the cursor
 		t.prevCursor = t.cursor
 		t.cursor += len(tokenValue)
-		if specTuple.OperationType == tokenizerSpec.None {
+		if specTuple.OperationType == enumTokenTypes.None {
 			return t.GetNextToken()
 		}
 		return true, specTuple.OperationType, tokenValue, nil
@@ -67,7 +70,7 @@ func (t *Tokenizer) GetNextToken() (hasMore bool, tokenType tokenizerSpec.TokenT
 	//If reached then it's an unknown/illegal token
 	illegalTokenMessage := fmt.Sprintf("UNKNOWN/ILLEGAL TOKEN: \x1b[31m%v\x1b[0m", stringSegment)
 
-	return false, tokenizerSpec.None, "", errors.New(illegalTokenMessage)
+	return false, enumTokenTypes.None, "", errors.New(illegalTokenMessage)
 }
 
 func (t *Tokenizer) GoBackToPrev() {
