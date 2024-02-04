@@ -1,7 +1,6 @@
 package instructionData
 
 import (
-	"fmt"
 	enumInstructionModes "misc/nintasm/enums/instructionModes"
 )
 
@@ -62,16 +61,14 @@ func init() {
 }
 
 func assignModesAndOpcodes(modeMap *map[string]instructionOpcodesAndSupportedModes) {
-	for key, value := range *modeMap {
-		baseOpcode := value.BaseOpcode
-		for _, mode := range *value.SupportedModes {
-			xyMod := key == "LDX" || key == "LDY"
+	for instructionNameAsKey, opcodeModeSet := range *modeMap {
+		baseOpcode := opcodeModeSet.BaseOpcode
+		for _, mode := range *opcodeModeSet.SupportedModes {
+			xyMod := instructionNameAsKey == "LDX" || instructionNameAsKey == "LDY"
 			adj := getAdjustedOpcode(mode, baseOpcode, xyMod)
-			value.ModeOpcodes[mode] = adj
+			opcodeModeSet.ModeOpcodes[mode] = adj
 		}
-		fmt.Println(value)
-
-		OpcodesAndSupportedModes[key] = value
+		OpcodesAndSupportedModes[instructionNameAsKey] = opcodeModeSet
 	}
 }
 

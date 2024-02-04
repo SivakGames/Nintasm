@@ -6,6 +6,7 @@ import (
 	enumInstructionModes "misc/nintasm/enums/instructionModes"
 	enumTokenTypes "misc/nintasm/enums/tokenTypes"
 	"misc/nintasm/instructionData"
+	"misc/nintasm/romBinary"
 	"strings"
 )
 
@@ -85,7 +86,6 @@ func (p *InstructionOperandParser) Process(operationValue string) error {
 		if m == instructionZPModeEquivalent && operand != nil && operand.Resolved {
 			if operand.AsNumber <= 255 && operand.AsNumber >= 0 {
 				useInstructionZPMode = m
-				fmt.Println("Yep")
 			}
 		}
 	}
@@ -97,6 +97,15 @@ func (p *InstructionOperandParser) Process(operationValue string) error {
 	if useInstructionZPMode != enumInstructionModes.None {
 		instructionMode = useInstructionZPMode
 	}
+
+	instructionOpcode := opcodesAndSupportedModes.ModeOpcodes[instructionMode]
+
+	err = romBinary.AddToRom([]uint8{instructionOpcode})
+	if err != nil {
+		return err
+	}
+
+	fmt.Println(instructionOpcode)
 
 	return nil
 }
