@@ -5,8 +5,6 @@ import (
 	"fmt"
 	enumTokenTypes "misc/nintasm/enums/tokenTypes"
 	"regexp"
-
-	"misc/nintasm/tokenizer/tokenizerSpec"
 )
 
 type tokenEnum = enumTokenTypes.Def
@@ -17,7 +15,7 @@ type Tokenizer struct {
 	text          string
 	cursor        int
 	prevCursor    int
-	tokenizerSpec []tokenizerSpec.TokenizerSpec
+	tokenizerSpec []specRegexEnum
 }
 
 // Used for seeing if a value is label-like (used mainly for local labels to avoid token overlap)
@@ -36,7 +34,7 @@ func (t *Tokenizer) Start(text string, tokenizerSpecType string) {
 	t.text = text
 	t.cursor = 0
 	t.prevCursor = 0
-	t.tokenizerSpec = tokenizerSpec.GenerateSpec(tokenizerSpecType)
+	t.tokenizerSpec = GenerateSpec(tokenizerSpecType)
 }
 
 // ================================================

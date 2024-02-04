@@ -13,13 +13,14 @@ type InstructionOperandParser struct {
 	OperandParser
 }
 
+// Constructor
 func NewInstructionOperandParser() InstructionOperandParser {
 	return InstructionOperandParser{}
 }
 
 func (p *InstructionOperandParser) Process(operationValue string) error {
 	var err error = nil
-	var instructionMode instModes
+	var instructionMode instModeEnum
 	var operand *Node = nil
 
 	instructionName := strings.ToUpper(operationValue)
@@ -73,10 +74,10 @@ func (p *InstructionOperandParser) Process(operationValue string) error {
 	}
 
 	//Used for auto ZP convert if possible
-	instructionZPModeEquivalent := getZeroPageEquivalent(instructionMode)
+	instructionZPModeEquivalent := getModeZeroPageEquivalent(instructionMode)
 
 	// Check if instruction itself supports mode
-	for _, m := range *opcodesAndSupportedModes.Modes {
+	for _, m := range *opcodesAndSupportedModes.SupportedModes {
 		if m == instructionMode {
 			useInstructionMode = m
 			continue
@@ -107,7 +108,7 @@ func checkIfBranchInstruction(instructionName string) bool {
 	// What modes this instruction can use
 	opcodesAndSupportedModes := instructionData.OpcodesAndSupportedModes[instructionName]
 
-	for _, v := range *opcodesAndSupportedModes.Modes {
+	for _, v := range *opcodesAndSupportedModes.SupportedModes {
 		if v == enumInstructionModes.REL {
 			return true
 		}
@@ -118,8 +119,8 @@ func checkIfBranchInstruction(instructionName string) bool {
 // +++++++++++++++++
 
 // Operand wants to use an X/Y index. See if index is used properly and eat it
-func checkModeSupportsXY(instructionMode instModes, instructionIndex tokenEnum) (instModes, error) {
-	xyMode, ok := instructionData.ModesWithXYIndexes[instructionMode]
+func checkModeSupportsXY(instructionMode instModeEnum, instructionIndex tokenEnum) (instModeEnum, error) {
+	xyMode, ok := instructionData.InstructionModeEnumToXYModeEnum[instructionMode]
 
 	if ok {
 		if instructionIndex == enumTokenTypes.REGISTER_X {
@@ -132,8 +133,8 @@ func checkModeSupportsXY(instructionMode instModes, instructionIndex tokenEnum) 
 }
 
 // If absolute mode (X,Y too) get the ZP version for auto convert. Get None otherwise
-func getZeroPageEquivalent(instructionMode instModes) instModes {
-	zpMode, ok := instructionData.ABStoZP[instructionMode]
+func getModeZeroPageEquivalent(instructionMode instModeEnum) instModeEnum {
+	zpMode, ok := instructionData.InstructionABSEnumToZPEnum[instructionMode]
 	if ok {
 		return zpMode
 	}

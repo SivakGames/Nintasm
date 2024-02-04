@@ -1,4 +1,4 @@
-package tokenizerSpec
+package tokenizer
 
 import (
 	"fmt"
@@ -6,43 +6,37 @@ import (
 	"regexp"
 )
 
-type tokenEnum = enumTokenTypes.Def
-
-//const DIRECTIVE_SUFFIX = "_DIRECTIVE"
-
-// +++++++++++++++++++++++++++++++++++++++++++++++
-// Helpers
-type TokenizerSpec struct {
+type specRegexEnum struct {
 	Regex         *regexp.Regexp
 	OperationType tokenEnum
 }
 
 // All the general specs
 var (
-	initialLineAnythingSpec = []TokenizerSpec{
+	initialLineAnythingSpec = []specRegexEnum{
 		{regexp.MustCompile(`^[^\;\s\"\']+`), enumTokenTypes.INIT_LINE_OTHER_CHARS},
 	}
-	indirectCapturingDelimiterspec = []TokenizerSpec{
+	indirectCapturingDelimiterspec = []specRegexEnum{
 		{regexp.MustCompile(`^[^\;\s\"\'()\[\]{}]+`), enumTokenTypes.INIT_LINE_OTHER_CHARS},
 	}
-	whitespaceAcknowledgeSpec = []TokenizerSpec{
+	whitespaceAcknowledgeSpec = []specRegexEnum{
 		{regexp.MustCompile(`^\s+`), enumTokenTypes.WHITESPACE},
 	}
-	whitespaceIgnoreSpec = []TokenizerSpec{
+	whitespaceIgnoreSpec = []specRegexEnum{
 		{regexp.MustCompile(`^\s+`), enumTokenTypes.None},
 	}
-	commentSpec = []TokenizerSpec{
+	commentSpec = []specRegexEnum{
 		{regexp.MustCompile(`^;.*`), enumTokenTypes.None},
 	}
-	stringSpec = []TokenizerSpec{
+	stringSpec = []specRegexEnum{
 		{regexp.MustCompile(`^\"[^\"]*\"`), enumTokenTypes.STRING},
 		{regexp.MustCompile(`^\'[^\']*\'`), enumTokenTypes.STRING},
 		{regexp.MustCompile("^\\`[^\\`]*\\`"), enumTokenTypes.BACKTICK_STRING},
 	}
-	instructionSpec = []TokenizerSpec{
+	instructionSpec = []specRegexEnum{
 		{regexp.MustCompile(generateBoundaries("brk|clc|cld|cli|clv|dex|dey|inx|iny|nop|pha|php|pla|plp|rti|rts|sec|sed|sei|tax|tay|tsx|txa|txs|tya|adc|and|cmp|eor|lda|ora|sbc|asl|lsr|rol|ror|cpx|cpy|dec|inc|ldx|ldy|sta|stx|sty|bit|jmp|jsr|bpl|bmi|bvc|bvs|bcc|bcs|bne|beq")), enumTokenTypes.INSTRUCTION},
 	}
-	directiveSpec = []TokenizerSpec{
+	directiveSpec = []specRegexEnum{
 		{regexp.MustCompile(generateBoundaries("db|byte|dw|word|dwBe|wordBe|rdb|reverseByte|ds|pad|ed|exprData")), enumTokenTypes.DIRECTIVE_data},
 		{regexp.MustCompile(generateBoundaries("d_[bwe]+_?")), enumTokenTypes.DIRECTIVE_mixedData},
 		{regexp.MustCompile(generateBoundaries("repeat|endrepeat")), enumTokenTypes.DIRECTIVE_repeat},
@@ -59,7 +53,7 @@ var (
 		{regexp.MustCompile(generateBoundaries("autoZP|autoZeroPage|emptyRomFill|rsset|resetCharMap|setCharMap|resetExprMap|setExprMap")), enumTokenTypes.DIRECTIVE_setting},
 		{regexp.MustCompile(generateBoundaries("throw")), enumTokenTypes.DIRECTIVE_throw},
 	}
-	delimiterSpec = []TokenizerSpec{
+	delimiterSpec = []specRegexEnum{
 		{regexp.MustCompile(`^,`), enumTokenTypes.DELIMITER_comma},
 		{regexp.MustCompile(`^\.`), enumTokenTypes.DELIMITER_period},
 		{regexp.MustCompile(`^\(`), enumTokenTypes.DELIMITER_leftParenthesis},
@@ -71,7 +65,7 @@ var (
 		{regexp.MustCompile(`^{`), enumTokenTypes.DELIMITER_leftCurlyBrace},
 		{regexp.MustCompile(`^}`), enumTokenTypes.DELIMITER_rightCurlyBrace},
 	}
-	remainingSpec = []TokenizerSpec{
+	remainingSpec = []specRegexEnum{
 		//Register letters (Used for indexes or shifting)
 		{regexp.MustCompile(generateBoundaries("a")), enumTokenTypes.REGISTER_A},
 		{regexp.MustCompile(generateBoundaries("x")), enumTokenTypes.REGISTER_X},
@@ -117,10 +111,10 @@ var (
 
 // All the combined general specs
 var (
-	CombinedInitialSpec   []TokenizerSpec
-	CombinedStartLineSpec []TokenizerSpec
-	CombinedOperandSpec   []TokenizerSpec
-	IndirectCapturingSpec []TokenizerSpec
+	CombinedInitialSpec   []specRegexEnum
+	CombinedStartLineSpec []specRegexEnum
+	CombinedOperandSpec   []specRegexEnum
+	IndirectCapturingSpec []specRegexEnum
 )
 
 // Generate the combined specs
@@ -151,7 +145,7 @@ func init() {
 }
 
 // ================================================
-func GenerateSpec(specType string) []TokenizerSpec {
+func GenerateSpec(specType string) []specRegexEnum {
 
 	switch specType {
 	case "initial":

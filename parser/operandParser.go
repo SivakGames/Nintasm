@@ -10,7 +10,7 @@ import (
 	"strconv"
 )
 
-type instModes = enumInstructionModes.Def
+type instModeEnum = enumInstructionModes.Def
 type Node = operandFactory.Node
 
 // General type for other operand parsers to borrow from
@@ -18,7 +18,7 @@ type OperandParser struct {
 	operandLine             string
 	operandPosition         int
 	ShouldParseInstructions bool
-	instructionMode         instModes
+	instructionMode         instModeEnum
 	instructionXYIndex      tokenEnum
 	Parser
 }
