@@ -1,4 +1,4 @@
-package romBinary
+package romBuilder
 
 import (
 	"errors"
@@ -15,6 +15,7 @@ var romSegments = make([][][]uint8, 0)
 var currentRomSegmentIndex = -1
 var currentBankIndex = -1
 var currentInsertionIndex = -1
+var currentOrg = 0x8000
 
 func AddNewRomSegment(totalSize int, bankSize int) error {
 	floatResult := float64(totalSize) / float64(bankSize)
@@ -31,19 +32,15 @@ func AddNewRomSegment(totalSize int, bankSize int) error {
 
 	romSegments = append(romSegments, newSegment)
 
-	fmt.Println(romSegments)
-
 	currentRomSegmentIndex = len(romSegments) - 1
 	currentBankIndex = 0
 	currentInsertionIndex = 0
 	return nil
 }
 
-func AddToRom(insertions []uint8) error {
+func AddBytesToRom(insertions []uint8) error {
 	currentRomSegment := &romSegments[currentRomSegmentIndex]
 	currentBankSegment := &(*currentRomSegment)[currentBankIndex]
-
-	fmt.Println("IData", len(*currentRomSegment), len(*currentBankSegment))
 
 	toInsertSpace := currentInsertionIndex + len(insertions)
 	overflowByteTotal := toInsertSpace - len(*currentBankSegment)
@@ -56,7 +53,6 @@ func AddToRom(insertions []uint8) error {
 		(*currentBankSegment)[currentInsertionIndex] = insertions[i]
 		currentInsertionIndex++
 	}
-	fmt.Println("Inserted oK", romSegments)
 
 	return nil
 }
@@ -73,15 +69,16 @@ func ConvertNodeValueToUInts(node Node, needBytes int) ([]uint8, error) {
 		switch needBytes {
 		case 1:
 			if node.AsNumber < -0x000ff || node.AsNumber > 0x000ff {
-				return nil, errors.New("NO!")
+				return nil, errors.New("Instruction operand for mode must resolve to an 8 bit value")
 			}
 			convertedValue = append(convertedValue, uint8(node.AsNumber))
 		case 2:
 			if node.AsNumber < -0x0ffff || node.AsNumber > 0x0ffff {
-				return nil, errors.New("NO!")
+				return nil, errors.New("Instruction operand for mode must resolve to a 16 bit value")
 			}
-			highByte := (node.AsNumber & 0x0ff00) >> 8
-			lowByte := node.AsNumber & 0x000ff
+			word := uint16(node.AsNumber)
+			highByte := (word & 0x0ff00) >> 8
+			lowByte := word & 0x000ff
 
 			convertedValue = append(convertedValue, uint8(lowByte))
 			convertedValue = append(convertedValue, uint8(highByte))

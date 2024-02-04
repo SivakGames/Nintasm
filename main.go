@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"misc/nintasm/parser"
 	"misc/nintasm/parser/parserTypes"
-	"misc/nintasm/romBinary"
+	"misc/nintasm/romBuilder"
 	"time"
 )
 
@@ -14,10 +14,10 @@ func main() {
 
 func process() {
 	start := time.Now()
-	lines := []string{" inx ", " dex", " lda #5", " lda [2], y"}
-	//lines := make([]string, 35000)
+	lines := []string{" sei ", " cld", " lda #5", " lda #"}
+	//lines := make([]string, 0x2000)
 	//for i := range lines {
-	//	lines[i] = " inx "
+	//	lines[i] = " lda [555], y "
 	//}
 
 	lineInitParzival := parser.NewInitialLineParser()
@@ -27,8 +27,8 @@ func process() {
 
 	instructionOperandParzival.ShouldParseInstructions = true
 
-	err := romBinary.AddNewRomSegment(0x10, 0x08)
-	err = romBinary.AddNewRomSegment(0x10, 0x08)
+	err := romBuilder.AddNewRomSegment(0x20000, 0x4000)
+	err = romBuilder.AddNewRomSegment(0x20000, 0x4000)
 	if err != nil {
 		fmt.Println(err)
 		return

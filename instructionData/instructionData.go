@@ -7,26 +7,25 @@ import (
 type instModes = enumInstructionModes.Def
 
 type modeDetailsKeys struct {
-	abbrev               string
-	description          string
-	operandRequiredBytes int
+	abbrev      string
+	description string
 }
 
 var InstructionModeEnumDetails = map[enumInstructionModes.Def]modeDetailsKeys{
-	enumInstructionModes.None:  {abbrev: "", description: "", operandRequiredBytes: -1},
-	enumInstructionModes.A:     {abbrev: "A", description: "Accumulator", operandRequiredBytes: 0},
-	enumInstructionModes.ABS:   {abbrev: "ABS", description: "Absolute", operandRequiredBytes: 2},
-	enumInstructionModes.ABS_X: {abbrev: "ABS_X", description: "Absolute,X", operandRequiredBytes: 2},
-	enumInstructionModes.ABS_Y: {abbrev: "ABS_Y", description: "Absolute,Y", operandRequiredBytes: 2},
-	enumInstructionModes.IMM:   {abbrev: "IMM", description: "Immediate", operandRequiredBytes: 1},
-	enumInstructionModes.IMPL:  {abbrev: "IMPL", description: "Implied", operandRequiredBytes: 0},
-	enumInstructionModes.IND:   {abbrev: "IND", description: "Indirect", operandRequiredBytes: 2},
-	enumInstructionModes.IND_X: {abbrev: "IND_X", description: "Indirect,X", operandRequiredBytes: 1},
-	enumInstructionModes.IND_Y: {abbrev: "IND_Y", description: "Indirect,Y", operandRequiredBytes: 1},
-	enumInstructionModes.REL:   {abbrev: "REL", description: "Releative", operandRequiredBytes: 1},
-	enumInstructionModes.ZP:    {abbrev: "ZP", description: "Zero Page", operandRequiredBytes: 1},
-	enumInstructionModes.ZP_X:  {abbrev: "ZP_X", description: "Zero Page,X", operandRequiredBytes: 1},
-	enumInstructionModes.ZP_Y:  {abbrev: "ZP_Y", description: "Zero Page,Y", operandRequiredBytes: 1},
+	enumInstructionModes.None:  {abbrev: "", description: ""},
+	enumInstructionModes.A:     {abbrev: "A", description: "Accumulator"},
+	enumInstructionModes.ABS:   {abbrev: "ABS", description: "Absolute"},
+	enumInstructionModes.ABS_X: {abbrev: "ABS_X", description: "Absolute,X"},
+	enumInstructionModes.ABS_Y: {abbrev: "ABS_Y", description: "Absolute,Y"},
+	enumInstructionModes.IMM:   {abbrev: "IMM", description: "Immediate"},
+	enumInstructionModes.IMPL:  {abbrev: "IMPL", description: "Implied"},
+	enumInstructionModes.IND:   {abbrev: "IND", description: "Indirect"},
+	enumInstructionModes.IND_X: {abbrev: "IND_X", description: "Indirect,X"},
+	enumInstructionModes.IND_Y: {abbrev: "IND_Y", description: "Indirect,Y"},
+	enumInstructionModes.REL:   {abbrev: "REL", description: "Releative"},
+	enumInstructionModes.ZP:    {abbrev: "ZP", description: "Zero Page"},
+	enumInstructionModes.ZP_X:  {abbrev: "ZP_X", description: "Zero Page,X"},
+	enumInstructionModes.ZP_Y:  {abbrev: "ZP_Y", description: "Zero Page,Y"},
 }
 
 var InstructionModeOperandRequiredBytes = map[enumInstructionModes.Def]int{

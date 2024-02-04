@@ -2,11 +2,12 @@ package parser
 
 import (
 	"errors"
+	"fmt"
 	enumInstructionModes "misc/nintasm/enums/instructionModes"
 	enumTokenTypes "misc/nintasm/enums/tokenTypes"
 	"misc/nintasm/instructionData"
 	"misc/nintasm/parser/operandFactory"
-	"misc/nintasm/romBinary"
+	"misc/nintasm/romBuilder"
 	"strings"
 )
 
@@ -78,14 +79,14 @@ func (p *InstructionOperandParser) Process(operationValue string) error {
 	instructionZPModeEquivalent := getModeZeroPageEquivalent(instructionMode)
 
 	// Check if instruction itself supports mode
-	for _, m := range *opcodesAndSupportedModes.SupportedModes {
-		if m == instructionMode {
-			useInstructionMode = m
+	for _, mode := range *opcodesAndSupportedModes.SupportedModes {
+		if mode == instructionMode {
+			useInstructionMode = mode
 			continue
 		}
-		if m == instructionZPModeEquivalent && operand.Resolved {
-			if operand.AsNumber <= 255 && operand.AsNumber >= 0 {
-				useInstructionZPMode = m
+		if mode == instructionZPModeEquivalent && operand.Resolved {
+			if operand.AsNumber <= 255 && operand.AsNumber >= -255 {
+				useInstructionZPMode = mode
 			}
 		}
 	}
@@ -105,13 +106,14 @@ func (p *InstructionOperandParser) Process(operationValue string) error {
 	bytesToInsert := make([]uint8, 0)
 	bytesToInsert = append(bytesToInsert, instructionOpcode)
 
-	asRomData, err := romBinary.ConvertNodeValueToUInts(operand, operandNeedsNBytes)
+	asRomData, err := romBuilder.ConvertNodeValueToUInts(operand, operandNeedsNBytes)
 	if err != nil {
 		return err
 	}
 	bytesToInsert = append(bytesToInsert, asRomData...)
+	fmt.Println(bytesToInsert)
 
-	err = romBinary.AddToRom(bytesToInsert)
+	err = romBuilder.AddBytesToRom(bytesToInsert)
 	if err != nil {
 		return err
 	}
