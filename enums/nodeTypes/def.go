@@ -5,6 +5,7 @@ type Def int
 const (
 	Empty Def = iota + 0
 	Error
+	AssignmentExpression
 	BinaryExpression
 	CallExpression
 	LogicalExpression

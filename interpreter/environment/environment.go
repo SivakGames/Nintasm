@@ -47,6 +47,16 @@ var GlobalEnvironmentValues = map[string]Node{
 
 // ----------------------------------
 
+func AddToEnvironment(symbolName string, node Node) Node {
+	_, exists := GlobalEnvironment.record[symbolName]
+	if exists {
+		fmt.Println(symbolName, ": SYMBOL IS ALREADY DEFINED!")
+	} else {
+		GlobalEnvironment.record[symbolName] = node
+	}
+	return GlobalEnvironment.record[symbolName]
+}
+
 func LookupInEnvironment(symbolName string) Node {
 	return resolveInEnvironment(symbolName)
 }
@@ -57,7 +67,7 @@ func resolveInEnvironment(symbolName string) Node {
 	if ok {
 		return value
 	} else {
-		fmt.Println("Not found")
+		fmt.Println(symbolName, "was not found")
 	}
 	return operandFactory.EmptyNode()
 }

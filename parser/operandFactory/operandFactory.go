@@ -86,9 +86,17 @@ func CreateBinaryExpressionNode(nodeType tokenEnum, nodeValue string, left Node,
 }
 
 // """Standard unary expression"""
-func CreateUnaryExpressionNode(nodeType tokenEnum, nodeValue string, argument Node) Node {
+func CreateUnaryExpressionNode(nodeType tokenEnum, nodeValue string, right Node) Node {
 	node := newNode(nodeType, nodeValue, enumNodeTypes.UnaryExpression)
-	node.Right = &argument
+	node.Right = &right
+	return node
+}
+
+// """Assign a symbol"""
+func CreateAssignmentNode(left Node, right Node) Node {
+	node := newNode(enumTokenTypes.ASSIGN_simple, "=", enumNodeTypes.AssignmentExpression)
+	node.Left = &left
+	node.Right = &right
 	return node
 }
 

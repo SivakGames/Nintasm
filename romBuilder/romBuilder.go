@@ -94,3 +94,7 @@ func ConvertNodeValueToUInts(node Node, needBytes int) ([]uint8, error) {
 
 	return convertedValue, nil
 }
+
+func GetOrg() int {
+	return currentOrg + currentInsertionIndex
+}

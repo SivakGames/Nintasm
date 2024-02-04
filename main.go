@@ -14,7 +14,7 @@ func main() {
 
 func process() {
 	start := time.Now()
-	lines := []string{" sei ", " cld", " lda #5", " lda #"}
+	lines := []string{"JAJA = 11", "JAJ2A equ 42", "RESET:", " sei ", " cld", " lda JAJA"}
 	//lines := make([]string, 0x2000)
 	//for i := range lines {
 	//	lines[i] = " lda [555], y "

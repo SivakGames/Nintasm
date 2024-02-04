@@ -156,10 +156,8 @@ func GenerateSpec(specType string) []specRegexEnum {
 		return CombinedOperandSpec
 	case "indirectCapturing":
 		return IndirectCapturingSpec
-	default:
-		fmt.Println("UNKNOWN TOKENIZER SPEC NAME")
 	}
-	return nil
+	panic("UNKNOWN TOKENIZER SPEC NAME")
 }
 
 // ++++++++++++++++++++++++++++++++++++++++++++++++

@@ -20,6 +20,15 @@ func EvaluateNode(node Node) Node {
 		enumNodeTypes.MemberExpression:
 		return environment.LookupInEnvironment(node.NodeValue)
 
+	case enumNodeTypes.AssignmentExpression:
+		left := *node.Left
+		right := EvaluateNode(*node.Right)
+		symbolName := left.NodeValue
+		node.Left = nil
+		node.Right = nil
+		environment.AddToEnvironment(symbolName, right)
+		return node
+
 	case enumNodeTypes.BinaryExpression:
 		left := EvaluateNode(*node.Left)
 		right := EvaluateNode(*node.Right)

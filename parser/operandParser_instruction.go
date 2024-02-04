@@ -2,7 +2,6 @@ package parser
 
 import (
 	"errors"
-	"fmt"
 	enumInstructionModes "misc/nintasm/enums/instructionModes"
 	enumTokenTypes "misc/nintasm/enums/tokenTypes"
 	"misc/nintasm/instructionData"
@@ -111,7 +110,6 @@ func (p *InstructionOperandParser) Process(operationValue string) error {
 		return err
 	}
 	bytesToInsert = append(bytesToInsert, asRomData...)
-	fmt.Println(bytesToInsert)
 
 	err = romBuilder.AddBytesToRom(bytesToInsert)
 	if err != nil {
