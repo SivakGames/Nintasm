@@ -2,10 +2,10 @@ package parser
 
 import (
 	"errors"
-	"fmt"
 	enumInstructionModes "misc/nintasm/enums/instructionModes"
 	enumTokenTypes "misc/nintasm/enums/tokenTypes"
 	"misc/nintasm/instructionData"
+	"misc/nintasm/parser/operandFactory"
 	"misc/nintasm/romBinary"
 	"strings"
 )
@@ -22,7 +22,7 @@ func NewInstructionOperandParser() InstructionOperandParser {
 func (p *InstructionOperandParser) Process(operationValue string) error {
 	var err error = nil
 	var instructionMode instModeEnum
-	var operand *Node = nil
+	var operand Node = operandFactory.EmptyNode()
 
 	instructionName := strings.ToUpper(operationValue)
 
@@ -71,7 +71,7 @@ func (p *InstructionOperandParser) Process(operationValue string) error {
 	}
 
 	if len(operandList) == 1 {
-		operand = &operandList[0]
+		operand = operandList[0]
 	}
 
 	//Used for auto ZP convert if possible
@@ -83,7 +83,7 @@ func (p *InstructionOperandParser) Process(operationValue string) error {
 			useInstructionMode = m
 			continue
 		}
-		if m == instructionZPModeEquivalent && operand != nil && operand.Resolved {
+		if m == instructionZPModeEquivalent && operand.Resolved {
 			if operand.AsNumber <= 255 && operand.AsNumber >= 0 {
 				useInstructionZPMode = m
 			}
@@ -98,14 +98,23 @@ func (p *InstructionOperandParser) Process(operationValue string) error {
 		instructionMode = useInstructionZPMode
 	}
 
-	instructionOpcode := opcodesAndSupportedModes.ModeOpcodes[instructionMode]
+	//Write data into ROM
 
-	err = romBinary.AddToRom([]uint8{instructionOpcode})
+	instructionOpcode := opcodesAndSupportedModes.ModeOpcodes[instructionMode]
+	operandNeedsNBytes := instructionData.InstructionModeOperandRequiredBytes[instructionMode]
+	bytesToInsert := make([]uint8, 0)
+	bytesToInsert = append(bytesToInsert, instructionOpcode)
+
+	asRomData, err := romBinary.ConvertNodeValueToUInts(operand, operandNeedsNBytes)
 	if err != nil {
 		return err
 	}
+	bytesToInsert = append(bytesToInsert, asRomData...)
 
-	fmt.Println(instructionOpcode)
+	err = romBinary.AddToRom(bytesToInsert)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
