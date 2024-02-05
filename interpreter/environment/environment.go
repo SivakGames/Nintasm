@@ -1,6 +1,7 @@
 package environment
 
 import (
+	"errors"
 	"fmt"
 	enumTokenTypes "misc/nintasm/enums/tokenTypes"
 	"misc/nintasm/parser/operandFactory"
@@ -47,27 +48,30 @@ var GlobalEnvironmentValues = map[string]Node{
 
 // ----------------------------------
 
-func AddToEnvironment(symbolName string, node Node) Node {
+func AddToEnvironment(symbolName string, node Node) (Node, error) {
 	_, exists := GlobalEnvironment.record[symbolName]
 	if exists {
-		fmt.Println(symbolName, ": SYMBOL IS ALREADY DEFINED!")
+		errMsg := fmt.Sprintf("%v : SYMBOL IS ALREADY DEFINED!", symbolName)
+		return node, errors.New(errMsg)
+
 	} else {
 		GlobalEnvironment.record[symbolName] = node
 	}
-	return GlobalEnvironment.record[symbolName]
+	return GlobalEnvironment.record[symbolName], nil
 }
 
-func LookupInEnvironment(symbolName string) Node {
+func LookupInEnvironment(symbolName string) (Node, error) {
 	return resolveInEnvironment(symbolName)
 }
 
-func resolveInEnvironment(symbolName string) Node {
+func resolveInEnvironment(symbolName string) (Node, error) {
 
 	value, ok := GlobalEnvironment.record[symbolName]
 	if ok {
-		return value
+		return value, nil
 	} else {
-		fmt.Println(symbolName, "was not found")
+		errMsg := fmt.Sprintf(symbolName, "was not found")
+		return operandFactory.EmptyNode(), errors.New(errMsg)
 	}
-	return operandFactory.EmptyNode()
+	//return operandFactory.EmptyNode(), nil
 }

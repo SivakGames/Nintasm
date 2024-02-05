@@ -82,7 +82,10 @@ func (p *OperandParser) statementList(stopTokenType tokenEnum) (Node, error) {
 		return statementList, err
 	}
 
-	statementList = interpreter.EvaluateNode(statementList)
+	statementList, err = interpreter.EvaluateNode(statementList)
+	if err != nil {
+		return statementList, err
+	}
 
 	//Subsequent operands
 	for p.lookaheadType != enumTokenTypes.None && p.lookaheadType != stopTokenType {

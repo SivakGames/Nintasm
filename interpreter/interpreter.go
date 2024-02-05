@@ -1,7 +1,7 @@
 package interpreter
 
 import (
-	"fmt"
+	"errors"
 	enumNodeTypes "misc/nintasm/enums/nodeTypes"
 	"misc/nintasm/interpreter/environment"
 	"misc/nintasm/parser/operandFactory"
@@ -9,29 +9,44 @@ import (
 
 type Node = operandFactory.Node
 
-func EvaluateNode(node Node) Node {
+func EvaluateNode(node Node) (Node, error) {
 	switch node.NodeType {
 	case enumNodeTypes.Empty,
 		enumNodeTypes.StringLiteral,
 		enumNodeTypes.NumericLiteral:
-		return node
+		return node, nil
 
 	case enumNodeTypes.Identifier,
 		enumNodeTypes.MemberExpression:
 		return environment.LookupInEnvironment(node.NodeValue)
 
 	case enumNodeTypes.AssignmentExpression:
+		var err error
 		left := *node.Left
-		right := EvaluateNode(*node.Right)
+		right, err := EvaluateNode(*node.Right)
+		if err != nil {
+			return node, err
+		}
 		symbolName := left.NodeValue
 		node.Left = nil
 		node.Right = nil
-		environment.AddToEnvironment(symbolName, right)
-		return node
+		_, err = environment.AddToEnvironment(symbolName, right)
+		if err != nil {
+			return node, err
+		}
+		return node, nil
 
 	case enumNodeTypes.BinaryExpression:
-		left := EvaluateNode(*node.Left)
-		right := EvaluateNode(*node.Right)
+		var err error
+		left, err := EvaluateNode(*node.Left)
+		if err != nil {
+			return node, err
+		}
+		right, err := EvaluateNode(*node.Right)
+		if err != nil {
+			return node, err
+		}
+
 		operation := node.NodeValue
 		node.Left = nil
 		node.Right = nil
@@ -73,7 +88,8 @@ func EvaluateNode(node Node) Node {
 		case "||":
 			node.AsBool = left.AsBool || right.AsBool
 		default:
-			fmt.Println("SOMETHING IS VERY WRONG")
+			return node, errors.New("SOMETHING IS VERY WRONG")
+
 		}
 		switch operation {
 		case "+", "-", "*", "/", "%", "|", "&", "^", "<<", ">>":
@@ -83,7 +99,10 @@ func EvaluateNode(node Node) Node {
 		}
 
 	case enumNodeTypes.UnaryExpression:
-		right := EvaluateNode(*node.Right)
+		right, err := EvaluateNode(*node.Right)
+		if err != nil {
+			return node, err
+		}
 		operation := node.NodeValue
 		node.Right = nil
 		switch operation {
@@ -96,7 +115,7 @@ func EvaluateNode(node Node) Node {
 		case "!":
 			node.AsBool = !right.AsBool
 		default:
-			fmt.Println("SOMETHING IS VERY WRONG")
+			return node, errors.New("SOMETHING IS VERY WRONG")
 		}
 
 		switch operation {
@@ -107,8 +126,8 @@ func EvaluateNode(node Node) Node {
 		}
 
 	default:
-		fmt.Println("UNKNOWN NODE!!!")
+		return node, errors.New("UNKNOWN NODE!!!")
 	}
 
-	return node
+	return node, nil
 }

@@ -10,7 +10,8 @@ import (
 
 type Node = operandFactory.Node
 
-var romSegments = make([][][]uint8, 0)
+// The final ROM that will be built
+var romLayout = make([][][]uint8, 0)
 
 var currentRomSegmentIndex = -1
 var currentBankIndex = -1
@@ -30,17 +31,16 @@ func AddNewRomSegment(totalSize int, bankSize int) error {
 		newSegment[i] = make([]uint8, bankSize)
 	}
 
-	romSegments = append(romSegments, newSegment)
+	romLayout = append(romLayout, newSegment)
 
-	currentRomSegmentIndex = len(romSegments) - 1
+	currentRomSegmentIndex = len(romLayout) - 1
 	currentBankIndex = 0
 	currentInsertionIndex = 0
 	return nil
 }
 
 func AddBytesToRom(insertions []uint8) error {
-	currentRomSegment := &romSegments[currentRomSegmentIndex]
-	currentBankSegment := &(*currentRomSegment)[currentBankIndex]
+	currentBankSegment := GetCurrentBankSegment()
 
 	toInsertSpace := currentInsertionIndex + len(insertions)
 	overflowByteTotal := toInsertSpace - len(*currentBankSegment)
@@ -95,6 +95,20 @@ func ConvertNodeValueToUInts(node Node, needBytes int) ([]uint8, error) {
 	return convertedValue, nil
 }
 
+func GetCurrentRomSegment() *[][]uint8 {
+	return &romLayout[currentRomSegmentIndex]
+}
+func GetCurrentBankSegment() *[]uint8 {
+	currentRomSegment := GetCurrentRomSegment()
+	return &(*currentRomSegment)[currentBankIndex]
+}
+
 func GetOrg() int {
 	return currentOrg + currentInsertionIndex
+}
+
+// TODO: Set ORG upper/lower bounds checks
+func SetOrg(newOrg int) {
+	currentOrg = newOrg
+	return
 }
