@@ -3,6 +3,7 @@ package parser
 import (
 	"errors"
 	"fmt"
+	"log"
 	enumInstructionModes "misc/nintasm/enums/instructionModes"
 	enumTokenTypes "misc/nintasm/enums/tokenTypes"
 	"misc/nintasm/interpreter"
@@ -30,7 +31,7 @@ type OperandParser struct {
 //=============================================
 
 // Used by most operations.  Will go through and separate operands by commas returning each one as an AST
-func (p *OperandParser) GetOperandList() ([]Node, error) {
+func (p *OperandParser) GetOperandList(minOperands int, maxOperands int) ([]Node, error) {
 	operandList := []Node{}
 	operandCount := 0
 
@@ -41,7 +42,7 @@ func (p *OperandParser) GetOperandList() ([]Node, error) {
 
 	//No commas at the beginning...
 	if p.lookaheadType == enumTokenTypes.DELIMITER_comma {
-		return operandList, errors.New("Operand list cannot start with a comma!") // ❌ Fails
+		return operandList, errors.New("Operand list \x1b[38;5;202mCANNOT\x1b[0m start with a comma!") // ❌ Fails
 	}
 
 	//There is at least one operand
@@ -54,16 +55,23 @@ func (p *OperandParser) GetOperandList() ([]Node, error) {
 
 	//From here, operands are comma separated
 	for p.lookaheadType != enumTokenTypes.None && p.lookaheadType == enumTokenTypes.DELIMITER_comma {
+		if len(operandList) >= maxOperands {
+			return operandList, errors.New("Too many operands for operation!")
+		}
 		err = p.eatFreelyAndAdvance(enumTokenTypes.DELIMITER_comma)
 		if err != nil {
 			return operandList, err // ❌ Fails
 		}
-		data, err := p.operandStatementList()
+		subsequentOperand, err := p.operandStatementList()
 		if err != nil {
 			return operandList, err // ❌ Fails
 		}
-		operandList = append(operandList, data)
+		operandList = append(operandList, subsequentOperand)
 		operandCount++
+	}
+
+	if len(operandList) < minOperands {
+		return operandList, errors.New("Too few operands for operation!")
 	}
 
 	return operandList, nil // 🟢 Succeeds
@@ -86,9 +94,9 @@ func (p *OperandParser) statementList(stopTokenType tokenEnum) (Node, error) {
 	if err != nil {
 		return statementList, err
 	}
-
-	//Subsequent operands
+	//If somehow, after evaluation, the next token is not the stop token...
 	for p.lookaheadType != enumTokenTypes.None && p.lookaheadType != stopTokenType {
+		log.Println("\x1b[38;5;202mEvaluating next statement...\x1b[0m")
 		return p.Statement()
 	}
 

@@ -3,9 +3,11 @@ package romBuilder
 import (
 	"errors"
 	"fmt"
+	"log"
 	"math"
 	enumNodeTypes "misc/nintasm/enums/nodeTypes"
 	"misc/nintasm/parser/operandFactory"
+	"unicode/utf8"
 )
 
 type Node = operandFactory.Node
@@ -57,39 +59,89 @@ func AddBytesToRom(insertions []uint8) error {
 	return nil
 }
 
-func ConvertNodeValueToUInts(node Node, needBytes int) ([]uint8, error) {
-	if needBytes < 0 {
-		return nil, errors.New("Ruh roh")
-	}
+// Convert into bytes for ROM data
+func ConvertNodeValueToUInts(node Node, neededBytes int, isBigEndian bool) ([]uint8, error) {
+	var lowByte, highByte int = 0, 0
 
 	convertedValue := make([]uint8, 0)
 
+	if !node.Resolved {
+		switch neededBytes {
+		case 1:
+			convertedValue = append(convertedValue, 0)
+		case 2:
+			convertedValue = append(convertedValue, 0, 0)
+		default:
+			panic("Something is very wrong with unresolved byte conversion!")
+		}
+		return convertedValue, nil
+	}
+
 	switch node.NodeType {
 	case enumNodeTypes.NumericLiteral:
-		switch needBytes {
+		highByte = (node.AsNumber & 0x0ff00) >> 8
+		lowByte = node.AsNumber & 0x000ff
+
+		switch neededBytes {
 		case 1:
 			if node.AsNumber < -0x000ff || node.AsNumber > 0x000ff {
 				return nil, errors.New("Instruction operand for mode must resolve to an 8 bit value")
 			}
-			convertedValue = append(convertedValue, uint8(node.AsNumber))
+			convertedValue = append(convertedValue, uint8(lowByte))
 		case 2:
 			if node.AsNumber < -0x0ffff || node.AsNumber > 0x0ffff {
 				return nil, errors.New("Instruction operand for mode must resolve to a 16 bit value")
 			}
-			word := uint16(node.AsNumber)
-			highByte := (word & 0x0ff00) >> 8
-			lowByte := word & 0x000ff
-
-			convertedValue = append(convertedValue, uint8(lowByte))
-			convertedValue = append(convertedValue, uint8(highByte))
+			if !isBigEndian {
+				convertedValue = append(convertedValue, uint8(lowByte))
+				convertedValue = append(convertedValue, uint8(highByte))
+			} else {
+				convertedValue = append(convertedValue, uint8(highByte))
+				convertedValue = append(convertedValue, uint8(lowByte))
+			}
+		default:
+			panic("Something is very wrong with numeric byte conversion!")
 		}
 	case enumNodeTypes.BooleanLiteral:
 		if node.AsBool {
-			convertedValue = append(convertedValue, 1)
+			lowByte = 1
 		} else {
-			convertedValue = append(convertedValue, 0)
+			lowByte = 0
 		}
-		fmt.Println("\x1b[33mWARNING\x1b[0m: Value is boolean; Resolving to 1 or 0...")
+
+		switch neededBytes {
+		case 1:
+			fmt.Println("\x1b[33mWARNING\x1b[0m: Value is boolean; Resolving to", lowByte)
+			convertedValue = append(convertedValue, uint8(lowByte))
+		case 2:
+			return convertedValue, errors.New("Boolean value cannot be used in 16 bit operations")
+		default:
+			panic("Something is very wrong with boolean byte conversion!")
+		}
+	case enumNodeTypes.StringLiteral:
+		switch neededBytes {
+		case 1:
+			convertedStringAsBytes := make([]uint8, 0, len(node.NodeValue))
+			for _, c := range node.NodeValue {
+				runeLen := utf8.RuneLen(c)
+				if runeLen > 1 {
+					log.Println("Character", c, "encoding requires more than a single byte. Using", runeLen, "bytes")
+					for i := 0; i < runeLen; i++ {
+						writeRune := (rune(c) >> (i * 8)) & 0x000ff
+						convertedStringAsBytes = append(convertedStringAsBytes, uint8(writeRune))
+					}
+				} else {
+					convertedStringAsBytes = append(convertedStringAsBytes, uint8(rune(c)))
+				}
+			}
+			convertedValue = append(convertedValue, convertedStringAsBytes...)
+		case 2:
+			return convertedValue, errors.New("String values cannot be used in 16 bit operations")
+		default:
+			panic("Something is very wrong with string byte conversion!")
+		}
+	default:
+		panic("Something is very wrong with operand conversion!")
 	}
 
 	return convertedValue, nil

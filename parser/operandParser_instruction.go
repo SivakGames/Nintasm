@@ -49,7 +49,7 @@ func (p *InstructionOperandParser) Process(operationValue string) error {
 
 	default:
 		isBranch = checkIfBranchInstruction(instructionName)
-		operandList, err = p.GetOperandList()
+		operandList, err = p.GetOperandList(0, 1)
 		if err != nil {
 			return err // ❌ Fails
 		}
@@ -105,7 +105,7 @@ func (p *InstructionOperandParser) Process(operationValue string) error {
 	bytesToInsert := make([]uint8, 0)
 	bytesToInsert = append(bytesToInsert, instructionOpcode)
 
-	asRomData, err := romBuilder.ConvertNodeValueToUInts(operand, operandNeedsNBytes)
+	asRomData, err := romBuilder.ConvertNodeValueToUInts(operand, operandNeedsNBytes, false)
 	if err != nil {
 		return err
 	}

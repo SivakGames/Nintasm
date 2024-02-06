@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	lines := []string{" .db 2"}
+	lines := []string{" .ds 2,4"}
 	//lines := make([]string, 0x2000)
 	//for i := range lines {
 	//	lines[i] = " lda [555], y "

@@ -2,11 +2,10 @@ package parser
 
 import (
 	"errors"
-	"log"
 	enumNodeTypes "misc/nintasm/enums/nodeTypes"
 	enumTokenTypes "misc/nintasm/enums/tokenTypes"
 	"misc/nintasm/romBuilder"
-	"unicode/utf8"
+	"strings"
 )
 
 type DirectiveOperandParser struct {
@@ -18,86 +17,128 @@ func NewDirectiveOperandParser() DirectiveOperandParser {
 	return DirectiveOperandParser{}
 }
 
+var directiveAliases = map[string]string{
+	"BYTE":        "DB",
+	"WORD":        "DW",
+	"WORDBE":      "DWBE",
+	"REVERSEBYTE": "RDB",
+	"PAD":         "DS",
+}
+
+var directiveMinMaxOperands = map[string][2]int{
+	"DB":   {1, 128},
+	"DW":   {1, 128},
+	"DWBE": {1, 128},
+	"RDB":  {1, 128},
+	"DS":   {1, 2},
+}
+
+var directiveOperandByteSizes = map[string]int{
+	"DB":   1,
+	"DW":   2,
+	"DWBE": 2,
+	"RDB":  1,
+}
+
 func (p *DirectiveOperandParser) Process(operationType tokenEnum, operationValue string) error {
-	var evalDirectiveOperandFunc func(Node, int) ([]uint8, error)
 	var evalOperandSize int
+	var err error
 
-	operandList, err := p.GetOperandList()
-	bytesToInsert := make([]uint8, 0)
+	directiveName := strings.ToUpper(operationValue)
+	aliasValue, aliasExists := directiveAliases[directiveName]
+	if aliasExists {
+		directiveName = aliasValue
+	}
 
+	isBigEndian := false
+	minMaxOperands := directiveMinMaxOperands[directiveName]
+	minOperands := minMaxOperands[0]
+	maxOperands := minMaxOperands[1]
+
+	operandList, err := p.GetOperandList(minOperands, maxOperands)
 	if err != nil {
-		return err
+		return err // ❌ Fails
 	}
 
 	switch operationType {
 
 	case enumTokenTypes.DIRECTIVE_data:
-		if len(operandList) == 0 {
-			return errors.New("Directive is empty!")
+		if directiveName == "DS" {
+			err = evalDataPadOperands(&operandList)
+			return err // 🟢/❌ Could be either
+
 		}
-		evalOperandSize = 1
-		evalDirectiveOperandFunc = evalDBOperand
+
+		evalOperandSize = directiveOperandByteSizes[directiveName]
+		if directiveName == "DWBE" {
+			isBigEndian = true
+		}
+		err = evalDataInsertionOperands(&operandList, evalOperandSize, isBigEndian)
+		if err != nil {
+			return err // ❌ Fails
+		}
 
 	default:
 		return errors.New("BAD DIRECTIVE OPERATION TYPE!!!")
-	}
-
-	for _, operand := range operandList {
-		asRomData, err := evalDirectiveOperandFunc(operand, evalOperandSize)
-
-		if err != nil {
-			return err
-		}
-		bytesToInsert = append(bytesToInsert, asRomData...)
-	}
-
-	err = romBuilder.AddBytesToRom(bytesToInsert)
-	if err != nil {
-		return err
 	}
 
 	return nil
 
 }
 
-func evalDBOperand(operand Node, operandSize int) ([]uint8, error) {
+// For .db, .dw, etc.
+func evalDataInsertionOperands(operandList *[]Node, operandSize int, isBigEndian bool) error {
+	var asRomData = make([]uint8, 0)
 	var err error
-	asRomData := make([]uint8, 0)
 
-	if operand.Resolved {
-		switch operand.NodeType {
-		case enumNodeTypes.NumericLiteral, enumNodeTypes.BooleanLiteral:
-			asRomData, err = romBuilder.ConvertNodeValueToUInts(operand, operandSize)
-			return asRomData, err
-
-		case enumNodeTypes.StringLiteral:
-			asRomData := stringToUint8Array(operand.NodeValue)
-			return asRomData, nil
+	for _, operand := range *operandList {
+		asRomData, err = romBuilder.ConvertNodeValueToUInts(operand, operandSize, isBigEndian)
+		if err != nil {
+			return err // ❌ Fails
 		}
-		panic("BAD resolved operand for directive eval!")
-
-	} else {
-		return []uint8{0}, nil
+		err = romBuilder.AddBytesToRom(asRomData)
+		if err != nil {
+			return err // ❌ Fails
+		}
 	}
-
+	return nil
 }
 
-func stringToUint8Array(s string) []uint8 {
-	result := make([]uint8, 0, len(s))
+// For .ds
+func evalDataPadOperands(operandList *[]Node) error {
+	padValue := 0xff
 
-	for _, c := range s {
-		runeLen := utf8.RuneLen(c)
-		if runeLen > 1 {
-			log.Println("Rune bigger than 1 byte", c)
-			for i := 0; i < runeLen; i++ {
-				writeRune := (rune(c) >> (i * 8)) & 0x0ff
-				result = append(result, uint8(writeRune))
-			}
-		} else {
-			result = append(result, uint8(rune(c)))
+	repetitionNode := &(*operandList)[0]
+	if repetitionNode.NodeType != enumNodeTypes.NumericLiteral {
+		return errors.New("DS/PAD directive Must be a number!")
+	}
+	repetitionNumber := repetitionNode.AsNumber
+	if repetitionNumber < 1 {
+		return errors.New("DS/PAD directive cannot less than 1!")
+	}
+	numRepetitions := repetitionNumber
+
+	if len(*operandList) == 2 {
+		padNode := &(*operandList)[1]
+		if padNode.NodeType != enumNodeTypes.NumericLiteral {
+			return errors.New("DS/PAD directive Must be a number!")
 		}
-
+		padNodeNumber := padNode.AsNumber
+		if padNodeNumber < 0 {
+			return errors.New("DS/PAD directive cannot be negative!")
+		}
+		padValue = padNodeNumber
 	}
 
-	return result
+	asRomData := make([]uint8, numRepetitions)
+	for i := range asRomData {
+		asRomData[i] = uint8(padValue)
+	}
+
+	err := romBuilder.AddBytesToRom(asRomData)
+	if err != nil {
+		return err // ❌ Fails
+	}
+
+	return nil
 }

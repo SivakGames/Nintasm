@@ -31,7 +31,28 @@ func TestDirectiveOperandParser(t *testing.T) {
 		result := (*bankSegment)
 		for i := range wanted {
 			if result[i] != wanted[i] {
-				t.Error("= Result", i, "not as expected")
+				t.Error("= Result at index", i, "not as expected")
+				t.Log("Wanted:", wanted[i], "Got:", result[i])
+			}
+		}
+
+	})
+	t.Run("Testing .ds", func(t *testing.T) {
+
+		testLine1 := " .ds 2, 5 "
+		wanted := []uint8{5, 5}
+
+		lines := []string{testLine1}
+		err := assemble.Start(lines)
+		if err != nil {
+			t.Error(err)
+		}
+
+		bankSegment := romBuilder.GetCurrentBankSegment()
+		result := (*bankSegment)
+		for i := range wanted {
+			if result[i] != wanted[i] {
+				t.Error("= Result at index", i, "not as expected")
 				t.Log("Wanted:", wanted[i], "Got:", result[i])
 			}
 		}

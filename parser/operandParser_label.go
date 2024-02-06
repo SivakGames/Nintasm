@@ -41,7 +41,7 @@ func (p *LabelOperandParser) Process(operationType tokenEnum, operationValue str
 		assignmentNode := operandFactory.CreateAssignmentNode(identifierNode, numberNode)
 		_, err := interpreter.EvaluateNode(assignmentNode)
 		if err != nil {
-			return err
+			return err // ❌ Fails
 		}
 		return nil
 
@@ -50,16 +50,16 @@ func (p *LabelOperandParser) Process(operationType tokenEnum, operationValue str
 			return errors.New("\x1b[31mMissing assignment operand!\x1b[0m")
 		}
 
-		operandList, err := p.GetOperandList()
+		operandList, err := p.GetOperandList(1, 64)
 		if err != nil {
-			return err
+			return err // ❌ Fails
 		}
 		if len(operandList) == 1 {
 			identifierNode := operandFactory.CreateIdentifierNode(operationType, operationLabel)
 			assignmentNode := operandFactory.CreateAssignmentNode(identifierNode, operandList[0])
 			_, err := interpreter.EvaluateNode(assignmentNode)
 			if err != nil {
-				return err
+				return err // ❌ Fails
 			}
 		} else {
 			return errors.New("Solve multi assignment operandz")
