@@ -115,7 +115,7 @@ func evalDataSeriesOperands(directiveName string, operandList *[]Node) error {
 	seriesValue := uint8(0xff)
 	repetitionNode := &(*operandList)[0]
 	if !(operandFactory.ValidateNodeIsNumeric(repetitionNode) &&
-		operandFactory.ValidateNumericNodeMinValue(repetitionNode, 1)) {
+		operandFactory.ValidateNumericNodeIsGTZero(repetitionNode)) {
 		return errors.New("DS/PAD directive repeat value must be a number that is > 0")
 	}
 

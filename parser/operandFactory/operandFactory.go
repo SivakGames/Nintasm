@@ -174,10 +174,25 @@ func ValidateNodeIsString(node *Node) bool {
 func ValidateNodeIsNumeric(node *Node) bool {
 	return node.NodeType == enumNodeTypes.NumericLiteral
 }
-func ValidateNumericNodeMinValue(node *Node, minValue int) bool {
+func ValidateNumericNodeIsGTValue(node *Node, minValue int) bool {
 	return node.AsNumber > minValue
 }
+func ValidateNumericNodeIsGTEValue(node *Node, minValue int) bool {
+	return node.AsNumber >= minValue
+}
+func ValidateNumericNodeIsLTValue(node *Node, maxValue int) bool {
+	return node.AsNumber < maxValue
+}
+func ValidateNumericNodeIsLTEValue(node *Node, maxValue int) bool {
+	return node.AsNumber <= maxValue
+}
+func ValidateNumericNodeIsGTEandLTEValues(node *Node, minValue int, maxValue int) bool {
+	return node.AsNumber >= minValue && node.AsNumber <= maxValue
+}
 func ValidateNumericNodeIsPositive(node *Node) bool {
+	return node.AsNumber >= 0
+}
+func ValidateNumericNodeIsGTZero(node *Node) bool {
 	return node.AsNumber > 0
 }
 func ValidateNumericNodeIs8BitValue(node *Node) bool {

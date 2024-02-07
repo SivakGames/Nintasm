@@ -9,10 +9,12 @@ import (
 )
 
 type iNESHeaderFormat struct {
-	chrSize         int
+	chrHeaderValue  int
+	chrSizeInKb     int
 	mapper          int
 	mirroring       int
-	prgSize         int
+	prgHeaderValue  int
+	prgSizeInKb     int
 	hasSetChr       bool
 	hasSetMapper    bool
 	hasSetMirroring bool
@@ -20,6 +22,9 @@ type iNESHeaderFormat struct {
 }
 
 var INESHeader = iNESHeaderFormat{}
+
+const INES_PRG_SIZE_MULTIPLIER = 0x04000
+const INES_CHR_SIZE_MULTIPLIER = 0x02000
 
 var inesPrgSizeEnumAliases = map[enumSizeAliases.Def]int{
 	enumSizeAliases.Size16kb:  1,
@@ -71,7 +76,7 @@ func ValidateInesMirroring(inesNode *Node) error {
 		return errors.New("INES mirroring has already been set!!!")
 	}
 	if !(operandFactory.ValidateNodeIsNumeric(inesNode) &&
-		operandFactory.ValidateNumericNodeIsPositive(inesNode)) {
+		operandFactory.ValidateNumericNodeIsGTEandLTEValues(inesNode, 0, 1)) {
 		return errors.New("INES mirroring must be either 0 or 1")
 	}
 
@@ -108,12 +113,13 @@ func ValidateInesPrg(inesNode *Node) error {
 	}
 
 	if !util.ValidateIsPowerOfTwo(inesNode.AsNumber) ||
-		operandFactory.ValidateNumericNodeMinValue(inesNode, 128) {
+		operandFactory.ValidateNumericNodeIsGTValue(inesNode, 128) {
 		return errors.New("Unacceptable INES PRG size declared!")
 	}
 
 	INESHeader.hasSetPrg = true
-	INESHeader.prgSize = inesNode.AsNumber
+	INESHeader.prgHeaderValue = inesNode.AsNumber
+	INESHeader.prgSizeInKb = INESHeader.prgHeaderValue * INES_PRG_SIZE_MULTIPLIER
 	return nil
 }
 
@@ -145,12 +151,13 @@ func ValidateInesChr(inesNode *Node) error {
 	}
 
 	if !util.ValidateIsPowerOfTwo(inesNode.AsNumber) ||
-		operandFactory.ValidateNumericNodeMinValue(inesNode, 256) {
+		operandFactory.ValidateNumericNodeIsGTValue(inesNode, 256) {
 		return errors.New("Unacceptable INES CHR size declared!")
 	}
 
 	INESHeader.hasSetChr = true
-	INESHeader.chrSize = inesNode.AsNumber
+	INESHeader.chrHeaderValue = inesNode.AsNumber
+	INESHeader.chrSizeInKb = INESHeader.chrHeaderValue * INES_CHR_SIZE_MULTIPLIER
 	return nil
 }
 
@@ -159,12 +166,24 @@ func ValidateInesChr(inesNode *Node) error {
 func GetInesMap() int {
 	return INESHeader.mapper
 }
-func GetInesPrg() int {
-	return INESHeader.prgSize
+func GetInesPrgHeaderValue() int {
+	return INESHeader.prgHeaderValue
 }
-func GetInesChr() int {
-	return INESHeader.chrSize
+func GetInesPrgSizeInKb() int {
+	return INESHeader.prgSizeInKb
 }
+
+func GetInesChrHeaderValue() int {
+	return INESHeader.chrHeaderValue
+}
+func GetInesChrSizeInKb() int {
+	return INESHeader.chrSizeInKb
+}
+
+func GetInesTotalRomSizeInKb() int {
+	return GetInesChrSizeInKb() + GetInesPrgSizeInKb()
+}
+
 func GetInesMirroring() int {
 	return INESHeader.mirroring
 }

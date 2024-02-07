@@ -1,6 +1,7 @@
 package parser_test
 
 import (
+	"fmt"
 	"misc/nintasm/assemble"
 	"misc/nintasm/romBuilder"
 	"testing"
@@ -73,7 +74,7 @@ func TestDirectiveOperandParser(t *testing.T) {
 	})
 
 	t.Run("Testing .ines***", func(t *testing.T) {
-		lines := []string{" .inesMap 5", " .inesPrg $8000", " .inesChr \"128kb\"", " .inesMir 0"}
+		lines := []string{" .inesMap 5", " .inesPrg $8000", " .inesChr \"128kb\"", " .inesMir 1"}
 
 		err := assemble.Start(lines)
 		if err != nil {
@@ -82,11 +83,19 @@ func TestDirectiveOperandParser(t *testing.T) {
 		if romBuilder.GetInesMap() != 5 {
 			t.Error("Bad INES Mapper result")
 		}
-		if romBuilder.GetInesPrg() != 2 {
-			t.Error("Bad INES PRG result")
+		if romBuilder.GetInesPrgHeaderValue() != 2 {
+			t.Error("Bad INES PRG header value result")
 		}
-		if romBuilder.GetInesChr() != 32 {
+		if romBuilder.GetInesPrgSizeInKb() != 0x08000 {
+			errMsg := fmt.Sprintf("Bad INES PRG size in KB result: %v", romBuilder.GetInesPrgSizeInKb())
+			t.Error(errMsg)
+		}
+		if romBuilder.GetInesChrHeaderValue() != 16 {
 			t.Error("Bad INES CHR result")
+		}
+		if romBuilder.GetInesChrSizeInKb() != 0x020000 {
+			errMsg := fmt.Sprintf("Bad INES CHR size in KB result: Got %v / Want %v", romBuilder.GetInesChrSizeInKb(), 0x020000)
+			t.Error(errMsg)
 		}
 	})
 
