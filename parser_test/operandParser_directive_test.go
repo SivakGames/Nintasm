@@ -72,4 +72,22 @@ func TestDirectiveOperandParser(t *testing.T) {
 		iterateOverResultWanted(t, wanted)
 	})
 
+	t.Run("Testing .ines***", func(t *testing.T) {
+		lines := []string{" .inesMap 5", " .inesPrg $8000", " .inesChr \"128kb\"", " .inesMir 0"}
+
+		err := assemble.Start(lines)
+		if err != nil {
+			t.Error(err)
+		}
+		if romBuilder.GetInesMap() != 5 {
+			t.Error("Bad INES Mapper result")
+		}
+		if romBuilder.GetInesPrg() != 2 {
+			t.Error("Bad INES PRG result")
+		}
+		if romBuilder.GetInesChr() != 32 {
+			t.Error("Bad INES CHR result")
+		}
+	})
+
 }

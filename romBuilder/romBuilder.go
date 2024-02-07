@@ -125,7 +125,7 @@ func ConvertNodeValueToUInts(node Node, neededBytes int, isBigEndian bool) ([]ui
 			for _, c := range node.NodeValue {
 				runeLen := utf8.RuneLen(c)
 				if runeLen > 1 {
-					log.Println("Character", c, "encoding requires more than a single byte. Using", runeLen, "bytes")
+					log.Println("\x1b[43m WARN \x1b[0mCharacter", c, "encoding requires more than a single byte. Using", runeLen, "bytes")
 					for i := 0; i < runeLen; i++ {
 						writeRune := (rune(c) >> (i * 8)) & 0x000ff
 						convertedStringAsBytes = append(convertedStringAsBytes, uint8(writeRune))

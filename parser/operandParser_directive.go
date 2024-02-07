@@ -29,18 +29,11 @@ var directiveMinMaxOperands = map[enumTokenTypes.Def][2]int{
 	enumTokenTypes.DIRECTIVE_dataBytes:  {1, 128},
 	enumTokenTypes.DIRECTIVE_mixedData:  {1, 128},
 	enumTokenTypes.DIRECTIVE_dataSeries: {1, 2},
-}
-
-var directiveOperandByteSizes = map[string]int{
-	"DB":   1,
-	"DW":   2,
-	"DWBE": 2,
-	"RDB":  1,
+	enumTokenTypes.DIRECTIVE_INES:       {1, 1},
 }
 
 // Main directive parser
 func (p *DirectiveOperandParser) Process(operationType tokenEnum, operationValue string) error {
-	var evalOperandSize int
 	var err error
 
 	directiveName := strings.ToUpper(operationValue)
@@ -49,7 +42,6 @@ func (p *DirectiveOperandParser) Process(operationType tokenEnum, operationValue
 		directiveName = aliasValue
 	}
 
-	isBigEndian := false
 	minMaxOperands := directiveMinMaxOperands[operationType]
 	minOperands := minMaxOperands[0]
 	maxOperands := minMaxOperands[1]
@@ -62,11 +54,7 @@ func (p *DirectiveOperandParser) Process(operationType tokenEnum, operationValue
 	switch operationType {
 
 	case enumTokenTypes.DIRECTIVE_dataBytes:
-		evalOperandSize = directiveOperandByteSizes[directiveName]
-		if directiveName == "DWBE" {
-			isBigEndian = true
-		}
-		err = evalDataBytesOperands(directiveName, &operandList, evalOperandSize, isBigEndian)
+		err = evalDataBytesOperands(directiveName, &operandList)
 		return err // 🟢/❌ Could be either
 
 	case enumTokenTypes.DIRECTIVE_dataSeries:
@@ -77,6 +65,10 @@ func (p *DirectiveOperandParser) Process(operationType tokenEnum, operationValue
 		err = evalMixedDataBytesOperands(directiveName, &operandList)
 		return err // 🟢/❌ Could be either
 
+	case enumTokenTypes.DIRECTIVE_INES:
+		err = evalInesBytesOperands(directiveName, &operandList)
+		return err // 🟢/❌ Could be either
+
 	default:
 		return errors.New("BAD DIRECTIVE OPERATION TYPE!!!")
 	}
@@ -84,10 +76,24 @@ func (p *DirectiveOperandParser) Process(operationType tokenEnum, operationValue
 
 // +++++++++++++++++++++++++
 
+var directiveOperandByteSizes = map[string]int{
+	"DB":   1,
+	"DW":   2,
+	"DWBE": 2,
+	"RDB":  1,
+}
+
 // For .db, .dw, .dwbe
-func evalDataBytesOperands(directiveName string, operandList *[]Node, operandSize int, isBigEndian bool) error {
+func evalDataBytesOperands(directiveName string, operandList *[]Node) error {
 	var asRomData = make([]uint8, 0)
 	var err error
+
+	isBigEndian := false
+	operandSize := directiveOperandByteSizes[directiveName]
+
+	if directiveName == "DWBE" {
+		isBigEndian = true
+	}
 
 	for _, operand := range *operandList {
 		asRomData, err = romBuilder.ConvertNodeValueToUInts(operand, operandSize, isBigEndian)
@@ -185,4 +191,27 @@ func evalMixedDataBytesOperands(directiveName string, operandList *[]Node) error
 		}
 	}
 	return nil
+}
+
+// +++++++++++++++++++++++++
+
+func evalInesBytesOperands(directiveName string, operandList *[]Node) error {
+	var err error
+	inesNode := &(*operandList)[0]
+
+	switch directiveName {
+	case "INESPRG":
+		err = romBuilder.ValidateInesPrg(inesNode)
+	case "INESCHR":
+		err = romBuilder.ValidateInesChr(inesNode)
+	case "INESMAP":
+		err = romBuilder.ValidateInesMap(inesNode)
+	case "INESMIR":
+		err = romBuilder.ValidateInesMirroring(inesNode)
+	case "INESBAT":
+	default:
+		panic("Something is very wrong with ines directive")
+	}
+
+	return err
 }
