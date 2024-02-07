@@ -2,8 +2,8 @@ package parser
 
 import (
 	"errors"
-	enumNodeTypes "misc/nintasm/enums/nodeTypes"
 	enumTokenTypes "misc/nintasm/enums/tokenTypes"
+	"misc/nintasm/parser/operandFactory"
 	"misc/nintasm/romBuilder"
 	"strings"
 )
@@ -25,12 +25,10 @@ var directiveAliases = map[string]string{
 	"PAD":         "DS",
 }
 
-var directiveMinMaxOperands = map[string][2]int{
-	"DB":   {1, 128},
-	"DW":   {1, 128},
-	"DWBE": {1, 128},
-	"RDB":  {1, 128},
-	"DS":   {1, 2},
+var directiveMinMaxOperands = map[enumTokenTypes.Def][2]int{
+	enumTokenTypes.DIRECTIVE_dataBytes:  {1, 128},
+	enumTokenTypes.DIRECTIVE_mixedData:  {1, 128},
+	enumTokenTypes.DIRECTIVE_dataSeries: {1, 2},
 }
 
 var directiveOperandByteSizes = map[string]int{
@@ -40,6 +38,7 @@ var directiveOperandByteSizes = map[string]int{
 	"RDB":  1,
 }
 
+// Main directive parser
 func (p *DirectiveOperandParser) Process(operationType tokenEnum, operationValue string) error {
 	var evalOperandSize int
 	var err error
@@ -51,7 +50,7 @@ func (p *DirectiveOperandParser) Process(operationType tokenEnum, operationValue
 	}
 
 	isBigEndian := false
-	minMaxOperands := directiveMinMaxOperands[directiveName]
+	minMaxOperands := directiveMinMaxOperands[operationType]
 	minOperands := minMaxOperands[0]
 	maxOperands := minMaxOperands[1]
 
@@ -62,32 +61,31 @@ func (p *DirectiveOperandParser) Process(operationType tokenEnum, operationValue
 
 	switch operationType {
 
-	case enumTokenTypes.DIRECTIVE_data:
-		if directiveName == "DS" {
-			err = evalDataPadOperands(&operandList)
-			return err // 🟢/❌ Could be either
-
-		}
-
+	case enumTokenTypes.DIRECTIVE_dataBytes:
 		evalOperandSize = directiveOperandByteSizes[directiveName]
 		if directiveName == "DWBE" {
 			isBigEndian = true
 		}
-		err = evalDataInsertionOperands(&operandList, evalOperandSize, isBigEndian)
-		if err != nil {
-			return err // ❌ Fails
-		}
+		err = evalDataBytesOperands(directiveName, &operandList, evalOperandSize, isBigEndian)
+		return err // 🟢/❌ Could be either
+
+	case enumTokenTypes.DIRECTIVE_dataSeries:
+		err = evalDataSeriesOperands(directiveName, &operandList)
+		return err // 🟢/❌ Could be either
+
+	case enumTokenTypes.DIRECTIVE_mixedData:
+		err = evalMixedDataBytesOperands(directiveName, &operandList)
+		return err // 🟢/❌ Could be either
 
 	default:
 		return errors.New("BAD DIRECTIVE OPERATION TYPE!!!")
 	}
-
-	return nil
-
 }
 
-// For .db, .dw, etc.
-func evalDataInsertionOperands(operandList *[]Node, operandSize int, isBigEndian bool) error {
+// +++++++++++++++++++++++++
+
+// For .db, .dw, .dwbe
+func evalDataBytesOperands(directiveName string, operandList *[]Node, operandSize int, isBigEndian bool) error {
 	var asRomData = make([]uint8, 0)
 	var err error
 
@@ -104,35 +102,33 @@ func evalDataInsertionOperands(operandList *[]Node, operandSize int, isBigEndian
 	return nil
 }
 
-// For .ds
-func evalDataPadOperands(operandList *[]Node) error {
-	padValue := 0xff
+// +++++++++++++++++++++++++
 
+// For .ds
+func evalDataSeriesOperands(directiveName string, operandList *[]Node) error {
+	seriesValue := uint8(0xff)
 	repetitionNode := &(*operandList)[0]
-	if repetitionNode.NodeType != enumNodeTypes.NumericLiteral {
-		return errors.New("DS/PAD directive Must be a number!")
+	if !(operandFactory.ValidateNodeIsNumeric(repetitionNode) &&
+		operandFactory.ValidateNumericNodeMinValue(repetitionNode, 1)) {
+		return errors.New("DS/PAD directive repeat value must be a number that is > 0")
 	}
+
 	repetitionNumber := repetitionNode.AsNumber
-	if repetitionNumber < 1 {
-		return errors.New("DS/PAD directive cannot less than 1!")
-	}
 	numRepetitions := repetitionNumber
 
 	if len(*operandList) == 2 {
 		padNode := &(*operandList)[1]
-		if padNode.NodeType != enumNodeTypes.NumericLiteral {
-			return errors.New("DS/PAD directive Must be a number!")
+		if !(operandFactory.ValidateNodeIsNumeric(padNode) &&
+			operandFactory.ValidateNumericNodeIsPositive(padNode) &&
+			operandFactory.ValidateNumericNodeIs8BitValue(padNode)) {
+			return errors.New("DS/PAD directive fill value must be a non-negative 8-bit number")
 		}
-		padNodeNumber := padNode.AsNumber
-		if padNodeNumber < 0 {
-			return errors.New("DS/PAD directive cannot be negative!")
-		}
-		padValue = padNodeNumber
+		seriesValue = uint8(padNode.AsNumber)
 	}
 
 	asRomData := make([]uint8, numRepetitions)
 	for i := range asRomData {
-		asRomData[i] = uint8(padValue)
+		asRomData[i] = seriesValue
 	}
 
 	err := romBuilder.AddBytesToRom(asRomData)
@@ -140,5 +136,53 @@ func evalDataPadOperands(operandList *[]Node) error {
 		return err // ❌ Fails
 	}
 
+	return nil
+}
+
+// +++++++++++++++++++++++++
+
+type mixedDataDirectiveBytesKeyFormat struct {
+	numBytes  int
+	bigEndian bool
+}
+
+var mixedDataDirectiveBytesKeys = map[byte]mixedDataDirectiveBytesKeyFormat{
+	'B': {1, false},
+	'W': {2, false},
+	'E': {2, true},
+}
+
+// For .d_***_
+func evalMixedDataBytesOperands(directiveName string, operandList *[]Node) error {
+	var asRomData = make([]uint8, 0)
+	var err error
+
+	mixedPattern := directiveName[2:]
+	lastRepeats := mixedPattern[len(mixedPattern)-1] == '_'
+	if lastRepeats {
+		mixedPattern = mixedPattern[:len(mixedPattern)-1]
+	}
+
+	for i, operand := range *operandList {
+		var mixedPatternIndex int
+		if lastRepeats && i >= len(mixedPattern) {
+			mixedPatternIndex = len(mixedPattern) - 1
+		} else {
+			mixedPatternIndex = i % len(mixedPattern)
+		}
+
+		currentPatternKey := mixedPattern[mixedPatternIndex]
+		operandSize := mixedDataDirectiveBytesKeys[currentPatternKey].numBytes
+		isBigEndian := mixedDataDirectiveBytesKeys[currentPatternKey].bigEndian
+
+		asRomData, err = romBuilder.ConvertNodeValueToUInts(operand, operandSize, isBigEndian)
+		if err != nil {
+			return err // ❌ Fails
+		}
+		err = romBuilder.AddBytesToRom(asRomData)
+		if err != nil {
+			return err // ❌ Fails
+		}
+	}
 	return nil
 }

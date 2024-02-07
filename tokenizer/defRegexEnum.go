@@ -37,7 +37,8 @@ var (
 		{regexp.MustCompile(generateBoundaries("brk|clc|cld|cli|clv|dex|dey|inx|iny|nop|pha|php|pla|plp|rti|rts|sec|sed|sei|tax|tay|tsx|txa|txs|tya|adc|and|cmp|eor|lda|ora|sbc|asl|lsr|rol|ror|cpx|cpy|dec|inc|ldx|ldy|sta|stx|sty|bit|jmp|jsr|bpl|bmi|bvc|bvs|bcc|bcs|bne|beq")), enumTokenTypes.INSTRUCTION},
 	}
 	directiveSpec = []specRegexEnum{
-		{regexp.MustCompile(generateBoundaries("db|byte|dw|word|dwBe|wordBe|rdb|reverseByte|ds|pad")), enumTokenTypes.DIRECTIVE_data},
+		{regexp.MustCompile(generateBoundaries("db|byte|dw|word|dwBe|wordBe|rdb|reverseByte")), enumTokenTypes.DIRECTIVE_dataBytes},
+		{regexp.MustCompile(generateBoundaries("ds|pad")), enumTokenTypes.DIRECTIVE_dataSeries},
 		{regexp.MustCompile(generateBoundaries("d_[bwe]+_?")), enumTokenTypes.DIRECTIVE_mixedData},
 		{regexp.MustCompile(generateBoundaries("repeat|endrepeat")), enumTokenTypes.DIRECTIVE_repeat},
 		{regexp.MustCompile(generateBoundaries("if|elseif|ifdef|ifndef|else|endif|switch|case|default|endswitch")), enumTokenTypes.DIRECTIVE_if},

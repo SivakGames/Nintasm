@@ -167,3 +167,16 @@ func ConvertNodeToBooleanLiteral(node *Node) {
 	node.Resolved = true
 	return
 }
+
+func ValidateNodeIsNumeric(node *Node) bool {
+	return node.NodeType == enumNodeTypes.NumericLiteral
+}
+func ValidateNumericNodeMinValue(node *Node, minValue int) bool {
+	return node.AsNumber > minValue
+}
+func ValidateNumericNodeIsPositive(node *Node) bool {
+	return node.AsNumber > 0
+}
+func ValidateNumericNodeIs8BitValue(node *Node) bool {
+	return node.AsNumber > -0x00100 && node.AsNumber < 0x00100
+}

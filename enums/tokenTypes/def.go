@@ -18,7 +18,8 @@ const (
 	DIRECTIVE_RANGE_START
 	//Directives
 	DIRECTIVE_charmap
-	DIRECTIVE_data
+	DIRECTIVE_dataBytes
+	DIRECTIVE_dataSeries
 	DIRECTIVE_exprMap
 	DIRECTIVE_if
 	DIRECTIVE_include
