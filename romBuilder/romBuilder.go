@@ -8,8 +8,22 @@ import (
 
 type Node = operandFactory.Node
 
+type bankDefStruct struct {
+	bytes    []uint8
+	orgIsSet bool
+	maxOrg   int
+	minOrg   int
+}
+
+func newBankDef(bankSize int) bankDefStruct {
+	return bankDefStruct{bytes: make([]uint8, bankSize), orgIsSet: false, minOrg: -1, maxOrg: -1}
+}
+
 // The final ROM that will be built
 var romLayout = make([][][]uint8, 0)
+
+// Corresponding ORG info for
+var romOrgInfos = make([][]bankDefStruct, 0)
 
 var allocatedRomSize = 0
 
@@ -28,9 +42,11 @@ func AddNewRomSegment(totalSize int, bankSize int) error {
 	}
 
 	newSegment := make([][]uint8, int(numBanks))
+	newOrgDefs := make([]bankDefStruct, int(numBanks))
 
 	for i := range newSegment {
 		newSegment[i] = make([]uint8, bankSize)
+		newOrgDefs[i] = newBankDef(bankSize)
 	}
 
 	romLayout = append(romLayout, newSegment)
@@ -51,13 +67,24 @@ func GetCurrentRomSegment() *[][]uint8 {
 	return &romLayout[currentRomSegmentIndex]
 }
 
+func GetTotalRomSegmentsInRom() int {
+	return len(*GetRomLayout())
+}
+
 // The current bank segment (array of uint8 )
 func GetCurrentBankSegment() *[]uint8 {
 	currentRomSegment := GetCurrentRomSegment()
 	return &(*currentRomSegment)[currentBankIndex]
 }
 
-func SetBank(newBankIndex int) error {
+func GetTotalBanksInCurrentRomSegment() int {
+	return len(*GetCurrentRomSegment())
+}
+
+func GetBankIndex() int {
+	return currentBankIndex
+}
+func SetBankIndex(newBankIndex int) error {
 	currentBankIndex = newBankIndex
 	return nil
 }

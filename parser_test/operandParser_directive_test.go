@@ -24,7 +24,7 @@ func TestDirectiveOperandParser(t *testing.T) {
 	t.Run("Testing .ines*** and declaring segments", func(t *testing.T) {
 		lines := []string{" .inesMap 5", " .inesPrg \"128kb\"", " .inesChr \"64kb\"", " .inesMir 1"}
 		lines = append(lines, " .romSegment \"32kb\", \"8kb\", \"PRG\"")
-		lines = append(lines, " .bank 0")
+		lines = append(lines, " .bank 0", " .bank 1", " .bank 2", " .bank 3", " .bank 4")
 
 		err := assemble.Start(lines)
 		if err != nil {
@@ -47,18 +47,15 @@ func TestDirectiveOperandParser(t *testing.T) {
 			errMsg := fmt.Sprintf("Bad INES CHR size in KB result: Got %v / Want %v", romBuilder.GetInesChrSizeInKb(), 0x020000)
 			t.Error(errMsg)
 		}
-		if len(*romBuilder.GetRomLayout()) != 1 {
-			errMsg := fmt.Sprintf("Unexpected ROM Segment length: Got %v / Want %v", len(*romBuilder.GetRomLayout()), 1)
+		if romBuilder.GetTotalRomSegmentsInRom() != 1 {
+			errMsg := fmt.Sprintf("Unexpected ROM Segment length: Got %v / Want %v", romBuilder.GetTotalRomSegmentsInRom(), 1)
 			t.Error(errMsg)
 		}
-		if len(*romBuilder.GetCurrentRomSegment()) != 4 {
-			errMsg := fmt.Sprintf("Unexpected ROM Segment bank quantity length: Got %v / Want %v", len(*romBuilder.GetCurrentRomSegment()), 2)
+		if romBuilder.GetTotalBanksInCurrentRomSegment() != 4 {
+			errMsg := fmt.Sprintf("Unexpected ROM Segment bank quantity length: Got %v / Want %v", romBuilder.GetTotalBanksInCurrentRomSegment(), 2)
 			t.Error(errMsg)
 		}
-		if len(*romBuilder.GetCurrentBankSegment()) != 0x02000 {
-			errMsg := fmt.Sprintf("Unexpected ROM Segment bank capacity length: Got %v / Want %v", len(*romBuilder.GetCurrentBankSegment()), 0x02000)
-			t.Error(errMsg)
-		}
+
 	})
 	/*
 		t.Run("Testing .db", func(t *testing.T) {

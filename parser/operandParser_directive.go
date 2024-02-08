@@ -78,7 +78,7 @@ func (p *DirectiveOperandParser) Process(operationType tokenEnum, operationValue
 		return err // 🟢/❌ Could be either
 
 	case enumTokenTypes.DIRECTIVE_romBankOrg:
-		err = evalRomBuildingOperands(directiveName, &operandList)
+		err = evalRomBankOrgOperands(directiveName, &operandList)
 		return err // 🟢/❌ Could be either
 
 	default:
@@ -250,6 +250,23 @@ func evalRomBuildingOperands(directiveName string, operandList *[]Node) error {
 	}
 
 	err = romSegmentation.ValidateAndAddRomSegment(segmentSizeNode, segmentBankSizeNode, segmentDescriptionNode)
+
+	return err
+}
+
+func evalRomBankOrgOperands(directiveName string, operandList *[]Node) error {
+	var err error = nil
+
+	bankOrgNode := &(*operandList)[0]
+
+	switch directiveName {
+	case "BANK":
+		err = romSegmentation.ValidateAndSetBank(bankOrgNode)
+	case "ORG":
+		err = romSegmentation.ValidateAndSetBank(bankOrgNode)
+	default:
+		panic("Something is VERY wrong with BANK or ORG directive")
+	}
 
 	return err
 }
