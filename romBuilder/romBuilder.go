@@ -20,12 +20,12 @@ func newBankDef(bankSize int) bankDefStruct {
 }
 
 // The final ROM that will be built
-var romLayout = make([][][]uint8, 0)
+var romLayout = make([][]bankDefStruct, 0)
 
 // Corresponding ORG info for
-var romOrgInfos = make([][]bankDefStruct, 0)
+//var romOrgInfos = make([][]bankDefStruct, 0)
 
-var allocatedRomSize = 0
+//var allocatedRomSize = 0
 
 var currentRomSegmentIndex = -1
 var currentBankIndex = -1
@@ -41,12 +41,13 @@ func AddNewRomSegment(totalSize int, bankSize int) error {
 		return errors.New("Bank size is not evenly distributable")
 	}
 
-	newSegment := make([][]uint8, int(numBanks))
-	newOrgDefs := make([]bankDefStruct, int(numBanks))
+	newSegment := make([]bankDefStruct, int(numBanks))
+	//newOrgDefs := make([]bankDefStruct, int(numBanks))
 
 	for i := range newSegment {
-		newSegment[i] = make([]uint8, bankSize)
-		newOrgDefs[i] = newBankDef(bankSize)
+		//newSegment[i] = make([]uint8, bankSize)
+		//	newOrgDefs[i] = newBankDef(bankSize)
+		newSegment[i] = newBankDef(bankSize)
 	}
 
 	romLayout = append(romLayout, newSegment)
@@ -58,12 +59,13 @@ func AddNewRomSegment(totalSize int, bankSize int) error {
 }
 
 // The entire ROM layout (array of segments)
-func GetRomLayout() *[][][]uint8 {
+func GetRomLayout() *[][]bankDefStruct {
 	return &romLayout
 }
 
 // The current ROM segment (array of bank segments)
-func GetCurrentRomSegment() *[][]uint8 {
+func GetCurrentRomSegment() *[]bankDefStruct {
+
 	return &romLayout[currentRomSegmentIndex]
 }
 
@@ -72,9 +74,15 @@ func GetTotalRomSegmentsInRom() int {
 }
 
 // The current bank segment (array of uint8 )
-func GetCurrentBankSegment() *[]uint8 {
+func GetCurrentBankSegment() *bankDefStruct {
 	currentRomSegment := GetCurrentRomSegment()
 	return &(*currentRomSegment)[currentBankIndex]
+}
+
+// The current bank segment (array of uint8 )
+func GetCurrentBankSegmentBytes() *[]uint8 {
+	currentRomSegment := GetCurrentBankSegment()
+	return &(*currentRomSegment).bytes
 }
 
 func GetTotalBanksInCurrentRomSegment() int {

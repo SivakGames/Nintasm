@@ -106,7 +106,7 @@ func ConvertNodeValueToUInts(node Node, neededBytes int, isBigEndian bool) ([]ui
 
 // Take an array of uint8s and put it the right spot
 func AddBytesToRom(insertions []uint8) error {
-	currentBankSegment := romBuilder.GetCurrentBankSegment()
+	currentBankSegment := romBuilder.GetCurrentBankSegmentBytes()
 
 	toInsertSpace := romBuilder.CurrentInsertionIndex + len(insertions)
 	overflowByteTotal := toInsertSpace - len(*currentBankSegment)

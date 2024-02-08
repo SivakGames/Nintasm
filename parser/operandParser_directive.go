@@ -263,7 +263,7 @@ func evalRomBankOrgOperands(directiveName string, operandList *[]Node) error {
 	case "BANK":
 		err = romSegmentation.ValidateAndSetBank(bankOrgNode)
 	case "ORG":
-		err = romSegmentation.ValidateAndSetBank(bankOrgNode)
+		err = romSegmentation.ValidateAndSetOrg(bankOrgNode)
 	default:
 		panic("Something is VERY wrong with BANK or ORG directive")
 	}
