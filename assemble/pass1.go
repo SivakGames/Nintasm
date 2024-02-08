@@ -21,11 +21,14 @@ func Start(lines []string) error {
 	// Iterate over all lines
 	for _, l := range lines {
 		lineCounter++
-		refoLine, lineInitErr := lineInitParzival.Process(l)
+		reformattedLine, lineInitErr := lineInitParzival.Process(l)
 		if lineInitErr != nil {
 			return lineInitErr
 		}
-		lineOperationErr := lineOperationParzival.Process(refoLine)
+		if len(reformattedLine) == 0 {
+			continue
+		}
+		lineOperationErr := lineOperationParzival.Process(reformattedLine)
 		if lineOperationErr != nil {
 			return lineOperationErr
 		}

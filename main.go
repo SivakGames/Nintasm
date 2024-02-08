@@ -1,24 +1,61 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
+	"log"
 	"misc/nintasm/assemble"
+	"os"
 	"time"
 )
 
 func main() {
-	lines := []string{" .romSegment $8000, $8000, \"PRG\"", " .bank 0", " .org $10000", " .org $7f00", " .org $7e00"}
-	//lines := make([]string, 0x2000)
-	//for i := range lines {
-	//	lines[i] = " lda [55], y "
-	//}
+	var err error
+
+	if len(os.Args) < 2 {
+		fmt.Println("Usage: go run . <filename> [-s]")
+		return
+	}
+
+	// --------------------
+
+	filename := os.Args[1]
+	file, err := os.Open(filename)
+	if err != nil {
+		log.Println("Failed to open file.")
+		return
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	var file_lines []string
+	for scanner.Scan() {
+		file_lines = append(file_lines, scanner.Text())
+	}
+
+	err = scanner.Err()
+	if err != nil {
+		log.Println("Failed to read line in file.")
+		return
+	}
+
+	//	sFlag := flag.Bool("s", false, "A S boolean flag")
+	//	rFlag := flag.Bool("r", false, "A R boolean flag")
+	//
+	//	flag.CommandLine.SetOutput(ioutil.Discard)
+	//	err = flag.CommandLine.Parse(os.Args[2:])
+	//
+	//	fmt.Println("File:", filename)
+	//	fmt.Println("Command:", *sFlag)
+	//	fmt.Println("Command:", *rFlag)
 
 	start := time.Now()
-	err := assemble.Start(lines)
+	err = assemble.Start(file_lines)
 	if err != nil {
 		fmt.Println(err)
 	}
 	assemblyTime := fmt.Sprintf("%.2f", time.Since(start).Seconds())
 	finalMessage := fmt.Sprintf("Assembly took: \x1b[33m%v\x1b[0m seconds", assemblyTime)
 	fmt.Println(finalMessage)
+	return
 }

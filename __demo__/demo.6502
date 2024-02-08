@@ -1,0 +1,17 @@
+	.inesMap 0
+	.inesPrg "32kb"
+	.inesChr "8kb"
+	.inesMir 0
+
+	.romSegment "32kb","32kb","PRG"
+	.bank 0
+	.org $8000
+	LDA #5
+	LDX #55
+	;LDY #2044
+	LDA abababa
+
+	.romSegment "8kb","8kb","CHR"
+	.bank 0
+	.org $0000
+
