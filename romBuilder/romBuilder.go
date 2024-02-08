@@ -8,24 +8,21 @@ import (
 
 type Node = operandFactory.Node
 
-type bankDefStruct struct {
+type romType []romSegmentType
+type romSegmentType []bankType
+type bankType struct {
 	bytes    []uint8
 	orgIsSet bool
 	maxOrg   int
 	minOrg   int
 }
 
-func newBankDef(bankSize int) bankDefStruct {
-	return bankDefStruct{bytes: make([]uint8, bankSize), orgIsSet: false, minOrg: -1, maxOrg: -1}
+func newBank(bankSize int) bankType {
+	return bankType{bytes: make([]uint8, bankSize), orgIsSet: false, minOrg: -1, maxOrg: -1}
 }
 
 // The final ROM that will be built
-var romLayout = make([][]bankDefStruct, 0)
-
-// Corresponding ORG info for
-//var romOrgInfos = make([][]bankDefStruct, 0)
-
-//var allocatedRomSize = 0
+var rom = make(romType, 0)
 
 var currentRomSegmentIndex = -1
 var currentBankIndex = -1
@@ -41,40 +38,45 @@ func AddNewRomSegment(totalSize int, bankSize int) error {
 		return errors.New("Bank size is not evenly distributable")
 	}
 
-	newSegment := make([]bankDefStruct, int(numBanks))
+	newSegment := make([]bankType, int(numBanks))
 	//newOrgDefs := make([]bankDefStruct, int(numBanks))
 
 	for i := range newSegment {
 		//newSegment[i] = make([]uint8, bankSize)
 		//	newOrgDefs[i] = newBankDef(bankSize)
-		newSegment[i] = newBankDef(bankSize)
+		newSegment[i] = newBank(bankSize)
 	}
 
-	romLayout = append(romLayout, newSegment)
+	rom = append(rom, newSegment)
 
-	currentRomSegmentIndex = len(romLayout) - 1
+	currentRomSegmentIndex = len(rom) - 1
 	currentBankIndex = -1
 	CurrentInsertionIndex = -1
 	return nil
 }
 
 // The entire ROM layout (array of segments)
-func GetRomLayout() *[][]bankDefStruct {
-	return &romLayout
+func getRom() *romType {
+	return &rom
 }
+
+//+++++++++++++++++++++++++++
 
 // The current ROM segment (array of bank segments)
-func GetCurrentRomSegment() *[]bankDefStruct {
+func GetCurrentRomSegment() *romSegmentType {
 
-	return &romLayout[currentRomSegmentIndex]
+	return &rom[currentRomSegmentIndex]
 }
 
+// How many rom segments are currently defined
 func GetTotalRomSegmentsInRom() int {
-	return len(*GetRomLayout())
+	return len(*getRom())
 }
+
+//+++++++++++++++++++++++++++
 
 // The current bank segment (array of uint8 )
-func GetCurrentBankSegment() *bankDefStruct {
+func GetCurrentBankSegment() *bankType {
 	currentRomSegment := GetCurrentRomSegment()
 	return &(*currentRomSegment)[currentBankIndex]
 }
@@ -85,9 +87,12 @@ func GetCurrentBankSegmentBytes() *[]uint8 {
 	return &(*currentRomSegment).bytes
 }
 
+// How many banks are in the current ROM segment
 func GetTotalBanksInCurrentRomSegment() int {
 	return len(*GetCurrentRomSegment())
 }
+
+//+++++++++++++++++++++++++++
 
 func GetBankIndex() int {
 	return currentBankIndex
@@ -96,6 +101,8 @@ func SetBankIndex(newBankIndex int) error {
 	currentBankIndex = newBankIndex
 	return nil
 }
+
+//+++++++++++++++++++++++++++
 
 func GetOrg() int {
 	return currentOrg + CurrentInsertionIndex
