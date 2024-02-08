@@ -6,7 +6,6 @@ import (
 	"log"
 	enumNodeTypes "misc/nintasm/enums/nodeTypes"
 	"misc/nintasm/parser/operandFactory"
-	"misc/nintasm/romBuilder"
 	"unicode/utf8"
 )
 
@@ -100,25 +99,4 @@ func ConvertNodeValueToUInts(node Node, neededBytes int, isBigEndian bool) ([]ui
 	}
 
 	return convertedValue, nil
-}
-
-// -----------------------------------------
-
-// Take an array of uint8s and put it the right spot
-func AddBytesToRom(insertions []uint8) error {
-	currentBankSegment := romBuilder.GetCurrentBankSegmentBytes()
-
-	toInsertSpace := romBuilder.CurrentInsertionIndex + len(insertions)
-	overflowByteTotal := toInsertSpace - len(*currentBankSegment)
-
-	if overflowByteTotal > 0 {
-		errMsg := fmt.Sprintf("Will overflow by: %d byte(s) here", overflowByteTotal)
-		return errors.New(errMsg)
-	}
-	for i := range insertions {
-		(*currentBankSegment)[romBuilder.CurrentInsertionIndex] = insertions[i]
-		romBuilder.CurrentInsertionIndex++
-	}
-
-	return nil
 }

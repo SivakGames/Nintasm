@@ -112,7 +112,7 @@ func evalDataBytesOperands(directiveName string, operandList *[]Node) error {
 		if err != nil {
 			return err // ❌ Fails
 		}
-		err = nodesToBytes.AddBytesToRom(asRomData)
+		err = romBuilder.AddBytesToRom(asRomData)
 		if err != nil {
 			return err // ❌ Fails
 		}
@@ -145,16 +145,13 @@ func evalDataSeriesOperands(directiveName string, operandList *[]Node) error {
 	}
 
 	asRomData := make([]uint8, numRepetitions)
+
 	for i := range asRomData {
 		asRomData[i] = seriesValue
 	}
 
-	err := nodesToBytes.AddBytesToRom(asRomData)
-	if err != nil {
-		return err // ❌ Fails
-	}
-
-	return nil
+	err := romBuilder.AddBytesToRom(asRomData)
+	return err
 }
 
 // +++++++++++++++++++++++++
@@ -197,7 +194,7 @@ func evalMixedDataBytesOperands(directiveName string, operandList *[]Node) error
 		if err != nil {
 			return err // ❌ Fails
 		}
-		err = nodesToBytes.AddBytesToRom(asRomData)
+		err = romBuilder.AddBytesToRom(asRomData)
 		if err != nil {
 			return err // ❌ Fails
 		}

@@ -26,7 +26,7 @@ func newBank(bankSize int) bankType {
 var rom = make(romType, 0)
 
 var currentBankIndex = -1
-var CurrentInsertionIndex = -1
+var currentInsertionIndex = -1
 
 //-------------------------------------------
 
@@ -49,7 +49,7 @@ func AddNewRomSegment(totalSize int, bankSize int) error {
 	rom = append(rom, newSegment)
 
 	currentBankIndex = -1
-	CurrentInsertionIndex = -1
+	currentInsertionIndex = -1
 	return nil
 }
 
@@ -106,7 +106,7 @@ func SetBankIndex(newBankIndex int) error {
 
 func GetOrg() int {
 	bank := GetCurrentBankSegment()
-	return bank.minOrg + CurrentInsertionIndex
+	return bank.minOrg + currentInsertionIndex
 }
 
 // TODO: Set ORG upper/lower bounds checks
@@ -121,7 +121,7 @@ func SetOrg(newOrg int) error {
 		bank.maxOrg = newMaxOrg
 		bank.orgIsSet = true
 	} else {
-		currentOrg := bank.minOrg + CurrentInsertionIndex
+		currentOrg := bank.minOrg + currentInsertionIndex
 		if newOrg < bank.minOrg {
 			errMsg := fmt.Sprintf("ORG is too small! Attempted: %d / Minimum Allowed: %d ", newOrg, bank.minOrg)
 			return errors.New(errMsg)
@@ -133,6 +133,43 @@ func SetOrg(newOrg int) error {
 			return errors.New(errMsg)
 		}
 	}
-	CurrentInsertionIndex = newOrg % bankSize
+	currentInsertionIndex = newOrg % bankSize
 	return nil
+}
+
+//============================================================
+
+// Take an array of uint8s and put it the right spot
+func AddBytesToRom(insertions []uint8) error {
+	currentBankSegment := GetCurrentBankSegmentBytes()
+
+	toInsertSpace := currentInsertionIndex + len(insertions)
+	overflowByteTotal := toInsertSpace - len(*currentBankSegment)
+
+	if overflowByteTotal > 0 {
+		errMsg := fmt.Sprintf("Bank will overflow by: %d byte(s) here", overflowByteTotal)
+		return errors.New(errMsg)
+	}
+	for i := range insertions {
+		(*currentBankSegment)[currentInsertionIndex] = insertions[i]
+		currentInsertionIndex++
+	}
+
+	return nil
+}
+
+//xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+func ClearRom() {
+	rom = make(romType, 0)
+	for i := range rom {
+		(rom)[i] = make(romSegmentType, 0)
+		for j := range (rom)[i] {
+			(rom)[i][j].bytes = nil
+			(rom)[i][j].orgIsSet = false
+			(rom)[i][j].maxOrg = 0
+			(rom)[i][j].minOrg = 0
+		}
+	}
+	return
 }

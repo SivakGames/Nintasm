@@ -186,3 +186,12 @@ func GetInesTotalRomSizeInKb() int {
 func GetInesMirroring() int {
 	return INESHeader.mirroring
 }
+
+//xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+func ClearINES() {
+	INESHeader.hasSetChr = false
+	INESHeader.hasSetPrg = false
+	INESHeader.hasSetMirroring = false
+	INESHeader.hasSetMapper = false
+}
