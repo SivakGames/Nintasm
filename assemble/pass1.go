@@ -3,7 +3,6 @@ package assemble
 import (
 	"misc/nintasm/parser"
 	"misc/nintasm/parser/parserTypes"
-	"misc/nintasm/romBuilder"
 )
 
 func Start(lines []string) error {
@@ -16,12 +15,6 @@ func Start(lines []string) error {
 	labelOperandParzival := parser.NewLabelOperandParser()
 
 	instructionOperandParzival.ShouldParseInstructions = true
-
-	err := romBuilder.AddNewRomSegment(0x20000, 0x4000)
-	err = romBuilder.AddNewRomSegment(0x20000, 0x4000)
-	if err != nil {
-		return err
-	}
 
 	var lineCounter uint = 0
 

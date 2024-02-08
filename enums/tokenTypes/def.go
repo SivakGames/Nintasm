@@ -30,6 +30,7 @@ const (
 	DIRECTIVE_labeledBlockEnd
 	DIRECTIVE_mixedData
 	DIRECTIVE_repeat
+	DIRECTIVE_romBankOrg
 	DIRECTIVE_romBuilding
 	DIRECTIVE_setting
 	DIRECTIVE_throw

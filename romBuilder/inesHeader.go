@@ -2,7 +2,6 @@ package romBuilder
 
 import (
 	"errors"
-	"fmt"
 	enumSizeAliases "misc/nintasm/enums/sizeAliases"
 	"misc/nintasm/parser/operandFactory"
 	"misc/nintasm/util"
@@ -96,7 +95,7 @@ func ValidateInesPrg(inesNode *Node) error {
 	}
 
 	if operandFactory.ValidateNodeIsString(inesNode) {
-		err := checkInesSizeStringAlias(inesNode, &inesPrgSizeEnumAliases, inesOperationDescription)
+		err := util.ValidateSizeStringAliasUsable(inesNode, &inesPrgSizeEnumAliases, inesOperationDescription)
 		if err != nil {
 			return err
 		}
@@ -107,7 +106,7 @@ func ValidateInesPrg(inesNode *Node) error {
 		return errors.New("INES PRG must be >= 1 or use a valid alias")
 	}
 
-	err := checkInesSizeNumberAlias(inesNode, &inesPrgSizeEnumAliases, inesOperationDescription)
+	err := util.ValidateSizeNumberAliasUsable(inesNode, &inesPrgSizeEnumAliases, inesOperationDescription)
 	if err != nil {
 		return err
 	}
@@ -134,7 +133,7 @@ func ValidateInesChr(inesNode *Node) error {
 	}
 
 	if operandFactory.ValidateNodeIsString(inesNode) {
-		err := checkInesSizeStringAlias(inesNode, &inesChrSizeEnumAliases, inesOperationDescription)
+		err := util.ValidateSizeStringAliasUsable(inesNode, &inesChrSizeEnumAliases, inesOperationDescription)
 		if err != nil {
 			return err
 		}
@@ -145,7 +144,7 @@ func ValidateInesChr(inesNode *Node) error {
 		return errors.New("INES CHR must be >= 1 or use a valid alias")
 	}
 
-	err := checkInesSizeNumberAlias(inesNode, &inesChrSizeEnumAliases, inesOperationDescription)
+	err := util.ValidateSizeNumberAliasUsable(inesNode, &inesChrSizeEnumAliases, inesOperationDescription)
 	if err != nil {
 		return err
 	}
@@ -186,37 +185,4 @@ func GetInesTotalRomSizeInKb() int {
 
 func GetInesMirroring() int {
 	return INESHeader.mirroring
-}
-
-// +++++++++++++++++++++++++++++++++++++++++++++
-
-func checkInesSizeStringAlias(inesNode *Node, aliasTable *map[enumSizeAliases.Def]int, inesOperationDescription string) error {
-	enumValue, enumOk := util.ValidateSizeStringAlias(inesNode.NodeValue)
-	if !enumOk {
-		errMessage := fmt.Sprintf("Invalid %v value alias!", inesOperationDescription)
-		return errors.New(errMessage)
-	}
-	value, ok := (*aliasTable)[enumValue]
-	if !ok {
-		errMessage := fmt.Sprintf("Unacceptable %v size declared!", inesOperationDescription)
-		return errors.New(errMessage)
-	}
-	inesNode.AsNumber = value
-	operandFactory.ConvertNodeToNumericLiteral(inesNode)
-	return nil
-}
-
-// +++++++++++++++++++++++++++++++++++++++++++++
-
-func checkInesSizeNumberAlias(inesNode *Node, aliasTable *map[enumSizeAliases.Def]int, inesOperationDescription string) error {
-	enumValue, enumOk := util.ValidateSizeNumericAlias(inesNode.AsNumber)
-	if enumOk {
-		value, ok := (*aliasTable)[enumValue]
-		if !ok {
-			errMessage := fmt.Sprintf("Unacceptable %v size declared!", inesOperationDescription)
-			return errors.New(errMessage)
-		}
-		inesNode.AsNumber = value
-	}
-	return nil
 }

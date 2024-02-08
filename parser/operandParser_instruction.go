@@ -6,7 +6,7 @@ import (
 	enumTokenTypes "misc/nintasm/enums/tokenTypes"
 	"misc/nintasm/instructionData"
 	"misc/nintasm/parser/operandFactory"
-	"misc/nintasm/romBuilder"
+	"misc/nintasm/romBuilder/nodesToBytes"
 	"strings"
 )
 
@@ -105,13 +105,13 @@ func (p *InstructionOperandParser) Process(operationValue string) error {
 	bytesToInsert := make([]uint8, 0)
 	bytesToInsert = append(bytesToInsert, instructionOpcode)
 
-	asRomData, err := romBuilder.ConvertNodeValueToUInts(operand, operandNeedsNBytes, false)
+	asRomData, err := nodesToBytes.ConvertNodeValueToUInts(operand, operandNeedsNBytes, false)
 	if err != nil {
 		return err
 	}
 	bytesToInsert = append(bytesToInsert, asRomData...)
 
-	err = romBuilder.AddBytesToRom(bytesToInsert)
+	err = nodesToBytes.AddBytesToRom(bytesToInsert)
 	if err != nil {
 		return err
 	}

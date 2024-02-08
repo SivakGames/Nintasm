@@ -1,9 +1,14 @@
 package util
 
 import (
+	"errors"
+	"fmt"
 	enumSizeAliases "misc/nintasm/enums/sizeAliases"
+	"misc/nintasm/parser/operandFactory"
 	"strings"
 )
+
+type Node = operandFactory.Node
 
 var sizeStringAliases = map[string]enumSizeAliases.Def{
 	"1kb":   enumSizeAliases.Size1kb,
@@ -35,6 +40,42 @@ var sizeNumericAliases = map[int]enumSizeAliases.Def{
 	0x0200000: enumSizeAliases.Size2mb,
 }
 
+//+++++++++++++++++++++++++++++++++++
+
+// Look at a string node and see if it can be converted to a size alias Enum
+func ValidateSizeStringAliasUsable(node *Node, aliasTable *map[enumSizeAliases.Def]int, operationDescription string) error {
+	enumValue, enumOk := ValidateSizeStringAlias(node.NodeValue)
+	if !enumOk {
+		errMessage := fmt.Sprintf("Invalid %v value alias!", operationDescription)
+		return errors.New(errMessage)
+	}
+	value, ok := (*aliasTable)[enumValue]
+	if !ok {
+		errMessage := fmt.Sprintf("Unacceptable %v size declared!", operationDescription)
+		return errors.New(errMessage)
+	}
+	node.AsNumber = value
+	operandFactory.ConvertNodeToNumericLiteral(node)
+	return nil
+}
+
+//+++++++++++++++++++++++++++++++++++
+
+func ValidateSizeNumberAliasUsable(node *Node, aliasTable *map[enumSizeAliases.Def]int, inesOperationDescription string) error {
+	enumValue, enumOk := ValidateSizeNumericAlias(node.AsNumber)
+	if enumOk {
+		value, ok := (*aliasTable)[enumValue]
+		if !ok {
+			errMessage := fmt.Sprintf("Unacceptable %v size declared!", inesOperationDescription)
+			return errors.New(errMessage)
+		}
+		node.AsNumber = value
+	}
+	return nil
+}
+
+//+++++++++++++++++++++++++++++++++++
+
 func ValidateSizeStringAlias(sizeAlias string) (enumSizeAliases.Def, bool) {
 	adjustedAlias := strings.ToLower(sizeAlias)
 	enumValue, enumOk := sizeStringAliases[adjustedAlias]
@@ -43,6 +84,8 @@ func ValidateSizeStringAlias(sizeAlias string) (enumSizeAliases.Def, bool) {
 	}
 	return enumValue, enumOk
 }
+
+//+++++++++++++++++++++++++++++++++++
 
 func ValidateSizeNumericAlias(sizeAlias int) (enumSizeAliases.Def, bool) {
 	enumValue, enumOk := sizeNumericAliases[sizeAlias]
