@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	lines := []string{" .romSegment $400, $4000, \"PRG\""}
+	lines := []string{" .romSegment $8000, $8000, \"PRG\"", " .bank 0", " .org $10000", " .org $7f00", " .org $7e00"}
 	//lines := make([]string, 0x2000)
 	//for i := range lines {
 	//	lines[i] = " lda [55], y "

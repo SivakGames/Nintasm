@@ -198,3 +198,6 @@ func ValidateNumericNodeIsGTZero(node *Node) bool {
 func ValidateNumericNodeIs8BitValue(node *Node) bool {
 	return node.AsNumber > -0x00100 && node.AsNumber < 0x00100
 }
+func ValidateNumericNodeIs16BitValue(node *Node) bool {
+	return node.AsNumber > -0x10000 && node.AsNumber < 0x10000
+}

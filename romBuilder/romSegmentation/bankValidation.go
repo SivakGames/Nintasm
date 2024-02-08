@@ -29,8 +29,15 @@ func ValidateAndSetOrg(orgNode *Node) error {
 	if !operandFactory.ValidateNodeIsNumeric(orgNode) {
 		return errors.New("MUST be a number!")
 	}
-	newOrg := orgNode.AsNumber
-	romBuilder.SetOrg(newOrg)
+	if !operandFactory.ValidateNumericNodeIsPositive(orgNode) {
+		return errors.New("ORG MUST be a positive number!")
+	}
+	if !operandFactory.ValidateNumericNodeIs16BitValue(orgNode) {
+		return errors.New("ORG MUST be a 16 bit value")
+	}
 
-	return nil
+	newOrg := orgNode.AsNumber
+	err := romBuilder.SetOrg(newOrg)
+
+	return err
 }

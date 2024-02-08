@@ -23,8 +23,8 @@ func TestDirectiveOperandParser(t *testing.T) {
 
 	t.Run("Testing .ines*** and declaring segments", func(t *testing.T) {
 		lines := []string{" .inesMap 5", " .inesPrg \"128kb\"", " .inesChr \"64kb\"", " .inesMir 1"}
-		lines = append(lines, " .romSegment \"32kb\", \"8kb\", \"PRG\"")
-		lines = append(lines, " .bank 0", " .org $8000", " .bank 1", " .org $a000", " .bank 2", " .org $c000", " .bank 3", " .org $e000")
+		lines = append(lines, " .romSegment \"32kb\", \"16kb\", \"PRG\"")
+		lines = append(lines, " .bank 0", " .org $8000", " .bank 1", " .org $a000")
 
 		err := assemble.Start(lines)
 		if err != nil {
@@ -51,12 +51,16 @@ func TestDirectiveOperandParser(t *testing.T) {
 			errMsg := fmt.Sprintf("Unexpected ROM Segment length: Got %v / Want %v", romBuilder.GetTotalRomSegmentsInRom(), 1)
 			t.Error(errMsg)
 		}
-		if romBuilder.GetTotalBanksInCurrentRomSegment() != 4 {
+		if romBuilder.GetTotalBanksInCurrentRomSegment() != 2 {
 			errMsg := fmt.Sprintf("Unexpected ROM Segment bank quantity length: Got %v / Want %v", romBuilder.GetTotalBanksInCurrentRomSegment(), 2)
 			t.Error(errMsg)
 		}
-		if len(*romBuilder.GetCurrentBankSegmentBytes()) != 0x02000 {
-			errMsg := fmt.Sprintf("Wrong number of bytes for bank. Got %v / Want %v", len(*romBuilder.GetCurrentBankSegmentBytes()), 0x02000)
+		if len(*romBuilder.GetCurrentBankSegmentBytes()) != 0x004000 {
+			errMsg := fmt.Sprintf("Wrong number of bytes for bank. Got %v / Want %v", len(*romBuilder.GetCurrentBankSegmentBytes()), 0x004000)
+			t.Error(errMsg)
+		}
+		if romBuilder.GetOrg() != 0x00a000 {
+			errMsg := fmt.Sprintf("Unexpected ORG: Got %v / Want %v", romBuilder.GetOrg(), 0x00a000)
 			t.Error(errMsg)
 		}
 

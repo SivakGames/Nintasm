@@ -2,6 +2,7 @@ package romBuilder
 
 import (
 	"errors"
+	"fmt"
 	"math"
 	"misc/nintasm/parser/operandFactory"
 )
@@ -24,10 +25,8 @@ func newBank(bankSize int) bankType {
 // The final ROM that will be built
 var rom = make(romType, 0)
 
-var currentRomSegmentIndex = -1
 var currentBankIndex = -1
 var CurrentInsertionIndex = -1
-var currentOrg = 0x8000
 
 //-------------------------------------------
 
@@ -49,7 +48,6 @@ func AddNewRomSegment(totalSize int, bankSize int) error {
 
 	rom = append(rom, newSegment)
 
-	currentRomSegmentIndex = len(rom) - 1
 	currentBankIndex = -1
 	CurrentInsertionIndex = -1
 	return nil
@@ -64,8 +62,10 @@ func getRom() *romType {
 
 // The current ROM segment (array of bank segments)
 func GetCurrentRomSegment() *romSegmentType {
-
-	return &rom[currentRomSegmentIndex]
+	if len(rom) > 0 {
+		return &rom[len(rom)-1]
+	}
+	panic("Attemped to access ROM with no segments!!!")
 }
 
 // How many rom segments are currently defined
@@ -105,11 +105,34 @@ func SetBankIndex(newBankIndex int) error {
 //+++++++++++++++++++++++++++
 
 func GetOrg() int {
-	return currentOrg + CurrentInsertionIndex
+	bank := GetCurrentBankSegment()
+	return bank.minOrg + CurrentInsertionIndex
 }
 
 // TODO: Set ORG upper/lower bounds checks
-func SetOrg(newOrg int) {
-	currentOrg = newOrg
-	return
+func SetOrg(newOrg int) error {
+	bank := GetCurrentBankSegment()
+	bankSize := len(bank.bytes)
+
+	if !bank.orgIsSet {
+		newMinOrg := int((newOrg / bankSize) * bankSize)
+		newMaxOrg := newMinOrg + bankSize - 1
+		bank.minOrg = newMinOrg
+		bank.maxOrg = newMaxOrg
+		bank.orgIsSet = true
+	} else {
+		currentOrg := bank.minOrg + CurrentInsertionIndex
+		if newOrg < bank.minOrg {
+			errMsg := fmt.Sprintf("ORG is too small! Attempted: %d / Minimum Allowed: %d ", newOrg, bank.minOrg)
+			return errors.New(errMsg)
+		} else if newOrg > bank.maxOrg {
+			errMsg := fmt.Sprintf("ORG is too big! Attempted: %d / Max Allowed: %d ", newOrg, bank.maxOrg)
+			return errors.New(errMsg)
+		} else if newOrg <= currentOrg {
+			errMsg := fmt.Sprintf("Cannot set ORG to a value less than where the program counter currently is!\nThis would overwrite data!\n Attempted: %d / Currently at: %d ", newOrg, currentOrg)
+			return errors.New(errMsg)
+		}
+	}
+	CurrentInsertionIndex = newOrg % bankSize
+	return nil
 }
