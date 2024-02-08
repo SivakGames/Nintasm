@@ -38,7 +38,6 @@ func TestBBB(t *testing.T) {
 		}
 
 		iterateOverResultWanted(t, wanted)
-
 		romBuilder.ClearINES()
 		romBuilder.ClearRom()
 	})
@@ -55,7 +54,6 @@ func TestBBB(t *testing.T) {
 		}
 
 		iterateOverResultWanted(t, wanted)
-
 		romBuilder.ClearINES()
 		romBuilder.ClearRom()
 	})
