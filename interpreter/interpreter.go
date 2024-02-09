@@ -2,6 +2,7 @@ package interpreter
 
 import (
 	"errors"
+	"log"
 	enumNodeTypes "misc/nintasm/enums/nodeTypes"
 	"misc/nintasm/interpreter/environment"
 	"misc/nintasm/parser/operandFactory"
@@ -124,6 +125,9 @@ func EvaluateNode(node Node) (Node, error) {
 		case "!":
 			operandFactory.ConvertNodeToBooleanLiteral(&node)
 		}
+
+	case enumNodeTypes.CallExpression:
+		log.Println("Cally", *node.ArgumentList)
 
 	default:
 		return node, errors.New("UNKNOWN NODE!!!")

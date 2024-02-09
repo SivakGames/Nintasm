@@ -5,8 +5,6 @@ import "misc/nintasm/romBuilder/romSegmentation"
 // +++++++++++++++++++++++++
 
 func evalRomBuildingOperands(directiveName string, operandList *[]Node) error {
-	var err error
-
 	switch directiveName {
 	case "ROMSEGMENT":
 		var segmentSizeNode *Node
@@ -22,17 +20,18 @@ func evalRomBuildingOperands(directiveName string, operandList *[]Node) error {
 		if len(*romBuildingNodes) == 3 {
 			segmentDescriptionNode = &(*romBuildingNodes)[2]
 		}
+		return romSegmentation.ValidateAndAddRomSegment(segmentSizeNode, segmentBankSizeNode, segmentDescriptionNode)
 
-		err = romSegmentation.ValidateAndAddRomSegment(segmentSizeNode, segmentBankSizeNode, segmentDescriptionNode)
 	case "BANK":
 		bankNode := &(*operandList)[0]
-		err = romSegmentation.ValidateAndSetBank(bankNode)
+		return romSegmentation.ValidateAndSetBank(bankNode)
+
 	case "ORG":
 		orgNode := &(*operandList)[0]
-		err = romSegmentation.ValidateAndSetOrg(orgNode)
+		return romSegmentation.ValidateAndSetOrg(orgNode)
+
 	default:
 		panic("Something is VERY wrong with ROM building directive")
 	}
 
-	return err
 }

@@ -3,7 +3,6 @@ package parser
 import (
 	"errors"
 	"fmt"
-	"log"
 	enumInstructionModes "misc/nintasm/enums/instructionModes"
 	enumTokenTypes "misc/nintasm/enums/tokenTypes"
 	"misc/nintasm/interpreter"
@@ -32,6 +31,8 @@ type OperandParser struct {
 
 // Used by most operations.  Will go through and separate operands by commas returning each one as an AST
 func (p *OperandParser) GetOperandList(minOperands int, maxOperands int) ([]Node, error) {
+	var captureStatementFunction func() (Node, error)
+
 	operandList := []Node{}
 	operandCount := 0
 
@@ -45,11 +46,19 @@ func (p *OperandParser) GetOperandList(minOperands int, maxOperands int) ([]Node
 		return operandList, errors.New("Operand list \x1b[38;5;202mCANNOT\x1b[0m start with a comma!") // ❌ Fails
 	}
 
+	if p.ShouldParseInstructions {
+		captureStatementFunction = p.instructionPrefix
+	} else {
+		captureStatementFunction = p.statement
+	}
+
 	//There is at least one operand
-	firstOperand, err := p.operandStatementList()
+	firstOperand, err := captureStatementFunction()
 	if err != nil {
 		return operandList, err // ❌ Fails
 	}
+
+	fmt.Println(firstOperand)
 
 	operandList = append(operandList, firstOperand)
 
@@ -62,7 +71,7 @@ func (p *OperandParser) GetOperandList(minOperands int, maxOperands int) ([]Node
 		if err != nil {
 			return operandList, err // ❌ Fails
 		}
-		subsequentOperand, err := p.operandStatementList()
+		subsequentOperand, err := captureStatementFunction()
 		if err != nil {
 			return operandList, err // ❌ Fails
 		}
@@ -78,51 +87,12 @@ func (p *OperandParser) GetOperandList(minOperands int, maxOperands int) ([]Node
 }
 
 // =============================================
-func (p *OperandParser) operandStatementList() (Node, error) {
-	return p.statementList(enumTokenTypes.DELIMITER_comma)
-}
-
+// Instructions only
 // =============================================
-// Get statements
-func (p *OperandParser) statementList(stopTokenType tokenEnum) (Node, error) {
-	statementList, err := p.Statement()
-	if err != nil {
-		return statementList, err
-	}
-
-	statementList, err = interpreter.EvaluateNode(statementList)
-	if err != nil {
-		return statementList, err
-	}
-	//If somehow, after evaluation, the next token is not the stop token...
-	for p.lookaheadType != enumTokenTypes.None && p.lookaheadType != stopTokenType {
-		log.Println("\x1b[38;5;202mEvaluating next statement...\x1b[0m")
-		return p.Statement()
-	}
-
-	return statementList, nil
-}
-
-// =============================================
-
-func (p *OperandParser) Statement() (Node, error) {
-	if p.lookaheadType == enumTokenTypes.None {
-		return operandFactory.EmptyNode(), nil
-	}
-
-	if p.ShouldParseInstructions {
-		return p.instructionPrefix()
-	}
-	return p.bitwiseOrExpression()
-
-}
-
-// -------------------------------------------
 
 func (p *OperandParser) instructionPrefix() (Node, error) {
 	p.instructionMode = enumInstructionModes.ABS
 	p.instructionXYIndex = enumTokenTypes.None
-	nextFunction := p.logicalOrExpression
 	xyIndex := enumTokenTypes.None
 	checkXYfollowup := false
 	var statement Node
@@ -139,7 +109,7 @@ func (p *OperandParser) instructionPrefix() (Node, error) {
 		if err != nil {
 			return operandFactory.ErrorNode(p.lookaheadValue), err // ❌ Fails
 		}
-		statement, err = nextFunction()
+		statement, err = p.statement()
 		if err != nil {
 			return statement, err // ❌ Fails
 		}
@@ -181,7 +151,7 @@ func (p *OperandParser) instructionPrefix() (Node, error) {
 		if err != nil {
 			return operandFactory.ErrorNode(p.lookaheadValue), err // ❌ Fails
 		}
-		statement, err = nextFunction()
+		statement, err = p.statement()
 		if err != nil {
 			return operandFactory.ErrorNode(p.lookaheadValue), err // ❌ Fails
 		}
@@ -198,7 +168,7 @@ func (p *OperandParser) instructionPrefix() (Node, error) {
 				return operandFactory.ErrorNode(p.lookaheadValue), err // ❌ Fails
 			}
 		}
-		statement, err = nextFunction()
+		statement, err = p.statement()
 		if err != nil {
 			return operandFactory.ErrorNode(p.lookaheadValue), err // ❌ Fails
 		}
@@ -208,7 +178,7 @@ func (p *OperandParser) instructionPrefix() (Node, error) {
 	//Absolute mode
 
 	default:
-		statement, err = nextFunction()
+		statement, err = p.statement()
 		if err != nil {
 			return operandFactory.ErrorNode(p.lookaheadValue), err // ❌ Fails
 		}
@@ -253,6 +223,49 @@ func (p *OperandParser) checkInstructionXYIndex() (tokenEnum, error) {
 	}
 
 	return targetIndex, nil
+}
+
+// =============================================
+/* func (p *OperandParser) operandStatementList() (Node, error) {
+	return p.statementList(enumTokenTypes.DELIMITER_comma)
+}
+*/
+
+// =============================================
+// Get statements - used for things like function arguments
+/*
+func (p *OperandParser) statementList(stopTokenType tokenEnum) (Node, error) {
+	statementList, err := p.statement()
+	if err != nil {
+		return statementList, err
+	}
+
+	statementList, err = interpreter.EvaluateNode(statementList)
+	if err != nil {
+		return statementList, err
+	}
+	//If somehow, after evaluation, the next token is not the stop token...
+	for p.lookaheadType != enumTokenTypes.None && p.lookaheadType != stopTokenType {
+		log.Println("\x1b[38;5;202mEvaluating next statement...\x1b[0m")
+		return p.statement()
+	}
+
+	return statementList, nil
+} */
+
+// =============================================
+
+func (p *OperandParser) statement() (Node, error) {
+	if p.lookaheadType == enumTokenTypes.None {
+		return operandFactory.EmptyNode(), nil
+	}
+	statement, err := p.bitwiseOrExpression()
+	if err != nil {
+		return statement, err
+	}
+
+	statement, err = interpreter.EvaluateNode(statement)
+	return statement, err
 }
 
 /*
@@ -375,6 +388,7 @@ func _checkValidAssignmentTarget(assignmentType tokenEnum) bool {
 // ---------------------
 // Functions
 func (p *OperandParser) _callExpression(callee string) (Node, error) {
+
 	arguments, err := p.arguments()
 	if err != nil {
 		return operandFactory.ErrorNode(p.lookaheadValue), err // ❌ Fails
@@ -424,7 +438,7 @@ func (p *OperandParser) arguments() ([]Node, error) {
 
 func (p *OperandParser) argumentList() ([]Node, error) {
 	argumentList := []Node{}
-	firstArgument, err := p.Statement()
+	firstArgument, err := p.statement()
 	if err != nil {
 		return argumentList, err // ❌ Fails
 	}
@@ -435,7 +449,7 @@ func (p *OperandParser) argumentList() ([]Node, error) {
 		if err != nil {
 			return argumentList, err // ❌ Fails
 		}
-		nextArgument, err := p.Statement()
+		nextArgument, err := p.statement()
 		if err != nil {
 			return argumentList, err // ❌ Fails
 		}
@@ -573,7 +587,7 @@ func (p *OperandParser) parenthesizedExpression() (Node, error) {
 		return operandFactory.ErrorNode(p.lookaheadValue), err // ❌ Fails
 	}
 
-	expression, err := p.Statement()
+	expression, err := p.statement()
 	if err != nil {
 		return operandFactory.ErrorNode(p.lookaheadValue), err // ❌ Fails
 	}

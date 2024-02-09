@@ -1,0 +1,16 @@
+	.inesMap 0
+	.inesPrg "32kb"
+	.inesChr "8kb"
+	.inesMir 0
+
+	.romSegment "32kb","32kb","PRG"
+	.bank 0
+	.org $8000
+
+	LDA #5 + 2
+	LDA high($1234, $334, $234, 1-1)
+
+	.romSegment "8kb","8kb","CHR"
+	.bank 0
+	.org $0000
+
