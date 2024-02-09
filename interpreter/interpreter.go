@@ -2,13 +2,23 @@ package interpreter
 
 import (
 	"errors"
-	"log"
 	enumNodeTypes "misc/nintasm/enums/nodeTypes"
 	"misc/nintasm/interpreter/environment"
 	"misc/nintasm/parser/operandFactory"
+	"strings"
 )
 
 type Node = operandFactory.Node
+
+type assemblerFunction struct {
+	minArgs          int
+	maxArgs          int
+	argMustResolveTo []enumNodeTypes.Def
+}
+
+var assemblerBuiltInFunctions = map[string]assemblerFunction{
+	"high": {1, 1, []enumNodeTypes.Def{enumNodeTypes.NumericLiteral}},
+}
 
 func EvaluateNode(node Node) (Node, error) {
 	switch node.NodeType {
@@ -127,11 +137,49 @@ func EvaluateNode(node Node) (Node, error) {
 		}
 
 	case enumNodeTypes.CallExpression:
-		log.Println("Cally", *node.ArgumentList)
+		potentialAssemblerFunctionName := strings.ToLower(node.NodeValue)
+		wasAsmFunc, err := ProcessAssemblerFunction(&node, potentialAssemblerFunctionName)
+		if err != nil {
+			return node, err
+		}
+		if wasAsmFunc {
+			switch potentialAssemblerFunctionName {
+			case "high":
+				node.AsNumber = (node.AsNumber & 0x0ff00) >> 8
+			case "low":
+				node.AsNumber = (node.AsNumber & 0x000ff)
+			}
+
+			switch potentialAssemblerFunctionName {
+			case "high", "low":
+				operandFactory.ConvertNodeToNumericLiteral(&node)
+			}
+
+		}
+		// Look up user def functions
 
 	default:
 		return node, errors.New("UNKNOWN NODE!!!")
 	}
 
 	return node, nil
+}
+
+func ProcessAssemblerFunction(node *Node, funcName string) (bool, error) {
+	functionData, isAsmFunc := assemblerBuiltInFunctions[funcName]
+	if isAsmFunc {
+		numArgs := len(*node.ArgumentList)
+		if numArgs < functionData.minArgs {
+			return isAsmFunc, errors.New("Too few arguments for function!")
+		}
+		if numArgs > functionData.maxArgs {
+			return isAsmFunc, errors.New("Too many arguments for function!")
+		}
+		for i, a := range *node.ArgumentList {
+			if a.NodeType != functionData.argMustResolveTo[i] {
+				return isAsmFunc, errors.New("Argument node is wrong type...")
+			}
+		}
+	}
+	return isAsmFunc, nil
 }

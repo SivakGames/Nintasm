@@ -58,8 +58,6 @@ func (p *OperandParser) GetOperandList(minOperands int, maxOperands int) ([]Node
 		return operandList, err // ❌ Fails
 	}
 
-	fmt.Println(firstOperand)
-
 	operandList = append(operandList, firstOperand)
 
 	//From here, operands are comma separated

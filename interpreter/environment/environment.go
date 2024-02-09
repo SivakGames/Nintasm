@@ -3,6 +3,7 @@ package environment
 import (
 	"errors"
 	"fmt"
+	enumNodeTypes "misc/nintasm/enums/nodeTypes"
 	enumTokenTypes "misc/nintasm/enums/tokenTypes"
 	"misc/nintasm/parser/operandFactory"
 )
@@ -27,6 +28,18 @@ func generateNumericNodeForEnvironment(number int) Node {
 	return operandFactory.CreateNumericLiteralNode(enumTokenTypes.NUMBER_decimal, fmt.Sprintf("%d", number), number)
 }
 
+func generateAssemblerBuiltInFunctionNode(funcName string) Node {
+	return operandFactory.CreateAssemblerBuiltInFunctionNode(funcName)
+}
+
+// ----------------------------------
+func decodeHigh(node Node) error {
+	if node.NodeType != enumNodeTypes.NumericLiteral {
+		return errors.New("High node must be a number")
+	}
+	return nil //node.AsNumber
+}
+
 // ----------------------------------
 
 var GlobalEnvironment Environment
@@ -44,6 +57,7 @@ var GlobalEnvironmentValues = map[string]Node{
 	"PPUMASK":     generateNumericNodeForEnvironment(0x02001),
 	"PPUADDR":     generateNumericNodeForEnvironment(0x02006),
 	"PPUADDR.aba": generateNumericNodeForEnvironment(0b00000001),
+	"high":        generateAssemblerBuiltInFunctionNode("high"),
 }
 
 // ----------------------------------

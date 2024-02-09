@@ -63,6 +63,13 @@ func CreateCallExpressionNode(callee string, arguments []Node) Node {
 	return node
 }
 
+// Called by interpreter at time of creating global env.
+func CreateAssemblerBuiltInFunctionNode(nodeValue string) Node {
+	node := newNode(enumTokenTypes.IDENTIFIER, nodeValue, enumNodeTypes.AssemblerBuiltInFunction)
+	node.Resolved = true
+	return node
+}
+
 // """Label.label expressions"""
 func CreateMemberExpressionNode(parent string, key string, computed bool) Node {
 	var parentKey string

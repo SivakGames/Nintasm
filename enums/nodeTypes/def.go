@@ -5,6 +5,8 @@ type Def int
 const (
 	Empty Def = iota + 0
 	Error
+	AssemblerBuiltInFunction
+
 	AssignmentExpression
 	BinaryExpression
 	CallExpression
