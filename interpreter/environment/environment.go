@@ -58,6 +58,7 @@ var GlobalEnvironmentValues = map[string]Node{
 	"PPUADDR":     generateNumericNodeForEnvironment(0x02006),
 	"PPUADDR.aba": generateNumericNodeForEnvironment(0b00000001),
 	"high":        generateAssemblerBuiltInFunctionNode("high"),
+	"low":         generateAssemblerBuiltInFunctionNode("low"),
 }
 
 // ----------------------------------
@@ -84,7 +85,7 @@ func resolveInEnvironment(symbolName string) (Node, error) {
 	if ok {
 		return value, nil
 	} else {
-		errMsg := fmt.Sprintf(symbolName, "was not found")
+		errMsg := fmt.Sprintf("\x1b[33m%v\x1b[0m was not found", symbolName)
 		return operandFactory.EmptyNode(), errors.New(errMsg)
 	}
 	//return operandFactory.EmptyNode(), nil

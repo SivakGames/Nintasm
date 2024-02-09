@@ -2,10 +2,10 @@ package interpreter
 
 import (
 	"errors"
+	"fmt"
 	enumNodeTypes "misc/nintasm/enums/nodeTypes"
 	"misc/nintasm/interpreter/environment"
 	"misc/nintasm/parser/operandFactory"
-	"strings"
 )
 
 type Node = operandFactory.Node
@@ -18,6 +18,7 @@ type assemblerFunction struct {
 
 var assemblerBuiltInFunctions = map[string]assemblerFunction{
 	"high": {1, 1, []enumNodeTypes.Def{enumNodeTypes.NumericLiteral}},
+	"low":  {1, 1, []enumNodeTypes.Def{enumNodeTypes.NumericLiteral}},
 }
 
 func EvaluateNode(node Node) (Node, error) {
@@ -137,24 +138,12 @@ func EvaluateNode(node Node) (Node, error) {
 		}
 
 	case enumNodeTypes.CallExpression:
-		potentialAssemblerFunctionName := strings.ToLower(node.NodeValue)
-		wasAsmFunc, err := ProcessAssemblerFunction(&node, potentialAssemblerFunctionName)
+		wasAsmFunc, err := ProcessAssemblerFunction(&node)
 		if err != nil {
 			return node, err
 		}
 		if wasAsmFunc {
-			switch potentialAssemblerFunctionName {
-			case "high":
-				node.AsNumber = (node.AsNumber & 0x0ff00) >> 8
-			case "low":
-				node.AsNumber = (node.AsNumber & 0x000ff)
-			}
-
-			switch potentialAssemblerFunctionName {
-			case "high", "low":
-				operandFactory.ConvertNodeToNumericLiteral(&node)
-			}
-
+			return node, nil
 		}
 		// Look up user def functions
 
@@ -165,7 +154,8 @@ func EvaluateNode(node Node) (Node, error) {
 	return node, nil
 }
 
-func ProcessAssemblerFunction(node *Node, funcName string) (bool, error) {
+func ProcessAssemblerFunction(node *Node) (bool, error) {
+	funcName := node.NodeValue
 	functionData, isAsmFunc := assemblerBuiltInFunctions[funcName]
 	if isAsmFunc {
 		numArgs := len(*node.ArgumentList)
@@ -177,8 +167,21 @@ func ProcessAssemblerFunction(node *Node, funcName string) (bool, error) {
 		}
 		for i, a := range *node.ArgumentList {
 			if a.NodeType != functionData.argMustResolveTo[i] {
-				return isAsmFunc, errors.New("Argument node is wrong type...")
+				return isAsmFunc, errors.New("Argument for node is wrong type...")
 			}
+		}
+
+		switch funcName {
+		case "high":
+			node.AsNumber = ((*node.ArgumentList)[0].AsNumber & 0x0ff00) >> 8
+		case "low":
+			node.AsNumber = ((*node.ArgumentList)[0].AsNumber & 0x000ff)
+			fmt.Println(node)
+		}
+
+		switch funcName {
+		case "high", "low":
+			operandFactory.ConvertNodeToNumericLiteral(node)
 		}
 	}
 	return isAsmFunc, nil

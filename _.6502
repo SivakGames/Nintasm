@@ -7,11 +7,10 @@
 	.bank 0
 	.org $8000
 
-xxx = $2006
+xxx = $2013
 
 	LDA #5 + 2
-	LDA high(xxx + 2 + 3 )
-	LDA low(xxx + %00001 + 3 )
+	LDA low(xxx)
 
 	.romSegment "8kb","8kb","CHR"
 	.bank 0
