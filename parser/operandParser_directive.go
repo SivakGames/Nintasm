@@ -3,10 +3,8 @@ package parser
 import (
 	"errors"
 	enumTokenTypes "misc/nintasm/enums/tokenTypes"
-	"misc/nintasm/parser/operandFactory"
-	"misc/nintasm/romBuilder"
-	"misc/nintasm/romBuilder/nodesToBytes"
-	"misc/nintasm/romBuilder/romSegmentation"
+	handlerDirective "misc/nintasm/handlers/directives"
+
 	"strings"
 )
 
@@ -19,21 +17,16 @@ func NewDirectiveOperandParser() DirectiveOperandParser {
 	return DirectiveOperandParser{}
 }
 
-var directiveAliases = map[string]string{
-	"BYTE":        "DB",
-	"WORD":        "DW",
-	"WORDBE":      "DWBE",
-	"REVERSEBYTE": "RDB",
-	"PAD":         "DS",
-}
+// Copy of name before checking aliases for error output relating to directive
+var unaliasedDirectiveName string
 
-var directiveMinMaxOperands = map[enumTokenTypes.Def][2]int{
-	enumTokenTypes.DIRECTIVE_dataBytes:   {1, 128},
-	enumTokenTypes.DIRECTIVE_mixedData:   {1, 128},
-	enumTokenTypes.DIRECTIVE_dataSeries:  {1, 2},
-	enumTokenTypes.DIRECTIVE_INES:        {1, 1},
-	enumTokenTypes.DIRECTIVE_romBuilding: {1, 3},
-	enumTokenTypes.DIRECTIVE_romBankOrg:  {1, 1},
+var directiveAliases = map[string]string{
+	"BYTE":         "DB",
+	"WORD":         "DW",
+	"WORDBE":       "DWBE",
+	"REVERSEBYTE":  "RDB",
+	"PAD":          "DS",
+	"AUTOZEROPAGE": "AUTOZP",
 }
 
 // Main directive parser
@@ -41,229 +34,61 @@ func (p *DirectiveOperandParser) Process(operationType tokenEnum, operationValue
 	var err error
 
 	directiveName := strings.ToUpper(operationValue)
+	unaliasedDirectiveName = directiveName
+
 	aliasValue, aliasExists := directiveAliases[directiveName]
 	if aliasExists {
 		directiveName = aliasValue
 	}
 
-	minMaxOperands := directiveMinMaxOperands[operationType]
-	minOperands := minMaxOperands[0]
-	maxOperands := minMaxOperands[1]
+	minOperands, maxOperands, err := getMinMaxOperandsForDirective(operationType, directiveName)
+	if err != nil {
+		return err // ❌ Fails
+	}
 
 	operandList, err := p.GetOperandList(minOperands, maxOperands)
 	if err != nil {
 		return err // ❌ Fails
 	}
 
-	switch operationType {
+	err = handlerDirective.Process(operationType, directiveName, &operandList)
+	return err
 
-	case enumTokenTypes.DIRECTIVE_dataBytes:
-		err = evalDataBytesOperands(directiveName, &operandList)
-		return err // 🟢/❌ Could be either
-
-	case enumTokenTypes.DIRECTIVE_dataSeries:
-		err = evalDataSeriesOperands(directiveName, &operandList)
-		return err // 🟢/❌ Could be either
-
-	case enumTokenTypes.DIRECTIVE_mixedData:
-		err = evalMixedDataBytesOperands(directiveName, &operandList)
-		return err // 🟢/❌ Could be either
-
-	case enumTokenTypes.DIRECTIVE_INES:
-		err = evalInesBytesOperands(directiveName, &operandList)
-		return err // 🟢/❌ Could be either
-
-	case enumTokenTypes.DIRECTIVE_romBuilding:
-		err = evalRomBuildingOperands(directiveName, &operandList)
-		return err // 🟢/❌ Could be either
-
-	case enumTokenTypes.DIRECTIVE_romBankOrg:
-		err = evalRomBankOrgOperands(directiveName, &operandList)
-		return err // 🟢/❌ Could be either
-
-	default:
-		return errors.New("BAD DIRECTIVE OPERATION TYPE!!!")
-	}
 }
 
 // +++++++++++++++++++++++++
 
-var directiveOperandByteSizes = map[string]int{
-	"DB":   1,
-	"DW":   2,
-	"DWBE": 2,
-	"RDB":  1,
+var directiveMinMaxOperands = map[enumTokenTypes.Def][2]int{
+	enumTokenTypes.DIRECTIVE_dataBytes:    {1, 128},
+	enumTokenTypes.DIRECTIVE_dataSeries:   {1, 2},
+	enumTokenTypes.DIRECTIVE_mixedData:    {1, 128},
+	enumTokenTypes.DIRECTIVE_blockEnd:     {0, 0},
+	enumTokenTypes.DIRECTIVE_INES:         {1, 1},
+	enumTokenTypes.DIRECTIVE_repeat:       {1, 1},
+	enumTokenTypes.DIRECTIVE_setting:      {1, 1},
+	enumTokenTypes.DIRECTIVE_settingReset: {0, 0},
+	enumTokenTypes.DIRECTIVE_throw:        {1, 1},
 }
 
-// For .db, .dw, .dwbe
-func evalDataBytesOperands(directiveName string, operandList *[]Node) error {
-	var asRomData = make([]uint8, 0)
-	var err error
-
-	isBigEndian := false
-	operandSize := directiveOperandByteSizes[directiveName]
-
-	if directiveName == "DWBE" {
-		isBigEndian = true
-	}
-
-	for _, operand := range *operandList {
-		asRomData, err = nodesToBytes.ConvertNodeValueToUInts(operand, operandSize, isBigEndian)
-		if err != nil {
-			return err // ❌ Fails
-		}
-		err = romBuilder.AddBytesToRom(asRomData)
-		if err != nil {
-			return err // ❌ Fails
-		}
-	}
-	return nil
+var directiveNameMinMaxOperands = map[string][2]int{
+	"BANK":       {1, 1},
+	"INCBIN":     {1, 3},
+	"INCLUDE":    {1, 1},
+	"ORG":        {1, 1},
+	"ROMSEGMENT": {1, 3},
 }
 
-// +++++++++++++++++++++++++
+func getMinMaxOperandsForDirective(directiveEnum tokenEnum, directiveName string) (int, int, error) {
+	var minMaxOperands [2]int
+	var checkOk bool
 
-// For .ds
-func evalDataSeriesOperands(directiveName string, operandList *[]Node) error {
-	seriesValue := uint8(0xff)
-	repetitionNode := &(*operandList)[0]
-	if !(operandFactory.ValidateNodeIsNumeric(repetitionNode) &&
-		operandFactory.ValidateNumericNodeIsGTZero(repetitionNode)) {
-		return errors.New("DS/PAD directive repeat value must be a number that is > 0")
+	minMaxOperands, checkOk = directiveMinMaxOperands[directiveEnum]
+	if checkOk {
+		return minMaxOperands[0], minMaxOperands[1], nil
 	}
-
-	repetitionNumber := repetitionNode.AsNumber
-	numRepetitions := repetitionNumber
-
-	if len(*operandList) == 2 {
-		padNode := &(*operandList)[1]
-		if !(operandFactory.ValidateNodeIsNumeric(padNode) &&
-			operandFactory.ValidateNumericNodeIsPositive(padNode) &&
-			operandFactory.ValidateNumericNodeIs8BitValue(padNode)) {
-			return errors.New("DS/PAD directive fill value must be a non-negative 8-bit number")
-		}
-		seriesValue = uint8(padNode.AsNumber)
+	minMaxOperands, checkOk = directiveNameMinMaxOperands[directiveName]
+	if !checkOk {
+		return 0, 0, errors.New("Unable to determine min/max operands for directive!")
 	}
-
-	asRomData := make([]uint8, numRepetitions)
-
-	for i := range asRomData {
-		asRomData[i] = seriesValue
-	}
-
-	err := romBuilder.AddBytesToRom(asRomData)
-	return err
-}
-
-// +++++++++++++++++++++++++
-
-type mixedDataDirectiveBytesKeyFormat struct {
-	numBytes  int
-	bigEndian bool
-}
-
-var mixedDataDirectiveBytesKeys = map[byte]mixedDataDirectiveBytesKeyFormat{
-	'B': {1, false},
-	'W': {2, false},
-	'E': {2, true},
-}
-
-// For .d_***_
-func evalMixedDataBytesOperands(directiveName string, operandList *[]Node) error {
-	var asRomData = make([]uint8, 0)
-	var err error
-
-	mixedPattern := directiveName[2:]
-	lastRepeats := mixedPattern[len(mixedPattern)-1] == '_'
-	if lastRepeats {
-		mixedPattern = mixedPattern[:len(mixedPattern)-1]
-	}
-
-	for i, operand := range *operandList {
-		var mixedPatternIndex int
-		if lastRepeats && i >= len(mixedPattern) {
-			mixedPatternIndex = len(mixedPattern) - 1
-		} else {
-			mixedPatternIndex = i % len(mixedPattern)
-		}
-
-		currentPatternKey := mixedPattern[mixedPatternIndex]
-		operandSize := mixedDataDirectiveBytesKeys[currentPatternKey].numBytes
-		isBigEndian := mixedDataDirectiveBytesKeys[currentPatternKey].bigEndian
-
-		asRomData, err = nodesToBytes.ConvertNodeValueToUInts(operand, operandSize, isBigEndian)
-		if err != nil {
-			return err // ❌ Fails
-		}
-		err = romBuilder.AddBytesToRom(asRomData)
-		if err != nil {
-			return err // ❌ Fails
-		}
-	}
-	return nil
-}
-
-// +++++++++++++++++++++++++
-
-func evalInesBytesOperands(directiveName string, operandList *[]Node) error {
-	var err error
-	inesNode := &(*operandList)[0]
-
-	switch directiveName {
-	case "INESPRG":
-		err = romBuilder.ValidateInesPrg(inesNode)
-	case "INESCHR":
-		err = romBuilder.ValidateInesChr(inesNode)
-	case "INESMAP":
-		err = romBuilder.ValidateInesMap(inesNode)
-	case "INESMIR":
-		err = romBuilder.ValidateInesMirroring(inesNode)
-	case "INESBAT":
-		err = nil
-	default:
-		panic("Something is very wrong with ines directive")
-	}
-
-	return err
-}
-
-func evalRomBuildingOperands(directiveName string, operandList *[]Node) error {
-	var err error
-	var segmentSizeNode *Node
-	var segmentBankSizeNode *Node = nil
-	var segmentDescriptionNode *Node = nil
-
-	if directiveName != "ROMSEGMENT" {
-		panic("Something is VERY wrong with ROM segment directive")
-	}
-
-	romBuildingNodes := &(*operandList)
-	segmentSizeNode = &(*romBuildingNodes)[0]
-
-	if len(*romBuildingNodes) >= 2 {
-		segmentBankSizeNode = &(*romBuildingNodes)[1]
-	}
-	if len(*romBuildingNodes) == 3 {
-		segmentDescriptionNode = &(*romBuildingNodes)[2]
-	}
-
-	err = romSegmentation.ValidateAndAddRomSegment(segmentSizeNode, segmentBankSizeNode, segmentDescriptionNode)
-
-	return err
-}
-
-func evalRomBankOrgOperands(directiveName string, operandList *[]Node) error {
-	var err error = nil
-
-	bankOrgNode := &(*operandList)[0]
-
-	switch directiveName {
-	case "BANK":
-		err = romSegmentation.ValidateAndSetBank(bankOrgNode)
-	case "ORG":
-		err = romSegmentation.ValidateAndSetOrg(bankOrgNode)
-	default:
-		panic("Something is VERY wrong with BANK or ORG directive")
-	}
-
-	return err
+	return minMaxOperands[0], minMaxOperands[1], nil
 }

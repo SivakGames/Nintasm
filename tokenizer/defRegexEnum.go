@@ -41,16 +41,20 @@ var (
 		{regexp.MustCompile(generateBoundaries("ds|pad")), enumTokenTypes.DIRECTIVE_dataSeries},
 		{regexp.MustCompile(generateBoundaries("d_[bwe]+_?")), enumTokenTypes.DIRECTIVE_mixedData},
 		{regexp.MustCompile(generateBoundaries("inesPrg|inesChr|inesMap|inesMir|inesBat")), enumTokenTypes.DIRECTIVE_INES},
-		{regexp.MustCompile(generateBoundaries("romSegment")), enumTokenTypes.DIRECTIVE_romBuilding},
-		{regexp.MustCompile(generateBoundaries("bank|org")), enumTokenTypes.DIRECTIVE_romBankOrg},
+
+		{regexp.MustCompile(generateBoundaries("romSegment|bank|org")), enumTokenTypes.DIRECTIVE_romBuilding},
+		{regexp.MustCompile(generateBoundaries("include|incbin")), enumTokenTypes.DIRECTIVE_include},
 		{regexp.MustCompile(generateBoundaries("throw")), enumTokenTypes.DIRECTIVE_throw},
 		{regexp.MustCompile(generateBoundaries("defChar|defCharRange")), enumTokenTypes.DIRECTIVE_charmap},
 		{regexp.MustCompile(generateBoundaries("defExpr")), enumTokenTypes.DIRECTIVE_exprMap},
-		{regexp.MustCompile(generateBoundaries("repeat|endrepeat")), enumTokenTypes.DIRECTIVE_repeat},
-		{regexp.MustCompile(generateBoundaries("if|elseif|ifdef|ifndef|else|endif|switch|case|default|endswitch")), enumTokenTypes.DIRECTIVE_if},
-		{regexp.MustCompile(generateBoundaries("ikv|kv|keyvalue|endIkv")), enumTokenTypes.DIRECTIVE_invokeKeyVal},
-		{regexp.MustCompile(generateBoundaries("include|incbin")), enumTokenTypes.DIRECTIVE_include},
-		{regexp.MustCompile(generateBoundaries("autoZP|autoZeroPage|emptyRomFill|rsset|resetCharMap|setCharMap|resetExprMap|setExprMap")), enumTokenTypes.DIRECTIVE_setting},
+
+		{regexp.MustCompile(generateBoundaries("repeat")), enumTokenTypes.DIRECTIVE_repeat},
+		{regexp.MustCompile(generateBoundaries("if|elseif|ifdef|ifndef|else|switch|case|default")), enumTokenTypes.DIRECTIVE_if},
+		{regexp.MustCompile(generateBoundaries("ikv|kv|keyvalue")), enumTokenTypes.DIRECTIVE_invokeKeyVal},
+		{regexp.MustCompile(generateBoundaries("end(?:if|ikv|repeat|switch)")), enumTokenTypes.DIRECTIVE_blockEnd},
+
+		{regexp.MustCompile(generateBoundaries("autoZP|autoZeroPage|emptyRomFill|rsset|setCharMap|setExprMap")), enumTokenTypes.DIRECTIVE_setting},
+		{regexp.MustCompile(generateBoundaries("resetCharMap|resetExprMap")), enumTokenTypes.DIRECTIVE_settingReset},
 
 		{regexp.MustCompile(generateBoundaries("func|rs")), enumTokenTypes.DIRECTIVE_labeled},
 		{regexp.MustCompile(generateBoundaries("nameSpace|macro|kvMacro|charMap|exprMap")), enumTokenTypes.DIRECTIVE_labeledBlockStart},

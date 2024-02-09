@@ -1,10 +1,10 @@
-package parserTypes
+package enumParserTypes
 
 // The possible values for simple operations
-type SimpleOperation int
+type Def int
 
 const (
-	None SimpleOperation = iota + 1
+	None Def = iota + 1
 	Directive
 	Instruction
 	Label

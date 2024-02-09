@@ -3,8 +3,8 @@ package parser
 import (
 	"errors"
 	"fmt"
+	enumParserTypes "misc/nintasm/enums/parserTypes"
 	enumTokenTypes "misc/nintasm/enums/tokenTypes"
-	"misc/nintasm/parser/parserTypes"
 )
 
 const LINE_OPERATION_TARGET_TOKENIZER = "startLine"
@@ -15,7 +15,7 @@ type OperationParser struct {
 	operationLabel       string
 	operationType        tokenEnum
 	operationValue       string
-	operationSimpleType  parserTypes.SimpleOperation
+	operationSimpleType  enumParserTypes.Def
 	operandStartPosition int
 }
 
@@ -25,14 +25,14 @@ func NewOperationParser() OperationParser {
 		operationLabel:       "",
 		operationType:        enumTokenTypes.None,
 		operationValue:       "",
-		operationSimpleType:  parserTypes.None,
+		operationSimpleType:  enumParserTypes.None,
 		operandStartPosition: 0,
 	}
 }
 
 // ++++++++++++++++++++++
 // 🛠️ Get info about the successfully-parsed operation
-func (p *OperationParser) GetOperationDetails() (tokenEnum, parserTypes.SimpleOperation, string, string, int) {
+func (p *OperationParser) GetOperationDetails() (tokenEnum, enumParserTypes.Def, string, string, int) {
 	return p.operationType, p.operationSimpleType, p.operationValue, p.operationLabel, p.operandStartPosition
 }
 
@@ -41,7 +41,7 @@ func (p *OperationParser) Process(line string) (err error) {
 	p.operationLabel = ""
 	p.operationType = enumTokenTypes.None
 	p.operationValue = ""
-	p.operationSimpleType = parserTypes.None
+	p.operationSimpleType = enumParserTypes.None
 	p.operandStartPosition = 0
 
 	// Get tokenizer to start
@@ -76,24 +76,24 @@ func (p *OperationParser) getRegularOperation() error {
 	p.eat(enumTokenTypes.WHITESPACE)
 	p.advanceToNext()
 
-	var operationSimpleType parserTypes.SimpleOperation
+	var operationSimpleType enumParserTypes.Def
 
 	switch p.lookaheadType {
 
 	case enumTokenTypes.INSTRUCTION:
-		operationSimpleType = parserTypes.Instruction
+		operationSimpleType = enumParserTypes.Instruction
 		break
 
 	case enumTokenTypes.DELIMITER_period:
 		p.eat(enumTokenTypes.DELIMITER_period)
 		p.advanceToNext()
 		if p.lookaheadType > enumTokenTypes.DIRECTIVE_RANGE_START && p.lookaheadType < enumTokenTypes.DIRECTIVE_RANGE_END {
-			operationSimpleType = parserTypes.Directive
+			operationSimpleType = enumParserTypes.Directive
 			break
 		}
 		return errors.New("UNKNOWN DIRECTIVE")
 	case enumTokenTypes.IDENTIFIER:
-		operationSimpleType = parserTypes.Macro
+		operationSimpleType = enumParserTypes.Macro
 		break
 	case enumTokenTypes.None:
 		return errors.New("UNEXPECTED EMPTY OPERATION???")
@@ -172,7 +172,7 @@ func (p *OperationParser) getLabelOperation() error {
 			p.operationLabel = operationLabel
 			p.operationType = enumTokenTypes.IDENTIFIER
 			p.operationValue = ""
-			p.operationSimpleType = parserTypes.Label
+			p.operationSimpleType = enumParserTypes.Label
 			return nil
 		}
 		// ❌ Fails if tokens follow colon
@@ -257,6 +257,6 @@ func (p *OperationParser) getLabelFollowup(operationLabel string, hadWhitespace 
 	p.operationLabel = operationLabel
 	p.operationType = operationType
 	p.operationValue = operationValue
-	p.operationSimpleType = parserTypes.Label
+	p.operationSimpleType = enumParserTypes.Label
 	return nil
 }

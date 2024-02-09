@@ -1,8 +1,8 @@
 package assemble
 
 import (
+	enumParserTypes "misc/nintasm/enums/parserTypes"
 	"misc/nintasm/parser"
-	"misc/nintasm/parser/parserTypes"
 )
 
 func Start(lines []string) error {
@@ -36,7 +36,7 @@ func Start(lines []string) error {
 		operationType, operationSimpleType, operationValue, operationLabel, operandStartPosition := lineOperationParzival.GetOperationDetails()
 
 		switch operationSimpleType {
-		case parserTypes.Directive:
+		case enumParserTypes.Directive:
 			operandParserErr := directiveOperandParzival.SetupOperandParser(l, operandStartPosition)
 			if operandParserErr != nil {
 				return operandParserErr
@@ -46,7 +46,7 @@ func Start(lines []string) error {
 				return operandParserErr
 			}
 
-		case parserTypes.Instruction:
+		case enumParserTypes.Instruction:
 			operandParserErr := instructionOperandParzival.SetupOperandParser(l, operandStartPosition)
 			if operandParserErr != nil {
 				return operandParserErr
@@ -56,10 +56,10 @@ func Start(lines []string) error {
 				return operandParserErr
 			}
 
-		//	case parserTypes.Macro:
+		//	case enumParserTypes.Macro:
 		//		fmt.Println("Mack")
 		//		fmt.Println(optype, opval, opPos)
-		case parserTypes.Label:
+		case enumParserTypes.Label:
 			operandParserErr := labelOperandParzival.SetupOperandParser(l, operandStartPosition)
 			if operandParserErr != nil {
 				return operandParserErr
