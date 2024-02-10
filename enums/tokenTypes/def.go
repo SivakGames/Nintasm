@@ -17,6 +17,7 @@ const (
 	//++++Helper for directive capture
 	DIRECTIVE_RANGE_START
 	//Directives
+	DIRECTIVE_blockStart
 	DIRECTIVE_blockEnd
 	DIRECTIVE_charmap
 	DIRECTIVE_dataBytes
@@ -30,7 +31,6 @@ const (
 	DIRECTIVE_labeledBlockStart
 	DIRECTIVE_labeledBlockEnd
 	DIRECTIVE_mixedData
-	DIRECTIVE_repeat
 	DIRECTIVE_romBuilding
 	DIRECTIVE_setting
 	DIRECTIVE_settingReset
