@@ -5,7 +5,7 @@ type Def int
 const (
 	Empty Def = iota + 0
 	Error
-	AssemblerBuiltInFunction
+	AssemblerReservedWord
 
 	AssignmentExpression
 	BinaryExpression

@@ -19,6 +19,7 @@ type assemblerFunction struct {
 var assemblerBuiltInFunctions = map[string]assemblerFunction{
 	"high": {1, 1, []enumNodeTypes.Def{enumNodeTypes.NumericLiteral}},
 	"low":  {1, 1, []enumNodeTypes.Def{enumNodeTypes.NumericLiteral}},
+	"bank": {1, 1, []enumNodeTypes.Def{enumNodeTypes.NumericLiteral}},
 }
 
 func EvaluateNode(node Node) (Node, error) {
@@ -145,7 +146,9 @@ func EvaluateNode(node Node) (Node, error) {
 		if wasAsmFunc {
 			return node, nil
 		}
+
 		// Look up user def functions
+		fmt.Println(node)
 
 	default:
 		return node, errors.New("UNKNOWN NODE!!!")
@@ -165,6 +168,7 @@ func ProcessAssemblerFunction(node *Node) (bool, error) {
 		if numArgs > functionData.maxArgs {
 			return isAsmFunc, errors.New("Too many arguments for function!")
 		}
+
 		for i, a := range *node.ArgumentList {
 			if a.NodeType != functionData.argMustResolveTo[i] {
 				return isAsmFunc, errors.New("Argument for node is wrong type...")
@@ -176,7 +180,8 @@ func ProcessAssemblerFunction(node *Node) (bool, error) {
 			node.AsNumber = ((*node.ArgumentList)[0].AsNumber & 0x0ff00) >> 8
 		case "low":
 			node.AsNumber = ((*node.ArgumentList)[0].AsNumber & 0x000ff)
-			fmt.Println(node)
+		case "bank":
+			//node.AsNumber = ((*node.ArgumentList)[0].AsNumber & 0x000ff)
 		}
 
 		switch funcName {

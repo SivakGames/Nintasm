@@ -261,7 +261,6 @@ func (p *OperandParser) statement() (Node, error) {
 	if err != nil {
 		return statement, err
 	}
-
 	statement, err = interpreter.EvaluateNode(statement)
 	return statement, err
 }

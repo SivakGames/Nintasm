@@ -24,12 +24,12 @@ func NewEnvironment(envName string) Environment {
 
 // ----------------------------------
 
-func generateNumericNodeForEnvironment(number int) Node {
-	return operandFactory.CreateNumericLiteralNode(enumTokenTypes.NUMBER_decimal, fmt.Sprintf("%d", number), number)
+func generateAssemblerReservedWordNode(funcName string) Node {
+	return operandFactory.CreateAssemblerReservedWordNode(funcName)
 }
 
-func generateAssemblerBuiltInFunctionNode(funcName string) Node {
-	return operandFactory.CreateAssemblerBuiltInFunctionNode(funcName)
+func generateNumericNodeForEnvironment(number int) Node {
+	return operandFactory.CreateNumericLiteralNode(enumTokenTypes.NUMBER_decimal, fmt.Sprintf("%d", number), number)
 }
 
 // ----------------------------------
@@ -57,8 +57,9 @@ var GlobalEnvironmentValues = map[string]Node{
 	"PPUMASK":     generateNumericNodeForEnvironment(0x02001),
 	"PPUADDR":     generateNumericNodeForEnvironment(0x02006),
 	"PPUADDR.aba": generateNumericNodeForEnvironment(0b00000001),
-	"high":        generateAssemblerBuiltInFunctionNode("high"),
-	"low":         generateAssemblerBuiltInFunctionNode("low"),
+	"bank":        generateAssemblerReservedWordNode("bank"),
+	"high":        generateAssemblerReservedWordNode("high"),
+	"low":         generateAssemblerReservedWordNode("low"),
 }
 
 // ----------------------------------

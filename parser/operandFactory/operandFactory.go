@@ -64,8 +64,8 @@ func CreateCallExpressionNode(callee string, arguments []Node) Node {
 }
 
 // Called by interpreter at time of creating global env.
-func CreateAssemblerBuiltInFunctionNode(nodeValue string) Node {
-	node := newNode(enumTokenTypes.IDENTIFIER, nodeValue, enumNodeTypes.AssemblerBuiltInFunction)
+func CreateAssemblerReservedWordNode(nodeValue string) Node {
+	node := newNode(enumTokenTypes.IDENTIFIER, nodeValue, enumNodeTypes.AssemblerReservedWord)
 	node.Resolved = true
 	return node
 }
