@@ -85,12 +85,20 @@ func (p *OperationParser) getRegularOperation() error {
 		break
 
 	case enumTokenTypes.DELIMITER_period:
-		p.eat(enumTokenTypes.DELIMITER_period)
-		p.advanceToNext()
+		err := p.eatFreelyAndAdvance(enumTokenTypes.DELIMITER_period)
+		if err != nil {
+			return err
+		}
+
 		if p.lookaheadType > enumTokenTypes.DIRECTIVE_RANGE_START && p.lookaheadType < enumTokenTypes.DIRECTIVE_RANGE_END {
 			operationSimpleType = enumParserTypes.Directive
 			break
+		} else if p.lookaheadType == enumTokenTypes.DIRECTIVE_blockStart ||
+			p.lookaheadType == enumTokenTypes.DIRECTIVE_blockEnd {
+			operationSimpleType = enumParserTypes.CaptureBlock
+			break
 		}
+
 		return errors.New("UNKNOWN DIRECTIVE")
 	case enumTokenTypes.IDENTIFIER:
 		operationSimpleType = enumParserTypes.Macro

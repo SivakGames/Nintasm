@@ -377,6 +377,8 @@ func (p *OperandParser) callMemberExpression() (Node, error) {
 	return member, nil
 }
 
+// +++++++++++++++++++++++
+
 // Call expressions MUST begin with an identifier
 func _checkValidAssignmentTarget(assignmentType tokenEnum) bool {
 	return (assignmentType == enumTokenTypes.IDENTIFIER)
@@ -385,6 +387,25 @@ func _checkValidAssignmentTarget(assignmentType tokenEnum) bool {
 // ---------------------
 // Functions
 func (p *OperandParser) _callExpression(callee string) (Node, error) {
+	var err error = nil
+
+	if callee == "bank" {
+		err = p.eatFreelyAndAdvance(enumTokenTypes.DELIMITER_leftParenthesis)
+		if err != nil {
+			return operandFactory.ErrorNode(p.lookaheadValue), err // ❌ Fails
+		}
+		bankArgument := operandFactory.CreateIdentifierNode(p.lookaheadType, p.lookaheadValue)
+		err = p.eatAndAdvance(enumTokenTypes.IDENTIFIER)
+		if err != nil {
+			return operandFactory.ErrorNode(p.lookaheadValue), err // ❌ Fails
+		}
+		err = p.eatAndAdvance(enumTokenTypes.DELIMITER_rightParenthesis)
+		if err != nil {
+			return operandFactory.ErrorNode(p.lookaheadValue), err // ❌ Fails
+		}
+
+		return operandFactory.CreateCallExpressionNode(callee, []Node{bankArgument}), nil
+	}
 
 	arguments, err := p.arguments()
 	if err != nil {
@@ -412,7 +433,7 @@ func (p *OperandParser) arguments() ([]Node, error) {
 	var argumentList []Node
 	var err error = nil
 
-	p.eatAndAdvance(enumTokenTypes.DELIMITER_leftParenthesis)
+	err = p.eatAndAdvance(enumTokenTypes.DELIMITER_leftParenthesis)
 	if err != nil {
 		return argumentList, err // ❌ Fails
 	}

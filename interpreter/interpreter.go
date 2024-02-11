@@ -3,6 +3,7 @@ package interpreter
 import (
 	"errors"
 	"fmt"
+	"log"
 	enumNodeTypes "misc/nintasm/enums/nodeTypes"
 	"misc/nintasm/interpreter/environment"
 	"misc/nintasm/parser/operandFactory"
@@ -19,7 +20,7 @@ type assemblerFunction struct {
 var assemblerBuiltInFunctions = map[string]assemblerFunction{
 	"high": {1, 1, []enumNodeTypes.Def{enumNodeTypes.NumericLiteral}},
 	"low":  {1, 1, []enumNodeTypes.Def{enumNodeTypes.NumericLiteral}},
-	"bank": {1, 1, []enumNodeTypes.Def{enumNodeTypes.NumericLiteral}},
+	"bank": {1, 1, []enumNodeTypes.Def{enumNodeTypes.Identifier}},
 }
 
 func EvaluateNode(node Node) (Node, error) {
@@ -181,6 +182,7 @@ func ProcessAssemblerFunction(node *Node) (bool, error) {
 		case "low":
 			node.AsNumber = ((*node.ArgumentList)[0].AsNumber & 0x000ff)
 		case "bank":
+			log.Println((*node.ArgumentList)[0])
 			//node.AsNumber = ((*node.ArgumentList)[0].AsNumber & 0x000ff)
 		}
 

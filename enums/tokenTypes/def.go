@@ -17,8 +17,6 @@ const (
 	//++++Helper for directive capture
 	DIRECTIVE_RANGE_START
 	//Directives
-	DIRECTIVE_blockStart
-	DIRECTIVE_blockEnd
 	DIRECTIVE_charmap
 	DIRECTIVE_dataBytes
 	DIRECTIVE_dataSeries
@@ -28,8 +26,6 @@ const (
 	DIRECTIVE_INES
 	DIRECTIVE_invokeKeyVal
 	DIRECTIVE_labeled
-	DIRECTIVE_labeledBlockStart
-	DIRECTIVE_labeledBlockEnd
 	DIRECTIVE_mixedData
 	DIRECTIVE_romBuilding
 	DIRECTIVE_setting
@@ -37,6 +33,10 @@ const (
 	DIRECTIVE_throw
 	//++++Helper for directive capture
 	DIRECTIVE_RANGE_END
+	DIRECTIVE_blockStart
+	DIRECTIVE_blockEnd
+	DIRECTIVE_labeledBlockStart
+	DIRECTIVE_labeledBlockEnd
 	//Delimiters
 	DELIMITER_comma
 	DELIMITER_period

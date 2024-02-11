@@ -9,9 +9,15 @@
 
 	LDA #5 + 2
 
+	.db bank(xxx), bank(xxyx)
+
 xxx:
 	LDA low(xxx)
 	lda bank(xxx)
+
+	.repeat 5
+	.db 5
+	.endRepeat
 
 	.romSegment "8kb","8kb","CHR"
 	.bank 0

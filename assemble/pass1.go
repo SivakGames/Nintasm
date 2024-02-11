@@ -13,6 +13,7 @@ func Start(lines []string) error {
 	directiveOperandParzival := parser.NewDirectiveOperandParser()
 	instructionOperandParzival := parser.NewInstructionOperandParser()
 	labelOperandParzival := parser.NewLabelOperandParser()
+	captureBlockOperandParzival := parser.NewCaptureBlockOperandParser()
 
 	instructionOperandParzival.ShouldParseInstructions = true
 
@@ -21,6 +22,8 @@ func Start(lines []string) error {
 	// Iterate over all lines
 	for _, l := range lines {
 		lineCounter++
+
+		//Step 1 - Reformat line
 		reformattedLine, lineInitErr := lineInitParzival.Process(l)
 		if lineInitErr != nil {
 			return lineInitErr
@@ -28,6 +31,8 @@ func Start(lines []string) error {
 		if len(reformattedLine) == 0 {
 			continue
 		}
+
+		//Step 2 - determine line op
 		lineOperationErr := lineOperationParzival.Process(reformattedLine)
 		if lineOperationErr != nil {
 			return lineOperationErr
@@ -68,6 +73,17 @@ func Start(lines []string) error {
 			if operandParserErr != nil {
 				return operandParserErr
 			}
+		case enumParserTypes.CaptureBlock:
+			operandParserErr := captureBlockOperandParzival.SetupOperandParser(l, operandStartPosition)
+			if operandParserErr != nil {
+				return operandParserErr
+			}
+			operandParserErr = captureBlockOperandParzival.Process(operationType, operationValue)
+			if operandParserErr != nil {
+				return operandParserErr
+			}
+		default:
+			panic("Ruh roh")
 		}
 
 	}
