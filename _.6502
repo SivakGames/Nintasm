@@ -9,13 +9,12 @@
 
 	LDA #5 + 2
 
-	.repeat 2, \j
-		.db 7 + \j
-		.repeat 6, \iterr
-			.db 5+\iterr * \j
-			.db 6 - \iterr
-		.endRepeat
+	.repeat 3, \j
+		.db 5 + \j
+
 	.endRepeat
+
+	ldx #6
 
 	.romSegment "8kb","8kb","CHR"
 	.bank 0

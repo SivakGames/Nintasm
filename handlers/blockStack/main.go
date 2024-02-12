@@ -58,12 +58,17 @@ var correspondingEndBlockOperations = map[string]string{
 
 //--------------------------------
 
-func CheckIfEndOperation(lineOperationParsedValues *util.LineOperationParsedValues) bool {
-	currentStackOp := &Stack[len(Stack)-1]
-	endOpName, _ := correspondingEndBlockOperations[currentStackOp.blockOperationValue]
-
-	return lineOperationParsedValues.OperationTokenEnum == enumTokenTypes.DIRECTIVE_blockEnd &&
-		endOpName == strings.ToUpper(lineOperationParsedValues.OperationTokenValue)
+func CheckIfNewStartEndOperation(lineOperationParsedValues *util.LineOperationParsedValues) bool {
+	switch lineOperationParsedValues.OperationTokenEnum {
+	case enumTokenTypes.DIRECTIVE_blockStart:
+		return true
+	case enumTokenTypes.DIRECTIVE_blockEnd:
+		currentStackOp := &Stack[len(Stack)-1]
+		endOpName, _ := correspondingEndBlockOperations[currentStackOp.blockOperationValue]
+		return lineOperationParsedValues.OperationTokenEnum == enumTokenTypes.DIRECTIVE_blockEnd &&
+			endOpName == strings.ToUpper(lineOperationParsedValues.OperationTokenValue)
+	}
+	return false
 
 }
 

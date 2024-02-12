@@ -32,6 +32,8 @@ func evalRepeat(directiveName string, operandList *[]Node) error {
 	}
 
 	blockStack.PushOntoStack(directiveName, evaluatedNodes)
+	fmt.Println(len(blockStack.Stack))
+
 	return nil
 }
 
@@ -69,15 +71,18 @@ func evalEndRepeat(directiveName string, operandList *[]Node) error {
 		}
 	}
 	if len(blockStack.Stack) > 1 {
-		fmt.Println("RUNNING")
 		blockStack.Stack = blockStack.Stack[:len(blockStack.Stack)-1]
 		newCurrentStackOperation := &blockStack.Stack[len(blockStack.Stack)-1]
 		for _, line := range replacedLines {
 			newCurrentStackOperation.CapturedLines = append(newCurrentStackOperation.CapturedLines, line)
+			fmt.Println("*", line)
 		}
+	} else {
+		newCurrentStackOperation := &blockStack.Stack[len(blockStack.Stack)-1]
+		newCurrentStackOperation.CapturedLines = replacedLines
 	}
 
-	fmt.Println(blockStack.Stack)
+	fmt.Println("New", blockStack.Stack)
 
 	return nil
 }

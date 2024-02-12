@@ -43,8 +43,8 @@ func Start(lines []string) error {
 		//Intermediate - determine if in stack capturing
 		if len(blockStack.Stack) > 0 {
 			var blockStackErr error
-			isEndOp := blockStack.CheckIfEndOperation(&lineOperationParsedValues)
-			if isEndOp {
+			isStartEndOp := blockStack.CheckIfNewStartEndOperation(&lineOperationParsedValues)
+			if isStartEndOp {
 				blockStackErr = parseOperandStringAndProcess(
 					reformattedLine,
 					&lineOperationParsedValues,
