@@ -5,6 +5,7 @@ import (
 	"fmt"
 	enumParserTypes "misc/nintasm/enums/parserTypes"
 	enumTokenTypes "misc/nintasm/enums/tokenTypes"
+	"misc/nintasm/util"
 )
 
 const LINE_OPERATION_TARGET_TOKENIZER = "startLine"
@@ -13,9 +14,9 @@ const LINE_OPERATION_TARGET_TOKENIZER = "startLine"
 type OperationParser struct {
 	Parser
 	operationLabel       string
-	operationType        tokenEnum
-	operationValue       string
-	operationSimpleType  enumParserTypes.Def
+	operationTokenEnum   tokenEnum
+	operationTokenValue  string
+	parentParserEnum     enumParserTypes.Def
 	operandStartPosition int
 }
 
@@ -23,25 +24,19 @@ type OperationParser struct {
 func NewOperationParser() OperationParser {
 	return OperationParser{
 		operationLabel:       "",
-		operationType:        enumTokenTypes.None,
-		operationValue:       "",
-		operationSimpleType:  enumParserTypes.None,
+		operationTokenEnum:   enumTokenTypes.None,
+		operationTokenValue:  "",
+		parentParserEnum:     enumParserTypes.None,
 		operandStartPosition: 0,
 	}
-}
-
-// ++++++++++++++++++++++
-// 🛠️ Get info about the successfully-parsed operation
-func (p *OperationParser) GetOperationDetails() (tokenEnum, enumParserTypes.Def, string, string, int) {
-	return p.operationType, p.operationSimpleType, p.operationValue, p.operationLabel, p.operandStartPosition
 }
 
 // ====================================================================
 func (p *OperationParser) Process(line string) (err error) {
 	p.operationLabel = ""
-	p.operationType = enumTokenTypes.None
-	p.operationValue = ""
-	p.operationSimpleType = enumParserTypes.None
+	p.operationTokenEnum = enumTokenTypes.None
+	p.operationTokenValue = ""
+	p.parentParserEnum = enumParserTypes.None
 	p.operandStartPosition = 0
 
 	// Get tokenizer to start
@@ -58,6 +53,18 @@ func (p *OperationParser) Process(line string) (err error) {
 	p.operandStartPosition = p.tokenizer.GetCursor()
 
 	return nil
+}
+
+//+++++++++++++++++++++++++++++
+
+func (p *OperationParser) GetLineOperationValues() util.LineOperationParsedValues {
+	return util.NewLineOperationParsedValues(
+		p.operandStartPosition,
+		p.operationLabel,
+		p.operationTokenEnum,
+		p.operationTokenValue,
+		p.parentParserEnum,
+	)
 }
 
 // ====================================================================
@@ -93,10 +100,6 @@ func (p *OperationParser) getRegularOperation() error {
 		if p.lookaheadType > enumTokenTypes.DIRECTIVE_RANGE_START && p.lookaheadType < enumTokenTypes.DIRECTIVE_RANGE_END {
 			operationSimpleType = enumParserTypes.Directive
 			break
-		} else if p.lookaheadType == enumTokenTypes.DIRECTIVE_blockStart ||
-			p.lookaheadType == enumTokenTypes.DIRECTIVE_blockEnd {
-			operationSimpleType = enumParserTypes.CaptureBlock
-			break
 		}
 
 		return errors.New("UNKNOWN DIRECTIVE")
@@ -109,8 +112,8 @@ func (p *OperationParser) getRegularOperation() error {
 		return errors.New("UNKNOWN OPERATION")
 	}
 
-	operationType := p.lookaheadType
-	operationValue := p.lookaheadValue
+	operationTokenEnum := p.lookaheadType
+	operationTokenValue := p.lookaheadValue
 
 	// ❔ See what's next. Should be either whitespace or nothing
 	p.eat(p.lookaheadType)
@@ -121,9 +124,9 @@ func (p *OperationParser) getRegularOperation() error {
 
 	// 🟢 Operation parsing succeeds
 	if p.lookaheadType == enumTokenTypes.WHITESPACE || p.lookaheadType == enumTokenTypes.None {
-		p.operationValue = operationValue
-		p.operationType = operationType
-		p.operationSimpleType = operationSimpleType
+		p.operationTokenValue = operationTokenValue
+		p.operationTokenEnum = operationTokenEnum
+		p.parentParserEnum = operationSimpleType
 		return nil
 	}
 
@@ -178,9 +181,9 @@ func (p *OperationParser) getLabelOperation() error {
 		if p.lookaheadType == enumTokenTypes.None {
 			// 🟢 Label parsing succeeds
 			p.operationLabel = operationLabel
-			p.operationType = enumTokenTypes.IDENTIFIER
-			p.operationValue = ""
-			p.operationSimpleType = enumParserTypes.Label
+			p.operationTokenEnum = enumTokenTypes.IDENTIFIER
+			p.operationTokenValue = ""
+			p.parentParserEnum = enumParserTypes.Label
 			return nil
 		}
 		// ❌ Fails if tokens follow colon
@@ -203,22 +206,22 @@ func (p *OperationParser) getLabelFollowup(operationLabel string, hadWhitespace 
 		}
 	}
 
-	var operationValue string
-	var operationType tokenEnum
+	var operationTokenValue string
+	var operationTokenEnum tokenEnum
 
 	switch p.lookaheadType {
 
 	//Equals sign
 	case enumTokenTypes.ASSIGN_simple:
-		operationType = p.lookaheadType
-		operationValue = p.lookaheadValue
+		operationTokenEnum = p.lookaheadType
+		operationTokenValue = p.lookaheadValue
 		p.eat(enumTokenTypes.ASSIGN_simple)
 		p.advanceToNext()
 
 	//EQU
 	case enumTokenTypes.ASSIGN_EQU:
-		operationType = p.lookaheadType
-		operationValue = p.lookaheadValue
+		operationTokenEnum = p.lookaheadType
+		operationTokenValue = p.lookaheadValue
 		p.eat(enumTokenTypes.ASSIGN_EQU)
 		p.advanceToNext()
 		err := p.eat(enumTokenTypes.WHITESPACE)
@@ -238,8 +241,8 @@ func (p *OperationParser) getLabelFollowup(operationLabel string, hadWhitespace 
 		case enumTokenTypes.DIRECTIVE_labeled,
 			enumTokenTypes.DIRECTIVE_labeledBlockStart,
 			enumTokenTypes.DIRECTIVE_labeledBlockEnd:
-			operationType = p.lookaheadType
-			operationValue = p.lookaheadValue
+			operationTokenEnum = p.lookaheadType
+			operationTokenValue = p.lookaheadValue
 			p.eat(p.lookaheadType)
 			err := p.advanceToNext()
 			if err != nil {
@@ -263,8 +266,8 @@ func (p *OperationParser) getLabelFollowup(operationLabel string, hadWhitespace 
 
 	// 🟢 Labeled directive parsing succeeds
 	p.operationLabel = operationLabel
-	p.operationType = operationType
-	p.operationValue = operationValue
-	p.operationSimpleType = enumParserTypes.Label
+	p.operationTokenEnum = operationTokenEnum
+	p.operationTokenValue = operationTokenValue
+	p.parentParserEnum = enumParserTypes.Label
 	return nil
 }

@@ -50,7 +50,7 @@ func (p *LabelOperandParser) Process(operationType tokenEnum, operationValue str
 			return errors.New("\x1b[31mMissing assignment operand!\x1b[0m")
 		}
 
-		operandList, err := p.GetOperandList(1, 64)
+		operandList, err := p.GetOperandList(1, 64, false)
 		if err != nil {
 			return err // ❌ Fails
 		}

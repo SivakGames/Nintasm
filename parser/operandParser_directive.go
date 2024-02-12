@@ -29,6 +29,10 @@ var directiveAliases = map[string]string{
 	"AUTOZEROPAGE": "AUTOZP",
 }
 
+var directiveManuallyEvaluatesOperands = map[string]bool{
+	"REPEAT": true,
+}
+
 // Main directive parser
 func (p *DirectiveOperandParser) Process(operationType tokenEnum, operationValue string) error {
 	var err error
@@ -46,7 +50,9 @@ func (p *DirectiveOperandParser) Process(operationType tokenEnum, operationValue
 		return err // ❌ Fails
 	}
 
-	operandList, err := p.GetOperandList(minOperands, maxOperands)
+	_, manuallyEvaluatesOperands := directiveManuallyEvaluatesOperands[directiveName]
+
+	operandList, err := p.GetOperandList(minOperands, maxOperands, manuallyEvaluatesOperands)
 	if err != nil {
 		return err // ❌ Fails
 	}
@@ -75,6 +81,7 @@ var directiveNameMinMaxOperands = map[string][2]int{
 	"INCLUDE":    {1, 1},
 	"ORG":        {1, 1},
 	"ROMSEGMENT": {1, 3},
+	"REPEAT":     {1, 2},
 }
 
 func getMinMaxOperandsForDirective(directiveEnum tokenEnum, directiveName string) (int, int, error) {

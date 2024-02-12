@@ -20,6 +20,7 @@ type OperandParser struct {
 	ShouldParseInstructions bool
 	instructionMode         instModeEnum
 	instructionXYIndex      tokenEnum
+	manuallyEvalOperands    bool
 	Parser
 }
 
@@ -30,11 +31,12 @@ type OperandParser struct {
 //=============================================
 
 // Used by most operations.  Will go through and separate operands by commas returning each one as an AST
-func (p *OperandParser) GetOperandList(minOperands int, maxOperands int) ([]Node, error) {
+func (p *OperandParser) GetOperandList(minOperands int, maxOperands int, manuallyEvalOperands bool) ([]Node, error) {
 	var captureStatementFunction func() (Node, error)
 
 	operandList := []Node{}
 	operandCount := 0
+	p.manuallyEvalOperands = manuallyEvalOperands
 
 	//No operands at all
 	if p.lookaheadType == enumTokenTypes.None {
@@ -59,12 +61,8 @@ func (p *OperandParser) GetOperandList(minOperands int, maxOperands int) ([]Node
 	}
 
 	operandList = append(operandList, firstOperand)
-
 	//From here, operands are comma separated
 	for p.lookaheadType != enumTokenTypes.None && p.lookaheadType == enumTokenTypes.DELIMITER_comma {
-		if len(operandList) >= maxOperands {
-			return operandList, errors.New("Too many operands for operation!")
-		}
 		err = p.eatFreelyAndAdvance(enumTokenTypes.DELIMITER_comma)
 		if err != nil {
 			return operandList, err // ❌ Fails
@@ -77,6 +75,9 @@ func (p *OperandParser) GetOperandList(minOperands int, maxOperands int) ([]Node
 		operandCount++
 	}
 
+	if len(operandList) > maxOperands {
+		return operandList, errors.New("Too many operands for operation!")
+	}
 	if len(operandList) < minOperands {
 		return operandList, errors.New("Too few operands for operation!")
 	}
@@ -261,7 +262,9 @@ func (p *OperandParser) statement() (Node, error) {
 	if err != nil {
 		return statement, err
 	}
-	statement, err = interpreter.EvaluateNode(statement)
+	if !p.manuallyEvalOperands {
+		statement, err = interpreter.EvaluateNode(statement)
+	}
 	return statement, err
 }
 

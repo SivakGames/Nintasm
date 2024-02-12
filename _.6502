@@ -9,14 +9,12 @@
 
 	LDA #5 + 2
 
-	.db bank(xxx), bank(xxyx)
-
-xxx:
-	LDA low(xxx)
-	lda bank(xxx)
-
-	.repeat 5
-	.db 5
+	.repeat 2, \j
+		.db 7 + \j
+		.repeat 6, \iterr
+			.db 5+\iterr * \j
+			.db 6 - \iterr
+		.endRepeat
 	.endRepeat
 
 	.romSegment "8kb","8kb","CHR"

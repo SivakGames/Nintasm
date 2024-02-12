@@ -8,9 +8,9 @@ import (
 
 type Node = operandFactory.Node
 
-func Process(operationType enumTokenTypes.Def, directiveName string, operandList *[]Node) error {
+func Process(operationTokenEnum enumTokenTypes.Def, directiveName string, operandList *[]Node) error {
 
-	switch operationType {
+	switch operationTokenEnum {
 
 	// 🟢/❌ Could be either
 	case enumTokenTypes.DIRECTIVE_dataBytes:
@@ -23,6 +23,11 @@ func Process(operationType enumTokenTypes.Def, directiveName string, operandList
 		return evalInesOperands(directiveName, operandList)
 	case enumTokenTypes.DIRECTIVE_romBuilding:
 		return evalRomBuildingOperands(directiveName, operandList)
+	case enumTokenTypes.DIRECTIVE_blockStart:
+		return evalRepeat(directiveName, operandList)
+	case enumTokenTypes.DIRECTIVE_blockEnd:
+		return evalEndRepeat(directiveName, operandList)
+		//return evalRomBuildingOperands(directiveName, operandList)
 	default:
 		return errors.New("BAD DIRECTIVE OPERATION TYPE!!!")
 	}
