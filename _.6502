@@ -11,12 +11,18 @@
 
 	.repeat 3, \j
 		.db 5 + \j
-
+		.repeat 4, \k
+		LDX #\k
+			.repeat 5, \l
+			LDX #\l
+			.endRepeat
+		.endRepeat
 	.endRepeat
 
+	.repeat 2
 	ldx #6
+	.endRepeat
 
 	.romSegment "8kb","8kb","CHR"
 	.bank 0
 	.org $0000
-

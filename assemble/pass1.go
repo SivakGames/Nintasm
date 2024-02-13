@@ -20,6 +20,7 @@ func Start(lines []string) error {
 	var lineCounter uint = 0
 
 	// Iterate over all lines
+
 	for _, rawLine := range lines {
 		lineCounter++
 
@@ -52,6 +53,8 @@ func Start(lines []string) error {
 				if blockStackErr != nil {
 					return blockStackErr
 				}
+				blockStack.CheckIfEndOperationAndClearStack(&lineOperationParsedValues)
+
 			} else {
 				err := blockStack.CheckOperationIsCapturableAndAppend(reformattedLine, &lineOperationParsedValues)
 				if err != nil {
