@@ -65,7 +65,7 @@ func GetCurrentRomSegment() *romSegmentType {
 	if len(rom) > 0 {
 		return &rom[len(rom)-1]
 	}
-	panic("Attemped to access ROM with no segments!!!")
+	panic("Attempted to access ROM with no segments!!!")
 }
 
 // How many rom segments are currently defined
@@ -142,7 +142,6 @@ func SetOrg(newOrg int) error {
 // Take an array of uint8s and put it the right spot
 func AddBytesToRom(insertions []uint8) error {
 	currentBankSegment := GetCurrentBankSegmentBytes()
-
 	toInsertSpace := currentInsertionIndex + len(insertions)
 	overflowByteTotal := toInsertSpace - len(*currentBankSegment)
 

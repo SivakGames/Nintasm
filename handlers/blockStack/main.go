@@ -3,6 +3,7 @@ package blockStack
 import (
 	"errors"
 	"fmt"
+	enumParserTypes "misc/nintasm/enums/parserTypes"
 	enumTokenTypes "misc/nintasm/enums/tokenTypes"
 	"misc/nintasm/parser/operandFactory"
 	"misc/nintasm/util"
@@ -13,20 +14,27 @@ type Node = operandFactory.Node
 
 type CapturedLine struct {
 	OriginalLine         string
-	operationTokenEnum   enumTokenTypes.Def
-	operationTokenValue  string
-	operandStartPosition int
+	OperationLabel       string
+	OperationTokenEnum   enumTokenTypes.Def
+	OperationTokenValue  string
+	OperandStartPosition int
+	ParentParserEnum     enumParserTypes.Def
 }
 
 func newCapturedLine(originalLine string,
+	operationLabel string,
 	operationTokenEnum enumTokenTypes.Def,
 	operationTokenValue string,
-	operandStartPosition int) CapturedLine {
+	operandStartPosition int,
+	parentParserEnum enumParserTypes.Def,
+) CapturedLine {
 	return CapturedLine{
 		OriginalLine:         originalLine,
-		operationTokenEnum:   operationTokenEnum,
-		operationTokenValue:  operationTokenValue,
-		operandStartPosition: operandStartPosition,
+		OperationLabel:       operationLabel,
+		OperationTokenEnum:   operationTokenEnum,
+		OperationTokenValue:  operationTokenValue,
+		OperandStartPosition: operandStartPosition,
+		ParentParserEnum:     parentParserEnum,
 	}
 }
 
@@ -106,9 +114,11 @@ func CheckOperationIsCapturableAndAppend(
 	}
 	currentStackOp.CapturedLines = append(currentStackOp.CapturedLines, newCapturedLine(
 		originalLine,
+		lineOperationParsedValues.OperationLabel,
 		lineOperationParsedValues.OperationTokenEnum,
 		lineOperationParsedValues.OperationTokenValue,
 		lineOperationParsedValues.OperandStartPosition,
+		lineOperationParsedValues.ParentParserEnum,
 	))
 
 	return nil
@@ -138,10 +148,16 @@ func PopFromStackAndExtendCapturedLines(extendLines []CapturedLine) {
 
 //--------------------------------
 
-func CheckIfEndOperationAndClearStack(lineOperationParsedValues *util.LineOperationParsedValues) {
+func CheckIfEndOperationAndClearStack(lineOperationParsedValues *util.LineOperationParsedValues) bool {
 	if lineOperationParsedValues.OperationTokenEnum == enumTokenTypes.DIRECTIVE_blockEnd &&
 		stackWillClear {
-		Stack = Stack[:0]
 		stackWillClear = false
+		return true
 	}
+	return false
+}
+
+func ClearStack() {
+	Stack = Stack[:0]
+	return
 }

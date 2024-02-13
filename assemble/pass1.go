@@ -53,7 +53,24 @@ func Start(lines []string) error {
 				if blockStackErr != nil {
 					return blockStackErr
 				}
-				blockStack.CheckIfEndOperationAndClearStack(&lineOperationParsedValues)
+				if blockStack.CheckIfEndOperationAndClearStack(&lineOperationParsedValues) {
+					for _, b := range blockStack.Stack[0].CapturedLines {
+						temp := util.NewLineOperationParsedValues(b.OperandStartPosition,
+							b.OperationLabel,
+							b.OperationTokenEnum,
+							b.OperationTokenValue,
+							b.ParentParserEnum,
+						)
+						blockStackErr = parseOperandStringAndProcess(
+							b.OriginalLine,
+							&temp,
+						)
+						if blockStackErr != nil {
+							return blockStackErr
+						}
+					}
+					blockStack.ClearStack()
+				}
 
 			} else {
 				err := blockStack.CheckOperationIsCapturableAndAppend(reformattedLine, &lineOperationParsedValues)

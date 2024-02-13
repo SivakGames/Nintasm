@@ -19,8 +19,9 @@
 		.endRepeat
 	.endRepeat
 
-	.repeat 2
+	.repeat 2, \i
 	ldx #6
+	.db 44 + \i
 	.endRepeat
 
 	.romSegment "8kb","8kb","CHR"

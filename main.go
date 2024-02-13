@@ -54,6 +54,7 @@ func main() {
 	if err != nil {
 		fmt.Println(err)
 	}
+
 	assemblyTime := fmt.Sprintf("%.2f", time.Since(start).Seconds())
 	finalMessage := fmt.Sprintf("Assembly took: \x1b[33m%v\x1b[0m seconds", assemblyTime)
 	fmt.Println(finalMessage)
