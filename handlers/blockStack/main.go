@@ -54,7 +54,7 @@ func newStackBlock(operationName string, operandList []Node) StackBlock {
 
 var Stack []StackBlock
 
-var stackWillClear bool = false
+var StackWillClearFlag bool = false
 
 // -----------------------------
 
@@ -90,6 +90,10 @@ func popFromStack() {
 func ClearStack() {
 	Stack = Stack[:0]
 	return
+}
+
+func SetBottomOfStackToEmpty() {
+	Stack[0] = newStackBlock("nil", nil)
 }
 
 //+++++++++++++++++++++++++++++++
@@ -159,7 +163,6 @@ func CheckOperationIsCapturableAndAppend(
 		lineOperationParsedValues.OperandStartPosition,
 		lineOperationParsedValues.ParentParserEnum,
 	))
-
 	return nil
 }
 
@@ -177,7 +180,7 @@ func PopFromStackAndExtendCapturedLines(extendLines []CapturedLine) {
 	} else if len(Stack) == 1 {
 		newCurrentStackOperation := GetLastAlternateOperation()
 		newCurrentStackOperation.CapturedLines = extendLines
-		stackWillClear = true
+		StackWillClearFlag = true
 
 	} else {
 		panic("Popping nothing from stack!!!")
@@ -188,8 +191,8 @@ func PopFromStackAndExtendCapturedLines(extendLines []CapturedLine) {
 
 func CheckIfEndOperationAndClearStack(lineOperationParsedValues *util.LineOperationParsedValues) bool {
 	if lineOperationParsedValues.OperationTokenEnum == enumTokenTypes.DIRECTIVE_blockEnd &&
-		stackWillClear {
-		stackWillClear = false
+		StackWillClearFlag {
+		StackWillClearFlag = false
 		return true
 	}
 	return false

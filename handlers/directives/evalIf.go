@@ -58,5 +58,15 @@ func evalEndIf(directiveName string, operandList *[]Node) error {
 	}
 
 	blockStack.PopFromStackAndExtendCapturedLines(*trueStatementCapturedLines)
+
+	if blockStack.StackWillClearFlag {
+		if currentStackOperation != nil {
+			blockStack.Stack[0] = *currentStackOperation
+			blockStack.Stack[0].AlternateStackBlock = nil
+		} else {
+			blockStack.SetBottomOfStackToEmpty()
+		}
+	}
+
 	return nil
 }
