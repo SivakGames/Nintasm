@@ -2,6 +2,7 @@ package handlerDirective
 
 import (
 	"errors"
+	enumTokenTypes "misc/nintasm/enums/tokenTypes"
 	"misc/nintasm/handlers/blockStack"
 	"misc/nintasm/parser/operandFactory"
 )
@@ -12,6 +13,21 @@ func evalIf(directiveName string, operandList *[]Node) error {
 }
 
 func evalElseIf(directiveName string, operandList *[]Node) error {
+	lastOp := blockStack.GetLastAlternateOperation()
+	if lastOp.BlockOperationName == "ELSE" {
+		return errors.New("Cannot have elseif after else")
+	}
+	blockStack.PushIntoAlternateStackBlock(directiveName, *operandList)
+	return nil
+}
+
+func evalElse(directiveName string, operandList *[]Node) error {
+	lastOp := blockStack.GetLastAlternateOperation()
+	if lastOp.BlockOperationName == "ELSE" {
+		return errors.New("Cannot only have 1 else in this block")
+	}
+
+	*operandList = append(*operandList, operandFactory.CreateBooleanLiteralNode(enumTokenTypes.NUMBER_decimal, "1", true))
 	blockStack.PushIntoAlternateStackBlock(directiveName, *operandList)
 	return nil
 }

@@ -30,6 +30,8 @@ func Process(operationTokenEnum enumTokenTypes.Def, directiveName string, operan
 			return evalIf(directiveName, operandList)
 		case "ELSEIF":
 			return evalElseIf(directiveName, operandList)
+		case "ELSE":
+			return evalElse(directiveName, operandList)
 		case "REPEAT":
 			return evalRepeat(directiveName, operandList)
 		default:

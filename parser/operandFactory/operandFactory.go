@@ -126,6 +126,13 @@ func CreateSubstitutionIdNode(nodeType tokenEnum, nodeValue string) Node {
 //===================================================
 //Literals
 
+func CreateBooleanLiteralNode(nodeType tokenEnum, nodeValue string, asBool bool) Node {
+	node := newNode(nodeType, nodeValue, enumNodeTypes.BooleanLiteral)
+	node.AsBool = asBool
+	node.Resolved = true
+	return node
+}
+
 // Numbers
 func CreateNumericLiteralNode(nodeType tokenEnum, nodeValue string, asNumber int) Node {
 	node := newNode(nodeType, nodeValue, enumNodeTypes.NumericLiteral)

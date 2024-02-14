@@ -7,12 +7,21 @@
 	.bank 0
 	.org $8000
 
-	.if 5 > 4
+	.if 1 > 2
+		.db 11
+	.elseif 3 > 4
+		.db 22
+		.db 33
+	.elseif 5 > 6
+		.db 44
 		.db 55
-		.if 150 < 100
+		.db 66
+	.else
 		.db 77
 		.db 88
-		.endif
+		.db 188
+		.db 88
+
 	.endif
 
 ;	LDA #5 + 2

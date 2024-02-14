@@ -39,7 +39,7 @@ func newCapturedLine(originalLine string,
 }
 
 type StackBlock struct {
-	blockOperationName  string
+	BlockOperationName  string
 	OperandList         []Node
 	CapturedLines       []CapturedLine
 	AlternateStackBlock *StackBlock
@@ -47,7 +47,7 @@ type StackBlock struct {
 
 func newStackBlock(operationName string, operandList []Node) StackBlock {
 	return StackBlock{
-		blockOperationName: operationName,
+		BlockOperationName: operationName,
 		OperandList:        operandList,
 	}
 }
@@ -64,15 +64,31 @@ func PushOntoStack(op string, operandList []Node) {
 }
 
 func PushIntoAlternateStackBlock(op string, operandList []Node) {
-	currentStackOp := &Stack[len(Stack)-1]
+	currentStackOp := GetLastAlternateOperation()
+	altBlock := newStackBlock(op, operandList)
+	currentStackOp.AlternateStackBlock = &altBlock
+	return
+}
+
+func GetCurrentOperation() *StackBlock {
+	return &Stack[len(Stack)-1]
+}
+
+func GetLastAlternateOperation() *StackBlock {
+	currentStackOp := GetCurrentOperation()
 	for currentStackOp.AlternateStackBlock != nil {
 		currentStackOp = currentStackOp.AlternateStackBlock
 	}
-	altBlock := newStackBlock(op, operandList)
-	currentStackOp.AlternateStackBlock = &altBlock
+	return currentStackOp
+}
 
-	fmt.Println(Stack)
+func popFromStack() {
+	Stack = Stack[:len(Stack)-1]
+	return
+}
 
+func ClearStack() {
+	Stack = Stack[:0]
 	return
 }
 
@@ -90,42 +106,44 @@ func CheckIfNewStartEndOperation(lineOperationParsedValues *util.LineOperationPa
 	case enumTokenTypes.DIRECTIVE_blockStart:
 		return true
 	case enumTokenTypes.DIRECTIVE_blockEnd:
-		currentStackOp := &Stack[len(Stack)-1]
-		endOpName, _ := correspondingEndBlockOperations[currentStackOp.blockOperationName]
+		currentStackOp := GetCurrentOperation()
+		endOpName, _ := correspondingEndBlockOperations[currentStackOp.BlockOperationName]
 		return lineOperationParsedValues.OperationTokenEnum == enumTokenTypes.DIRECTIVE_blockEnd &&
 			endOpName == strings.ToUpper(lineOperationParsedValues.OperationTokenValue)
 	}
 	return false
 }
 
-//+++++++++++++++++++++++++++++++
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-var allowedOperationsForParentOps = map[string]map[enumTokenTypes.Def]bool{
-	"REPEAT": {
-		enumTokenTypes.INSTRUCTION:          true,
-		enumTokenTypes.DIRECTIVE_dataBytes:  true,
-		enumTokenTypes.DIRECTIVE_dataSeries: true,
-		enumTokenTypes.DIRECTIVE_mixedData:  true,
-	},
-	"IF": {
-		enumTokenTypes.INSTRUCTION:          true,
-		enumTokenTypes.DIRECTIVE_dataBytes:  true,
-		enumTokenTypes.DIRECTIVE_dataSeries: true,
-		enumTokenTypes.DIRECTIVE_mixedData:  true,
-	},
+type captureableOpMap = map[enumTokenTypes.Def]bool
+
+var sharedCapturableOps = captureableOpMap{
+	enumTokenTypes.INSTRUCTION:          true,
+	enumTokenTypes.DIRECTIVE_dataBytes:  true,
+	enumTokenTypes.DIRECTIVE_dataSeries: true,
+	enumTokenTypes.DIRECTIVE_mixedData:  true,
 }
 
-//--------------------------------
+var allowedOperationsForParentOps = map[string]captureableOpMap{
+	"REPEAT": sharedCapturableOps,
+	"IF":     sharedCapturableOps,
+	"ELSEIF": sharedCapturableOps,
+	"ELSE":   sharedCapturableOps,
+}
+
+//-----------------------------------------------------
 
 func CheckOperationIsCapturableAndAppend(
 	originalLine string,
 	lineOperationParsedValues *util.LineOperationParsedValues,
 ) error {
-	currentStackOp := &Stack[len(Stack)-1]
-	currentStackOpValue := currentStackOp.blockOperationName
+	currentStackOp := GetLastAlternateOperation()
+	currentStackOpValue := currentStackOp.BlockOperationName
 	checka, ok := allowedOperationsForParentOps[currentStackOpValue]
 	if !ok {
-		panic("Very bad stack op!")
+		errMsg := fmt.Sprintf("Very bad stack op! Got: %v", currentStackOpValue)
+		panic(errMsg)
 	}
 
 	_, ok = checka[lineOperationParsedValues.OperationTokenEnum]
@@ -147,28 +165,17 @@ func CheckOperationIsCapturableAndAppend(
 
 //--------------------------------
 
-func popFromStack() {
-	Stack = Stack[:len(Stack)-1]
-	return
-}
-
-func GetCurrentOperation() *StackBlock {
-	return &Stack[len(Stack)-1]
-}
-
-//--------------------------------
-
 // Take top of the stack and append all of it to the next unit down and pop the top
 func PopFromStackAndExtendCapturedLines(extendLines []CapturedLine) {
 	if len(Stack) > 1 {
 		popFromStack()
-		newCurrentStackOperation := GetCurrentOperation()
+		newCurrentStackOperation := GetLastAlternateOperation()
 		for _, line := range extendLines {
 			newCurrentStackOperation.CapturedLines = append(newCurrentStackOperation.CapturedLines, line)
 		}
 
 	} else if len(Stack) == 1 {
-		newCurrentStackOperation := GetCurrentOperation()
+		newCurrentStackOperation := GetLastAlternateOperation()
 		newCurrentStackOperation.CapturedLines = extendLines
 		stackWillClear = true
 
@@ -186,9 +193,4 @@ func CheckIfEndOperationAndClearStack(lineOperationParsedValues *util.LineOperat
 		return true
 	}
 	return false
-}
-
-func ClearStack() {
-	Stack = Stack[:0]
-	return
 }
