@@ -147,21 +147,31 @@ func CheckOperationIsCapturableAndAppend(
 
 //--------------------------------
 
+func popFromStack() {
+	Stack = Stack[:len(Stack)-1]
+	return
+}
+
+func GetCurrentOperation() *StackBlock {
+	return &Stack[len(Stack)-1]
+}
+
+//--------------------------------
+
 // Take top of the stack and append all of it to the next unit down and pop the top
 func PopFromStackAndExtendCapturedLines(extendLines []CapturedLine) {
 	if len(Stack) > 1 {
-		Stack = Stack[:len(Stack)-1]
-		newCurrentStackOperation := &Stack[len(Stack)-1]
+		popFromStack()
+		newCurrentStackOperation := GetCurrentOperation()
 		for _, line := range extendLines {
 			newCurrentStackOperation.CapturedLines = append(newCurrentStackOperation.CapturedLines, line)
 		}
 
-		// This is the last stack entry being popped
-
 	} else if len(Stack) == 1 {
-		newCurrentStackOperation := &Stack[len(Stack)-1]
+		newCurrentStackOperation := GetCurrentOperation()
 		newCurrentStackOperation.CapturedLines = extendLines
 		stackWillClear = true
+
 	} else {
 		panic("Popping nothing from stack!!!")
 	}

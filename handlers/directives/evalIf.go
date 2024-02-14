@@ -2,7 +2,6 @@ package handlerDirective
 
 import (
 	"errors"
-	"fmt"
 	"misc/nintasm/handlers/blockStack"
 	"misc/nintasm/parser/operandFactory"
 )
@@ -18,7 +17,11 @@ func evalElseIf(directiveName string, operandList *[]Node) error {
 }
 
 func evalEndIf(directiveName string, operandList *[]Node) error {
-	currentStackOperation := &blockStack.Stack[len(blockStack.Stack)-1]
+	currentStackOperation := blockStack.GetCurrentOperation()
+	var trueStatementCapturedLines *[]blockStack.CapturedLine
+
+	// Cycle through until finding a true block or a nil one (nothing is true)
+	// Will change currentStackOp
 
 	for currentStackOperation != nil {
 		ifData := &currentStackOperation.OperandList[0]
@@ -31,8 +34,13 @@ func evalEndIf(directiveName string, operandList *[]Node) error {
 		currentStackOperation = currentStackOperation.AlternateStackBlock
 	}
 
-	fmt.Println("At the end!")
+	if currentStackOperation != nil {
+		trueStatementCapturedLines = &currentStackOperation.CapturedLines
+	} else {
+		emptyCapturedLines := make([]blockStack.CapturedLine, 0)
+		trueStatementCapturedLines = &emptyCapturedLines
+	}
 
-	//blockStack.PopFromStackAndExtendCapturedLines(replacedLines)
+	blockStack.PopFromStackAndExtendCapturedLines(*trueStatementCapturedLines)
 	return nil
 }
