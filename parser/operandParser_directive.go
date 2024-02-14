@@ -82,6 +82,8 @@ var directiveNameMinMaxOperands = map[string][2]int{
 	"ORG":        {1, 1},
 	"ROMSEGMENT": {1, 3},
 	"REPEAT":     {1, 2},
+	"IF":         {1, 1},
+	"ELSEIF":     {1, 1},
 }
 
 func getMinMaxOperandsForDirective(directiveEnum tokenEnum, directiveName string) (int, int, error) {

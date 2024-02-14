@@ -175,6 +175,9 @@ func ConvertNodeToBooleanLiteral(node *Node) {
 	return
 }
 
+func ValidateNodeIsBoolean(node *Node) bool {
+	return node.NodeType == enumNodeTypes.BooleanLiteral
+}
 func ValidateNodeIsString(node *Node) bool {
 	return node.NodeType == enumNodeTypes.StringLiteral
 }

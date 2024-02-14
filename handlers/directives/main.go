@@ -2,6 +2,7 @@ package handlerDirective
 
 import (
 	"errors"
+	"fmt"
 	enumTokenTypes "misc/nintasm/enums/tokenTypes"
 	"misc/nintasm/parser/operandFactory"
 )
@@ -24,11 +25,28 @@ func Process(operationTokenEnum enumTokenTypes.Def, directiveName string, operan
 	case enumTokenTypes.DIRECTIVE_romBuilding:
 		return evalRomBuildingOperands(directiveName, operandList)
 	case enumTokenTypes.DIRECTIVE_blockStart:
-		return evalRepeat(directiveName, operandList)
+		switch directiveName {
+		case "IF":
+			return evalIf(directiveName, operandList)
+		case "ELSEIF":
+			return evalElseIf(directiveName, operandList)
+		case "REPEAT":
+			return evalRepeat(directiveName, operandList)
+		default:
+			return errors.New("BAD BLOCK START DIRECTIVE!!!")
+		}
 	case enumTokenTypes.DIRECTIVE_blockEnd:
-		return evalEndRepeat(directiveName, operandList)
+		switch directiveName {
+		case "ENDIF":
+			return evalEndIf(directiveName, operandList)
+		case "ENDREPEAT":
+			return evalEndRepeat(directiveName, operandList)
+		default:
+			return errors.New("BAD BLOCK END DIRECTIVE!!!")
+		}
 		//return evalRomBuildingOperands(directiveName, operandList)
 	default:
-		return errors.New("BAD DIRECTIVE OPERATION TYPE!!!")
+		errMsg := fmt.Sprintf("BAD DIRECTIVE OPERATION TYPE!!! %v", directiveName)
+		return errors.New(errMsg)
 	}
 }

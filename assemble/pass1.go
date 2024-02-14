@@ -71,7 +71,6 @@ func Start(lines []string) error {
 					}
 					blockStack.ClearStack()
 				}
-
 			} else {
 				err := blockStack.CheckOperationIsCapturableAndAppend(reformattedLine, &lineOperationParsedValues)
 				if err != nil {

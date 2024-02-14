@@ -26,8 +26,9 @@ var assemblerBuiltInFunctions = map[string]assemblerFunction{
 func EvaluateNode(node Node) (Node, error) {
 	switch node.NodeType {
 	case enumNodeTypes.Empty,
-		enumNodeTypes.StringLiteral,
-		enumNodeTypes.NumericLiteral:
+		enumNodeTypes.BooleanLiteral,
+		enumNodeTypes.NumericLiteral,
+		enumNodeTypes.StringLiteral:
 		return node, nil
 
 	case enumNodeTypes.Identifier,
@@ -152,7 +153,9 @@ func EvaluateNode(node Node) (Node, error) {
 		fmt.Println(node)
 
 	default:
-		return node, errors.New("UNKNOWN NODE!!!")
+
+		fmt.Println(node)
+		return node, errors.New("UNKNOWN NODE BEING INTERPRETED!!!")
 	}
 
 	return node, nil

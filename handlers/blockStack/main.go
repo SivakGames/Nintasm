@@ -38,27 +38,41 @@ func newCapturedLine(originalLine string,
 	}
 }
 
-type Bloxx struct {
-	blockOperationValue string
+type StackBlock struct {
+	blockOperationName  string
 	OperandList         []Node
 	CapturedLines       []CapturedLine
+	AlternateStackBlock *StackBlock
 }
 
-func newBloxx(op string, operandList []Node) Bloxx {
-	return Bloxx{
-		blockOperationValue: op,
-		OperandList:         operandList,
+func newStackBlock(operationName string, operandList []Node) StackBlock {
+	return StackBlock{
+		blockOperationName: operationName,
+		OperandList:        operandList,
 	}
 }
 
-var Stack []Bloxx
+var Stack []StackBlock
 
 var stackWillClear bool = false
 
 // -----------------------------
 
 func PushOntoStack(op string, operandList []Node) {
-	Stack = append(Stack, newBloxx(op, operandList))
+	Stack = append(Stack, newStackBlock(op, operandList))
+	return
+}
+
+func PushIntoAlternateStackBlock(op string, operandList []Node) {
+	currentStackOp := &Stack[len(Stack)-1]
+	for currentStackOp.AlternateStackBlock != nil {
+		currentStackOp = currentStackOp.AlternateStackBlock
+	}
+	altBlock := newStackBlock(op, operandList)
+	currentStackOp.AlternateStackBlock = &altBlock
+
+	fmt.Println(Stack)
+
 	return
 }
 
@@ -66,6 +80,7 @@ func PushOntoStack(op string, operandList []Node) {
 
 var correspondingEndBlockOperations = map[string]string{
 	"REPEAT": "ENDREPEAT",
+	"IF":     "ENDIF",
 }
 
 //--------------------------------
@@ -76,7 +91,7 @@ func CheckIfNewStartEndOperation(lineOperationParsedValues *util.LineOperationPa
 		return true
 	case enumTokenTypes.DIRECTIVE_blockEnd:
 		currentStackOp := &Stack[len(Stack)-1]
-		endOpName, _ := correspondingEndBlockOperations[currentStackOp.blockOperationValue]
+		endOpName, _ := correspondingEndBlockOperations[currentStackOp.blockOperationName]
 		return lineOperationParsedValues.OperationTokenEnum == enumTokenTypes.DIRECTIVE_blockEnd &&
 			endOpName == strings.ToUpper(lineOperationParsedValues.OperationTokenValue)
 	}
@@ -92,6 +107,12 @@ var allowedOperationsForParentOps = map[string]map[enumTokenTypes.Def]bool{
 		enumTokenTypes.DIRECTIVE_dataSeries: true,
 		enumTokenTypes.DIRECTIVE_mixedData:  true,
 	},
+	"IF": {
+		enumTokenTypes.INSTRUCTION:          true,
+		enumTokenTypes.DIRECTIVE_dataBytes:  true,
+		enumTokenTypes.DIRECTIVE_dataSeries: true,
+		enumTokenTypes.DIRECTIVE_mixedData:  true,
+	},
 }
 
 //--------------------------------
@@ -101,7 +122,7 @@ func CheckOperationIsCapturableAndAppend(
 	lineOperationParsedValues *util.LineOperationParsedValues,
 ) error {
 	currentStackOp := &Stack[len(Stack)-1]
-	currentStackOpValue := currentStackOp.blockOperationValue
+	currentStackOpValue := currentStackOp.blockOperationName
 	checka, ok := allowedOperationsForParentOps[currentStackOpValue]
 	if !ok {
 		panic("Very bad stack op!")

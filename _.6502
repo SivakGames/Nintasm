@@ -7,22 +7,31 @@
 	.bank 0
 	.org $8000
 
-	LDA #5 + 2
+	.if 5 > 2
+	.db 55
+	.elseif 6 < 2
+		.db 5
+		.if 50 < 100
+		.db 55
+		.endif
+	.endif
 
-	.repeat 3, \j
-		.db 5 + \j
-		.repeat 4, \k
-		LDX #\k
-			.repeat 5, \l
-			LDX #\l
-			.endRepeat
-		.endRepeat
-	.endRepeat
-
-	.repeat 2, \i
-	ldx #6
-	.db 44 + \i
-	.endRepeat
+;	LDA #5 + 2
+;
+;	.repeat 3, \j
+;		.db 5 + \j
+;		.repeat 4, \k
+;		LDX #\k
+;			.repeat 5, \l
+;			LDX #\l
+;			.endRepeat
+;		.endRepeat
+;	.endRepeat
+;
+;	.repeat 2, \i
+;	ldx #6
+;	.db 44 + \i
+;	.endRepeat
 
 	.romSegment "8kb","8kb","CHR"
 	.bank 0
