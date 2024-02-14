@@ -80,8 +80,10 @@ func (p *OperationParser) determineLabelOrOperation() error {
 // There IS whitespace at the start
 
 func (p *OperationParser) getRegularOperation() error {
-	p.eat(enumTokenTypes.WHITESPACE)
-	p.advanceToNext()
+	err := p.eatFreelyAndAdvance(enumTokenTypes.WHITESPACE)
+	if err != nil {
+		return err
+	}
 
 	var operationSimpleType enumParserTypes.Def
 
@@ -116,8 +118,7 @@ func (p *OperationParser) getRegularOperation() error {
 	operationTokenValue := p.lookaheadValue
 
 	// ❔ See what's next. Should be either whitespace or nothing
-	p.eat(p.lookaheadType)
-	err := p.advanceToNext()
+	err = p.eatAndAdvance(p.lookaheadType)
 	if err != nil {
 		return err
 	}
@@ -145,8 +146,11 @@ func (p *OperationParser) getLabelOperation() error {
 	// Check for local label
 	isLocal := p.lookaheadType == enumTokenTypes.DELIMITER_period
 	if isLocal {
-		p.eat(enumTokenTypes.DELIMITER_period)
-		p.advanceToNext()
+		err := p.eatFreelyAndAdvance(enumTokenTypes.DELIMITER_period)
+		if err != nil {
+			return err
+		}
+
 	}
 
 	// Label itself has been determined
@@ -155,7 +159,8 @@ func (p *OperationParser) getLabelOperation() error {
 		operationLabel = "." + operationLabel
 	}
 
-	//Will expect an identifier to signify a label
+	//⭐⭐ We JUST try to eat first ⭐⭐
+	//Will expect an identifier to signify a label - hence why
 	err := p.eat(enumTokenTypes.IDENTIFIER)
 	if err != nil {
 		//⚠️ In the case of a LOCAL label, other label-likes are allowed
@@ -176,8 +181,11 @@ func (p *OperationParser) getLabelOperation() error {
 		return errors.New("LABEL IS INCOMPLETE - WHERE'S YOUR COLON!?")
 
 	case enumTokenTypes.DELIMITER_colon:
-		p.eat(enumTokenTypes.DELIMITER_colon)
-		p.advanceToNext()
+		err := p.eatFreelyAndAdvance(enumTokenTypes.DELIMITER_colon)
+		if err != nil {
+			return err
+		}
+
 		if p.lookaheadType == enumTokenTypes.None {
 			// 🟢 Label parsing succeeds
 			p.operationLabel = operationLabel
@@ -199,8 +207,11 @@ func (p *OperationParser) getLabelOperation() error {
 // Labeled directive
 func (p *OperationParser) getLabelFollowup(operationLabel string, hadWhitespace bool) error {
 	if p.lookaheadType == enumTokenTypes.WHITESPACE {
-		p.eat(enumTokenTypes.WHITESPACE)
-		p.advanceToNext()
+		err := p.eatFreelyAndAdvance(enumTokenTypes.WHITESPACE)
+		if err != nil {
+			return err
+		}
+
 		if p.lookaheadType != enumTokenTypes.None {
 			return p.getLabelFollowup(operationLabel, true)
 		}
@@ -215,16 +226,16 @@ func (p *OperationParser) getLabelFollowup(operationLabel string, hadWhitespace 
 	case enumTokenTypes.ASSIGN_simple:
 		operationTokenEnum = p.lookaheadType
 		operationTokenValue = p.lookaheadValue
-		p.eat(enumTokenTypes.ASSIGN_simple)
-		p.advanceToNext()
+		err := p.eatFreelyAndAdvance(enumTokenTypes.ASSIGN_simple)
+		if err != nil {
+			return err
+		}
 
 	//EQU
 	case enumTokenTypes.ASSIGN_EQU:
 		operationTokenEnum = p.lookaheadType
 		operationTokenValue = p.lookaheadValue
-		p.eat(enumTokenTypes.ASSIGN_EQU)
-		p.advanceToNext()
-		err := p.eat(enumTokenTypes.WHITESPACE)
+		err := p.eatFreelyAndAdvance(enumTokenTypes.ASSIGN_EQU)
 		if err != nil {
 			return err
 		}
@@ -234,8 +245,10 @@ func (p *OperationParser) getLabelFollowup(operationLabel string, hadWhitespace 
 		if !hadWhitespace {
 			return errors.New("need spacing for labeled directive")
 		}
-		p.eat(enumTokenTypes.DELIMITER_period)
-		p.advanceToNext()
+		err := p.eatFreelyAndAdvance(enumTokenTypes.DELIMITER_period)
+		if err != nil {
+			return err
+		}
 
 		switch p.lookaheadType {
 		case enumTokenTypes.DIRECTIVE_labeled,
@@ -243,8 +256,7 @@ func (p *OperationParser) getLabelFollowup(operationLabel string, hadWhitespace 
 			enumTokenTypes.DIRECTIVE_labeledBlockEnd:
 			operationTokenEnum = p.lookaheadType
 			operationTokenValue = p.lookaheadValue
-			p.eat(p.lookaheadType)
-			err := p.advanceToNext()
+			err := p.eatAndAdvance(p.lookaheadType)
 			if err != nil {
 				return err
 			}

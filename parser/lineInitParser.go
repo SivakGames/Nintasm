@@ -32,8 +32,7 @@ func (p *InitialLineParser) Process(line string) (string, error) {
 		} else {
 			reformattedString += p.lookaheadValue
 		}
-		p.eat(p.lookaheadType)
-		err = p.advanceToNext()
+		err = p.eatFreelyAndAdvance(p.lookaheadType)
 		if err != nil {
 			return "", err
 		}

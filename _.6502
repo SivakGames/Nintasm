@@ -9,10 +9,10 @@
 
 	.repeat 2
 		.if 12 > 3
-		.db 55
+			.db 55
 		.else
-		.db 77
-		.db 77
+			.db 77
+			.db 77
 		.endif
 	.endRepeat
 
