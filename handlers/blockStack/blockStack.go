@@ -54,6 +54,7 @@ func newStackBlock(operationName string, operandList []Node) StackBlock {
 
 var Stack []StackBlock
 
+var StackCapturesParentOpOnlyFlag bool = false
 var StackWillClearFlag bool = false
 
 // -----------------------------
@@ -84,16 +85,25 @@ func GetLastAlternateOperation() *StackBlock {
 
 func popFromStack() {
 	Stack = Stack[:len(Stack)-1]
-	return
 }
 
 func ClearStack() {
 	Stack = Stack[:0]
-	return
 }
 
-func SetBottomOfStackToEmpty() {
+func SetBottomOfStackToEmptyBlock() {
 	Stack[0] = newStackBlock("nil", nil)
+}
+
+func ClearBottomOfStackCapturedLines() {
+	Stack[0].CapturedLines = Stack[0].CapturedLines[:0]
+}
+
+func SetCaptureParentOpOnly() {
+	StackCapturesParentOpOnlyFlag = true
+}
+func ClearCaptureParentOpOnly() {
+	StackCapturesParentOpOnlyFlag = false
 }
 
 //+++++++++++++++++++++++++++++++
@@ -101,6 +111,7 @@ func SetBottomOfStackToEmpty() {
 var correspondingEndBlockOperations = map[string]string{
 	"REPEAT": "ENDREPEAT",
 	"IF":     "ENDIF",
+	"MACRO":  "ENDM",
 }
 
 //--------------------------------
@@ -108,12 +119,18 @@ var correspondingEndBlockOperations = map[string]string{
 func CheckIfNewStartEndOperation(lineOperationParsedValues *util.LineOperationParsedValues) bool {
 	switch lineOperationParsedValues.OperationTokenEnum {
 	case enumTokenTypes.DIRECTIVE_blockStart:
+		if StackCapturesParentOpOnlyFlag {
+			return false
+		}
 		return true
-	case enumTokenTypes.DIRECTIVE_blockEnd:
+	case enumTokenTypes.DIRECTIVE_blockEnd, enumTokenTypes.DIRECTIVE_labeledBlockEnd:
 		currentStackOp := GetCurrentOperation()
 		endOpName, _ := correspondingEndBlockOperations[currentStackOp.BlockOperationName]
-		return lineOperationParsedValues.OperationTokenEnum == enumTokenTypes.DIRECTIVE_blockEnd &&
-			endOpName == strings.ToUpper(lineOperationParsedValues.OperationTokenValue)
+		if endOpName == strings.ToUpper(lineOperationParsedValues.OperationTokenValue) {
+			return true
+		} else if StackCapturesParentOpOnlyFlag {
+			return false
+		}
 	}
 	return false
 }
@@ -134,6 +151,16 @@ var allowedOperationsForParentOps = map[string]captureableOpMap{
 	"IF":     sharedCapturableOps,
 	"ELSEIF": sharedCapturableOps,
 	"ELSE":   sharedCapturableOps,
+	"MACRO": func() captureableOpMap {
+		m := make(captureableOpMap)
+		// Copy shared operations
+		for k, v := range sharedCapturableOps {
+			m[k] = v
+		}
+		m[enumTokenTypes.DIRECTIVE_blockStart] = true
+		m[enumTokenTypes.DIRECTIVE_blockEnd] = true
+		return m
+	}(),
 }
 
 //-----------------------------------------------------
@@ -190,7 +217,8 @@ func PopFromStackAndExtendCapturedLines(extendLines []CapturedLine) {
 //--------------------------------
 
 func CheckIfEndOperationAndClearStack(lineOperationParsedValues *util.LineOperationParsedValues) bool {
-	if lineOperationParsedValues.OperationTokenEnum == enumTokenTypes.DIRECTIVE_blockEnd &&
+	if (lineOperationParsedValues.OperationTokenEnum == enumTokenTypes.DIRECTIVE_blockEnd ||
+		lineOperationParsedValues.OperationTokenEnum == enumTokenTypes.DIRECTIVE_labeledBlockEnd) &&
 		StackWillClearFlag {
 		StackWillClearFlag = false
 		return true

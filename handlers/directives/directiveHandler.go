@@ -47,6 +47,23 @@ func Process(operationTokenEnum enumTokenTypes.Def, directiveName string, operan
 			return errors.New("BAD BLOCK END DIRECTIVE!!!")
 		}
 		//return evalRomBuildingOperands(directiveName, operandList)
+
+	case enumTokenTypes.DIRECTIVE_labeledBlockStart:
+		switch directiveName {
+		case "MACRO":
+			return evalMacro(directiveName, operandList)
+		default:
+			return errors.New("BAD LABELED BLOCK START DIRECTIVE!!!")
+		}
+
+	case enumTokenTypes.DIRECTIVE_labeledBlockEnd:
+		switch directiveName {
+		case "ENDM":
+			return evalEndMacro(directiveName, operandList)
+		default:
+			return errors.New("BAD LABELED BLOCK END DIRECTIVE!!!")
+		}
+
 	default:
 		errMsg := fmt.Sprintf("BAD DIRECTIVE OPERATION TYPE!!! %v", directiveName)
 		return errors.New(errMsg)

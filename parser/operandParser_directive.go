@@ -34,7 +34,7 @@ var directiveManuallyEvaluatesOperands = map[string]bool{
 }
 
 // Main directive parser
-func (p *DirectiveOperandParser) Process(operationType tokenEnum, operationValue string) error {
+func (p *DirectiveOperandParser) Process(operationType tokenEnum, operationValue string, operationLabel string) error {
 	var err error
 
 	directiveName := strings.ToUpper(operationValue)
@@ -65,14 +65,15 @@ func (p *DirectiveOperandParser) Process(operationType tokenEnum, operationValue
 // +++++++++++++++++++++++++
 
 var directiveMinMaxOperands = map[enumTokenTypes.Def][2]int{
-	enumTokenTypes.DIRECTIVE_dataBytes:    {1, 128},
-	enumTokenTypes.DIRECTIVE_dataSeries:   {1, 2},
-	enumTokenTypes.DIRECTIVE_mixedData:    {1, 128},
-	enumTokenTypes.DIRECTIVE_blockEnd:     {0, 0},
-	enumTokenTypes.DIRECTIVE_INES:         {1, 1},
-	enumTokenTypes.DIRECTIVE_setting:      {1, 1},
-	enumTokenTypes.DIRECTIVE_settingReset: {0, 0},
-	enumTokenTypes.DIRECTIVE_throw:        {1, 1},
+	enumTokenTypes.DIRECTIVE_dataBytes:       {1, 128},
+	enumTokenTypes.DIRECTIVE_dataSeries:      {1, 2},
+	enumTokenTypes.DIRECTIVE_mixedData:       {1, 128},
+	enumTokenTypes.DIRECTIVE_blockEnd:        {0, 0},
+	enumTokenTypes.DIRECTIVE_labeledBlockEnd: {0, 0},
+	enumTokenTypes.DIRECTIVE_INES:            {1, 1},
+	enumTokenTypes.DIRECTIVE_setting:         {1, 1},
+	enumTokenTypes.DIRECTIVE_settingReset:    {0, 0},
+	enumTokenTypes.DIRECTIVE_throw:           {1, 1},
 }
 
 var directiveNameMinMaxOperands = map[string][2]int{
@@ -85,6 +86,7 @@ var directiveNameMinMaxOperands = map[string][2]int{
 	"IF":         {1, 1},
 	"ELSEIF":     {1, 1},
 	"ELSE":       {0, 0},
+	"MACRO":      {0, 0},
 }
 
 func getMinMaxOperandsForDirective(directiveEnum tokenEnum, directiveName string) (int, int, error) {

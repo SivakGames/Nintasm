@@ -7,12 +7,12 @@ import (
 	"misc/nintasm/util"
 )
 
-var directiveOperandParzival = parser.NewDirectiveOperandParser()
-var instructionOperandParzival = parser.NewInstructionOperandParser()
-var labelOperandParzival = parser.NewLabelOperandParser()
+var directiveOperandParser = parser.NewDirectiveOperandParser()
+var instructionOperandParser = parser.NewInstructionOperandParser()
+var labelOperandParser = parser.NewLabelOperandParser()
 
 func Start(lines []string) error {
-	instructionOperandParzival.ShouldParseInstructions = true
+	instructionOperandParser.ShouldParseInstructions = true
 
 	lineInitParser := parser.NewInitialLineParser()
 	lineOperationParser := parser.NewOperationParser()
@@ -97,22 +97,35 @@ func parseOperandStringAndProcess(
 ) error {
 
 	switch lineOperationParsedValues.ParentParserEnum {
-	case enumParserTypes.Directive:
-		operandParserErr := directiveOperandParzival.SetupOperandParser(reformattedLine, lineOperationParsedValues.OperandStartPosition)
+
+	// -------------------
+	case enumParserTypes.Instruction:
+		operandParserErr := instructionOperandParser.SetupOperandParser(
+			reformattedLine,
+			lineOperationParsedValues.OperandStartPosition,
+		)
 		if operandParserErr != nil {
 			return operandParserErr
 		}
-		operandParserErr = directiveOperandParzival.Process(lineOperationParsedValues.OperationTokenEnum, lineOperationParsedValues.OperationTokenValue)
+		operandParserErr = instructionOperandParser.Process(lineOperationParsedValues.OperationTokenValue)
 		if operandParserErr != nil {
 			return operandParserErr
 		}
 
-	case enumParserTypes.Instruction:
-		operandParserErr := instructionOperandParzival.SetupOperandParser(reformattedLine, lineOperationParsedValues.OperandStartPosition)
+	// -------------------
+	case enumParserTypes.Directive:
+		operandParserErr := directiveOperandParser.SetupOperandParser(
+			reformattedLine,
+			lineOperationParsedValues.OperandStartPosition,
+		)
 		if operandParserErr != nil {
 			return operandParserErr
 		}
-		operandParserErr = instructionOperandParzival.Process(lineOperationParsedValues.OperationTokenValue)
+		operandParserErr = directiveOperandParser.Process(
+			lineOperationParsedValues.OperationTokenEnum,
+			lineOperationParsedValues.OperationTokenValue,
+			lineOperationParsedValues.OperationLabel,
+		)
 		if operandParserErr != nil {
 			return operandParserErr
 		}
@@ -120,18 +133,27 @@ func parseOperandStringAndProcess(
 	//	case enumParserTypes.Macro:
 	//		fmt.Println("Mack")
 	//		fmt.Println(optype, opval, opPos)
+
+	// -------------------
 	case enumParserTypes.Label:
-		operandParserErr := labelOperandParzival.SetupOperandParser(reformattedLine, lineOperationParsedValues.OperandStartPosition)
+		operandParserErr := labelOperandParser.SetupOperandParser(
+			reformattedLine,
+			lineOperationParsedValues.OperandStartPosition,
+		)
 		if operandParserErr != nil {
 			return operandParserErr
 		}
-		operandParserErr = labelOperandParzival.Process(lineOperationParsedValues.OperationTokenEnum, lineOperationParsedValues.OperationTokenValue, lineOperationParsedValues.OperationLabel)
+		operandParserErr = labelOperandParser.Process(
+			lineOperationParsedValues.OperationTokenEnum,
+			lineOperationParsedValues.OperationTokenValue,
+			lineOperationParsedValues.OperationLabel,
+		)
 		if operandParserErr != nil {
 			return operandParserErr
 		}
 
 	default:
-		panic("Ruh roh")
+		panic("🛑 Parent parsing operation could not be determined!")
 	}
 	return nil
 }

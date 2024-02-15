@@ -3,6 +3,12 @@
 	.inesChr "8kb"
 	.inesMir 0
 
+ttt .macro
+	.if 5 > 4
+	.db 4, \1
+	.endif
+ttt .endm
+
 	.romSegment "32kb","32kb","PRG"
 	.bank 0
 	.org $8000

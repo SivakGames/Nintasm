@@ -85,12 +85,12 @@ func (p *OperationParser) getRegularOperation() error {
 		return err
 	}
 
-	var operationSimpleType enumParserTypes.Def
+	var parentParserEnum enumParserTypes.Def
 
 	switch p.lookaheadType {
 
 	case enumTokenTypes.INSTRUCTION:
-		operationSimpleType = enumParserTypes.Instruction
+		parentParserEnum = enumParserTypes.Instruction
 		break
 
 	case enumTokenTypes.DELIMITER_period:
@@ -100,13 +100,13 @@ func (p *OperationParser) getRegularOperation() error {
 		}
 
 		if p.lookaheadType > enumTokenTypes.DIRECTIVE_RANGE_START && p.lookaheadType < enumTokenTypes.DIRECTIVE_RANGE_END {
-			operationSimpleType = enumParserTypes.Directive
+			parentParserEnum = enumParserTypes.Directive
 			break
 		}
 
 		return errors.New("UNKNOWN DIRECTIVE")
 	case enumTokenTypes.IDENTIFIER:
-		operationSimpleType = enumParserTypes.Macro
+		parentParserEnum = enumParserTypes.Macro
 		break
 	case enumTokenTypes.None:
 		return errors.New("UNEXPECTED EMPTY OPERATION???")
@@ -127,7 +127,7 @@ func (p *OperationParser) getRegularOperation() error {
 	if p.lookaheadType == enumTokenTypes.WHITESPACE || p.lookaheadType == enumTokenTypes.None {
 		p.operationTokenValue = operationTokenValue
 		p.operationTokenEnum = operationTokenEnum
-		p.parentParserEnum = operationSimpleType
+		p.parentParserEnum = parentParserEnum
 		return nil
 	}
 
@@ -160,10 +160,10 @@ func (p *OperationParser) getLabelOperation() error {
 	}
 
 	//⭐⭐ We JUST try to eat first ⭐⭐
-	//Will expect an identifier to signify a label - hence why
+	//Will expect an identifier to signify a label...
 	err := p.eat(enumTokenTypes.IDENTIFIER)
 	if err != nil {
-		//⚠️ In the case of a LOCAL label, other label-likes are allowed
+		//⚠️ ... but in the case of a LOCAL label, label-likes ARE allowed
 		if !isLocal || !p.tokenizer.IsTokenIdentifierLike(operationLabel) {
 			return err
 		}
@@ -219,6 +219,7 @@ func (p *OperationParser) getLabelFollowup(operationLabel string, hadWhitespace 
 
 	var operationTokenValue string
 	var operationTokenEnum tokenEnum
+	var parentParserEnum enumParserTypes.Def
 
 	switch p.lookaheadType {
 
@@ -226,6 +227,7 @@ func (p *OperationParser) getLabelFollowup(operationLabel string, hadWhitespace 
 	case enumTokenTypes.ASSIGN_simple:
 		operationTokenEnum = p.lookaheadType
 		operationTokenValue = p.lookaheadValue
+		parentParserEnum = enumParserTypes.Label
 		err := p.eatFreelyAndAdvance(enumTokenTypes.ASSIGN_simple)
 		if err != nil {
 			return err
@@ -235,6 +237,7 @@ func (p *OperationParser) getLabelFollowup(operationLabel string, hadWhitespace 
 	case enumTokenTypes.ASSIGN_EQU:
 		operationTokenEnum = p.lookaheadType
 		operationTokenValue = p.lookaheadValue
+		parentParserEnum = enumParserTypes.Label
 		err := p.eatFreelyAndAdvance(enumTokenTypes.ASSIGN_EQU)
 		if err != nil {
 			return err
@@ -256,6 +259,7 @@ func (p *OperationParser) getLabelFollowup(operationLabel string, hadWhitespace 
 			enumTokenTypes.DIRECTIVE_labeledBlockEnd:
 			operationTokenEnum = p.lookaheadType
 			operationTokenValue = p.lookaheadValue
+			parentParserEnum = enumParserTypes.Directive
 			err := p.eatAndAdvance(p.lookaheadType)
 			if err != nil {
 				return err
@@ -280,6 +284,6 @@ func (p *OperationParser) getLabelFollowup(operationLabel string, hadWhitespace 
 	p.operationLabel = operationLabel
 	p.operationTokenEnum = operationTokenEnum
 	p.operationTokenValue = operationTokenValue
-	p.parentParserEnum = enumParserTypes.Label
+	p.parentParserEnum = parentParserEnum
 	return nil
 }

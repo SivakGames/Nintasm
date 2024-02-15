@@ -64,7 +64,7 @@ func evalEndIf(directiveName string, operandList *[]Node) error {
 			blockStack.Stack[0] = *currentStackOperation
 			blockStack.Stack[0].AlternateStackBlock = nil
 		} else {
-			blockStack.SetBottomOfStackToEmpty()
+			blockStack.SetBottomOfStackToEmptyBlock()
 		}
 	}
 
