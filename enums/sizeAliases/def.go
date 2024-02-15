@@ -1,5 +1,6 @@
 package enumSizeAliases
 
+// For strings containing specific KB/MB values
 type Def int
 
 const (

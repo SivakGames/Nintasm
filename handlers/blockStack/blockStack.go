@@ -83,6 +83,8 @@ func GetLastAlternateOperation() *StackBlock {
 	return currentStackOp
 }
 
+// -----------------
+
 func popFromStack() {
 	Stack = Stack[:len(Stack)-1]
 }
@@ -90,6 +92,8 @@ func popFromStack() {
 func ClearStack() {
 	Stack = Stack[:0]
 }
+
+// -----------------
 
 func SetBottomOfStackToEmptyBlock() {
 	Stack[0] = newStackBlock("nil", nil)
@@ -99,10 +103,12 @@ func ClearBottomOfStackCapturedLines() {
 	Stack[0].CapturedLines = Stack[0].CapturedLines[:0]
 }
 
-func SetCaptureParentOpOnly() {
+// -----------------
+
+func SetCaptureParentOpOnlyFlag() {
 	StackCapturesParentOpOnlyFlag = true
 }
-func ClearCaptureParentOpOnly() {
+func ClearCaptureParentOpOnlyFlag() {
 	StackCapturesParentOpOnlyFlag = false
 }
 
