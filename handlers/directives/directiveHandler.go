@@ -9,7 +9,7 @@ import (
 
 type Node = operandFactory.Node
 
-func Process(operationTokenEnum enumTokenTypes.Def, directiveName string, operandList *[]Node) error {
+func Process(operationTokenEnum enumTokenTypes.Def, directiveName string, operationLabel string, operandList *[]Node) error {
 
 	switch operationTokenEnum {
 
@@ -51,7 +51,7 @@ func Process(operationTokenEnum enumTokenTypes.Def, directiveName string, operan
 	case enumTokenTypes.DIRECTIVE_labeledBlockStart:
 		switch directiveName {
 		case "MACRO":
-			return evalMacro(directiveName, operandList)
+			return evalMacro(directiveName, operationLabel, operandList)
 		default:
 			return errors.New("BAD LABELED BLOCK START DIRECTIVE!!!")
 		}

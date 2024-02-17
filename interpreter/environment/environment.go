@@ -31,6 +31,25 @@ func decodeHigh(node Node) error {
 
 // ----------------------------------
 
+func CheckIfSymbolAlreadyDefined(symbolName string) error {
+	var exists bool
+	errMsgBase := "Symbol %v has been previously defined! (Defined as %v)"
+
+	_, exists = literalNodeSymbolTable[symbolName]
+	if exists {
+		errMsg := fmt.Sprintf(errMsgBase, symbolName, "literal")
+		return errors.New(errMsg)
+	}
+	_, exists = macroSymbolTable[symbolName]
+	if exists {
+		errMsg := fmt.Sprintf(errMsgBase, symbolName, "macro")
+		return errors.New(errMsg)
+	}
+	return nil
+}
+
+// ----------------------------------
+
 func AddToEnvironment(symbolName string, node Node) (Node, error) {
 	_, exists := literalNodeSymbolTable[symbolName]
 	if exists {
@@ -59,11 +78,17 @@ func AddMacroToEnvironment(symbolName string, capturedLines []blockStack.Capture
 	return nil
 }
 
-func LookupMacroInEnvironment(symbolName string) error {
-	_, ok := macroSymbolTable[symbolName]
+func LookupMacroInEnvironment(symbolName string) (MacroTableType, bool) {
+	macro, ok := macroSymbolTable[symbolName]
+	return macro, ok
+}
+
+func LookupAndGetMacroInEnvironment(symbolName string) (MacroTableType, error) {
+	macro, ok := LookupMacroInEnvironment(symbolName)
 	if ok {
-		return nil
+		return macro, nil
 	} else {
-		return errors.New("No Macro!")
+		errMsg := fmt.Sprintf("Macro %v does not exist!", symbolName)
+		return nil, errors.New(errMsg)
 	}
 }

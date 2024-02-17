@@ -7,12 +7,23 @@ import (
 	"misc/nintasm/interpreter/environment"
 )
 
-func evalMacro(directiveName string, operandList *[]Node) error {
+func evalMacro(directiveName string, macroLabel string, operandList *[]Node) error {
+	var err error
+
 	if len(blockStack.Stack) > 0 {
 		errMsg := fmt.Sprintf("Cannot define a macro when in another block statement!")
-		return errors.New(errMsg)
+		return errors.New(errMsg) // ❌ Fails
 	}
-	environment.LookupMacroInEnvironment("GSG")
+
+	err = environment.CheckIfSymbolAlreadyDefined(macroLabel)
+	if err != nil {
+		return err // ❌ Fails
+	}
+
+	err = blockStack.SetCurrentOperationLabel(macroLabel)
+	if err != nil {
+		return err // ❌ Fails
+	}
 
 	blockStack.PushOntoStack(directiveName, *operandList)
 	blockStack.SetCaptureParentOpOnlyFlag()
@@ -22,10 +33,14 @@ func evalMacro(directiveName string, operandList *[]Node) error {
 func evalEndMacro(directiveName string, operandList *[]Node) error {
 	var noLines []blockStack.CapturedLine
 
+	macroLabel := blockStack.GetCurrentOperationLabel()
+	blockStack.ClearCurrentOperationLabel()
 	blockStack.ClearCaptureParentOpOnlyFlag()
-	currentStackOp := blockStack.GetCurrentOperation()
+
+	currentStackOp := blockStack.GetTopOfStackOperation()
 	capturedLines := &currentStackOp.CapturedLines
-	environment.AddMacroToEnvironment("GSG", *capturedLines)
+	environment.AddMacroToEnvironment(macroLabel, *capturedLines)
+
 	blockStack.ClearBottomOfStackCapturedLines()
 	blockStack.PopFromStackAndExtendCapturedLines(noLines)
 	return nil

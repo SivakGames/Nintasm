@@ -57,7 +57,7 @@ func (p *DirectiveOperandParser) Process(operationType tokenEnum, operationValue
 		return err // ❌ Fails
 	}
 
-	err = handlerDirective.Process(operationType, directiveName, &operandList)
+	err = handlerDirective.Process(operationType, directiveName, operationLabel, &operandList)
 	return err
 
 }

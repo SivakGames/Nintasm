@@ -36,7 +36,7 @@ func evalRepeat(directiveName string, operandList *[]Node) error {
 }
 
 func evalEndRepeat(directiveName string, operandList *[]Node) error {
-	currentStackOperation := blockStack.GetCurrentOperation()
+	currentStackOperation := blockStack.GetTopOfStackOperation()
 	currentStackOperationOperandList := &currentStackOperation.OperandList
 	currentStackOperationCapturedLines := &currentStackOperation.CapturedLines
 

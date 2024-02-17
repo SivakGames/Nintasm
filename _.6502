@@ -9,6 +9,17 @@ ttt .macro
 	.endif
 ttt .endm
 
+ttt2 .macro
+	.db 4, \1
+	.db 5, \2
+	.db 7 + 5
+	ldx %66666
+	.repeat 4
+		.db 555
+	.endRepeat
+	
+ttt2 .endm
+
 	.romSegment "32kb","32kb","PRG"
 	.bank 0
 	.org $8000

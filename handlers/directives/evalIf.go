@@ -13,27 +13,27 @@ func evalIf(directiveName string, operandList *[]Node) error {
 }
 
 func evalElseIf(directiveName string, operandList *[]Node) error {
-	lastOp := blockStack.GetLastAlternateOperation()
+	lastOp := blockStack.GetTopOfStackLastAlternateOperation()
 	if lastOp.BlockOperationName == "ELSE" {
 		return errors.New("Cannot have elseif after else")
 	}
-	blockStack.PushIntoAlternateStackBlock(directiveName, *operandList)
+	blockStack.AppendToTopOfStackAlternateBlock(directiveName, *operandList)
 	return nil
 }
 
 func evalElse(directiveName string, operandList *[]Node) error {
-	lastOp := blockStack.GetLastAlternateOperation()
+	lastOp := blockStack.GetTopOfStackLastAlternateOperation()
 	if lastOp.BlockOperationName == "ELSE" {
 		return errors.New("Cannot only have 1 else in this block")
 	}
 
 	*operandList = append(*operandList, operandFactory.CreateBooleanLiteralNode(enumTokenTypes.NUMBER_decimal, "1", true))
-	blockStack.PushIntoAlternateStackBlock(directiveName, *operandList)
+	blockStack.AppendToTopOfStackAlternateBlock(directiveName, *operandList)
 	return nil
 }
 
 func evalEndIf(directiveName string, operandList *[]Node) error {
-	currentStackOperation := blockStack.GetCurrentOperation()
+	currentStackOperation := blockStack.GetTopOfStackOperation()
 	var trueStatementCapturedLines *[]blockStack.CapturedLine
 
 	// Cycle through until finding a true block or a nil one (nothing is true)

@@ -6,6 +6,8 @@ import (
 	"misc/nintasm/handlers/blockStack"
 )
 
+type MacroTableType = []blockStack.CapturedLine
+
 var literalNodeSymbolTable = map[string]Node{
 	"temp":        generateNumericNodeForEnvironment(100),
 	"PPUCTRL":     generateNumericNodeForEnvironment(0x02000),
@@ -17,7 +19,7 @@ var literalNodeSymbolTable = map[string]Node{
 	"low":         generateAssemblerReservedWordNode("low"),
 }
 
-var macroSymbolTable = map[string][]blockStack.CapturedLine{
+var macroSymbolTable = map[string]MacroTableType{
 	"__PPU__": {{
 		OriginalLine:         " LDA #$20",
 		OperationLabel:       "",

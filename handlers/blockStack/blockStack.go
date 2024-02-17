@@ -54,8 +54,9 @@ func newStackBlock(operationName string, operandList []Node) StackBlock {
 
 var Stack []StackBlock
 
-var StackCapturesParentOpOnlyFlag bool = false
 var StackWillClearFlag bool = false
+var stackCapturesParentOpOnlyFlag bool = false
+var currentBlockOperationLabel string = ""
 
 // -----------------------------
 
@@ -64,33 +65,34 @@ func PushOntoStack(op string, operandList []Node) {
 	return
 }
 
-func PushIntoAlternateStackBlock(op string, operandList []Node) {
-	currentStackOp := GetLastAlternateOperation()
-	altBlock := newStackBlock(op, operandList)
-	currentStackOp.AlternateStackBlock = &altBlock
-	return
-}
-
-func GetCurrentOperation() *StackBlock {
-	return &Stack[len(Stack)-1]
-}
-
-func GetLastAlternateOperation() *StackBlock {
-	currentStackOp := GetCurrentOperation()
-	for currentStackOp.AlternateStackBlock != nil {
-		currentStackOp = currentStackOp.AlternateStackBlock
-	}
-	return currentStackOp
-}
-
-// -----------------
-
 func popFromStack() {
 	Stack = Stack[:len(Stack)-1]
 }
 
 func ClearStack() {
 	Stack = Stack[:0]
+}
+
+// -----------------
+
+func AppendToTopOfStackAlternateBlock(op string, operandList []Node) {
+	currentStackOp := GetTopOfStackLastAlternateOperation()
+	altBlock := newStackBlock(op, operandList)
+	currentStackOp.AlternateStackBlock = &altBlock
+	return
+}
+
+// Get whatever's on top (and thus current)
+func GetTopOfStackOperation() *StackBlock {
+	return &Stack[len(Stack)-1]
+}
+
+func GetTopOfStackLastAlternateOperation() *StackBlock {
+	currentStackOp := GetTopOfStackOperation()
+	for currentStackOp.AlternateStackBlock != nil {
+		currentStackOp = currentStackOp.AlternateStackBlock
+	}
+	return currentStackOp
 }
 
 // -----------------
@@ -105,11 +107,33 @@ func ClearBottomOfStackCapturedLines() {
 
 // -----------------
 
+// Stack will only handle the parent op. No nested ops.
 func SetCaptureParentOpOnlyFlag() {
-	StackCapturesParentOpOnlyFlag = true
+	stackCapturesParentOpOnlyFlag = true
 }
 func ClearCaptureParentOpOnlyFlag() {
-	StackCapturesParentOpOnlyFlag = false
+	stackCapturesParentOpOnlyFlag = false
+}
+
+// -----------------
+
+// Will set the label of the labeled operation that will be captured.
+// If one was previously set then error because it hasn't finished.
+func SetCurrentOperationLabel(label string) error {
+	if currentBlockOperationLabel != "" {
+		return errors.New("Somehow entering another label block operation while first is not done...")
+	}
+
+	currentBlockOperationLabel = label
+	return nil
+}
+func ClearCurrentOperationLabel() {
+	currentBlockOperationLabel = ""
+	return
+}
+
+func GetCurrentOperationLabel() string {
+	return currentBlockOperationLabel
 }
 
 //+++++++++++++++++++++++++++++++
@@ -125,16 +149,16 @@ var correspondingEndBlockOperations = map[string]string{
 func CheckIfNewStartEndOperation(lineOperationParsedValues *util.LineOperationParsedValues) bool {
 	switch lineOperationParsedValues.OperationTokenEnum {
 	case enumTokenTypes.DIRECTIVE_blockStart:
-		if StackCapturesParentOpOnlyFlag {
+		if stackCapturesParentOpOnlyFlag {
 			return false
 		}
 		return true
 	case enumTokenTypes.DIRECTIVE_blockEnd, enumTokenTypes.DIRECTIVE_labeledBlockEnd:
-		currentStackOp := GetCurrentOperation()
+		currentStackOp := GetTopOfStackOperation()
 		endOpName, _ := correspondingEndBlockOperations[currentStackOp.BlockOperationName]
 		if endOpName == strings.ToUpper(lineOperationParsedValues.OperationTokenValue) {
 			return true
-		} else if StackCapturesParentOpOnlyFlag {
+		} else if stackCapturesParentOpOnlyFlag {
 			return false
 		}
 	}
@@ -175,7 +199,7 @@ func CheckOperationIsCapturableAndAppend(
 	originalLine string,
 	lineOperationParsedValues *util.LineOperationParsedValues,
 ) error {
-	currentStackOp := GetLastAlternateOperation()
+	currentStackOp := GetTopOfStackLastAlternateOperation()
 	currentStackOpValue := currentStackOp.BlockOperationName
 	checka, ok := allowedOperationsForParentOps[currentStackOpValue]
 	if !ok {
@@ -205,13 +229,13 @@ func CheckOperationIsCapturableAndAppend(
 func PopFromStackAndExtendCapturedLines(extendLines []CapturedLine) {
 	if len(Stack) > 1 {
 		popFromStack()
-		newCurrentStackOperation := GetLastAlternateOperation()
+		newCurrentStackOperation := GetTopOfStackLastAlternateOperation()
 		for _, line := range extendLines {
 			newCurrentStackOperation.CapturedLines = append(newCurrentStackOperation.CapturedLines, line)
 		}
 
 	} else if len(Stack) == 1 {
-		newCurrentStackOperation := GetLastAlternateOperation()
+		newCurrentStackOperation := GetTopOfStackLastAlternateOperation()
 		newCurrentStackOperation.CapturedLines = extendLines
 		StackWillClearFlag = true
 
