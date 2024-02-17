@@ -30,6 +30,7 @@ func evalMacro(directiveName string, macroLabel string, operandList *[]Node) err
 	return nil
 }
 
+// End the macro definition and add to environment
 func evalEndMacro(directiveName string, operandList *[]Node) error {
 	var noLines []blockStack.CapturedLine
 
@@ -40,6 +41,10 @@ func evalEndMacro(directiveName string, operandList *[]Node) error {
 	currentStackOp := blockStack.GetTopOfStackOperation()
 	capturedLines := &currentStackOp.CapturedLines
 	environment.AddMacroToEnvironment(macroLabel, *capturedLines)
+
+	if len(*capturedLines) == 0 {
+		fmt.Println("Warning: Macro is empty!")
+	}
 
 	blockStack.ClearBottomOfStackCapturedLines()
 	blockStack.PopFromStackAndExtendCapturedLines(noLines)

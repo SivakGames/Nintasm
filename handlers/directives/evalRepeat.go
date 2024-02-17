@@ -17,7 +17,7 @@ func evalRepeat(directiveName string, operandList *[]Node) error {
 
 	if !(operandFactory.ValidateNodeIsNumeric(&numRepeatsNode) &&
 		operandFactory.ValidateNumericNodeIsGTEValue(&numRepeatsNode, 1)) {
-		return errors.New("Repeat must be numeric and >= 1")
+		return errors.New("Repeat must be numeric and >= 1") // ❌ Fails
 	}
 
 	evaluatedNodes := []Node{numRepeatsNode}
@@ -25,7 +25,7 @@ func evalRepeat(directiveName string, operandList *[]Node) error {
 	if len(*operandList) > 1 {
 		iterNameNode := (*operandList)[1]
 		if !operandFactory.ValidateNodeIsSubstitutionID(&iterNameNode) {
-			return errors.New("Bad iterator name for repeat. Must be an \\iter")
+			return errors.New("Bad iterator name for repeat. Must be an \\iter") // ❌ Fails
 		}
 		evaluatedNodes = append(evaluatedNodes, (*operandList)[1])
 	}
