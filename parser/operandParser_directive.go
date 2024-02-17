@@ -34,7 +34,7 @@ var directiveManuallyEvaluatesOperands = map[string]bool{
 }
 
 // Main directive parser
-func (p *DirectiveOperandParser) Process(operationType tokenEnum, operationValue string, operationLabel string) error {
+func (p *DirectiveOperandParser) Process(operationTokenEnum tokenEnum, operationValue string, operationLabel string) error {
 	var err error
 
 	directiveName := strings.ToUpper(operationValue)
@@ -45,7 +45,7 @@ func (p *DirectiveOperandParser) Process(operationType tokenEnum, operationValue
 		directiveName = aliasValue
 	}
 
-	minOperands, maxOperands, err := getMinMaxOperandsForDirective(operationType, directiveName)
+	minOperands, maxOperands, err := getMinMaxOperandsForDirective(operationTokenEnum, directiveName)
 	if err != nil {
 		return err // ❌ Fails
 	}
@@ -57,7 +57,7 @@ func (p *DirectiveOperandParser) Process(operationType tokenEnum, operationValue
 		return err // ❌ Fails
 	}
 
-	err = handlerDirective.Process(operationType, directiveName, operationLabel, &operandList)
+	err = handlerDirective.Process(operationTokenEnum, directiveName, operationLabel, &operandList)
 	return err
 
 }

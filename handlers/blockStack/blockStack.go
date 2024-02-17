@@ -136,6 +136,30 @@ func GetCurrentOperationLabel() string {
 	return currentBlockOperationLabel
 }
 
+//--------------------------------
+
+func CheckIfNewStartEndOperation(lineOperationParsedValues *util.LineOperationParsedValues) bool {
+	isStartEndEnum := (lineOperationParsedValues.OperationTokenEnum == enumTokenTypes.DIRECTIVE_blockStart ||
+		lineOperationParsedValues.OperationTokenEnum == enumTokenTypes.DIRECTIVE_labeledBlockStart ||
+		lineOperationParsedValues.OperationTokenEnum == enumTokenTypes.DIRECTIVE_blockEnd ||
+		lineOperationParsedValues.OperationTokenEnum == enumTokenTypes.DIRECTIVE_labeledBlockEnd)
+
+	// If op isn't start/end enum no need to proceed...
+	if !isStartEndEnum {
+		return false
+	}
+
+	//If capturing for only the parent op, only a valid closing block for the parent can end it
+
+	if stackCapturesParentOpOnlyFlag &&
+		!CheckIfEndOpMatchesOpeningOp(lineOperationParsedValues.OperationTokenValue) {
+		return false
+	}
+
+	return true
+
+}
+
 //+++++++++++++++++++++++++++++++
 
 var correspondingEndBlockOperations = map[string]string{
@@ -144,25 +168,11 @@ var correspondingEndBlockOperations = map[string]string{
 	"MACRO":  "ENDM",
 }
 
-//--------------------------------
-
-func CheckIfNewStartEndOperation(lineOperationParsedValues *util.LineOperationParsedValues) bool {
-	switch lineOperationParsedValues.OperationTokenEnum {
-	case enumTokenTypes.DIRECTIVE_blockStart:
-		if stackCapturesParentOpOnlyFlag {
-			return false
-		}
-		return true
-	case enumTokenTypes.DIRECTIVE_blockEnd, enumTokenTypes.DIRECTIVE_labeledBlockEnd:
-		currentStackOp := GetTopOfStackOperation()
-		endOpName, _ := correspondingEndBlockOperations[currentStackOp.BlockOperationName]
-		if endOpName == strings.ToUpper(lineOperationParsedValues.OperationTokenValue) {
-			return true
-		} else if stackCapturesParentOpOnlyFlag {
-			return false
-		}
-	}
-	return false
+// --------------------------------
+func CheckIfEndOpMatchesOpeningOp(desiredEndOpName string) bool {
+	currentStackOp := GetTopOfStackOperation()
+	endOpName, _ := correspondingEndBlockOperations[currentStackOp.BlockOperationName]
+	return endOpName == strings.ToUpper(desiredEndOpName)
 }
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++

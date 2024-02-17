@@ -17,12 +17,20 @@ ttt2 .macro
 	.repeat 4
 		.db 555
 	.endRepeat
-	
 ttt2 .endm
+
+
 
 	.romSegment "32kb","32kb","PRG"
 	.bank 0
 	.org $8000
+
+	.repeat 4
+		.db 5
+		.if 5>2
+			.db 6
+		.endIf
+	.endRepeat
 
 	.repeat 2
 		.if 12 > 3

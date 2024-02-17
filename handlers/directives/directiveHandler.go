@@ -4,12 +4,26 @@ import (
 	"errors"
 	"fmt"
 	enumTokenTypes "misc/nintasm/enums/tokenTypes"
+	"misc/nintasm/handlers/blockStack"
 	"misc/nintasm/parser/operandFactory"
 )
 
 type Node = operandFactory.Node
 
 func Process(operationTokenEnum enumTokenTypes.Def, directiveName string, operationLabel string, operandList *[]Node) error {
+
+	if operationTokenEnum == enumTokenTypes.DIRECTIVE_blockEnd ||
+		operationTokenEnum == enumTokenTypes.DIRECTIVE_labeledBlockEnd {
+		if len(blockStack.Stack) == 0 {
+			errMsg := fmt.Sprintf("%v with no opening operation found!", directiveName)
+			return errors.New(errMsg)
+		}
+
+		if !blockStack.CheckIfEndOpMatchesOpeningOp(directiveName) {
+			errMsg := fmt.Sprintf("Non-matching closing block with parent operation, %v", directiveName)
+			return errors.New(errMsg)
+		}
+	}
 
 	switch operationTokenEnum {
 

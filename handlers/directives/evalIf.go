@@ -50,6 +50,8 @@ func evalEndIf(directiveName string, operandList *[]Node) error {
 		currentStackOperation = currentStackOperation.AlternateStackBlock
 	}
 
+	// Nil signifies no if/elseif/else are true so nothing will be
+
 	if currentStackOperation != nil {
 		trueStatementCapturedLines = &currentStackOperation.CapturedLines
 	} else {
