@@ -142,10 +142,10 @@ func init() {
 	CombinedOperandSpec = append(CombinedOperandSpec, remainingSpec...)
 	CombinedOperandSpec = append(CombinedOperandSpec, stringSpec...)
 
-	IndirectCapturingSpec = append(commentSpec, whitespaceAcknowledgeSpec...)
-	IndirectCapturingSpec = append(IndirectCapturingSpec, delimiterSpec...)
-	IndirectCapturingSpec = append(IndirectCapturingSpec, stringSpec...)
-	IndirectCapturingSpec = append(IndirectCapturingSpec, indirectCapturingDelimiterspec...)
+	// IndirectCapturingSpec = append(commentSpec, whitespaceAcknowledgeSpec...)
+	// IndirectCapturingSpec = append(IndirectCapturingSpec, delimiterSpec...)
+	// IndirectCapturingSpec = append(IndirectCapturingSpec, stringSpec...)
+	// IndirectCapturingSpec = append(IndirectCapturingSpec, indirectCapturingDelimiterspec...)
 
 }
 
@@ -159,8 +159,8 @@ func GenerateSpec(specType string) []specRegexEnum {
 		return CombinedStartLineSpec
 	case "operand":
 		return CombinedOperandSpec
-	case "indirectCapturing":
-		return IndirectCapturingSpec
+		//case "indirectCapturing":
+		//	return IndirectCapturingSpec
 	}
 	panic("UNKNOWN TOKENIZER SPEC NAME")
 }

@@ -4,21 +4,16 @@
 	.inesMir 0
 
 ttt .macro
-	.if 5 > 4
-	.db 4, \1
-	.endif
+	.db \1
+	lda \2
+	ldy \3
 ttt .endm
 
-ttt2 .macro
-	.db 4, \1
-	.db 5, \2
-	.db 7 + 5
-	ldx %66666
-	.repeat 4
-		.db 555
-	.endRepeat
-ttt2 .endm
-
+ttct .macro
+	ldy \1
+	.db \2
+	lda \3
+ttct .endm
 
 
 	.romSegment "32kb","32kb","PRG"
@@ -41,6 +36,7 @@ ttt2 .endm
 		.endif
 	.endRepeat
 
+	ttct 1,2
 
 ;	LDA #5 + 2
 ;

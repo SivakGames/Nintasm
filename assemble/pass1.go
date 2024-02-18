@@ -10,6 +10,7 @@ import (
 var directiveOperandParser = parser.NewDirectiveOperandParser()
 var instructionOperandParser = parser.NewInstructionOperandParser()
 var labelOperandParser = parser.NewLabelOperandParser()
+var macroOperandParser = parser.NewMacroOperandParser()
 
 func Start(lines []string) error {
 	instructionOperandParser.ShouldParseInstructions = true
@@ -130,10 +131,6 @@ func parseOperandStringAndProcess(
 			return operandParserErr
 		}
 
-	//	case enumParserTypes.Macro:
-	//		fmt.Println("Mack")
-	//		fmt.Println(optype, opval, opPos)
-
 	// -------------------
 	case enumParserTypes.Label:
 		operandParserErr := labelOperandParser.SetupOperandParser(
@@ -150,6 +147,34 @@ func parseOperandStringAndProcess(
 		)
 		if operandParserErr != nil {
 			return operandParserErr
+		}
+
+	// -------------------
+	case enumParserTypes.Macro:
+		operandParserErr := macroOperandParser.SetupOperandParser(
+			reformattedLine,
+			lineOperationParsedValues.OperandStartPosition,
+		)
+		if operandParserErr != nil {
+			return operandParserErr
+		}
+		operandParserErr = macroOperandParser.Process(lineOperationParsedValues.OperationTokenValue)
+		if operandParserErr != nil {
+			return operandParserErr
+		}
+		linesToUnpack := macroOperandParser.GetUnpackLinesRef()
+		for i := range *linesToUnpack {
+			replacedCapturedLine := macroOperandParser.ApplyReplacementsToCapturedLine(i)
+			temp := util.NewLineOperationParsedValues(replacedCapturedLine.OperandStartPosition,
+				replacedCapturedLine.OperationLabel,
+				replacedCapturedLine.OperationTokenEnum,
+				replacedCapturedLine.OperationTokenValue,
+				replacedCapturedLine.ParentParserEnum,
+			)
+			err := parseOperandStringAndProcess(replacedCapturedLine.OriginalLine, &temp)
+			if err != nil {
+				return err
+			}
 		}
 
 	default:
