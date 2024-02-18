@@ -18,7 +18,7 @@ func iterateOverResultWanted(t *testing.T, wanted []uint8) {
 	return
 }
 
-func TestBBB(t *testing.T) {
+func TestBytes(t *testing.T) {
 
 	t.Run("***Testing .db", func(t *testing.T) {
 		t.Log("--- Doing DB tests ---")
