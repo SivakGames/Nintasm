@@ -5,7 +5,6 @@ import (
 	"fmt"
 	enumNodeTypes "misc/nintasm/constants/enums/nodeTypes"
 	enumTokenTypes "misc/nintasm/constants/enums/tokenTypes"
-	"misc/nintasm/handlers/blockStack"
 	"misc/nintasm/parser/operandFactory"
 )
 
@@ -73,7 +72,8 @@ func LookupInEnvironment(symbolName string) (Node, error) {
 }
 
 // ----------------------------------
-func AddMacroToEnvironment(symbolName string, capturedLines []blockStack.CapturedLine) error {
+
+func AddMacroToEnvironment(symbolName string, capturedLines MacroTableType) error {
 	macroSymbolTable[symbolName] = capturedLines
 	return nil
 }
@@ -91,4 +91,24 @@ func LookupAndGetMacroInEnvironment(symbolName string) (MacroTableType, error) {
 		errMsg := fmt.Sprintf("Macro %v does not exist!", symbolName)
 		return nil, errors.New(errMsg)
 	}
+}
+
+// ----------------------------------
+
+var defaultCharmapName = ""
+var lastAddedCharmapName = ""
+
+func AddCharmapToEnvironment(symbolName string) error {
+	charmapSymbolTable[symbolName] = nil
+	lastAddedCharmapName = symbolName
+
+	if defaultCharmapName == "" {
+		defaultCharmapName = lastAddedCharmapName
+	}
+	return nil
+}
+
+func AddCharToCharmap(newChar rune, charNodes []Node) error {
+	charmapSymbolTable[lastAddedCharmapName][newChar] = charNodes
+	return nil
 }

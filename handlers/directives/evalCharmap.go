@@ -1,8 +1,11 @@
 package handlerDirective
 
 import (
+	"errors"
 	"fmt"
 	"misc/nintasm/handlers/blockStack"
+	"misc/nintasm/interpreter/environment"
+	"misc/nintasm/parser/operandFactory"
 )
 
 func evalCharmap(directiveName string, macroLabel string, operandList *[]Node) error {
@@ -20,8 +23,7 @@ func evalEndCharmap(directiveName string) error {
 	currentStackOp := blockStack.GetTopOfStackOperation()
 	capturedLines := &currentStackOp.CapturedLines
 
-	//environment.AddMacroToEnvironment(charmapLabel, *capturedLines)
-	//blockStack.ClearBottomOfStackCapturedLines()
+	environment.AddCharmapToEnvironment(charmapLabel)
 	blockStack.PopFromStackAndExtendCapturedLines(*capturedLines)
 	return nil
 }
@@ -29,10 +31,30 @@ func evalEndCharmap(directiveName string) error {
 func evalDefChar(directiveName string, operandList *[]Node) error {
 	switch directiveName {
 	case "DEFCHAR":
+		runeNode := &(*operandList)[0]
+		if !operandFactory.ValidateNodeIsString(runeNode) {
+			return errors.New("First operand must be a string!")
+		}
+		runeArray := []rune(runeNode.NodeValue)
+		if len(runeArray) != 1 {
+			return errors.New("Character definition must be 1 character long!")
+		}
+		targetRune := runeArray[0]
+
+		charValue := &(*operandList)[1]
+		if !operandFactory.ValidateNodeIsNumeric(charValue) ||
+			!operandFactory.ValidateNumericNodeIsPositive(charValue) ||
+			!operandFactory.ValidateNumericNodeIs8BitValue(charValue) {
+			return errors.New("Node must be positive, 8 bit, and numeric...")
+		}
+
+		environment.AddCharToCharmap(targetRune, {charValue})
+
 		fmt.Println(directiveName, operandList)
+
 	case "DEFCHARRANGE":
 	default:
-		panic("Somethis is very wrong with charmap/defchar capturing!!!")
+		panic("Something is very wrong with charmap/defchar capturing!!!")
 	}
 
 	return nil

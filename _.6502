@@ -16,7 +16,7 @@ ttct .macro
 ttct .endm
 
 ett .charmap
-	.defchar "あ", $14
+	.defchar "", $14
 	.defchar "い", $15
 	.defchar "う", $16
 	.defchar "え", $17

@@ -6,7 +6,7 @@ import (
 	"misc/nintasm/handlers/blockStack"
 )
 
-type MacroTableType = []blockStack.CapturedLine
+// ++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 var literalNodeSymbolTable = map[string]Node{
 	"temp":        generateNumericNodeForEnvironment(100),
@@ -19,6 +19,10 @@ var literalNodeSymbolTable = map[string]Node{
 	"low":         generateAssemblerReservedWordNode("low"),
 }
 
+// ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+type MacroTableType = []blockStack.CapturedLine
+
 var macroSymbolTable = map[string]MacroTableType{
 	"__PPU__": {{
 		OriginalLine:         " LDA #$20",
@@ -28,4 +32,16 @@ var macroSymbolTable = map[string]MacroTableType{
 		OperandStartPosition: 5,
 		ParentParserEnum:     enumParserTypes.Instruction,
 	}},
+}
+
+// ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+type CharmapTableType = map[rune][]Node
+
+var charmapSymbolTable = map[string]CharmapTableType{
+	"JcharTest": {
+		'あ': {generateNumericNodeForEnvironment(0x1f)},
+		'は': {generateNumericNodeForEnvironment(0x20)},
+		'ば': {generateNumericNodeForEnvironment(0xff), generateNumericNodeForEnvironment(0x20)},
+	},
 }
