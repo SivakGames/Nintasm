@@ -38,6 +38,12 @@ func Process(operationTokenEnum enumTokenTypes.Def, directiveName string, operat
 		return evalInesOperands(directiveName, operandList)
 	case enumTokenTypes.DIRECTIVE_romBuilding:
 		return evalRomBuildingOperands(directiveName, operandList)
+	case enumTokenTypes.DIRECTIVE_defCharmap:
+		fmt.Println("Def char map")
+		return nil
+	case enumTokenTypes.DIRECTIVE_defExprMap:
+		fmt.Println("Def expr map")
+		return nil
 	case enumTokenTypes.DIRECTIVE_blockStart:
 		switch directiveName {
 		case "IF":
@@ -49,7 +55,7 @@ func Process(operationTokenEnum enumTokenTypes.Def, directiveName string, operat
 		case "REPEAT":
 			return evalRepeat(directiveName, operandList)
 		default:
-			return errors.New("BAD BLOCK START DIRECTIVE!!!")
+			return errors.New("BAD BLOCK START DIRECTIVE!!!" + directiveName)
 		}
 	case enumTokenTypes.DIRECTIVE_blockEnd:
 		switch directiveName {
@@ -58,7 +64,7 @@ func Process(operationTokenEnum enumTokenTypes.Def, directiveName string, operat
 		case "ENDREPEAT":
 			return evalEndRepeat(directiveName, operandList)
 		default:
-			return errors.New("BAD BLOCK END DIRECTIVE!!!")
+			return errors.New("BAD BLOCK END DIRECTIVE!!!" + directiveName)
 		}
 		//return evalRomBuildingOperands(directiveName, operandList)
 
@@ -66,16 +72,26 @@ func Process(operationTokenEnum enumTokenTypes.Def, directiveName string, operat
 		switch directiveName {
 		case "MACRO":
 			return evalMacro(directiveName, operationLabel, operandList)
+		case "CHARMAP":
+			fmt.Println("c map")
+			return nil
+		case "EXPRMAP":
+			fmt.Println("c map")
+			return nil
+
 		default:
-			return errors.New("BAD LABELED BLOCK START DIRECTIVE!!!")
+			return errors.New("BAD LABELED BLOCK START DIRECTIVE!!!" + directiveName)
 		}
 
 	case enumTokenTypes.DIRECTIVE_labeledBlockEnd:
 		switch directiveName {
 		case "ENDM":
 			return evalEndMacro(directiveName, operandList)
+		case "ENDCHARMAP":
+			fmt.Println("c map")
+			return nil
 		default:
-			return errors.New("BAD LABELED BLOCK END DIRECTIVE!!!")
+			return errors.New("BAD LABELED BLOCK END DIRECTIVE!!!" + directiveName)
 		}
 
 	default:

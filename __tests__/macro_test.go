@@ -1,6 +1,7 @@
 package parser_test
 
 import (
+	testHelper "misc/nintasm/__tests__/helper"
 	"misc/nintasm/assemble"
 	"misc/nintasm/romBuilder"
 	"testing"
@@ -10,7 +11,7 @@ func TestMacros(t *testing.T) {
 
 	t.Run("***Testing macro", func(t *testing.T) {
 		t.Log("--- Doing Macro tests ---")
-		moduleLines := lines
+		moduleLines := testHelper.BaseLines
 		moduleLines = append(moduleLines, "testMacro .macro", " .db \\1, \\2, \\3", "testMacro .endm")
 		moduleLines = append(moduleLines, "testMacro2 .macro", " lda \\1", "testMacro2 .endm")
 		moduleLines = append(moduleLines, " testMacro 1,2,3")

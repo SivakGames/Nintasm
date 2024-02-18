@@ -1,4 +1,4 @@
-package parser_test
+package line_init_parser_test
 
 import (
 	"misc/nintasm/parser"

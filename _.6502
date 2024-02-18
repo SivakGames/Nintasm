@@ -15,15 +15,14 @@ ttct .macro
 	lda \3
 ttct .endm
 
+ett .charmap
+	.defchar "2", $14
+ett .endcharmap
+
 
 	.romSegment "32kb","32kb","PRG"
 	.bank 0
 	.org $8000
-
-
-
-	ttct 1,2,5
-
 
 
 	.romSegment "8kb","8kb","CHR"

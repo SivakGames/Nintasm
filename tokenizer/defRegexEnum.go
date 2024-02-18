@@ -49,8 +49,8 @@ var (
 		{regexp.MustCompile(generateBoundaries("throw")), enumTokenTypes.DIRECTIVE_throw},
 
 		{regexp.MustCompile(generateBoundaries("if|ikv|repeat|switch|elseif|ifdef|ifndef|else|case|default")), enumTokenTypes.DIRECTIVE_blockStart},
-		{regexp.MustCompile(generateBoundaries("defChar|defCharRange")), enumTokenTypes.DIRECTIVE_charmap},
-		{regexp.MustCompile(generateBoundaries("defExpr")), enumTokenTypes.DIRECTIVE_exprMap},
+		{regexp.MustCompile(generateBoundaries("defChar|defCharRange")), enumTokenTypes.DIRECTIVE_defCharmap},
+		{regexp.MustCompile(generateBoundaries("defExpr")), enumTokenTypes.DIRECTIVE_defExprMap},
 		{regexp.MustCompile(generateBoundaries("kv|keyvalue")), enumTokenTypes.DIRECTIVE_invokeKeyVal},
 		{regexp.MustCompile(generateBoundaries("end(?:if|ikv|repeat|switch)")), enumTokenTypes.DIRECTIVE_blockEnd},
 

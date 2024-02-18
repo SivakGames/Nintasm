@@ -19,10 +19,10 @@ const (
 	//Directives
 	DIRECTIVE_blockStart
 	DIRECTIVE_blockEnd
-	DIRECTIVE_charmap
+	DIRECTIVE_defCharmap
 	DIRECTIVE_dataBytes
 	DIRECTIVE_dataSeries
-	DIRECTIVE_exprMap
+	DIRECTIVE_defExprMap
 	DIRECTIVE_if
 	DIRECTIVE_include
 	DIRECTIVE_INES

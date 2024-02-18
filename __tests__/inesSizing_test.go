@@ -2,18 +2,15 @@ package parser_test
 
 import (
 	"fmt"
+	testHelper "misc/nintasm/__tests__/helper"
 	"misc/nintasm/assemble"
 	"misc/nintasm/romBuilder"
 	"testing"
 )
 
-var lines = []string{" .inesMap 0", " .inesPrg \"32kb\"", " .inesChr \"8kb\"", " .inesMir 1",
-	" .romSegment \"32kb\", \"16kb\", \"PRG\"",
-	" .bank 0", " .org $8000", " .bank 1", " .org $8000"}
-
 func TestDirectiveOperandParser(t *testing.T) {
 	t.Run("Testing .ines*** and declaring segments", func(t *testing.T) {
-		err := assemble.Start(lines)
+		err := assemble.Start(testHelper.BaseLines)
 		if err != nil {
 			t.Error(err)
 		}
