@@ -1,39 +1,19 @@
 package handlerDirective
 
 import (
-	"errors"
 	"fmt"
 	"misc/nintasm/handlers/blockStack"
 	"misc/nintasm/interpreter/environment"
 )
 
 func evalMacro(directiveName string, macroLabel string, operandList *[]Node) error {
-	var err error
-
-	if len(blockStack.Stack) > 0 {
-		errMsg := fmt.Sprintf("Cannot define a macro when in another block statement!")
-		return errors.New(errMsg) // ❌ Fails
-	}
-
-	err = environment.CheckIfSymbolAlreadyDefined(macroLabel)
-	if err != nil {
-		return err // ❌ Fails
-	}
-
-	err = blockStack.SetCurrentOperationLabel(macroLabel)
-	if err != nil {
-		return err // ❌ Fails
-	}
-
 	blockStack.PushOntoStack(directiveName, *operandList)
 	blockStack.SetCaptureParentOpOnlyFlag()
 	return nil
 }
 
 // End the macro definition and add to environment
-func evalEndMacro(directiveName string, operandList *[]Node) error {
-	var noLines []blockStack.CapturedLine
-
+func evalEndMacro(directiveName string) error {
 	macroLabel := blockStack.GetCurrentOperationLabel()
 	blockStack.ClearCurrentOperationLabel()
 	blockStack.ClearCaptureParentOpOnlyFlag()
@@ -47,6 +27,6 @@ func evalEndMacro(directiveName string, operandList *[]Node) error {
 	}
 
 	blockStack.ClearBottomOfStackCapturedLines()
-	blockStack.PopFromStackAndExtendCapturedLines(noLines)
+	blockStack.PopFromStackAndExtendNoLines()
 	return nil
 }

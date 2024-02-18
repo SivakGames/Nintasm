@@ -19,7 +19,7 @@ const (
 	//Directives
 	DIRECTIVE_blockStart
 	DIRECTIVE_blockEnd
-	DIRECTIVE_defCharmap
+	DIRECTIVE_defCharMap
 	DIRECTIVE_dataBytes
 	DIRECTIVE_dataSeries
 	DIRECTIVE_defExprMap

@@ -163,9 +163,11 @@ func CheckIfNewStartEndOperation(lineOperationParsedValues *util.LineOperationPa
 //+++++++++++++++++++++++++++++++
 
 var correspondingEndBlockOperations = map[string]string{
-	"REPEAT": "ENDREPEAT",
-	"IF":     "ENDIF",
-	"MACRO":  "ENDM",
+	"REPEAT":  "ENDREPEAT",
+	"IF":      "ENDIF",
+	"MACRO":   "ENDM",
+	"CHARMAP": "ENDCHARMAP",
+	"EXPRMAP": "ENDEXPRMAP",
 }
 
 // --------------------------------
@@ -191,6 +193,9 @@ var allowedOperationsForParentOps = map[string]captureableOpMap{
 	"IF":     sharedCapturableOps,
 	"ELSEIF": sharedCapturableOps,
 	"ELSE":   sharedCapturableOps,
+	"CHARMAP": {
+		enumTokenTypes.DIRECTIVE_defCharMap: true,
+	},
 	"MACRO": func() captureableOpMap {
 		m := make(captureableOpMap)
 		// Copy shared operations
@@ -252,6 +257,13 @@ func PopFromStackAndExtendCapturedLines(extendLines []CapturedLine) {
 	} else {
 		panic("Popping nothing from stack!!!")
 	}
+}
+
+// Helper to pop from the stack but won't supply any captured lines to extends.
+// (Used for labeled block directives)
+func PopFromStackAndExtendNoLines() {
+	var emptyCapturedLines []CapturedLine
+	PopFromStackAndExtendCapturedLines(emptyCapturedLines)
 }
 
 //--------------------------------

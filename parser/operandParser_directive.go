@@ -75,21 +75,22 @@ var directiveMinMaxOperands = map[enumTokenTypes.Def][2]int{
 	enumTokenTypes.DIRECTIVE_setting:         {1, 1},
 	enumTokenTypes.DIRECTIVE_settingReset:    {0, 0},
 	enumTokenTypes.DIRECTIVE_throw:           {1, 1},
-	enumTokenTypes.DIRECTIVE_defCharmap:      {2, 3},
 }
 
 var directiveNameMinMaxOperands = map[string][2]int{
-	"BANK":       {1, 1},
-	"INCBIN":     {1, 3},
-	"INCLUDE":    {1, 1},
-	"ORG":        {1, 1},
-	"ROMSEGMENT": {1, 3},
-	"REPEAT":     {1, 2},
-	"IF":         {1, 1},
-	"ELSEIF":     {1, 1},
-	"ELSE":       {0, 0},
-	"MACRO":      {0, 0},
-	"CHARMAP":    {0, 0},
+	"BANK":         {1, 1},
+	"INCBIN":       {1, 3},
+	"INCLUDE":      {1, 1},
+	"ORG":          {1, 1},
+	"ROMSEGMENT":   {1, 3},
+	"REPEAT":       {1, 2},
+	"IF":           {1, 1},
+	"ELSEIF":       {1, 1},
+	"ELSE":         {0, 0},
+	"MACRO":        {0, 0},
+	"CHARMAP":      {0, 0},
+	"DEFCHAR":      {2, 3},
+	"DEFCHARRANGE": {3, 3},
 }
 
 func getMinMaxOperandsForDirective(directiveEnum tokenEnum, directiveName string) (int, int, error) {
