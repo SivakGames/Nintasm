@@ -2,7 +2,7 @@ package handlerDirective
 
 import (
 	"errors"
-	enumTokenTypes "misc/nintasm/enums/tokenTypes"
+	enumTokenTypes "misc/nintasm/constants/enums/tokenTypes"
 	"misc/nintasm/handlers/blockStack"
 	"misc/nintasm/parser/operandFactory"
 )

@@ -1,7 +1,7 @@
 package parser
 
 import (
-	enumTokenTypes "misc/nintasm/enums/tokenTypes"
+	enumTokenTypes "misc/nintasm/constants/enums/tokenTypes"
 	"strings"
 )
 

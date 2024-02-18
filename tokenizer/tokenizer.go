@@ -3,7 +3,7 @@ package tokenizer
 import (
 	"errors"
 	"fmt"
-	enumTokenTypes "misc/nintasm/enums/tokenTypes"
+	enumTokenTypes "misc/nintasm/constants/enums/tokenTypes"
 	"regexp"
 )
 

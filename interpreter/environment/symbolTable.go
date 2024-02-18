@@ -1,8 +1,8 @@
 package environment
 
 import (
-	enumParserTypes "misc/nintasm/enums/parserTypes"
-	enumTokenTypes "misc/nintasm/enums/tokenTypes"
+	enumParserTypes "misc/nintasm/constants/enums/parserTypes"
+	enumTokenTypes "misc/nintasm/constants/enums/tokenTypes"
 	"misc/nintasm/handlers/blockStack"
 )
 

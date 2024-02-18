@@ -1,7 +1,7 @@
 package instructionData
 
 import (
-	enumInstructionModes "misc/nintasm/enums/instructionModes"
+	enumInstructionModes "misc/nintasm/constants/enums/instructionModes"
 )
 
 type instModes = enumInstructionModes.Def

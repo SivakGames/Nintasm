@@ -2,9 +2,9 @@ package parser
 
 import (
 	"errors"
-	enumInstructionModes "misc/nintasm/enums/instructionModes"
-	enumTokenTypes "misc/nintasm/enums/tokenTypes"
-	"misc/nintasm/instructionData"
+	enumInstructionModes "misc/nintasm/constants/enums/instructionModes"
+	enumTokenTypes "misc/nintasm/constants/enums/tokenTypes"
+	"misc/nintasm/constants/instructionData"
 	"misc/nintasm/parser/operandFactory"
 	"misc/nintasm/romBuilder"
 	"misc/nintasm/romBuilder/nodesToBytes"

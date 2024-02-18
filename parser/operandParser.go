@@ -3,8 +3,8 @@ package parser
 import (
 	"errors"
 	"fmt"
-	enumInstructionModes "misc/nintasm/enums/instructionModes"
-	enumTokenTypes "misc/nintasm/enums/tokenTypes"
+	enumInstructionModes "misc/nintasm/constants/enums/instructionModes"
+	enumTokenTypes "misc/nintasm/constants/enums/tokenTypes"
 	"misc/nintasm/interpreter"
 	"misc/nintasm/parser/operandFactory"
 	"strconv"

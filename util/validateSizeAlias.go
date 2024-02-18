@@ -3,7 +3,7 @@ package util
 import (
 	"errors"
 	"fmt"
-	enumSizeAliases "misc/nintasm/enums/sizeAliases"
+	enumSizeAliases "misc/nintasm/constants/enums/sizeAliases"
 	"misc/nintasm/parser/operandFactory"
 	"strings"
 )

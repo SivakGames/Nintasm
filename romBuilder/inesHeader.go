@@ -2,7 +2,7 @@ package romBuilder
 
 import (
 	"errors"
-	enumSizeAliases "misc/nintasm/enums/sizeAliases"
+	enumSizeAliases "misc/nintasm/constants/enums/sizeAliases"
 	"misc/nintasm/parser/operandFactory"
 	"misc/nintasm/util"
 )

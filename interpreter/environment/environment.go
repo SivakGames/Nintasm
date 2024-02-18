@@ -3,8 +3,8 @@ package environment
 import (
 	"errors"
 	"fmt"
-	enumNodeTypes "misc/nintasm/enums/nodeTypes"
-	enumTokenTypes "misc/nintasm/enums/tokenTypes"
+	enumNodeTypes "misc/nintasm/constants/enums/nodeTypes"
+	enumTokenTypes "misc/nintasm/constants/enums/tokenTypes"
 	"misc/nintasm/handlers/blockStack"
 	"misc/nintasm/parser/operandFactory"
 )

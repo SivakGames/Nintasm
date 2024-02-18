@@ -3,7 +3,7 @@ package parser
 import (
 	"errors"
 	"fmt"
-	enumTokenTypes "misc/nintasm/enums/tokenTypes"
+	enumTokenTypes "misc/nintasm/constants/enums/tokenTypes"
 	"misc/nintasm/tokenizer"
 )
 

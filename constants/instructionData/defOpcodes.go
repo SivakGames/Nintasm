@@ -1,6 +1,6 @@
 package instructionData
 
-import enumInstructionModes "misc/nintasm/enums/instructionModes"
+import enumInstructionModes "misc/nintasm/constants/enums/instructionModes"
 
 var impliedModes = []instModes{enumInstructionModes.IMPL}
 var branchModes = []instModes{enumInstructionModes.REL, enumInstructionModes.IMM}

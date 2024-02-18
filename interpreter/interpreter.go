@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
-	enumNodeTypes "misc/nintasm/enums/nodeTypes"
+	enumNodeTypes "misc/nintasm/constants/enums/nodeTypes"
 	"misc/nintasm/interpreter/environment"
 	"misc/nintasm/parser/operandFactory"
 )
