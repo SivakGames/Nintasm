@@ -91,7 +91,8 @@ func validateCharmapTextNodeGetRune(runeNode *Node) (rune, error) {
 	}
 	runeArray := []rune(runeNode.NodeValue)
 	if len(runeArray) != 1 {
-		return ' ', errors.New("Character definition must be 1 character long!")
+		errMsg := fmt.Sprintf("%v Character definition must be 1 character long!", runeNode.NodeValue)
+		return ' ', errors.New(errMsg)
 	}
 	return runeArray[0], nil
 }

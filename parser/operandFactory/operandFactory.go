@@ -182,6 +182,13 @@ func ConvertNodeToBooleanLiteral(node *Node) {
 	return
 }
 
+func ConvertNodeToStringLiteral(node *Node) {
+	node.NodeType = enumNodeTypes.StringLiteral
+	node.NodeTokenType = enumTokenTypes.STRING
+	node.Resolved = true
+	return
+}
+
 func ValidateNodeIsBoolean(node *Node) bool {
 	return node.NodeType == enumNodeTypes.BooleanLiteral
 }

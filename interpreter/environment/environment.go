@@ -96,6 +96,7 @@ func LookupAndGetMacroInEnvironment(symbolName string) (MacroTableType, error) {
 // ----------------------------------
 
 var defaultCharmapName = ""
+var currentCharmapName = ""
 var lastAddedCharmapName = ""
 
 func AddCharmapToEnvironment(symbolName string) error {
@@ -104,8 +105,17 @@ func AddCharmapToEnvironment(symbolName string) error {
 
 	if defaultCharmapName == "" {
 		defaultCharmapName = lastAddedCharmapName
+		currentCharmapName = defaultCharmapName
 	}
 	return nil
+}
+
+func GetCurrentCharmap() (CharmapTableType, error) {
+	if currentCharmapName == "" {
+		return nil, errors.New("No charmaps have been defined!!!!")
+	}
+
+	return charmapSymbolTable[currentCharmapName], nil
 }
 
 func CheckIfDefinedInCharmap(lookupChar rune) ([]Node, bool) {
@@ -116,7 +126,8 @@ func CheckIfDefinedInCharmap(lookupChar rune) ([]Node, bool) {
 func CheckIfAlreadyExistsInCharmap(lookupChar rune) ([]Node, error) {
 	target, exists := CheckIfDefinedInCharmap(lookupChar)
 	if exists {
-		return target, errors.New("Target char already defined!")
+		errMsg := fmt.Sprintf("Target char %c already defined!", lookupChar)
+		return target, errors.New(errMsg)
 	}
 	return target, nil
 }

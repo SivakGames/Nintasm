@@ -18,9 +18,10 @@ type assemblerFunction struct {
 }
 
 var assemblerBuiltInFunctions = map[string]assemblerFunction{
-	"high": {1, 1, []enumNodeTypes.Def{enumNodeTypes.NumericLiteral}},
-	"low":  {1, 1, []enumNodeTypes.Def{enumNodeTypes.NumericLiteral}},
-	"bank": {1, 1, []enumNodeTypes.Def{enumNodeTypes.Identifier}},
+	"high":      {1, 1, []enumNodeTypes.Def{enumNodeTypes.NumericLiteral}},
+	"low":       {1, 1, []enumNodeTypes.Def{enumNodeTypes.NumericLiteral}},
+	"bank":      {1, 1, []enumNodeTypes.Def{enumNodeTypes.Identifier}},
+	"toCharmap": {1, 1, []enumNodeTypes.Def{enumNodeTypes.StringLiteral}},
 }
 
 func EvaluateNode(node Node) (Node, error) {
@@ -184,6 +185,25 @@ func ProcessAssemblerFunction(node *Node) (bool, error) {
 			node.AsNumber = ((*node.ArgumentList)[0].AsNumber & 0x0ff00) >> 8
 		case "low":
 			node.AsNumber = ((*node.ArgumentList)[0].AsNumber & 0x000ff)
+		case "toCharmap":
+			nodeString := ((*node.ArgumentList)[0].NodeValue)
+			runeArray := []rune(nodeString)
+			currCharmap, err := environment.GetCurrentCharmap()
+			if err != nil {
+				return isAsmFunc, err
+			}
+
+			replacedString := ""
+			for _, r := range runeArray {
+				d, exists := currCharmap[r]
+				if !exists {
+					return isAsmFunc, errors.New("Char doesn't exit")
+				}
+				for _, v := range d {
+					replacedString += string(v.AsNumber)
+				}
+			}
+			node.NodeValue = replacedString
 		case "bank":
 			log.Println((*node.ArgumentList)[0])
 			//node.AsNumber = ((*node.ArgumentList)[0].AsNumber & 0x000ff)
@@ -192,6 +212,8 @@ func ProcessAssemblerFunction(node *Node) (bool, error) {
 		switch funcName {
 		case "high", "low":
 			operandFactory.ConvertNodeToNumericLiteral(node)
+		case "toCharmap":
+			operandFactory.ConvertNodeToStringLiteral(node)
 		}
 	}
 	return isAsmFunc, nil
