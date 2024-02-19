@@ -21,7 +21,7 @@ ett .charmap
 	.defchar "う", $16
 	.defchar "え", $17,$ff
 	.defchar "お", $18
-	.defcharRange "2","4", $14
+	.defcharRange "A","Z", $11
 ett .endcharmap
 
 

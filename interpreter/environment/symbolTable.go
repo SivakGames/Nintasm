@@ -38,10 +38,4 @@ var macroSymbolTable = map[string]MacroTableType{
 
 type CharmapTableType = map[rune][]Node
 
-var charmapSymbolTable = map[string]CharmapTableType{
-	"JcharTest": {
-		'あ': {generateNumericNodeForEnvironment(0x1f)},
-		'は': {generateNumericNodeForEnvironment(0x20)},
-		'ば': {generateNumericNodeForEnvironment(0xff), generateNumericNodeForEnvironment(0x20)},
-	},
-}
+var charmapSymbolTable = map[string]CharmapTableType{}

@@ -2,6 +2,7 @@ package handlerDirective
 
 import (
 	"errors"
+	"fmt"
 	"misc/nintasm/handlers/blockStack"
 	"misc/nintasm/interpreter/environment"
 	"misc/nintasm/parser/operandFactory"
@@ -44,10 +45,9 @@ func evalDefChar(directiveName string, operandList *[]Node) error {
 
 		charNodes := []Node{}
 		for _, charNode := range (*operandList)[1:] {
-			if !operandFactory.ValidateNodeIsNumeric(&charNode) ||
-				!operandFactory.ValidateNumericNodeIsPositive(&charNode) ||
-				!operandFactory.ValidateNumericNodeIs8BitValue(&charNode) {
-				return errors.New("Node must be positive, 8 bit, and numeric...")
+			err = validateCharmapNumberNode(&charNode)
+			if err != nil {
+				return err
 			}
 			charNodes = append(charNodes, charNode)
 		}
@@ -70,6 +70,14 @@ func evalDefChar(directiveName string, operandList *[]Node) error {
 			return errors.New("End bigger than start")
 		}
 
+		charBaseNode := (*operandList)[2]
+
+		for i := targetStartRune; i <= targetEndRune; i++ {
+			environment.AddCharToCharmap(i, []Node{charBaseNode})
+			charBaseNode.AsNumber += 1
+			charBaseNode.NodeValue = fmt.Sprintf("%v", charBaseNode.AsNumber)
+		}
+
 	default:
 		panic("Something is very wrong with charmap/defchar capturing!!!")
 	}
@@ -85,6 +93,14 @@ func validateCharmapTextNodeGetRune(runeNode *Node) (rune, error) {
 	if len(runeArray) != 1 {
 		return ' ', errors.New("Character definition must be 1 character long!")
 	}
-
 	return runeArray[0], nil
+}
+
+func validateCharmapNumberNode(node *Node) error {
+	if !operandFactory.ValidateNodeIsNumeric(node) ||
+		!operandFactory.ValidateNumericNodeIsPositive(node) ||
+		!operandFactory.ValidateNumericNodeIs8BitValue(node) {
+		return errors.New("Node must be positive, 8 bit, and numeric...")
+	}
+	return nil
 }
