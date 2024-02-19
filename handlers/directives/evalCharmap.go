@@ -2,7 +2,6 @@ package handlerDirective
 
 import (
 	"errors"
-	"fmt"
 	"misc/nintasm/handlers/blockStack"
 	"misc/nintasm/interpreter/environment"
 	"misc/nintasm/parser/operandFactory"
@@ -31,31 +30,61 @@ func evalEndCharmap(directiveName string) error {
 func evalDefChar(directiveName string, operandList *[]Node) error {
 	switch directiveName {
 	case "DEFCHAR":
-		runeNode := &(*operandList)[0]
-		if !operandFactory.ValidateNodeIsString(runeNode) {
-			return errors.New("First operand must be a string!")
-		}
-		runeArray := []rune(runeNode.NodeValue)
-		if len(runeArray) != 1 {
-			return errors.New("Character definition must be 1 character long!")
-		}
-		targetRune := runeArray[0]
+		textNode := &(*operandList)[0]
 
-		charValue := &(*operandList)[1]
-		if !operandFactory.ValidateNodeIsNumeric(charValue) ||
-			!operandFactory.ValidateNumericNodeIsPositive(charValue) ||
-			!operandFactory.ValidateNumericNodeIs8BitValue(charValue) {
-			return errors.New("Node must be positive, 8 bit, and numeric...")
+		targetRune, err := validateCharmapTextNodeGetRune(textNode)
+		if err != nil {
+			return err
 		}
 
-		environment.AddCharToCharmap(targetRune, {charValue})
+		_, err = environment.CheckIfAlreadyExistsInCharmap(targetRune)
+		if err != nil {
+			return err
+		}
 
-		fmt.Println(directiveName, operandList)
+		charNodes := []Node{}
+		for _, charNode := range (*operandList)[1:] {
+			if !operandFactory.ValidateNodeIsNumeric(&charNode) ||
+				!operandFactory.ValidateNumericNodeIsPositive(&charNode) ||
+				!operandFactory.ValidateNumericNodeIs8BitValue(&charNode) {
+				return errors.New("Node must be positive, 8 bit, and numeric...")
+			}
+			charNodes = append(charNodes, charNode)
+		}
+
+		environment.AddCharToCharmap(targetRune, charNodes)
 
 	case "DEFCHARRANGE":
+		textNodeStart := &(*operandList)[0]
+		targetStartRune, err := validateCharmapTextNodeGetRune(textNodeStart)
+		if err != nil {
+			return err
+		}
+		textNodeEnd := &(*operandList)[1]
+		targetEndRune, err := validateCharmapTextNodeGetRune(textNodeEnd)
+		if err != nil {
+			return err
+		}
+
+		if targetStartRune >= targetEndRune {
+			return errors.New("End bigger than start")
+		}
+
 	default:
 		panic("Something is very wrong with charmap/defchar capturing!!!")
 	}
 
 	return nil
+}
+
+func validateCharmapTextNodeGetRune(runeNode *Node) (rune, error) {
+	if !operandFactory.ValidateNodeIsString(runeNode) {
+		return ' ', errors.New("First operand must be a string!")
+	}
+	runeArray := []rune(runeNode.NodeValue)
+	if len(runeArray) != 1 {
+		return ' ', errors.New("Character definition must be 1 character long!")
+	}
+
+	return runeArray[0], nil
 }

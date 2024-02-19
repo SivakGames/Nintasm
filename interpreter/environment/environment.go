@@ -99,13 +99,26 @@ var defaultCharmapName = ""
 var lastAddedCharmapName = ""
 
 func AddCharmapToEnvironment(symbolName string) error {
-	charmapSymbolTable[symbolName] = nil
+	charmapSymbolTable[symbolName] = CharmapTableType{}
 	lastAddedCharmapName = symbolName
 
 	if defaultCharmapName == "" {
 		defaultCharmapName = lastAddedCharmapName
 	}
 	return nil
+}
+
+func CheckIfDefinedInCharmap(lookupChar rune) ([]Node, bool) {
+	target, exists := charmapSymbolTable[lastAddedCharmapName][lookupChar]
+	return target, exists
+}
+
+func CheckIfAlreadyExistsInCharmap(lookupChar rune) ([]Node, error) {
+	target, exists := CheckIfDefinedInCharmap(lookupChar)
+	if exists {
+		return target, errors.New("Target char already defined!")
+	}
+	return target, nil
 }
 
 func AddCharToCharmap(newChar rune, charNodes []Node) error {
