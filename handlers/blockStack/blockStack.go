@@ -196,6 +196,9 @@ var allowedOperationsForParentOps = map[string]captureableOpMap{
 	"CHARMAP": {
 		enumTokenTypes.DIRECTIVE_defCharMap: true,
 	},
+	"EXPRMAP": {
+		enumTokenTypes.DIRECTIVE_defExprMap: true,
+	},
 	"MACRO": func() captureableOpMap {
 		m := make(captureableOpMap)
 		// Copy shared operations

@@ -91,6 +91,8 @@ var directiveNameMinMaxOperands = map[string][2]int{
 	"CHARMAP":      {0, 0},
 	"DEFCHAR":      {2, 3},
 	"DEFCHARRANGE": {3, 3},
+	"EXPRMAP":      {0, 0},
+	"DEFEXPR":      {2, 2},
 }
 
 func getMinMaxOperandsForDirective(directiveEnum tokenEnum, directiveName string) (int, int, error) {
