@@ -6,7 +6,7 @@ import (
 	"log"
 	enumNodeTypes "misc/nintasm/constants/enums/nodeTypes"
 	"misc/nintasm/interpreter/environment"
-	"misc/nintasm/parser/operandFactory"
+	"misc/nintasm/interpreter/operandFactory"
 )
 
 type Node = operandFactory.Node
@@ -200,7 +200,7 @@ func ProcessAssemblerFunction(node *Node) (bool, error) {
 					return isAsmFunc, errors.New("Char doesn't exit")
 				}
 				for _, v := range d {
-					replacedString += string(v.AsNumber)
+					replacedString += string(rune(v.AsNumber))
 				}
 			}
 			node.NodeValue = replacedString

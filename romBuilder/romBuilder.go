@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"math"
-	"misc/nintasm/parser/operandFactory"
+	"misc/nintasm/interpreter/operandFactory"
 )
 
 type Node = operandFactory.Node

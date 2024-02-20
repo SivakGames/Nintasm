@@ -5,7 +5,7 @@ import (
 	"fmt"
 	enumNodeTypes "misc/nintasm/constants/enums/nodeTypes"
 	enumTokenTypes "misc/nintasm/constants/enums/tokenTypes"
-	"misc/nintasm/parser/operandFactory"
+	"misc/nintasm/interpreter/operandFactory"
 )
 
 type Node = operandFactory.Node

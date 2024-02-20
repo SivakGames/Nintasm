@@ -5,7 +5,7 @@ import (
 	"fmt"
 	enumParserTypes "misc/nintasm/constants/enums/parserTypes"
 	enumTokenTypes "misc/nintasm/constants/enums/tokenTypes"
-	"misc/nintasm/parser/operandFactory"
+	"misc/nintasm/interpreter/operandFactory"
 	"misc/nintasm/util"
 	"strings"
 )

@@ -4,7 +4,7 @@ import (
 	"errors"
 	enumTokenTypes "misc/nintasm/constants/enums/tokenTypes"
 	"misc/nintasm/handlers/blockStack"
-	"misc/nintasm/parser/operandFactory"
+	"misc/nintasm/interpreter/operandFactory"
 )
 
 func evalIf(directiveName string, operandList *[]Node) error {

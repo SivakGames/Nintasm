@@ -2,7 +2,7 @@ package handlerDirective
 
 import (
 	"errors"
-	"misc/nintasm/parser/operandFactory"
+	"misc/nintasm/interpreter/operandFactory"
 	"misc/nintasm/romBuilder"
 )
 

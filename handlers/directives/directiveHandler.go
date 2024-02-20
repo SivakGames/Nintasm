@@ -6,7 +6,7 @@ import (
 	enumTokenTypes "misc/nintasm/constants/enums/tokenTypes"
 	"misc/nintasm/handlers/blockStack"
 	"misc/nintasm/interpreter/environment"
-	"misc/nintasm/parser/operandFactory"
+	"misc/nintasm/interpreter/operandFactory"
 )
 
 type Node = operandFactory.Node

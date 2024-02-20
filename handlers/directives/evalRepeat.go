@@ -4,7 +4,7 @@ import (
 	"errors"
 	"misc/nintasm/handlers/blockStack"
 	"misc/nintasm/interpreter"
-	"misc/nintasm/parser/operandFactory"
+	"misc/nintasm/interpreter/operandFactory"
 	"regexp"
 	"strconv"
 )

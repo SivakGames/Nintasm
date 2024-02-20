@@ -5,7 +5,7 @@ import (
 	enumInstructionModes "misc/nintasm/constants/enums/instructionModes"
 	enumTokenTypes "misc/nintasm/constants/enums/tokenTypes"
 	"misc/nintasm/constants/instructionData"
-	"misc/nintasm/parser/operandFactory"
+	"misc/nintasm/interpreter/operandFactory"
 	"misc/nintasm/romBuilder"
 	"misc/nintasm/romBuilder/nodesToBytes"
 	"strings"

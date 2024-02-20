@@ -5,7 +5,7 @@ import (
 	"fmt"
 	enumTokenTypes "misc/nintasm/constants/enums/tokenTypes"
 	"misc/nintasm/interpreter"
-	"misc/nintasm/parser/operandFactory"
+	"misc/nintasm/interpreter/operandFactory"
 	"misc/nintasm/romBuilder"
 	"strconv"
 	"strings"

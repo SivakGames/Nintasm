@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"misc/nintasm/handlers/blockStack"
 	"misc/nintasm/interpreter/environment"
-	"misc/nintasm/parser/operandFactory"
+	"misc/nintasm/interpreter/operandFactory"
 )
 
 func evalCharmap(directiveName string, macroLabel string, operandList *[]Node) error {

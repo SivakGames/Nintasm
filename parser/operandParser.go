@@ -6,7 +6,7 @@ import (
 	enumInstructionModes "misc/nintasm/constants/enums/instructionModes"
 	enumTokenTypes "misc/nintasm/constants/enums/tokenTypes"
 	"misc/nintasm/interpreter"
-	"misc/nintasm/parser/operandFactory"
+	"misc/nintasm/interpreter/operandFactory"
 	"strconv"
 )
 

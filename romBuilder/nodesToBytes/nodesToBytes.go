@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log"
 	enumNodeTypes "misc/nintasm/constants/enums/nodeTypes"
-	"misc/nintasm/parser/operandFactory"
+	"misc/nintasm/interpreter/operandFactory"
 	"unicode/utf8"
 )
 
