@@ -6,6 +6,8 @@ import (
 	"log"
 	enumNodeTypes "misc/nintasm/constants/enums/nodeTypes"
 	"misc/nintasm/interpreter/environment"
+	"misc/nintasm/interpreter/environment/charmapTable"
+	"misc/nintasm/interpreter/environment/exprmapTable"
 	"misc/nintasm/interpreter/operandFactory"
 )
 
@@ -33,11 +35,12 @@ func EvaluateNode(node Node) (Node, error) {
 		return node, nil
 
 	case enumNodeTypes.BacktickStringLiteral:
-		_, err := environment.GetCurrentExprmap()
+		_, err := exprmapTable.GetCurrentExprmap()
 		if err != nil {
 			return node, err
 		}
-		exprValue, exists := environment.CheckIfDefinedInExprmap(node.NodeValue)
+
+		exprValue, exists := exprmapTable.CheckIfDefinedInExprmap(node.NodeValue)
 		if !exists {
 			return node, errors.New("Bad expr char")
 		}
@@ -201,7 +204,7 @@ func ProcessAssemblerFunction(node *Node) (bool, error) {
 		case "toCharmap":
 			nodeString := ((*node.ArgumentList)[0].NodeValue)
 			runeArray := []rune(nodeString)
-			currCharmap, err := environment.GetCurrentCharmap()
+			currCharmap, err := charmapTable.GetCurrentCharmap()
 			if err != nil {
 				return isAsmFunc, err
 			}

@@ -1,11 +1,5 @@
 package environment
 
-import (
-	enumParserTypes "misc/nintasm/constants/enums/parserTypes"
-	enumTokenTypes "misc/nintasm/constants/enums/tokenTypes"
-	"misc/nintasm/handlers/blockStack"
-)
-
 // ++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 var literalNodeSymbolTable = map[string]Node{
@@ -18,30 +12,3 @@ var literalNodeSymbolTable = map[string]Node{
 	"high":        generateAssemblerReservedWordNode("high"),
 	"low":         generateAssemblerReservedWordNode("low"),
 }
-
-// ++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-type MacroTableType = []blockStack.CapturedLine
-
-var macroSymbolTable = map[string]MacroTableType{
-	"__PPU__": {{
-		OriginalLine:         " LDA #$20",
-		OperationLabel:       "",
-		OperationTokenEnum:   enumTokenTypes.INSTRUCTION,
-		OperationTokenValue:  "LDA",
-		OperandStartPosition: 5,
-		ParentParserEnum:     enumParserTypes.Instruction,
-	}},
-}
-
-// ++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-type CharmapTableType = map[rune][]Node
-
-var charmapSymbolTable = map[string]CharmapTableType{}
-
-// ++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-type ExprmapTableType = map[string]int
-
-var exprmapSymbolTable = map[string]ExprmapTableType{}

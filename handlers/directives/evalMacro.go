@@ -3,7 +3,7 @@ package handlerDirective
 import (
 	"fmt"
 	"misc/nintasm/handlers/blockStack"
-	"misc/nintasm/interpreter/environment"
+	"misc/nintasm/interpreter/environment/macroTable"
 )
 
 func evalMacro(directiveName string, macroLabel string, operandList *[]Node) error {
@@ -20,7 +20,7 @@ func evalEndMacro(directiveName string) error {
 
 	currentStackOp := blockStack.GetTopOfStackOperation()
 	capturedLines := &currentStackOp.CapturedLines
-	environment.AddMacroToEnvironment(macroLabel, *capturedLines)
+	macroTable.AddMacroToEnvironment(macroLabel, *capturedLines)
 
 	if len(*capturedLines) == 0 {
 		fmt.Println("Warning: Macro is empty!")

@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"misc/nintasm/handlers/blockStack"
-	"misc/nintasm/interpreter/environment"
+	"misc/nintasm/interpreter/environment/charmapTable"
 	"misc/nintasm/interpreter/operandFactory"
 )
 
@@ -22,7 +22,7 @@ func evalEndCharmap(directiveName string) error {
 	currentStackOp := blockStack.GetTopOfStackOperation()
 	capturedLines := &currentStackOp.CapturedLines
 
-	environment.AddCharmapToEnvironment(charmapLabel)
+	charmapTable.AddCharmapToEnvironment(charmapLabel)
 	blockStack.PopFromStackAndExtendCapturedLines(*capturedLines)
 	return nil
 }
@@ -37,7 +37,7 @@ func evalDefChar(directiveName string, operandList *[]Node) error {
 			return err
 		}
 
-		_, err = environment.CheckIfAlreadyExistsInCharmap(targetRune)
+		_, err = charmapTable.CheckIfAlreadyExistsInCharmap(targetRune)
 		if err != nil {
 			return err
 		}
@@ -51,7 +51,7 @@ func evalDefChar(directiveName string, operandList *[]Node) error {
 			charNodes = append(charNodes, charNode)
 		}
 
-		environment.AddCharToCharmap(targetRune, charNodes)
+		charmapTable.AddCharToCharmap(targetRune, charNodes)
 
 	case "DEFCHARRANGE":
 		textNodeStart := &(*operandList)[0]
@@ -72,7 +72,7 @@ func evalDefChar(directiveName string, operandList *[]Node) error {
 		charBaseNode := (*operandList)[2]
 
 		for i := targetStartRune; i <= targetEndRune; i++ {
-			environment.AddCharToCharmap(i, []Node{charBaseNode})
+			charmapTable.AddCharToCharmap(i, []Node{charBaseNode})
 			charBaseNode.AsNumber += 1
 			charBaseNode.NodeValue = fmt.Sprintf("%v", charBaseNode.AsNumber)
 		}

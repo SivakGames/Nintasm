@@ -3,7 +3,7 @@ package handlerDirective
 import (
 	"errors"
 	"misc/nintasm/handlers/blockStack"
-	"misc/nintasm/interpreter/environment"
+	"misc/nintasm/interpreter/environment/exprmapTable"
 	"misc/nintasm/interpreter/operandFactory"
 )
 
@@ -21,7 +21,7 @@ func evalEndExprmap(directiveName string) error {
 	currentStackOp := blockStack.GetTopOfStackOperation()
 	capturedLines := &currentStackOp.CapturedLines
 
-	environment.AddExprmapToEnvironment(exprmapLabel)
+	exprmapTable.AddExprmapToEnvironment(exprmapLabel)
 	blockStack.PopFromStackAndExtendCapturedLines(*capturedLines)
 	return nil
 }
@@ -37,11 +37,11 @@ func evalDefExpr(directiveName string, operandList *[]Node) error {
 		return errors.New("Expression value must be a number and be 8 bit!")
 	}
 
-	_, err := environment.CheckIfAlreadyExistsInExprmap(exprValueNode.NodeValue)
+	_, err := exprmapTable.CheckIfAlreadyExistsInExprmap(exprValueNode.NodeValue)
 	if err != nil {
 		return err
 	}
 
-	environment.AddExprToExprmap(exprNode.NodeValue, exprValueNode.AsNumber)
+	exprmapTable.AddExprToExprmap(exprNode.NodeValue, exprValueNode.AsNumber)
 	return nil
 }

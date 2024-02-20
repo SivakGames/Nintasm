@@ -5,7 +5,7 @@ import (
 	"fmt"
 	enumTokenTypes "misc/nintasm/constants/enums/tokenTypes"
 	"misc/nintasm/handlers/blockStack"
-	"misc/nintasm/interpreter/environment"
+	"misc/nintasm/interpreter/environment/macroTable"
 	"regexp"
 )
 
@@ -37,7 +37,7 @@ func (mop *MacroOperandParser) Process(macroName string) error {
 
 	mop.replacementsList = mop.replacementsList[:0]
 
-	mop.capturedLinesToUnpack, err = environment.LookupAndGetMacroInEnvironment(macroName)
+	mop.capturedLinesToUnpack, err = macroTable.LookupAndGetMacroInEnvironment(macroName)
 	if err != nil {
 		return err
 	}
