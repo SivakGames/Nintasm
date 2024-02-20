@@ -39,3 +39,9 @@ var macroSymbolTable = map[string]MacroTableType{
 type CharmapTableType = map[rune][]Node
 
 var charmapSymbolTable = map[string]CharmapTableType{}
+
+// ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+type ExprmapTableType = map[string]int
+
+var exprmapSymbolTable = map[string]ExprmapTableType{}

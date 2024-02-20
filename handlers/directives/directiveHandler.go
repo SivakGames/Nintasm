@@ -42,8 +42,7 @@ func Process(operationTokenEnum enumTokenTypes.Def, directiveName string, operat
 	case enumTokenTypes.DIRECTIVE_defCharMap:
 		return evalDefChar(directiveName, operandList)
 	case enumTokenTypes.DIRECTIVE_defExprMap:
-		fmt.Println("Def expr map")
-		return nil
+		return evalDefExpr(directiveName, operandList)
 	case enumTokenTypes.DIRECTIVE_blockStart:
 		switch directiveName {
 		case "IF":

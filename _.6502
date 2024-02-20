@@ -15,19 +15,16 @@ ttct .macro
 	lda \3
 ttct .endm
 
-ett .charmap
-	.defchar "A", $14
-	.defchar "い", $15
-	.defchar "う", $16
-	.defchar "え", $17,$ff
-	.defchar "お", $18
-	.defcharRange "A","Z", $11
-ett .endcharmap
+ett .exprmap
+	.defexpr "a", $14
+ett .endexprmap
 
 
 	.romSegment "32kb","32kb","PRG"
 	.bank 0
 	.org $8000
+
+	.db `a`
 
 
 	.romSegment "8kb","8kb","CHR"

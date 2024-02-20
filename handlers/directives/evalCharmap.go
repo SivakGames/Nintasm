@@ -16,7 +16,6 @@ func evalCharmap(directiveName string, macroLabel string, operandList *[]Node) e
 func evalEndCharmap(directiveName string) error {
 
 	charmapLabel := blockStack.GetCurrentOperationLabel()
-	_ = charmapLabel
 	blockStack.ClearCurrentOperationLabel()
 	blockStack.ClearCaptureParentOpOnlyFlag()
 

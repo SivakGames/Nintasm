@@ -32,6 +32,19 @@ func EvaluateNode(node Node) (Node, error) {
 		enumNodeTypes.StringLiteral:
 		return node, nil
 
+	case enumNodeTypes.BacktickStringLiteral:
+		_, err := environment.GetCurrentExprmap()
+		if err != nil {
+			return node, err
+		}
+		exprValue, exists := environment.CheckIfDefinedInExprmap(node.NodeValue)
+		if !exists {
+			return node, errors.New("Bad expr char")
+		}
+		node.AsNumber = exprValue
+		operandFactory.ConvertNodeToNumericLiteral(&node)
+		return node, nil
+
 	case enumNodeTypes.Identifier,
 		enumNodeTypes.MemberExpression:
 		return environment.LookupInEnvironment(node.NodeValue)
