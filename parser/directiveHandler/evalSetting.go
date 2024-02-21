@@ -5,6 +5,7 @@ import (
 	"misc/nintasm/interpreter/environment/charmapTable"
 	"misc/nintasm/interpreter/environment/exprmapTable"
 	"misc/nintasm/interpreter/operandFactory"
+	"misc/nintasm/romBuilder/romBuildingSettings"
 )
 
 // ---------------------------------
@@ -31,6 +32,36 @@ func evalSettingChange(directiveName string, operandList *[]Node) error {
 		if err != nil {
 			return err
 		}
+
+	case "RSSET":
+		EmptyFillSettingNode := (*operandList)[0]
+		if !operandFactory.ValidateNodeIsNumeric(&EmptyFillSettingNode) ||
+			!operandFactory.ValidateNumericNodeIsPositive(&EmptyFillSettingNode) ||
+			!operandFactory.ValidateNumericNodeIs16BitValue(&EmptyFillSettingNode) {
+			return errors.New("Bad rsset value. Must be a 16-bit positive number")
+		}
+
+	case "AUTOZP":
+		autoZPSettingNode := (*operandList)[0]
+		if !operandFactory.ValidateNodeIsNumeric(&autoZPSettingNode) ||
+			!operandFactory.ValidateNumericNodeIsGTEandLTEValues(&autoZPSettingNode, 0, 1) {
+			return errors.New("Bad auto ZP value. Must be 0 or 1!")
+		}
+		autoZPOn := autoZPSettingNode.AsNumber == 1
+		romBuildingSettings.SetAutoZeroPage(autoZPOn)
+		return nil
+
+	case "EMPTYROMFILL":
+		EmptyFillSettingNode := (*operandList)[0]
+		if !operandFactory.ValidateNodeIsNumeric(&EmptyFillSettingNode) ||
+			!operandFactory.ValidateNumericNodeIsPositive(&EmptyFillSettingNode) ||
+			!operandFactory.ValidateNumericNodeIs8BitValue(&EmptyFillSettingNode) {
+			return errors.New("Bad empty fill value. Must be an 8-bit positive number")
+		}
+		emptyFillValue := uint8(EmptyFillSettingNode.AsNumber)
+		romBuildingSettings.SetEmptyRomFillValue(emptyFillValue)
+		return nil
+
 	default:
 		panic("Unknown reset setting!")
 	}
