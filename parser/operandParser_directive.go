@@ -33,6 +33,7 @@ var directiveAliases = map[string]string{
 var directiveManuallyEvaluatesOperands = map[string]bool{
 	"REPEAT":     true,
 	"SETCHARMAP": true,
+	"SETEXPRMAP": true,
 }
 
 // Main directive parser

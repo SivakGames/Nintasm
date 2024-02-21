@@ -84,7 +84,7 @@ func MapStringToCharmap(stringToConvert string) (string, error) {
 // ----------------------------------
 
 func checkIfDefinedInCharmap(lookupChar rune) ([]Node, bool) {
-	target, exists := charmapSymbolTable[lastAddedCharmapName][lookupChar]
+	target, exists := charmapSymbolTable[currentCharmapName][lookupChar]
 	return target, exists
 }
 

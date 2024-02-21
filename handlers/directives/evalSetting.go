@@ -3,6 +3,7 @@ package handlerDirective
 import (
 	"errors"
 	"misc/nintasm/interpreter/environment/charmapTable"
+	"misc/nintasm/interpreter/environment/exprmapTable"
 	"misc/nintasm/interpreter/operandFactory"
 )
 
@@ -11,13 +12,22 @@ import (
 func evalSettingChange(directiveName string, operandList *[]Node) error {
 	switch directiveName {
 	case "SETCHARMAP":
-		changeToCharmapName := (*operandList)[0]
-		if !operandFactory.ValidateNodeIsIdentifier(&changeToCharmapName) {
+		changeToCharmapNode := (*operandList)[0]
+		if !operandFactory.ValidateNodeIsIdentifier(&changeToCharmapNode) {
 			return errors.New("Must use an identifier!")
 		}
-
-		newCharmapName := changeToCharmapName.NodeValue
+		newCharmapName := changeToCharmapNode.NodeValue
 		err := charmapTable.SetCharmapTo__(newCharmapName)
+		if err != nil {
+			return err
+		}
+	case "SETEXPRMAP":
+		changeToExprmapNode := (*operandList)[0]
+		if !operandFactory.ValidateNodeIsIdentifier(&changeToExprmapNode) {
+			return errors.New("Must use an identifier!")
+		}
+		newExprmapName := changeToExprmapNode.NodeValue
+		err := exprmapTable.SetExprmapTo__(newExprmapName)
 		if err != nil {
 			return err
 		}
@@ -33,6 +43,11 @@ func evalSettingReset(directiveName string) error {
 	switch directiveName {
 	case "RESETCHARMAP":
 		err := charmapTable.SetCharmapToDefault()
+		if err != nil {
+			return err
+		}
+	case "RESETEXPRMAP":
+		err := exprmapTable.SetExprmapToDefault()
 		if err != nil {
 			return err
 		}

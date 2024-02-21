@@ -44,6 +44,7 @@ func EvaluateNode(node Node) (Node, error) {
 		if !exists {
 			return node, errors.New("Bad expr char")
 		}
+
 		node.AsNumber = exprValue
 		operandFactory.ConvertNodeToNumericLiteral(&node)
 		return node, nil
