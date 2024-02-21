@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 	enumTokenTypes "misc/nintasm/constants/enums/tokenTypes"
-	handlerDirective "misc/nintasm/parser/directiveHandler"
+	"misc/nintasm/parser/directiveHandler"
 
 	"strings"
 )
@@ -60,7 +60,7 @@ func (p *DirectiveOperandParser) Process(operationTokenEnum tokenEnum, operation
 		return err // ❌ Fails
 	}
 
-	err = handlerDirective.Process(operationTokenEnum, directiveName, operationLabel, &operandList)
+	err = directiveHandler.Process(operationTokenEnum, directiveName, operationLabel, &operandList)
 	return err
 
 }

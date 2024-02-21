@@ -1,4 +1,4 @@
-package handlerDirective
+package directiveHandler
 
 import (
 	"fmt"
