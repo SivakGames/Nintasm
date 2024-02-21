@@ -3,7 +3,7 @@ package handlerDirective
 import (
 	"errors"
 	"fmt"
-	"misc/nintasm/handlers/blockStack"
+	"misc/nintasm/assemble/blockStack"
 	"misc/nintasm/interpreter/environment/charmapTable"
 	"misc/nintasm/interpreter/operandFactory"
 )

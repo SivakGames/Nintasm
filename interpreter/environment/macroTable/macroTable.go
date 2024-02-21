@@ -3,9 +3,9 @@ package macroTable
 import (
 	"errors"
 	"fmt"
+	"misc/nintasm/assemble/blockStack"
 	enumParserTypes "misc/nintasm/constants/enums/parserTypes"
 	enumTokenTypes "misc/nintasm/constants/enums/tokenTypes"
-	"misc/nintasm/handlers/blockStack"
 )
 
 // ++++++++++++++++++++++++++++++++++++++++++++++++++++++

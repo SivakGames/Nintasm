@@ -1,8 +1,8 @@
 package assemble
 
 import (
+	"misc/nintasm/assemble/blockStack"
 	enumParserTypes "misc/nintasm/constants/enums/parserTypes"
-	"misc/nintasm/handlers/blockStack"
 	"misc/nintasm/parser"
 	"misc/nintasm/util"
 )

@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 	enumTokenTypes "misc/nintasm/constants/enums/tokenTypes"
-	handlerDirective "misc/nintasm/handlers/directives"
+	handlerDirective "misc/nintasm/parser/directiveHandler"
 
 	"strings"
 )

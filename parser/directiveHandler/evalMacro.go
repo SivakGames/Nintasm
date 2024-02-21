@@ -2,7 +2,7 @@ package handlerDirective
 
 import (
 	"fmt"
-	"misc/nintasm/handlers/blockStack"
+	"misc/nintasm/assemble/blockStack"
 	"misc/nintasm/interpreter/environment/macroTable"
 )
 

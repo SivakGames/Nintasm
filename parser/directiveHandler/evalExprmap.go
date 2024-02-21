@@ -2,7 +2,7 @@ package handlerDirective
 
 import (
 	"errors"
-	"misc/nintasm/handlers/blockStack"
+	"misc/nintasm/assemble/blockStack"
 	"misc/nintasm/interpreter/environment/exprmapTable"
 	"misc/nintasm/interpreter/operandFactory"
 )
