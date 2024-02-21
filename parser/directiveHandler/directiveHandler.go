@@ -78,12 +78,14 @@ func Process(operationTokenEnum enumTokenTypes.Def, directiveName string, operat
 		}
 
 		switch directiveName {
-		case "MACRO":
-			return evalMacro(directiveName, operationLabel, operandList)
 		case "CHARMAP":
 			return evalCharmap(directiveName, operationLabel, operandList)
 		case "EXPRMAP":
 			return evalExprmap(directiveName, operationLabel, operandList)
+		case "MACRO":
+			return evalMacro(directiveName, operationLabel, operandList)
+		case "NAMESPACE":
+			return evalNamespace(directiveName, operationLabel, operandList)
 
 		default:
 			return errors.New("BAD LABELED BLOCK START DIRECTIVE!!!" + directiveName)
@@ -91,12 +93,14 @@ func Process(operationTokenEnum enumTokenTypes.Def, directiveName string, operat
 
 	case enumTokenTypes.DIRECTIVE_labeledBlockEnd:
 		switch directiveName {
-		case "ENDM":
-			return evalEndMacro(directiveName)
 		case "ENDCHARMAP":
 			return evalEndCharmap(directiveName)
 		case "ENDEXPRMAP":
 			return evalEndExprmap(directiveName)
+		case "ENDM":
+			return evalEndMacro(directiveName)
+		case "ENDNAMESPACE":
+			return evalEndNamespace(directiveName)
 		default:
 			return errors.New("BAD LABELED BLOCK END DIRECTIVE!!!" + directiveName)
 		}

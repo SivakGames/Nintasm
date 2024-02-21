@@ -2,7 +2,7 @@ package parser
 
 import (
 	"errors"
-	"fmt"
+	"misc/nintasm/assemble/blockStack"
 	enumTokenTypes "misc/nintasm/constants/enums/tokenTypes"
 	"misc/nintasm/interpreter"
 	"misc/nintasm/interpreter/operandFactory"
@@ -28,8 +28,9 @@ func (p *LabelOperandParser) Process(operationType tokenEnum, operationValue str
 	switch operationType {
 	case enumTokenTypes.IDENTIFIER:
 		if isLocal {
-			if p.parentLabel == "" {
-				return errors.New("No parent label!")
+			useParentLabel := p.generateParentLabel()
+			if useParentLabel == "" {
+				return errors.New("No parent label! Cannot use local label yet!")
 			}
 		} else {
 			p.parentLabel = operationLabel
@@ -54,6 +55,15 @@ func (p *LabelOperandParser) Process(operationType tokenEnum, operationValue str
 		if err != nil {
 			return err // ❌ Fails
 		}
+
+		if isLocal {
+			useParentLabel := p.generateParentLabel()
+			if useParentLabel == "" {
+				return errors.New("No parent label! Cannot use local label for assignment!")
+			}
+			operationLabel = useParentLabel + operationLabel
+		}
+
 		if len(operandList) == 1 {
 			identifierNode := operandFactory.CreateIdentifierNode(operationType, operationLabel)
 			assignmentNode := operandFactory.CreateAssignmentNode(identifierNode, operandList[0])
@@ -66,18 +76,17 @@ func (p *LabelOperandParser) Process(operationType tokenEnum, operationValue str
 		}
 		return nil
 
-	case enumTokenTypes.DIRECTIVE_labeled:
-		//fmt.Println("label dir")
-		return nil
-	case enumTokenTypes.DIRECTIVE_labeledBlockStart:
-		fmt.Println("label dir st")
-		return nil
-	case enumTokenTypes.DIRECTIVE_labeledBlockEnd:
-		fmt.Println("label dir en")
-		return nil
 	default:
 		return errors.New("BAD LABEL OPERATION TYPE!!!")
 	}
+}
+
+func (p *LabelOperandParser) generateParentLabel() string {
+	useParentLabel := blockStack.GetTemporaryOverwritingParentLabel()
+	if useParentLabel == "" {
+		useParentLabel = p.parentLabel
+	}
+	return useParentLabel
 }
 
 func (p *LabelOperandParser) GetParentLabel() string {

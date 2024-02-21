@@ -171,7 +171,6 @@ func EvaluateNode(node Node) (Node, error) {
 		fmt.Println(node)
 
 	default:
-
 		fmt.Println(node)
 		return node, errors.New("UNKNOWN NODE BEING INTERPRETED!!!")
 	}

@@ -58,6 +58,9 @@ var StackWillClearFlag bool = false
 var stackCapturesParentOpOnlyFlag bool = false
 var currentBlockOperationLabel string = ""
 
+// Mainly used with namespace. Will temporarily act as the parent label for such operations
+var temporaryOverwritingParentLabel string = ""
+
 // -----------------------------
 
 func PushOntoStack(op string, operandList []Node) {
@@ -117,6 +120,13 @@ func ClearCaptureParentOpOnlyFlag() {
 
 // -----------------
 
+func ClearCurrentOperationLabel() {
+	currentBlockOperationLabel = ""
+}
+func GetCurrentOperationLabel() string {
+	return currentBlockOperationLabel
+}
+
 // Will set the label of the labeled operation that will be captured.
 // If one was previously set then error because it hasn't finished.
 func SetCurrentOperationLabel(label string) error {
@@ -127,13 +137,16 @@ func SetCurrentOperationLabel(label string) error {
 	currentBlockOperationLabel = label
 	return nil
 }
-func ClearCurrentOperationLabel() {
-	currentBlockOperationLabel = ""
-	return
-}
 
-func GetCurrentOperationLabel() string {
-	return currentBlockOperationLabel
+// --------------------------------
+func ClearTemporaryOverwritingParentLabel() {
+	temporaryOverwritingParentLabel = ""
+}
+func SetTemporaryOverwritingParentLabel(label string) {
+	temporaryOverwritingParentLabel = label
+}
+func GetTemporaryOverwritingParentLabel() string {
+	return temporaryOverwritingParentLabel
 }
 
 //--------------------------------
@@ -163,11 +176,12 @@ func CheckIfNewStartEndOperation(lineOperationParsedValues *util.LineOperationPa
 //+++++++++++++++++++++++++++++++
 
 var correspondingEndBlockOperations = map[string]string{
-	"REPEAT":  "ENDREPEAT",
-	"IF":      "ENDIF",
-	"MACRO":   "ENDM",
-	"CHARMAP": "ENDCHARMAP",
-	"EXPRMAP": "ENDEXPRMAP",
+	"CHARMAP":   "ENDCHARMAP",
+	"EXPRMAP":   "ENDEXPRMAP",
+	"IF":        "ENDIF",
+	"MACRO":     "ENDM",
+	"NAMESPACE": "ENDNAMESPACE",
+	"REPEAT":    "ENDREPEAT",
 }
 
 // --------------------------------
@@ -198,6 +212,9 @@ var allowedOperationsForParentOps = map[string]captureableOpMap{
 	},
 	"EXPRMAP": {
 		enumTokenTypes.DIRECTIVE_defExprMap: true,
+	},
+	"NAMESPACE": {
+		enumTokenTypes.ASSIGN_simple: true,
 	},
 	"MACRO": func() captureableOpMap {
 		m := make(captureableOpMap)

@@ -11,7 +11,6 @@ import (
 
 type DirectiveOperandParser struct {
 	OperandParser
-	parentLabel string
 }
 
 func NewDirectiveOperandParser() DirectiveOperandParser {
@@ -81,20 +80,21 @@ var directiveMinMaxOperands = map[enumTokenTypes.Def][2]int{
 
 var directiveNameMinMaxOperands = map[string][2]int{
 	"BANK":         {1, 1},
-	"INCBIN":       {1, 3},
-	"INCLUDE":      {1, 1},
-	"ORG":          {1, 1},
-	"ROMSEGMENT":   {1, 3},
-	"REPEAT":       {1, 2},
-	"IF":           {1, 1},
-	"ELSEIF":       {1, 1},
-	"ELSE":         {0, 0},
-	"MACRO":        {0, 0},
 	"CHARMAP":      {0, 0},
 	"DEFCHAR":      {2, 3},
 	"DEFCHARRANGE": {3, 3},
-	"EXPRMAP":      {0, 0},
 	"DEFEXPR":      {2, 2},
+	"ELSE":         {0, 0},
+	"ELSEIF":       {1, 1},
+	"EXPRMAP":      {0, 0},
+	"IF":           {1, 1},
+	"INCBIN":       {1, 3},
+	"INCLUDE":      {1, 1},
+	"MACRO":        {0, 0},
+	"NAMESPACE":    {0, 0},
+	"ORG":          {1, 1},
+	"REPEAT":       {1, 2},
+	"ROMSEGMENT":   {1, 3},
 }
 
 func getMinMaxOperandsForDirective(directiveEnum tokenEnum, directiveName string) (int, int, error) {

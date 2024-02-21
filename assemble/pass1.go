@@ -54,9 +54,11 @@ func Start(lines []string) error {
 				if blockStackErr != nil {
 					return blockStackErr
 				}
+
+				//If ending, iterate bottom of stack and parse all captured operations (if any)
 				if blockStack.CheckIfEndOperationAndClearStack(&lineOperationParsedValues) {
 					for _, b := range blockStack.Stack[0].CapturedLines {
-						temp := util.NewLineOperationParsedValues(b.OperandStartPosition,
+						processOperandArguments := util.NewLineOperationParsedValues(b.OperandStartPosition,
 							b.OperationLabel,
 							b.OperationTokenEnum,
 							b.OperationTokenValue,
@@ -64,12 +66,13 @@ func Start(lines []string) error {
 						)
 						blockStackErr = parseOperandStringAndProcess(
 							b.OriginalLine,
-							&temp,
+							&processOperandArguments,
 						)
 						if blockStackErr != nil {
 							return blockStackErr
 						}
 					}
+					blockStack.ClearTemporaryOverwritingParentLabel()
 					blockStack.ClearStack()
 				}
 			} else {

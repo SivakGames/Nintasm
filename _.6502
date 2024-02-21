@@ -19,6 +19,11 @@ ett .exprmap
 	.defexpr "a", $14
 ett .endexprmap
 
+ns .namespace
+.aaa = 1
+.bbb = .aaa + 2
+ns .endnamespace
+
 
 	.romSegment "32kb","32kb","PRG"
 	.bank 0
