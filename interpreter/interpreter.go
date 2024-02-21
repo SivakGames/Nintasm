@@ -203,21 +203,9 @@ func ProcessAssemblerFunction(node *Node) (bool, error) {
 			node.AsNumber = ((*node.ArgumentList)[0].AsNumber & 0x000ff)
 		case "toCharmap":
 			nodeString := ((*node.ArgumentList)[0].NodeValue)
-			runeArray := []rune(nodeString)
-			currCharmap, err := charmapTable.GetCurrentCharmap()
+			replacedString, err := charmapTable.MapStringToCharmap(nodeString)
 			if err != nil {
 				return isAsmFunc, err
-			}
-
-			replacedString := ""
-			for _, r := range runeArray {
-				d, exists := currCharmap[r]
-				if !exists {
-					return isAsmFunc, errors.New("Char doesn't exit")
-				}
-				for _, v := range d {
-					replacedString += string(rune(v.AsNumber))
-				}
 			}
 			node.NodeValue = replacedString
 		case "bank":

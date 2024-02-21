@@ -195,9 +195,15 @@ func ValidateNodeIsBoolean(node *Node) bool {
 func ValidateNodeIsString(node *Node) bool {
 	return node.NodeType == enumNodeTypes.StringLiteral
 }
+func ValidateNodeIsIdentifier(node *Node) bool {
+	return node.NodeType == enumNodeTypes.Identifier
+}
 func ValidateNodeIsSubstitutionID(node *Node) bool {
 	return node.NodeType == enumNodeTypes.SubstitutionID
 }
+
+//-----------------------------------1234567890
+
 func ValidateNodeIsNumeric(node *Node) bool {
 	return node.NodeType == enumNodeTypes.NumericLiteral
 }

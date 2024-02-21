@@ -37,7 +37,7 @@ func evalDefChar(directiveName string, operandList *[]Node) error {
 			return err
 		}
 
-		_, err = charmapTable.CheckIfAlreadyExistsInCharmap(targetRune)
+		_, err = charmapTable.CheckIfCharAlreadyExistsInCharmap(targetRune)
 		if err != nil {
 			return err
 		}

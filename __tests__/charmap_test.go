@@ -33,7 +33,17 @@ func TestCharmaps(t *testing.T) {
 		moduleLines = append(moduleLines, " .defchar \"🧊\", $21")
 		moduleLines = append(moduleLines, " .defchar \"➡\", $22,$23")
 		moduleLines = append(moduleLines, "testCharmap .endcharmap")
+		moduleLines = append(moduleLines, "testCharmap2 .charmap")
+		moduleLines = append(moduleLines, " .defchar \"D\", $10")
+		moduleLines = append(moduleLines, " .defchar \"E\", $11")
+		moduleLines = append(moduleLines, " .defchar \"F\", $12")
+		moduleLines = append(moduleLines, " .defchar \"G\", $13")
+		moduleLines = append(moduleLines, "testCharmap2 .endcharmap")
 		moduleLines = append(moduleLines, " .db toCharmap(\"ABCÄÔ┏┓┗┛あいガギ邪鬼王💚🧊➡\")")
+		moduleLines = append(moduleLines, " .setCharmap testCharmap2")
+		moduleLines = append(moduleLines, " .db toCharmap(\"GFED\")")
+		moduleLines = append(moduleLines, " .resetCharmap")
+		moduleLines = append(moduleLines, " .db toCharmap(\"💚💚💚💚\")")
 
 		wanted := []uint8{
 			uint8(0x10), uint8(0x11), uint8(0x12), uint8(0x13),
@@ -41,6 +51,8 @@ func TestCharmaps(t *testing.T) {
 			uint8(0x18), uint8(0x19), uint8(0x1a), uint8(0x1b),
 			uint8(0x1c), uint8(0x1d), uint8(0x1e), uint8(0x1f),
 			uint8(0x20), uint8(0x21), uint8(0x22), uint8(0x23),
+			uint8(0x13), uint8(0x12), uint8(0x11), uint8(0x10),
+			uint8(0x20), uint8(0x20), uint8(0x20), uint8(0x20),
 		}
 
 		err := assemble.Start(moduleLines)
