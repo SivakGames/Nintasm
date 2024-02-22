@@ -44,6 +44,7 @@ func TestLabelOperandParser(t *testing.T) {
 		testLines = append(testLines, "testNS .namespace")
 		testLines = append(testLines, ".var1 = 3")
 		testLines = append(testLines, ".var2 = 44+2")
+		testLines = append(testLines, ".var3 = .var2 - 2")
 		testLines = append(testLines, "testNS .endNamespace")
 		wanted = append(wanted, 3)
 		wanted = append(wanted, 46)

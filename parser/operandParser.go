@@ -543,9 +543,21 @@ func (p *OperandParser) primaryExpression() (Node, error) {
 	case enumTokenTypes.DELIMITER_leftParenthesis:
 		return p.parenthesizedExpression()
 
+	//Dots will prepend the parent label
 	case enumTokenTypes.DELIMITER_period:
-		// ⚠️ TODO: Add period checker for local labels
-		return operandFactory.ErrorNode(p.lookaheadValue), errors.New("Period doesn't exist yet") // ❌ Fails
+		parentLabel, err := interpreter.GetParentLabel()
+		if err != nil {
+			return operandFactory.ErrorNode(p.lookaheadValue), err // ❌ Fails
+		}
+		err = p.eatFreelyAndAdvance(enumTokenTypes.DELIMITER_period)
+		if err != nil {
+			return operandFactory.ErrorNode(p.lookaheadValue), err // ❌ Fails
+		}
+		if p.lookaheadType == enumTokenTypes.IDENTIFIER {
+			p.lookaheadValue = parentLabel + "." + p.lookaheadValue
+			return p.identifier()
+		}
+		return operandFactory.ErrorNode(p.lookaheadValue), errors.New("Identifier must follow period!") // ❌ Fails
 
 	case enumTokenTypes.IDENTIFIER:
 		return p.identifier()
