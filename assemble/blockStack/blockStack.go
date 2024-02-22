@@ -98,6 +98,12 @@ func GetTopOfStackLastAlternateOperation() *StackBlock {
 	return currentStackOp
 }
 
+func GetTopOfStackCapturedLines() *[]CapturedLine {
+	currentStackOp := GetTopOfStackOperation()
+	capturedLines := &currentStackOp.CapturedLines
+	return capturedLines
+}
+
 // -----------------
 
 func SetBottomOfStackToEmptyBlock() {
@@ -139,14 +145,12 @@ func SetCurrentOperationLabel(label string) error {
 }
 
 // --------------------------------
-func ClearTemporaryOverwritingParentLabel() {
-	temporaryOverwritingParentLabel = ""
-}
-func SetTemporaryOverwritingParentLabel(label string) {
-	temporaryOverwritingParentLabel = label
-}
-func GetTemporaryOverwritingParentLabel() string {
-	return temporaryOverwritingParentLabel
+
+func GetLabelAndDoEndBlockSetups() string {
+	blockLabel := GetCurrentOperationLabel()
+	ClearCurrentOperationLabel()
+	ClearCaptureParentOpOnlyFlag()
+	return blockLabel
 }
 
 //--------------------------------
@@ -179,6 +183,7 @@ var correspondingEndBlockOperations = map[string]string{
 	"CHARMAP":   "ENDCHARMAP",
 	"EXPRMAP":   "ENDEXPRMAP",
 	"IF":        "ENDIF",
+	"KVMACRO":   "ENDKVM",
 	"MACRO":     "ENDM",
 	"NAMESPACE": "ENDNAMESPACE",
 	"REPEAT":    "ENDREPEAT",
@@ -202,6 +207,15 @@ var sharedCapturableOps = captureableOpMap{
 	enumTokenTypes.DIRECTIVE_mixedData:  true,
 }
 
+var sharedCapturableMacroOps = captureableOpMap{
+	enumTokenTypes.INSTRUCTION:          true,
+	enumTokenTypes.DIRECTIVE_dataBytes:  true,
+	enumTokenTypes.DIRECTIVE_dataSeries: true,
+	enumTokenTypes.DIRECTIVE_mixedData:  true,
+	enumTokenTypes.DIRECTIVE_blockStart: true,
+	enumTokenTypes.DIRECTIVE_blockEnd:   true,
+}
+
 var allowedOperationsForParentOps = map[string]captureableOpMap{
 	"REPEAT": sharedCapturableOps,
 	"IF":     sharedCapturableOps,
@@ -216,16 +230,8 @@ var allowedOperationsForParentOps = map[string]captureableOpMap{
 	"NAMESPACE": {
 		enumTokenTypes.ASSIGN_simple: true,
 	},
-	"MACRO": func() captureableOpMap {
-		m := make(captureableOpMap)
-		// Copy shared operations
-		for k, v := range sharedCapturableOps {
-			m[k] = v
-		}
-		m[enumTokenTypes.DIRECTIVE_blockStart] = true
-		m[enumTokenTypes.DIRECTIVE_blockEnd] = true
-		return m
-	}(),
+	"MACRO":   sharedCapturableMacroOps,
+	"KVMACRO": sharedCapturableMacroOps,
 }
 
 //-----------------------------------------------------

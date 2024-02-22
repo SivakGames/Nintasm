@@ -15,12 +15,8 @@ func evalNamespace(directiveName string, NamespaceLabel string, operandList *[]N
 
 // End the Namespace definition and add to environment
 func evalEndNamespace(directiveName string) error {
-	namespaceLabel := blockStack.GetCurrentOperationLabel()
-	blockStack.ClearCurrentOperationLabel()
-	blockStack.ClearCaptureParentOpOnlyFlag()
-
-	currentStackOp := blockStack.GetTopOfStackOperation()
-	capturedLines := &currentStackOp.CapturedLines
+	namespaceLabel := blockStack.GetLabelAndDoEndBlockSetups()
+	capturedLines := blockStack.GetTopOfStackCapturedLines()
 	namespaceTable.AddNamespaceToEnvironment(namespaceLabel)
 
 	interpreter.PopParentLabelWhenBlockOpDone = true

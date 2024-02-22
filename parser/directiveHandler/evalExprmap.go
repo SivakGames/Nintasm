@@ -13,15 +13,10 @@ func evalExprmap(directiveName string, macroLabel string, operandList *[]Node) e
 }
 
 func evalEndExprmap(directiveName string) error {
-
-	exprmapLabel := blockStack.GetCurrentOperationLabel()
-	blockStack.ClearCurrentOperationLabel()
-	blockStack.ClearCaptureParentOpOnlyFlag()
-
-	currentStackOp := blockStack.GetTopOfStackOperation()
-	capturedLines := &currentStackOp.CapturedLines
-
+	exprmapLabel := blockStack.GetLabelAndDoEndBlockSetups()
+	capturedLines := blockStack.GetTopOfStackCapturedLines()
 	exprmapTable.AddExprmapToEnvironment(exprmapLabel)
+
 	blockStack.PopFromStackAndExtendCapturedLines(*capturedLines)
 	return nil
 }

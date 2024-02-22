@@ -31,13 +31,13 @@ func NewMacroOperandParser() MacroOperandParser {
 	return MacroOperandParser{}
 }
 
-// Main directive parser
+// Main macro invoke parser
 func (mop *MacroOperandParser) Process(macroName string) error {
 	var err error
 
 	mop.replacementsList = mop.replacementsList[:0]
 
-	mop.capturedLinesToUnpack, err = macroTable.LookupAndGetMacroInEnvironment(macroName)
+	mop.capturedLinesToUnpack, err = macroTable.LookupAndGetMacroInEnvironment(macroName, macroTable.Macro)
 	if err != nil {
 		return err
 	}

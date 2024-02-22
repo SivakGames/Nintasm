@@ -14,15 +14,10 @@ func evalCharmap(directiveName string, macroLabel string, operandList *[]Node) e
 }
 
 func evalEndCharmap(directiveName string) error {
-
-	charmapLabel := blockStack.GetCurrentOperationLabel()
-	blockStack.ClearCurrentOperationLabel()
-	blockStack.ClearCaptureParentOpOnlyFlag()
-
-	currentStackOp := blockStack.GetTopOfStackOperation()
-	capturedLines := &currentStackOp.CapturedLines
-
+	charmapLabel := blockStack.GetLabelAndDoEndBlockSetups()
+	capturedLines := blockStack.GetTopOfStackCapturedLines()
 	charmapTable.AddCharmapToEnvironment(charmapLabel)
+
 	blockStack.PopFromStackAndExtendCapturedLines(*capturedLines)
 	return nil
 }

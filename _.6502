@@ -3,33 +3,18 @@
 	.inesChr "8kb"
 	.inesMir 0
 
-ttt .macro
-	.db \1
-	lda \2
-	ldy \3
-ttt .endm
+ttct .kvmacro
+	ldy \abc
+	.db \def
+	lda \ghi
+ttct .endkvm
 
-ttct .macro
-	ldy \1
-	.db \2
-	lda \3
-ttct .endm
-
-ett .exprmap
-	.defexpr "a", $14
-ett .endexprmap
-
-ns .namespace
-.aaa = 1
-.bbb = .aaa + 2
-ns .endnamespace
 
 
 	.romSegment "32kb","32kb","PRG"
 	.bank 0
 	.org $8000
 
-	.db `a`
 
 
 	.romSegment "8kb","8kb","CHR"

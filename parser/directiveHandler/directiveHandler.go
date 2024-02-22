@@ -82,6 +82,8 @@ func Process(operationTokenEnum enumTokenTypes.Def, directiveName string, operat
 			return evalCharmap(directiveName, operationLabel, operandList)
 		case "EXPRMAP":
 			return evalExprmap(directiveName, operationLabel, operandList)
+		case "KVMACRO":
+			return evalKVMacro(directiveName, operationLabel, operandList)
 		case "MACRO":
 			return evalMacro(directiveName, operationLabel, operandList)
 		case "NAMESPACE":
@@ -97,6 +99,8 @@ func Process(operationTokenEnum enumTokenTypes.Def, directiveName string, operat
 			return evalEndCharmap(directiveName)
 		case "ENDEXPRMAP":
 			return evalEndExprmap(directiveName)
+		case "ENDKVM":
+			return evalEndKVMacro(directiveName)
 		case "ENDM":
 			return evalEndMacro(directiveName)
 		case "ENDNAMESPACE":

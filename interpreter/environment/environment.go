@@ -31,7 +31,7 @@ func CheckIfSymbolAlreadyDefined(symbolName string) error {
 		errMsg := fmt.Sprintf(errMsgBase, symbolName, "literal")
 		return errors.New(errMsg)
 	}
-	_, exists = macroTable.LookupMacroInEnvironment(symbolName)
+	_, exists = macroTable.LookupMacroInEnvironment(symbolName, macroTable.Macro)
 	if exists {
 		errMsg := fmt.Sprintf(errMsgBase, symbolName, "macro")
 		return errors.New(errMsg)
