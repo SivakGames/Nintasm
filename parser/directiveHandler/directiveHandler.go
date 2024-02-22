@@ -45,6 +45,9 @@ func Process(operationTokenEnum enumTokenTypes.Def, directiveName string, operat
 		return evalDefExpr(directiveName, operandList)
 	case enumTokenTypes.DIRECTIVE_setting:
 		return evalSettingChange(directiveName, operandList)
+	case enumTokenTypes.DIRECTIVE_invokeKeyVal:
+		fmt.Println("KV")
+		return nil
 	case enumTokenTypes.DIRECTIVE_settingReset:
 		return evalSettingReset(directiveName)
 	case enumTokenTypes.DIRECTIVE_blockStart:
@@ -55,6 +58,9 @@ func Process(operationTokenEnum enumTokenTypes.Def, directiveName string, operat
 			return evalElseIf(directiveName, operandList)
 		case "ELSE":
 			return evalElse(directiveName, operandList)
+		case "IKV":
+			fmt.Println("IKV")
+			return nil
 		case "REPEAT":
 			return evalRepeat(directiveName, operandList)
 		default:
@@ -64,6 +70,9 @@ func Process(operationTokenEnum enumTokenTypes.Def, directiveName string, operat
 		switch directiveName {
 		case "ENDIF":
 			return evalEndIf(directiveName, operandList)
+		case "ENDIKV":
+			fmt.Println("ENDIKV")
+			return nil
 		case "ENDREPEAT":
 			return evalEndRepeat(directiveName, operandList)
 		default:

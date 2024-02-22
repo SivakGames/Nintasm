@@ -15,6 +15,12 @@ ttct .endkvm
 	.bank 0
 	.org $8000
 
+	.ikv ttct
+	.kv \abc, 2
+	.kv \def, 4
+	.kv \ghi, 6
+	.endikv
+
 
 
 	.romSegment "8kb","8kb","CHR"

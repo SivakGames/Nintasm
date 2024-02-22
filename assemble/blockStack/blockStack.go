@@ -183,6 +183,7 @@ var correspondingEndBlockOperations = map[string]string{
 	"CHARMAP":   "ENDCHARMAP",
 	"EXPRMAP":   "ENDEXPRMAP",
 	"IF":        "ENDIF",
+	"IKV":       "ENDIKV",
 	"KVMACRO":   "ENDKVM",
 	"MACRO":     "ENDM",
 	"NAMESPACE": "ENDNAMESPACE",
@@ -217,21 +218,24 @@ var sharedCapturableMacroOps = captureableOpMap{
 }
 
 var allowedOperationsForParentOps = map[string]captureableOpMap{
-	"REPEAT": sharedCapturableOps,
-	"IF":     sharedCapturableOps,
-	"ELSEIF": sharedCapturableOps,
-	"ELSE":   sharedCapturableOps,
 	"CHARMAP": {
 		enumTokenTypes.DIRECTIVE_defCharMap: true,
 	},
 	"EXPRMAP": {
 		enumTokenTypes.DIRECTIVE_defExprMap: true,
 	},
+	"IF":     sharedCapturableOps,
+	"ELSEIF": sharedCapturableOps,
+	"ELSE":   sharedCapturableOps,
+	"IKV": {
+		enumTokenTypes.DIRECTIVE_invokeKeyVal: true,
+	},
+	"KVMACRO": sharedCapturableMacroOps,
+	"MACRO":   sharedCapturableMacroOps,
 	"NAMESPACE": {
 		enumTokenTypes.ASSIGN_simple: true,
 	},
-	"MACRO":   sharedCapturableMacroOps,
-	"KVMACRO": sharedCapturableMacroOps,
+	"REPEAT": sharedCapturableOps,
 }
 
 //-----------------------------------------------------

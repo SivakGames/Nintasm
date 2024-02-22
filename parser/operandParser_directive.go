@@ -27,10 +27,13 @@ var directiveAliases = map[string]string{
 	"REVERSEBYTE":  "RDB",
 	"PAD":          "DS",
 	"AUTOZEROPAGE": "AUTOZP",
+	"KEYVALUE":     "KV",
 }
 
 var directiveManuallyEvaluatesOperands = map[string]bool{
 	"REPEAT":     true,
+	"KV":         true,
+	"IKV":        true,
 	"SETCHARMAP": true,
 	"SETEXPRMAP": true,
 }
@@ -73,6 +76,7 @@ var directiveMinMaxOperands = map[enumTokenTypes.Def][2]int{
 	enumTokenTypes.DIRECTIVE_blockEnd:        {0, 0},
 	enumTokenTypes.DIRECTIVE_labeledBlockEnd: {0, 0},
 	enumTokenTypes.DIRECTIVE_INES:            {1, 1},
+	enumTokenTypes.DIRECTIVE_invokeKeyVal:    {2, 2},
 	enumTokenTypes.DIRECTIVE_setting:         {1, 1},
 	enumTokenTypes.DIRECTIVE_settingReset:    {0, 0},
 	enumTokenTypes.DIRECTIVE_throw:           {1, 1},
@@ -88,6 +92,7 @@ var directiveNameMinMaxOperands = map[string][2]int{
 	"ELSEIF":       {1, 1},
 	"EXPRMAP":      {0, 0},
 	"IF":           {1, 1},
+	"IKV":          {1, 1},
 	"INCBIN":       {1, 3},
 	"INCLUDE":      {1, 1},
 	"KVMACRO":      {0, 0},
