@@ -2,7 +2,6 @@ package parser
 
 import (
 	"errors"
-	"misc/nintasm/assemble/blockStack"
 	enumTokenTypes "misc/nintasm/constants/enums/tokenTypes"
 	"misc/nintasm/interpreter"
 	"misc/nintasm/interpreter/operandFactory"
@@ -13,27 +12,25 @@ import (
 
 type LabelOperandParser struct {
 	OperandParser
-	parentLabel string
 }
 
 func NewLabelOperandParser() LabelOperandParser {
-	return LabelOperandParser{
-		parentLabel: "",
-	}
+	return LabelOperandParser{}
 }
 
 func (p *LabelOperandParser) Process(operationType tokenEnum, operationValue string, operationLabel string) error {
 	isLocal := strings.HasPrefix(operationLabel, ".")
+	if isLocal {
+		_, err := interpreter.GetParentLabel()
+		if err != nil {
+			return err
+		}
+	}
 
 	switch operationType {
 	case enumTokenTypes.IDENTIFIER:
-		if isLocal {
-			useParentLabel := p.generateParentLabel()
-			if useParentLabel == "" {
-				return errors.New("No parent label! Cannot use local label yet!")
-			}
-		} else {
-			p.parentLabel = operationLabel
+		if !isLocal {
+			interpreter.OverwriteParentLabel(operationLabel)
 		}
 
 		org := romBuilder.GetOrg()
@@ -56,14 +53,6 @@ func (p *LabelOperandParser) Process(operationType tokenEnum, operationValue str
 			return err // ❌ Fails
 		}
 
-		if isLocal {
-			useParentLabel := p.generateParentLabel()
-			if useParentLabel == "" {
-				return errors.New("No parent label! Cannot use local label for assignment!")
-			}
-			operationLabel = useParentLabel + operationLabel
-		}
-
 		if len(operandList) == 1 {
 			identifierNode := operandFactory.CreateIdentifierNode(operationType, operationLabel)
 			assignmentNode := operandFactory.CreateAssignmentNode(identifierNode, operandList[0])
@@ -79,16 +68,4 @@ func (p *LabelOperandParser) Process(operationType tokenEnum, operationValue str
 	default:
 		return errors.New("BAD LABEL OPERATION TYPE!!!")
 	}
-}
-
-func (p *LabelOperandParser) generateParentLabel() string {
-	useParentLabel := blockStack.GetTemporaryOverwritingParentLabel()
-	if useParentLabel == "" {
-		useParentLabel = p.parentLabel
-	}
-	return useParentLabel
-}
-
-func (p *LabelOperandParser) GetParentLabel() string {
-	return p.parentLabel
 }

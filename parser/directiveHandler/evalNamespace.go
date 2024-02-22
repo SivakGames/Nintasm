@@ -3,6 +3,8 @@ package directiveHandler
 import (
 	"fmt"
 	"misc/nintasm/assemble/blockStack"
+	"misc/nintasm/interpreter"
+	"misc/nintasm/interpreter/environment/namespaceTable"
 )
 
 func evalNamespace(directiveName string, NamespaceLabel string, operandList *[]Node) error {
@@ -16,10 +18,13 @@ func evalEndNamespace(directiveName string) error {
 	namespaceLabel := blockStack.GetCurrentOperationLabel()
 	blockStack.ClearCurrentOperationLabel()
 	blockStack.ClearCaptureParentOpOnlyFlag()
-	blockStack.SetTemporaryOverwritingParentLabel(namespaceLabel)
 
 	currentStackOp := blockStack.GetTopOfStackOperation()
 	capturedLines := &currentStackOp.CapturedLines
+	namespaceTable.AddNamespaceToEnvironment(namespaceLabel)
+
+	interpreter.PopParentLabelWhenBlockOpDone = true
+	interpreter.AppendParentLabel(namespaceLabel)
 
 	if len(*capturedLines) == 0 {
 		fmt.Println("Warning: Namespace is empty!")

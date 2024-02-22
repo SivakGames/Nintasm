@@ -9,6 +9,7 @@ import (
 	"misc/nintasm/interpreter/environment/charmapTable"
 	"misc/nintasm/interpreter/environment/exprmapTable"
 	"misc/nintasm/interpreter/operandFactory"
+	"strings"
 )
 
 type Node = operandFactory.Node
@@ -18,6 +19,9 @@ type assemblerFunction struct {
 	maxArgs          int
 	argMustResolveTo []enumNodeTypes.Def
 }
+
+var PopParentLabelWhenBlockOpDone bool = false
+var parentLabelStack []string
 
 var assemblerBuiltInFunctions = map[string]assemblerFunction{
 	"high":      {1, 1, []enumNodeTypes.Def{enumNodeTypes.NumericLiteral}},
@@ -63,6 +67,15 @@ func EvaluateNode(node Node) (Node, error) {
 		symbolName := left.NodeValue
 		node.Left = nil
 		node.Right = nil
+		isLocal := strings.HasPrefix(symbolName, ".")
+		if isLocal {
+			parentLabel, err := GetParentLabel()
+			if err != nil {
+				return node, err
+			}
+			symbolName = parentLabel + symbolName
+		}
+
 		_, err = environment.AddToEnvironment(symbolName, right)
 		if err != nil {
 			return node, err
@@ -221,4 +234,34 @@ func ProcessAssemblerFunction(node *Node) (bool, error) {
 		}
 	}
 	return isAsmFunc, nil
+}
+
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+func GetParentLabel() (string, error) {
+	if len(parentLabelStack) == 0 {
+		return "", errors.New("Cannot use operation! No parent label!")
+	}
+	parentLabel := parentLabelStack[len(parentLabelStack)-1]
+	return parentLabel, nil
+}
+
+func AppendParentLabel(newLabel string) {
+	parentLabelStack = append(parentLabelStack, newLabel)
+	return
+}
+
+func PopParentLabel() {
+	parentLabelStack = parentLabelStack[:len(parentLabelStack)-1]
+	return
+}
+
+// Will overwrite at current position or add if none
+func OverwriteParentLabel(newLabel string) {
+	if len(parentLabelStack) == 0 {
+		parentLabelStack = append(parentLabelStack, newLabel)
+		return
+	}
+	parentLabelStack[len(parentLabelStack)-1] = newLabel
+	return
 }

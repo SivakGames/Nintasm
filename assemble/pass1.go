@@ -3,6 +3,7 @@ package assemble
 import (
 	"misc/nintasm/assemble/blockStack"
 	enumParserTypes "misc/nintasm/constants/enums/parserTypes"
+	"misc/nintasm/interpreter"
 	"misc/nintasm/parser"
 	"misc/nintasm/util"
 )
@@ -72,7 +73,10 @@ func Start(lines []string) error {
 							return blockStackErr
 						}
 					}
-					blockStack.ClearTemporaryOverwritingParentLabel()
+					if interpreter.PopParentLabelWhenBlockOpDone {
+						interpreter.PopParentLabel()
+						interpreter.PopParentLabelWhenBlockOpDone = false
+					}
 					blockStack.ClearStack()
 				}
 			} else {

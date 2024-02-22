@@ -3,11 +3,12 @@ package parser_test
 import (
 	"misc/nintasm/assemble"
 	"misc/nintasm/interpreter/environment"
+	"misc/nintasm/romBuilder"
 	"testing"
 )
 
 func TestLabelOperandParser(t *testing.T) {
-	t.Run("Testing Assignment", func(t *testing.T) {
+	t.Run("***Testing Assignment", func(t *testing.T) {
 
 		var testLines []string
 		var wanted []int
@@ -32,9 +33,11 @@ func TestLabelOperandParser(t *testing.T) {
 			t.Error("EQU Result not as expected")
 			t.Log("Wanted:", wanted[1], "Got:", result2.AsNumber)
 		}
+		romBuilder.ClearINES()
+		romBuilder.ClearRom()
 	})
 
-	t.Run("Testing Namespace", func(t *testing.T) {
+	t.Run("***Testing Namespace", func(t *testing.T) {
 		var testLines []string
 		var wanted []int
 
@@ -60,5 +63,7 @@ func TestLabelOperandParser(t *testing.T) {
 			t.Error("Namespace 1 result not as expected")
 			t.Log("Wanted:", wanted[1], "Got:", result2.AsNumber)
 		}
+		romBuilder.ClearINES()
+		romBuilder.ClearRom()
 	})
 }
