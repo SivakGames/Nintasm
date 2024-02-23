@@ -9,7 +9,6 @@ import (
 type MacroOperandParser struct {
 	OperandParser
 	capturedLinesToUnpack []blockStack.CapturedLine
-	replacementsList      []macroTable.Replacer
 }
 
 func NewMacroOperandParser() MacroOperandParser {
@@ -20,7 +19,7 @@ func NewMacroOperandParser() MacroOperandParser {
 func (mop *MacroOperandParser) Process(macroName string) error {
 	var err error
 
-	mop.replacementsList = mop.replacementsList[:0]
+	macroTable.AppendToReplacementStack()
 
 	mop.capturedLinesToUnpack, err = macroTable.LookupAndGetMacroInEnvironment(macroName, macroTable.Macro)
 	if err != nil {
@@ -33,8 +32,9 @@ func (mop *MacroOperandParser) Process(macroName string) error {
 	}
 
 	for i, operand := range operandList {
-		mop.replacementsList = append(mop.replacementsList, macroTable.NewReplacer(fmt.Sprintf("%d", i+1), operand.NodeValue))
+		macroTable.AddToReplacementListOnTopOfStack(fmt.Sprintf("\\%d", i+1), operand.NodeValue)
 	}
+
 	return nil
 }
 
@@ -44,9 +44,15 @@ func (mop *MacroOperandParser) GetUnpackLinesRef() *[]blockStack.CapturedLine {
 
 func (mop *MacroOperandParser) ApplyReplacementsToCapturedLine(capturedLineIndex int) blockStack.CapturedLine {
 	replacedCapturedLine := mop.capturedLinesToUnpack[capturedLineIndex]
-	for _, replacementListItem := range mop.replacementsList {
+	replacementList := macroTable.GetReplacementListOnTopOfStack()
+
+	for _, replacementListItem := range *replacementList {
 		replacedCapturedLine.OriginalLine = replacementListItem.ReplaceRegex.ReplaceAllString(replacedCapturedLine.OriginalLine, replacementListItem.ReplaceString)
 	}
 
 	return replacedCapturedLine
+}
+
+func (mop *MacroOperandParser) PopFromStack() {
+	macroTable.PopFromReplacementStack()
 }

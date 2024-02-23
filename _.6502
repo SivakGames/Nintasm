@@ -18,7 +18,12 @@ aaa .endm
 	.bank 0
 	.org $8000
 
-	aaa 1,2
+	.ikv ttct
+	.kv \ghi, 33
+	.kv \abc, 11
+	.kv \def, 22
+	.endikv
+
 	aaa 2,3
 
 	.romSegment "8kb","8kb","CHR"

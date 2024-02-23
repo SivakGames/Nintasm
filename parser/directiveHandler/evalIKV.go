@@ -2,7 +2,6 @@ package directiveHandler
 
 import (
 	"errors"
-	"fmt"
 	"misc/nintasm/assemble/blockStack"
 	"misc/nintasm/interpreter/environment/macroTable"
 	"misc/nintasm/interpreter/operandFactory"
@@ -20,6 +19,8 @@ func evalIkv(directiveName string, operandList *[]Node) error {
 	blockStack.SetCaptureParentOpOnlyFlag()
 	blockStack.SetCurrentOperationEvaluatesFlag()
 
+	macroTable.AppendToReplacementStack()
+
 	return nil
 }
 
@@ -32,12 +33,21 @@ func evalEndIkv(directiveName string, operandList *[]Node) error {
 		return err
 	}
 
-	fmt.Println(macroData)
+	replacementList := macroTable.GetReplacementListOnTopOfStack()
+	var modifiedCapturedLines []blockStack.CapturedLine
+
+	for _, md := range macroData {
+		for _, replacementListItem := range *replacementList {
+			md.OriginalLine = replacementListItem.ReplaceRegex.ReplaceAllString(md.OriginalLine, replacementListItem.ReplaceString)
+		}
+		modifiedCapturedLines = append(modifiedCapturedLines, md)
+	}
+
+	macroTable.PopFromReplacementStack()
 
 	blockStack.ClearCaptureParentOpOnlyFlag()
 	blockStack.ClearCurrentOperationEvaluatesFlag()
-	blockStack.PopFromStackAndExtendNoLines()
-	//blockStack.PopFromStackAndExtendCapturedLines(*currentStackOperationCapturedLines)
+	blockStack.PopFromStackAndExtendCapturedLines(modifiedCapturedLines)
 
 	return nil
 }
@@ -48,10 +58,6 @@ func evalKv(directiveName string, operandList *[]Node) error {
 		return errors.New("Must use a substitution type node for KV")
 	}
 	macroValueNode := &(*operandList)[1]
-	_ = macroValueNode
-
-	//ikvKeys[macroKeyNode.NodeValue] = ""
-
-	fmt.Println("macroData", operandList)
+	macroTable.AddToReplacementListOnTopOfStack(macroKeyNode.NodeValue, macroValueNode.NodeValue)
 	return nil
 }
