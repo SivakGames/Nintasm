@@ -47,6 +47,8 @@ func Start(lines []string) error {
 		if len(blockStack.Stack) > 0 {
 			var blockStackErr error
 			isStartEndOp := blockStack.CheckIfNewStartEndOperation(&lineOperationParsedValues)
+
+			//See if the incoming operation is for starting/ending a block
 			if isStartEndOp {
 				blockStackErr = parseOperandStringAndProcess(
 					reformattedLine,
@@ -73,16 +75,29 @@ func Start(lines []string) error {
 							return blockStackErr
 						}
 					}
+					//Mainly set by namespaces - will clear the overriding parent label
 					if interpreter.PopParentLabelWhenBlockOpDone {
 						interpreter.PopParentLabel()
 						interpreter.PopParentLabelWhenBlockOpDone = false
 					}
 					blockStack.ClearStack()
 				}
+
 			} else {
-				err := blockStack.CheckOperationIsCapturableAndAppend(reformattedLine, &lineOperationParsedValues)
-				if err != nil {
-					return err
+				//Either append the operation to the stack's captured lines or evaluate them now
+				if !blockStack.GetCurrentOperationEvaluatesFlag() {
+					err := blockStack.CheckOperationIsCapturableAndAppend(reformattedLine, &lineOperationParsedValues)
+					if err != nil {
+						return err
+					}
+				} else {
+					blockStackErr = parseOperandStringAndProcess(
+						reformattedLine,
+						&lineOperationParsedValues,
+					)
+					if blockStackErr != nil {
+						return blockStackErr
+					}
 				}
 			}
 			continue

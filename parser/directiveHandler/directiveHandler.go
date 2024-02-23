@@ -28,6 +28,8 @@ func Process(operationTokenEnum enumTokenTypes.Def, directiveName string, operat
 
 	switch operationTokenEnum {
 
+	//TODO: Remove directive name args being passed where unneeded
+
 	// 🟢/❌ Could be either
 	case enumTokenTypes.DIRECTIVE_dataBytes:
 		return evalDataBytesOperands(directiveName, operandList)
@@ -46,10 +48,10 @@ func Process(operationTokenEnum enumTokenTypes.Def, directiveName string, operat
 	case enumTokenTypes.DIRECTIVE_setting:
 		return evalSettingChange(directiveName, operandList)
 	case enumTokenTypes.DIRECTIVE_invokeKeyVal:
-		fmt.Println("KV")
-		return nil
+		return evalKv(directiveName, operandList)
 	case enumTokenTypes.DIRECTIVE_settingReset:
 		return evalSettingReset(directiveName)
+
 	case enumTokenTypes.DIRECTIVE_blockStart:
 		switch directiveName {
 		case "IF":
@@ -59,20 +61,19 @@ func Process(operationTokenEnum enumTokenTypes.Def, directiveName string, operat
 		case "ELSE":
 			return evalElse(directiveName, operandList)
 		case "IKV":
-			fmt.Println("IKV")
-			return nil
+			return evalIkv(directiveName, operandList)
 		case "REPEAT":
 			return evalRepeat(directiveName, operandList)
 		default:
 			return errors.New("BAD BLOCK START DIRECTIVE!!!" + directiveName)
 		}
+
 	case enumTokenTypes.DIRECTIVE_blockEnd:
 		switch directiveName {
 		case "ENDIF":
 			return evalEndIf(directiveName, operandList)
 		case "ENDIKV":
-			fmt.Println("ENDIKV")
-			return nil
+			return evalEndIkv(directiveName, operandList)
 		case "ENDREPEAT":
 			return evalEndRepeat(directiveName, operandList)
 		default:

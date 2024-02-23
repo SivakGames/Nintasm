@@ -48,6 +48,7 @@ func TestLabelOperandParser(t *testing.T) {
 		testLines = append(testLines, "testNS .endNamespace")
 		wanted = append(wanted, 3)
 		wanted = append(wanted, 46)
+		wanted = append(wanted, 44)
 
 		err := assemble.Start(testLines)
 		if err != nil {
@@ -63,6 +64,11 @@ func TestLabelOperandParser(t *testing.T) {
 		if result2.AsNumber != wanted[1] {
 			t.Error("Namespace 1 result not as expected")
 			t.Log("Wanted:", wanted[1], "Got:", result2.AsNumber)
+		}
+		result3, _ := environment.LookupInEnvironment("testNS.var3")
+		if result3.AsNumber != wanted[2] {
+			t.Error("Namespace 2 result not as expected")
+			t.Log("Wanted:", wanted[2], "Got:", result3.AsNumber)
 		}
 		romBuilder.ClearINES()
 		romBuilder.ClearRom()

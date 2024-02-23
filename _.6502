@@ -18,10 +18,8 @@ ttct .endkvm
 	.ikv ttct
 	.kv \abc, 2
 	.kv \def, 4
-	.kv \ghi, 6
+	.kv \1, 6
 	.endikv
-
-
 
 	.romSegment "8kb","8kb","CHR"
 	.bank 0

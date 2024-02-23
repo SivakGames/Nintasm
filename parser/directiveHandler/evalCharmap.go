@@ -8,19 +8,21 @@ import (
 	"misc/nintasm/interpreter/operandFactory"
 )
 
-func evalCharmap(directiveName string, macroLabel string, operandList *[]Node) error {
+func evalCharmap(directiveName string, charmapLabel string, operandList *[]Node) error {
 	blockStack.PushOntoStack(directiveName, *operandList)
+	charmapTable.AddCharmapToEnvironment(charmapLabel)
+	blockStack.SetCurrentOperationEvaluatesFlag()
 	return nil
 }
 
 func evalEndCharmap(directiveName string) error {
-	charmapLabel := blockStack.GetLabelAndDoEndBlockSetups()
-	capturedLines := blockStack.GetTopOfStackCapturedLines()
-	charmapTable.AddCharmapToEnvironment(charmapLabel)
-
-	blockStack.PopFromStackAndExtendCapturedLines(*capturedLines)
+	_ = blockStack.GetLabelAndDoEndBlockSetups()
+	blockStack.ClearCurrentOperationEvaluatesFlag()
+	blockStack.PopFromStackAndExtendNoLines()
 	return nil
 }
+
+// -----------------------------------------
 
 func evalDefChar(directiveName string, operandList *[]Node) error {
 	switch directiveName {

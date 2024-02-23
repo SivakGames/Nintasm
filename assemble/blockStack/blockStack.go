@@ -55,6 +55,9 @@ func newStackBlock(operationName string, operandList []Node) StackBlock {
 var Stack []StackBlock
 
 var StackWillClearFlag bool = false
+
+// Will evaluate the node rather than capturing it
+var currentOperationEvaluates bool = false
 var stackCapturesParentOpOnlyFlag bool = false
 var currentBlockOperationLabel string = ""
 
@@ -116,12 +119,13 @@ func ClearBottomOfStackCapturedLines() {
 
 // -----------------
 
+func ClearCaptureParentOpOnlyFlag() {
+	stackCapturesParentOpOnlyFlag = false
+}
+
 // Stack will only handle the parent op. No nested ops.
 func SetCaptureParentOpOnlyFlag() {
 	stackCapturesParentOpOnlyFlag = true
-}
-func ClearCaptureParentOpOnlyFlag() {
-	stackCapturesParentOpOnlyFlag = false
 }
 
 // -----------------
@@ -142,6 +146,18 @@ func SetCurrentOperationLabel(label string) error {
 
 	currentBlockOperationLabel = label
 	return nil
+}
+
+// -----------------
+
+func ClearCurrentOperationEvaluatesFlag() {
+	currentOperationEvaluates = false
+}
+func GetCurrentOperationEvaluatesFlag() bool {
+	return currentOperationEvaluates
+}
+func SetCurrentOperationEvaluatesFlag() {
+	currentOperationEvaluates = true
 }
 
 // --------------------------------
@@ -174,7 +190,6 @@ func CheckIfNewStartEndOperation(lineOperationParsedValues *util.LineOperationPa
 	}
 
 	return true
-
 }
 
 //+++++++++++++++++++++++++++++++
@@ -240,7 +255,7 @@ var allowedOperationsForParentOps = map[string]captureableOpMap{
 
 //-----------------------------------------------------
 
-func CheckOperationIsCapturableAndAppend(
+func CheckOperationIsCapturable(
 	originalLine string,
 	lineOperationParsedValues *util.LineOperationParsedValues,
 ) error {
@@ -257,6 +272,18 @@ func CheckOperationIsCapturableAndAppend(
 		errMsg := fmt.Sprintf("Uncapturable! %v", lineOperationParsedValues.OperationTokenValue)
 		return errors.New(errMsg)
 	}
+	return nil
+}
+
+func CheckOperationIsCapturableAndAppend(
+	originalLine string,
+	lineOperationParsedValues *util.LineOperationParsedValues,
+) error {
+	err := CheckOperationIsCapturable(originalLine, lineOperationParsedValues)
+	if err != nil {
+		return err
+	}
+	currentStackOp := GetTopOfStackLastAlternateOperation()
 	currentStackOp.CapturedLines = append(currentStackOp.CapturedLines, newCapturedLine(
 		originalLine,
 		lineOperationParsedValues.OperationLabel,

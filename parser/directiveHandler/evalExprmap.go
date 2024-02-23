@@ -7,17 +7,17 @@ import (
 	"misc/nintasm/interpreter/operandFactory"
 )
 
-func evalExprmap(directiveName string, macroLabel string, operandList *[]Node) error {
+func evalExprmap(directiveName string, exprmapLabel string, operandList *[]Node) error {
 	blockStack.PushOntoStack(directiveName, *operandList)
+	exprmapTable.AddExprmapToEnvironment(exprmapLabel)
+	blockStack.SetCurrentOperationEvaluatesFlag()
 	return nil
 }
 
 func evalEndExprmap(directiveName string) error {
-	exprmapLabel := blockStack.GetLabelAndDoEndBlockSetups()
-	capturedLines := blockStack.GetTopOfStackCapturedLines()
-	exprmapTable.AddExprmapToEnvironment(exprmapLabel)
-
-	blockStack.PopFromStackAndExtendCapturedLines(*capturedLines)
+	_ = blockStack.GetLabelAndDoEndBlockSetups()
+	blockStack.ClearCurrentOperationEvaluatesFlag()
+	blockStack.PopFromStackAndExtendNoLines()
 	return nil
 }
 
