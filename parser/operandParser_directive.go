@@ -38,9 +38,14 @@ var directiveManuallyEvaluatesOperands = map[string]bool{
 	"SETEXPRMAP": true,
 }
 
+var directiveEvaluatesLikeMacroOperands = map[string][]string{
+	"KV": {"", "macro"},
+}
+
 // Main directive parser
 func (p *DirectiveOperandParser) Process(operationTokenEnum tokenEnum, operationValue string, operationLabel string) error {
 	var err error
+	var captureMasks []string
 
 	directiveName := strings.ToUpper(operationValue)
 	unaliasedDirectiveName = directiveName
@@ -56,8 +61,12 @@ func (p *DirectiveOperandParser) Process(operationTokenEnum tokenEnum, operation
 	}
 
 	_, manuallyEvaluatesOperands := directiveManuallyEvaluatesOperands[directiveName]
+	evalLikeMacro, ok := directiveEvaluatesLikeMacroOperands[directiveName]
+	if ok {
+		captureMasks = evalLikeMacro
+	}
 
-	operandList, err := p.GetOperandList(minOperands, maxOperands, manuallyEvaluatesOperands)
+	operandList, err := p.GetOperandList(minOperands, maxOperands, manuallyEvaluatesOperands, captureMasks)
 	if err != nil {
 		return err // ❌ Fails
 	}

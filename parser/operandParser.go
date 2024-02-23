@@ -31,7 +31,9 @@ type OperandParser struct {
 //=============================================
 
 // Used by most operations.  Will go through and separate operands by commas returning each one as an AST
-func (p *OperandParser) GetOperandList(minOperands int, maxOperands int, manuallyEvalOperands bool) ([]Node, error) {
+func (p *OperandParser) GetOperandList(
+	minOperands int, maxOperands int,
+	manuallyEvalOperands bool, captureMasks []string) ([]Node, error) {
 	var captureStatementFunction func() (Node, error)
 
 	operandList := []Node{}
@@ -48,10 +50,17 @@ func (p *OperandParser) GetOperandList(minOperands int, maxOperands int, manuall
 		return operandList, errors.New("Operand list \x1b[38;5;202mCANNOT\x1b[0m start with a comma!") // ❌ Fails
 	}
 
-	if p.ShouldParseInstructions {
-		captureStatementFunction = p.instructionPrefix
-	} else {
-		captureStatementFunction = p.statement
+	captureStatementFunction = p.statement
+
+	if len(captureMasks) > len(operandList) {
+		switch captureMasks[len(operandList)] {
+		case "instruction":
+			captureStatementFunction = p.instructionPrefix
+		case "macro":
+			captureStatementFunction = p.macroReplaceStatement
+		default:
+			captureStatementFunction = p.statement
+		}
 	}
 
 	//There is at least one operand
@@ -67,6 +76,18 @@ func (p *OperandParser) GetOperandList(minOperands int, maxOperands int, manuall
 		if err != nil {
 			return operandList, err // ❌ Fails
 		}
+
+		if len(captureMasks) > len(operandList) {
+			switch captureMasks[len(operandList)] {
+			case "instruction":
+				captureStatementFunction = p.instructionPrefix
+			case "macro":
+				captureStatementFunction = p.macroReplaceStatement
+			default:
+				captureStatementFunction = p.statement
+			}
+		}
+
 		subsequentOperand, err := captureStatementFunction()
 		if err != nil {
 			return operandList, err // ❌ Fails
@@ -251,6 +272,53 @@ func (p *OperandParser) statementList(stopTokenType tokenEnum) (Node, error) {
 
 	return statementList, nil
 } */
+
+// =============================================
+
+// Will return a special node recognized by macros that stops at commas.
+// Statements within curly braces will ignore commas
+func (p *OperandParser) macroReplaceStatement() (Node, error) {
+	var closingTokenEnum []enumTokenTypes.Def
+
+	replacement := ""
+	closingTokenEnum = append(closingTokenEnum, enumTokenTypes.DELIMITER_comma)
+
+	for len(closingTokenEnum) > 0 && p.lookaheadType != enumTokenTypes.None {
+		topOfStackEnum := closingTokenEnum[len(closingTokenEnum)-1]
+		switch p.lookaheadType {
+		case topOfStackEnum:
+			closingTokenEnum = closingTokenEnum[:len(closingTokenEnum)-1]
+			if len(closingTokenEnum) > 0 {
+				err := p.eatFreelyAndAdvance(topOfStackEnum)
+				if err != nil {
+					return operandFactory.ErrorNode(p.lookaheadValue), err // ❌ Fails
+				}
+			}
+
+		case enumTokenTypes.DELIMITER_leftCurlyBrace:
+			if topOfStackEnum == enumTokenTypes.DELIMITER_rightCurlyBrace {
+				return operandFactory.ErrorNode(p.lookaheadValue), errors.New("Macro args - Must close curly brace before opening another!")
+			}
+			err := p.eatFreelyAndAdvance(enumTokenTypes.DELIMITER_leftCurlyBrace)
+			if err != nil {
+				return operandFactory.ErrorNode(p.lookaheadValue), err // ❌ Fails
+			}
+			closingTokenEnum = append(closingTokenEnum, enumTokenTypes.DELIMITER_rightCurlyBrace)
+
+		default:
+			replacement += p.lookaheadValue
+			err := p.eatFreelyAndAdvance(p.lookaheadType)
+			if err != nil {
+				return operandFactory.ErrorNode(p.lookaheadValue), err // ❌ Fails
+			}
+		}
+	}
+	if len(closingTokenEnum) > 1 {
+		return operandFactory.ErrorNode(p.lookaheadValue), errors.New("Unclosed???") // ❌ Fails
+	}
+
+	return operandFactory.CreateMacroReplacementNode(replacement), nil
+}
 
 // =============================================
 

@@ -50,7 +50,7 @@ func (p *InstructionOperandParser) Process(operationValue string) error {
 
 	default:
 		isBranch = checkIfBranchInstruction(instructionName)
-		operandList, err = p.GetOperandList(0, 1, false)
+		operandList, err = p.GetOperandList(0, 1, false, []string{"instruction"})
 		if err != nil {
 			return err // ❌ Fails
 		}

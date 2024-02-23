@@ -123,6 +123,12 @@ func CreateSubstitutionIdNode(nodeType tokenEnum, nodeValue string) Node {
 	return node
 }
 
+// Special node recognized by macros
+func CreateMacroReplacementNode(nodeValue string) Node {
+	node := newNode(enumTokenTypes.None, nodeValue, enumNodeTypes.MacroReplacementString)
+	return node
+}
+
 //===================================================
 //Literals
 

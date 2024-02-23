@@ -20,4 +20,6 @@ const (
 	NumericLiteral
 	StringLiteral
 	SubstitutionID
+
+	MacroReplacementString
 )
