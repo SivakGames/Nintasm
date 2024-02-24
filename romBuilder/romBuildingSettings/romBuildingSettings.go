@@ -29,8 +29,11 @@ func SetEmptyRomFillValue(newEmptyRomFillValue uint8) {
 var rsValue uint
 var rsHasBeenSetOnce bool
 
-func GetRSValue() uint {
-	return rsValue
+func GetRSValue() (uint, error) {
+	if !rsHasBeenSetOnce {
+		return rsValue, errors.New("RS has not been set!")
+	}
+	return rsValue, nil
 }
 func SetRSValue(newRSValue uint) {
 	rsValue = newRSValue

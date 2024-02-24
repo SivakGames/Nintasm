@@ -83,6 +83,7 @@ var directiveMinMaxOperands = map[enumTokenTypes.Def][2]int{
 	enumTokenTypes.DIRECTIVE_dataSeries:      {1, 2},
 	enumTokenTypes.DIRECTIVE_mixedData:       {1, 128},
 	enumTokenTypes.DIRECTIVE_blockEnd:        {0, 0},
+	enumTokenTypes.DIRECTIVE_labeled:         {1, 1},
 	enumTokenTypes.DIRECTIVE_labeledBlockEnd: {0, 0},
 	enumTokenTypes.DIRECTIVE_INES:            {1, 1},
 	enumTokenTypes.DIRECTIVE_invokeKeyVal:    {2, 2},

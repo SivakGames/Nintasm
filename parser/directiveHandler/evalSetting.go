@@ -34,12 +34,14 @@ func evalSettingChange(directiveName string, operandList *[]Node) error {
 		}
 
 	case "RSSET":
-		EmptyFillSettingNode := (*operandList)[0]
-		if !operandFactory.ValidateNodeIsNumeric(&EmptyFillSettingNode) ||
-			!operandFactory.ValidateNumericNodeIsPositive(&EmptyFillSettingNode) ||
-			!operandFactory.ValidateNumericNodeIs16BitValue(&EmptyFillSettingNode) {
+		RSSetSettingNode := (*operandList)[0]
+		if !operandFactory.ValidateNodeIsNumeric(&RSSetSettingNode) ||
+			!operandFactory.ValidateNumericNodeIsPositive(&RSSetSettingNode) ||
+			!operandFactory.ValidateNumericNodeIs16BitValue(&RSSetSettingNode) {
 			return errors.New("Bad rsset value. Must be a 16-bit positive number")
 		}
+		rssetNumber := RSSetSettingNode.AsNumber
+		romBuildingSettings.SetRSValue(uint(rssetNumber))
 
 	case "AUTOZP":
 		autoZPSettingNode := (*operandList)[0]

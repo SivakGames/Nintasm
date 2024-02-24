@@ -52,6 +52,14 @@ func Process(operationTokenEnum enumTokenTypes.Def, directiveName string, operat
 	case enumTokenTypes.DIRECTIVE_settingReset:
 		return evalSettingReset(directiveName)
 
+	case enumTokenTypes.DIRECTIVE_labeled:
+		switch directiveName {
+		case "RS":
+			return evalRs(directiveName, operandList)
+		default:
+			return errors.New("BAD LABELED DIRECTIVE!!!" + directiveName)
+		}
+
 	case enumTokenTypes.DIRECTIVE_blockStart:
 		switch directiveName {
 		case "IF":
