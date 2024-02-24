@@ -1,6 +1,7 @@
 package assemble
 
 import (
+	"fmt"
 	"misc/nintasm/assemble/blockStack"
 	"misc/nintasm/assemble/fileStack"
 	enumParserTypes "misc/nintasm/constants/enums/parserTypes"
@@ -23,6 +24,7 @@ func Start(initialInputFile string) error {
 	if err != nil {
 		return err
 	}
+	fmt.Println("End of the line!")
 	return nil
 }
 
@@ -32,6 +34,7 @@ func GetLinesTopFileStack() error {
 	if err != nil {
 		return err
 	}
+	fileStack.PopFromFileStack()
 	return nil
 }
 

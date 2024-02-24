@@ -14,13 +14,14 @@ ttct .endkvm
 	.bank 0
 	.org $8000
 
+	.incbin "__.6502"
+
 	.ikv ttct
 	.kv \ghi, 33
 	.kv \abc, 11
 	.kv \def, 22
 	.endikv
 
-	aaa 2,3
 
 	.romSegment "8kb","8kb","CHR"
 	.bank 0
