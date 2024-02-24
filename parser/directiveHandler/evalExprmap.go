@@ -14,7 +14,7 @@ func evalExprmap(directiveName string, exprmapLabel string, operandList *[]Node)
 	return nil
 }
 
-func evalEndExprmap(directiveName string) error {
+func evalEndExprmap() error {
 	_ = blockStack.GetLabelAndDoEndBlockSetups()
 	blockStack.ClearCurrentOperationEvaluatesFlag()
 	blockStack.PopFromStackAndExtendNoLines()

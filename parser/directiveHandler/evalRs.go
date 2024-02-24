@@ -7,7 +7,7 @@ import (
 	"misc/nintasm/romBuilder/romBuildingSettings"
 )
 
-func evalRs(directiveName string, operandList *[]Node) error {
+func evalRs(operandList *[]Node) error {
 	rsValueNode := (*operandList)[0]
 
 	if !(operandFactory.ValidateNodeIsNumeric(&rsValueNode) &&

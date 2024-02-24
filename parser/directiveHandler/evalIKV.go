@@ -24,7 +24,7 @@ func evalIkv(directiveName string, operandList *[]Node) error {
 	return nil
 }
 
-func evalEndIkv(directiveName string, operandList *[]Node) error {
+func evalEndIkv(operandList *[]Node) error {
 	currentStackOperation := blockStack.GetTopOfStackOperation()
 	currentStackOperationOperandList := &currentStackOperation.OperandList
 	macroNameNode := &(*currentStackOperationOperandList)[0]
@@ -52,7 +52,7 @@ func evalEndIkv(directiveName string, operandList *[]Node) error {
 	return nil
 }
 
-func evalKv(directiveName string, operandList *[]Node) error {
+func evalKv(operandList *[]Node) error {
 	macroKeyNode := &(*operandList)[0]
 	if !operandFactory.ValidateNodeIsSubstitutionID(macroKeyNode) {
 		return errors.New("Must use a substitution type node for KV")

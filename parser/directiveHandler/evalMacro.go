@@ -13,7 +13,7 @@ func evalMacro(directiveName string, macroLabel string, operandList *[]Node) err
 }
 
 // End the macro definition and add to environment
-func evalEndMacro(directiveName string) error {
+func evalEndMacro() error {
 	macroLabel := blockStack.GetLabelAndDoEndBlockSetups()
 	capturedLines := blockStack.GetTopOfStackCapturedLines()
 	macroTable.AddMacroToEnvironment(macroLabel, macroTable.Macro, *capturedLines)

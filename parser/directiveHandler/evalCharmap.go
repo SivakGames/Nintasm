@@ -15,7 +15,7 @@ func evalCharmap(directiveName string, charmapLabel string, operandList *[]Node)
 	return nil
 }
 
-func evalEndCharmap(directiveName string) error {
+func evalEndCharmap() error {
 	_ = blockStack.GetLabelAndDoEndBlockSetups()
 	blockStack.ClearCurrentOperationEvaluatesFlag()
 	blockStack.PopFromStackAndExtendNoLines()

@@ -35,7 +35,7 @@ func evalRepeat(directiveName string, operandList *[]Node) error {
 	return nil
 }
 
-func evalEndRepeat(directiveName string, operandList *[]Node) error {
+func evalEndRepeat(operandList *[]Node) error {
 	currentStackOperation := blockStack.GetTopOfStackOperation()
 	currentStackOperationOperandList := &currentStackOperation.OperandList
 	currentStackOperationCapturedLines := &currentStackOperation.CapturedLines

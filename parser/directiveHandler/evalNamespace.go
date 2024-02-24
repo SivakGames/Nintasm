@@ -17,7 +17,7 @@ func evalNamespace(directiveName string, namespaceLabel string, operandList *[]N
 }
 
 // End the Namespace definition and add to environment
-func evalEndNamespace(directiveName string) error {
+func evalEndNamespace() error {
 	_ = blockStack.GetLabelAndDoEndBlockSetups()
 	interpreter.PopParentLabel()
 	blockStack.PopFromStackAndExtendNoLines()

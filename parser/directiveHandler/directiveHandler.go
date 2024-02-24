@@ -45,17 +45,27 @@ func Process(operationTokenEnum enumTokenTypes.Def, directiveName string, operat
 		return evalDefChar(directiveName, operandList)
 	case enumTokenTypes.DIRECTIVE_defExprMap:
 		return evalDefExpr(directiveName, operandList)
+	case enumTokenTypes.DIRECTIVE_invokeKeyVal:
+		return evalKv(operandList)
 	case enumTokenTypes.DIRECTIVE_setting:
 		return evalSettingChange(directiveName, operandList)
-	case enumTokenTypes.DIRECTIVE_invokeKeyVal:
-		return evalKv(directiveName, operandList)
 	case enumTokenTypes.DIRECTIVE_settingReset:
 		return evalSettingReset(directiveName)
+
+	case enumTokenTypes.DIRECTIVE_include:
+		switch directiveName {
+		case "INCLUDE":
+			return evalInclude(operandList)
+		case "INCBIN":
+			return evalIncbin(operandList)
+		default:
+			return errors.New("BAD INCLUDE DIRECTIVE!!!" + directiveName)
+		}
 
 	case enumTokenTypes.DIRECTIVE_labeled:
 		switch directiveName {
 		case "RS":
-			return evalRs(directiveName, operandList)
+			return evalRs(operandList)
 		default:
 			return errors.New("BAD LABELED DIRECTIVE!!!" + directiveName)
 		}
@@ -79,11 +89,11 @@ func Process(operationTokenEnum enumTokenTypes.Def, directiveName string, operat
 	case enumTokenTypes.DIRECTIVE_blockEnd:
 		switch directiveName {
 		case "ENDIF":
-			return evalEndIf(directiveName, operandList)
+			return evalEndIf(operandList)
 		case "ENDIKV":
-			return evalEndIkv(directiveName, operandList)
+			return evalEndIkv(operandList)
 		case "ENDREPEAT":
-			return evalEndRepeat(directiveName, operandList)
+			return evalEndRepeat(operandList)
 		default:
 			return errors.New("BAD BLOCK END DIRECTIVE!!!" + directiveName)
 		}
@@ -114,15 +124,15 @@ func Process(operationTokenEnum enumTokenTypes.Def, directiveName string, operat
 	case enumTokenTypes.DIRECTIVE_labeledBlockEnd:
 		switch directiveName {
 		case "ENDCHARMAP":
-			return evalEndCharmap(directiveName)
+			return evalEndCharmap()
 		case "ENDEXPRMAP":
-			return evalEndExprmap(directiveName)
+			return evalEndExprmap()
 		case "ENDKVM":
-			return evalEndKVMacro(directiveName)
+			return evalEndKVMacro()
 		case "ENDM":
-			return evalEndMacro(directiveName)
+			return evalEndMacro()
 		case "ENDNAMESPACE":
-			return evalEndNamespace(directiveName)
+			return evalEndNamespace()
 		default:
 			return errors.New("BAD LABELED BLOCK END DIRECTIVE!!!" + directiveName)
 		}

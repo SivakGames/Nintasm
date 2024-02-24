@@ -9,16 +9,6 @@ ttct .kvmacro
 	lda \ghi
 ttct .endkvm
 
-	.rsset $0000
-temp .rs 16
-temp2 .rs 8
-temp21 .rs 8
-
-
-aaa .macro
-	.db \1, \2
-aaa .endm
-
 
 	.romSegment "32kb","32kb","PRG"
 	.bank 0

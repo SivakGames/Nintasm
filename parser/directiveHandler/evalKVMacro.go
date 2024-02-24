@@ -13,7 +13,7 @@ func evalKVMacro(directiveName string, macroLabel string, operandList *[]Node) e
 }
 
 // End the macro definition and add to environment
-func evalEndKVMacro(directiveName string) error {
+func evalEndKVMacro() error {
 	macroLabel := blockStack.GetLabelAndDoEndBlockSetups()
 	capturedLines := blockStack.GetTopOfStackCapturedLines()
 	macroTable.AddMacroToEnvironment(macroLabel, macroTable.KVMacro, *capturedLines)
