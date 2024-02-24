@@ -2,6 +2,7 @@ package assemble
 
 import (
 	"misc/nintasm/assemble/blockStack"
+	"misc/nintasm/assemble/fileStack"
 	enumParserTypes "misc/nintasm/constants/enums/parserTypes"
 	"misc/nintasm/interpreter"
 	"misc/nintasm/parser"
@@ -13,7 +14,28 @@ var instructionOperandParser = parser.NewInstructionOperandParser()
 var labelOperandParser = parser.NewLabelOperandParser()
 var macroOperandParser = parser.NewMacroOperandParser()
 
-func Start(lines []string) error {
+func Start(initialInputFile string) error {
+	err := fileStack.GetFirstInputFile(initialInputFile)
+	if err != nil {
+		return err
+	}
+	err = GetLinesTopFileStack()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func GetLinesTopFileStack() error {
+	lines := fileStack.GetTopOfFileStack()
+	err := ReadLines(lines)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func ReadLines(lines []string) error {
 	instructionOperandParser.ShouldParseInstructions = true
 
 	lineInitParser := parser.NewInitialLineParser()

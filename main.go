@@ -1,9 +1,7 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
-	"log"
 	"misc/nintasm/assemble"
 	"os"
 	"time"
@@ -19,25 +17,7 @@ func main() {
 
 	// --------------------
 
-	filename := os.Args[1]
-	file, err := os.Open(filename)
-	if err != nil {
-		log.Println("Failed to open file.")
-		return
-	}
-	defer file.Close()
-
-	scanner := bufio.NewScanner(file)
-	var file_lines []string
-	for scanner.Scan() {
-		file_lines = append(file_lines, scanner.Text())
-	}
-
-	err = scanner.Err()
-	if err != nil {
-		log.Println("Failed to read line in file.")
-		return
-	}
+	baseInputFileName := os.Args[1]
 
 	//	sFlag := flag.Bool("s", false, "A S boolean flag")
 	//	rFlag := flag.Bool("r", false, "A R boolean flag")
@@ -50,7 +30,7 @@ func main() {
 	//	fmt.Println("Command:", *rFlag)
 
 	start := time.Now()
-	err = assemble.Start(file_lines)
+	err = assemble.Start(baseInputFileName)
 	if err != nil {
 		fmt.Println(err)
 	}
