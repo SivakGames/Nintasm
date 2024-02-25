@@ -228,5 +228,13 @@ func parseOperandStringAndProcess(
 	default:
 		panic("🛑 Parent parsing operation could not be determined!")
 	}
+	if fileStack.TriggerNewStackCall {
+		fileStack.TriggerNewStackCall = false
+		err := GetLinesTopFileStack()
+		if err != nil {
+			return err
+		}
+	}
+
 	return nil
 }

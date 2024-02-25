@@ -11,6 +11,7 @@ import (
 
 var InputFileLines [][]string
 var relativeFileDirectory string
+var TriggerNewStackCall bool = false
 
 // The primary source file from the command line
 func GetFirstInputFile(inputFileName string) error {
@@ -32,7 +33,7 @@ func GetFirstInputFile(inputFileName string) error {
 	absFilePath := filepath.Join(cwd, inputFileName)
 	relativeFileDirectory = filepath.Dir(absFilePath)
 
-	err = openInputFileAndAppendLinesToStack(absFilePath)
+	err = OpenInputFileAndPushLinesToStack(absFilePath)
 	if err != nil {
 		return err
 	}
@@ -48,7 +49,8 @@ func AddRelativePathIncludeFileName(inputFileName string) string {
 	return inputFileName
 }
 
-func openInputFileAndAppendLinesToStack(inputFileName string) error {
+// Open new include file
+func OpenInputFileAndPushLinesToStack(inputFileName string) error {
 	file, err := os.Open(inputFileName)
 	if err != nil {
 		return errors.New("Failed to open file.")

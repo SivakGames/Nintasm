@@ -15,6 +15,7 @@ ttct .endkvm
 	.org $8000
 
 	.incbin "__.6502", $04, $04
+	.include "__.6502"
 
 	.ikv ttct
 	.kv \ghi, 33
