@@ -82,7 +82,8 @@ func PopFromFileStack() {
 
 // --------------------------------
 
-func OpenBinFile(binFileName string, seek int, read int) ([]byte, error) {
+// For incbin directives
+func ProcessBinFile(binFileName string, seek int, read int) ([]byte, error) {
 	var buffer []byte
 
 	file, err := os.Open(binFileName)
@@ -123,12 +124,10 @@ func OpenBinFile(binFileName string, seek int, read int) ([]byte, error) {
 		buffer = make([]byte, seekFileSizeDifference)
 	}
 
-	// Read from the current position to EOF
 	_, err = io.ReadFull(file, buffer)
 	if err != nil {
 		return []byte{}, err
 	}
 
-	fmt.Println("File content from position to EOF:", buffer)
 	return buffer, nil
 }

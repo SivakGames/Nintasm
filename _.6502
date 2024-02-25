@@ -14,7 +14,7 @@ ttct .endkvm
 	.bank 0
 	.org $8000
 
-	.incbin "__.6502"
+	.incbin "__.6502", $04, $04
 
 	.ikv ttct
 	.kv \ghi, 33
