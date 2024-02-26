@@ -11,6 +11,7 @@ func TestCharmaps(t *testing.T) {
 
 	t.Run("***Testing charmap", func(t *testing.T) {
 		t.Log("--- Doing Charmap tests ---")
+		var lineCounter uint = 0
 		moduleLines := testHelper.BaseLines
 		moduleLines = append(moduleLines, "testCharmap .charmap")
 		moduleLines = append(moduleLines, " .defchar \"A\", $10")
@@ -59,7 +60,7 @@ func TestCharmaps(t *testing.T) {
 			uint8(0x20), uint8(0x20), uint8(0x20), uint8(0x20),
 		}
 
-		err := assemble.Start(moduleLines)
+		err := assemble.ReadLines(&moduleLines, &lineCounter)
 		if err != nil {
 			t.Error(err)
 		}

@@ -10,7 +10,8 @@ import (
 
 func TestDirectiveOperandParser(t *testing.T) {
 	t.Run("Testing .ines*** and declaring segments", func(t *testing.T) {
-		err := assemble.Start(testHelper.BaseLines)
+		var lineCounter uint = 0
+		err := assemble.ReadLines(&testHelper.BaseLines, &lineCounter)
 		if err != nil {
 			t.Error(err)
 		}

@@ -11,6 +11,7 @@ func TestMacros(t *testing.T) {
 
 	t.Run("***Testing macro", func(t *testing.T) {
 		t.Log("--- Doing Macro tests ---")
+		var lineCounter uint = 0
 		moduleLines := testHelper.BaseLines
 		moduleLines = append(moduleLines, "testMacro .macro", " .db \\1, \\2, \\3", "testMacro .endm")
 		moduleLines = append(moduleLines, "testMacro2 .macro", " lda \\1", "testMacro2 .endm")
@@ -34,7 +35,7 @@ func TestMacros(t *testing.T) {
 			uint8(55), uint8(66),
 		}
 
-		err := assemble.Start(moduleLines)
+		err := assemble.ReadLines(&moduleLines, &lineCounter)
 		if err != nil {
 			t.Error(err)
 		}

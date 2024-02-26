@@ -21,8 +21,6 @@ type NodeStruct struct {
 	Left          *Node
 	Right         *Node
 	ArgumentList  *[]Node
-	//Consequent    *Node
-	//Alternate     *Node
 }
 
 func newNode(nodeType tokenEnum, nodeValue string, nType nodeEnum) NodeStruct {

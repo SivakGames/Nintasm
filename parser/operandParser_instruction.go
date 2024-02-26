@@ -85,7 +85,7 @@ func (p *InstructionOperandParser) Process(operationValue string) error {
 			continue
 		}
 		if mode == instructionZPModeEquivalent && operand.Resolved {
-			if operand.AsNumber <= 255 && operand.AsNumber >= -255 {
+			if operandFactory.ValidateNumericNodeIs8BitValue(&operand) {
 				useInstructionZPMode = mode
 			}
 		}

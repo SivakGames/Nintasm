@@ -11,6 +11,7 @@ func TestExprmaps(t *testing.T) {
 
 	t.Run("***Testing exprmap", func(t *testing.T) {
 		t.Log("--- Doing Exprmap tests ---")
+		var lineCounter uint = 0
 		moduleLines := testHelper.BaseLines
 		moduleLines = append(moduleLines, "testExprmap .exprmap")
 		moduleLines = append(moduleLines, " .defexpr \"A\", $10")
@@ -34,7 +35,7 @@ func TestExprmaps(t *testing.T) {
 			uint8(0x20), uint8(0x21), uint8(0x22), uint8(0x23),
 		}
 
-		err := assemble.Start(moduleLines)
+		err := assemble.ReadLines(&moduleLines, &lineCounter)
 		if err != nil {
 			t.Error(err)
 		}

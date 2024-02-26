@@ -9,7 +9,7 @@ import (
 
 func TestLabelOperandParser(t *testing.T) {
 	t.Run("***Testing Assignment", func(t *testing.T) {
-
+		var lineCounter uint = 0
 		var testLines []string
 		var wanted []int
 
@@ -18,7 +18,7 @@ func TestLabelOperandParser(t *testing.T) {
 		wanted = append(wanted, 1)
 		wanted = append(wanted, 2)
 
-		err := assemble.Start(testLines)
+		err := assemble.ReadLines(&testLines, &lineCounter)
 		if err != nil {
 			t.Error(err)
 		}
@@ -38,6 +38,7 @@ func TestLabelOperandParser(t *testing.T) {
 	})
 
 	t.Run("***Testing Namespace", func(t *testing.T) {
+		var lineCounter uint = 0
 		var testLines []string
 		var wanted []int
 
@@ -50,7 +51,7 @@ func TestLabelOperandParser(t *testing.T) {
 		wanted = append(wanted, 46)
 		wanted = append(wanted, 44)
 
-		err := assemble.Start(testLines)
+		err := assemble.ReadLines(&testLines, &lineCounter)
 		if err != nil {
 			t.Error(err)
 		}

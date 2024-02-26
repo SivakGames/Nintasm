@@ -3,27 +3,17 @@
 	.inesChr "8kb"
 	.inesMir 0
 
-ttct .kvmacro
-	ldy \abc
-	.db \def
-	lda \ghi
-ttct .endkvm
-
-
 	.romSegment "32kb","32kb","PRG"
 	.bank 0
 	.org $8000
 
-	.incbin "__.6502", $04, $04
-	.include "__.6502"
+	LDA #high(label11)
 
-	.ikv ttct
-	.kv \ghi, 33
-	.kv \abc, 11
-	.kv \def, 22
-	.endikv
-
+label11:
+	LDX #5
 
 	.romSegment "8kb","8kb","CHR"
 	.bank 0
 	.org $0000
+	.db toCharmap("💗1")
+

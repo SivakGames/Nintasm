@@ -9,7 +9,21 @@ import (
 	"path/filepath"
 )
 
-var InputFileLines [][]string
+type fileStackEntry struct {
+	FileName          string
+	CurrentLineNumber uint
+	ProcessedLines    []string
+}
+
+func newFileStackEntry(fileName string, processedLines []string) fileStackEntry {
+	return fileStackEntry{
+		FileName:          fileName,
+		CurrentLineNumber: 0,
+		ProcessedLines:    processedLines,
+	}
+}
+
+var InputFileLines []fileStackEntry
 var relativeFileDirectory string
 var TriggerNewStackCall bool = false
 
@@ -68,13 +82,13 @@ func OpenInputFileAndPushLinesToStack(inputFileName string) error {
 		return errors.New("Failed to read line in file.")
 	}
 
-	InputFileLines = append(InputFileLines, processedLines)
+	InputFileLines = append(InputFileLines, newFileStackEntry(inputFileName, processedLines))
 	return nil
 }
 
 // +++++++++++++++++++++++++++++++++
 
-func GetTopOfFileStack() []string {
+func GetTopOfFileStack() fileStackEntry {
 	return InputFileLines[len(InputFileLines)-1]
 }
 

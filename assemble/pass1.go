@@ -22,6 +22,9 @@ func Start(initialInputFile string) error {
 	}
 	err = GetLinesTopFileStack()
 	if err != nil {
+		fileData := fileStack.GetTopOfFileStack()
+		fmt.Print("\x1b[38;5;208m")
+		fmt.Println(fileData.FileName, "\x1b[0m")
 		return err
 	}
 	fmt.Println("End of the line!")
@@ -29,8 +32,8 @@ func Start(initialInputFile string) error {
 }
 
 func GetLinesTopFileStack() error {
-	lines := fileStack.GetTopOfFileStack()
-	err := ReadLines(lines)
+	fileData := fileStack.GetTopOfFileStack()
+	err := ReadLines(&fileData.ProcessedLines, &fileData.CurrentLineNumber)
 	if err != nil {
 		return err
 	}
@@ -38,18 +41,16 @@ func GetLinesTopFileStack() error {
 	return nil
 }
 
-func ReadLines(lines []string) error {
+func ReadLines(lines *[]string, lineCounter *uint) error {
 	instructionOperandParser.ShouldParseInstructions = true
 
 	lineInitParser := parser.NewInitialLineParser()
 	lineOperationParser := parser.NewOperationParser()
 
-	var lineCounter uint = 0
-
 	// Iterate over all lines
 
-	for _, rawLine := range lines {
-		lineCounter++
+	for _, rawLine := range *lines {
+		*lineCounter++
 
 		//Step 1 - Reformat line
 		reformattedLine, lineInitErr := lineInitParser.Process(rawLine)
