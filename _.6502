@@ -7,13 +7,16 @@
 	.bank 0
 	.org $8000
 
-	LDA #high(label11)
+	;LDA #high(label11)
 
 label11:
 	LDX #5
+	.include "__.6502"
 
 	.romSegment "8kb","8kb","CHR"
 	.bank 0
 	.org $0000
-	.db toCharmap("💗1")
+	;.db toCharmap("💗1")
+
+
 

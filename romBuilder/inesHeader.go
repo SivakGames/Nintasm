@@ -2,6 +2,7 @@ package romBuilder
 
 import (
 	"errors"
+	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
 	enumSizeAliases "misc/nintasm/constants/enums/sizeAliases"
 	"misc/nintasm/interpreter/operandFactory"
 	"misc/nintasm/util"
@@ -91,7 +92,7 @@ func ValidateInesPrg(inesNode *Node) error {
 	inesOperationDescription := "INES PRG"
 
 	if INESHeader.hasSetPrg {
-		return errors.New("INES PRG has already been set!!!")
+		return errors.New(enumErrorCodes.INESPRGSet)
 	}
 
 	if operandFactory.ValidateNodeIsString(inesNode) {
@@ -103,7 +104,7 @@ func ValidateInesPrg(inesNode *Node) error {
 
 	if !(operandFactory.ValidateNodeIsNumeric(inesNode) &&
 		operandFactory.ValidateNumericNodeIsPositive(inesNode)) {
-		return errors.New("INES PRG must be >= 1 or use a valid alias")
+		return errors.New(enumErrorCodes.INESPRGSet)
 	}
 
 	err := util.ValidateSizeNumberAliasUsable(inesNode, &inesPrgSizeEnumAliases, inesOperationDescription)
@@ -113,7 +114,7 @@ func ValidateInesPrg(inesNode *Node) error {
 
 	if !util.ValidateIsPowerOfTwo(inesNode.AsNumber) ||
 		operandFactory.ValidateNumericNodeIsGTValue(inesNode, 128) {
-		return errors.New("Unacceptable INES PRG size declared!")
+		return errors.New(enumErrorCodes.INESPRGUnacceptable)
 	}
 
 	INESHeader.hasSetPrg = true
@@ -129,7 +130,7 @@ func ValidateInesChr(inesNode *Node) error {
 	inesOperationDescription := "INES CHR"
 
 	if INESHeader.hasSetChr {
-		return errors.New("INES CHR has already been set!!!")
+		return errors.New(enumErrorCodes.INESCHRSet)
 	}
 
 	if operandFactory.ValidateNodeIsString(inesNode) {
@@ -141,7 +142,7 @@ func ValidateInesChr(inesNode *Node) error {
 
 	if !(operandFactory.ValidateNodeIsNumeric(inesNode) &&
 		operandFactory.ValidateNumericNodeIsPositive(inesNode)) {
-		return errors.New("INES CHR must be >= 1 or use a valid alias")
+		return errors.New(enumErrorCodes.INESCHRBadValue)
 	}
 
 	err := util.ValidateSizeNumberAliasUsable(inesNode, &inesChrSizeEnumAliases, inesOperationDescription)
@@ -151,7 +152,7 @@ func ValidateInesChr(inesNode *Node) error {
 
 	if !util.ValidateIsPowerOfTwo(inesNode.AsNumber) ||
 		operandFactory.ValidateNumericNodeIsGTValue(inesNode, 256) {
-		return errors.New("Unacceptable INES CHR size declared!")
+		return errors.New(enumErrorCodes.INESCHRUnacceptable)
 	}
 
 	INESHeader.hasSetChr = true

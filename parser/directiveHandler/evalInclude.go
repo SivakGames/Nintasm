@@ -2,7 +2,7 @@ package directiveHandler
 
 import (
 	"errors"
-	"misc/nintasm/assemble/fileStack"
+	"misc/nintasm/assemble/fileHandler"
 	"misc/nintasm/interpreter/operandFactory"
 	"misc/nintasm/romBuilder"
 )
@@ -12,12 +12,12 @@ func evalInclude(operandList *[]Node) error {
 	if !operandFactory.ValidateNodeIsString(&fileNameNode) {
 		return errors.New("Input file has to be a string!!!")
 	}
-	newFileName := fileStack.AddRelativePathIncludeFileName(fileNameNode.NodeValue)
-	err := fileStack.OpenInputFileAndPushLinesToStack(newFileName)
+	newFileName := fileHandler.AddRelativePathIncludeFileName(fileNameNode.NodeValue)
+	err := fileHandler.OpenInputFileAndPushLinesToStack(newFileName)
 	if err != nil {
 		return err
 	}
-	fileStack.TriggerNewStackCall = true
+	fileHandler.TriggerNewStackCall = true
 
 	return nil
 }
@@ -32,7 +32,7 @@ func evalIncbin(operandList *[]Node) error {
 	if !operandFactory.ValidateNodeIsString(&fileNameNode) {
 		return errors.New("Input file has to be a string!!!")
 	}
-	newBinFileName := fileStack.AddRelativePathIncludeFileName(fileNameNode.NodeValue)
+	newBinFileName := fileHandler.AddRelativePathIncludeFileName(fileNameNode.NodeValue)
 
 	if len(*operandList) >= 2 {
 		seekNode := (*operandList)[1]
@@ -52,7 +52,7 @@ func evalIncbin(operandList *[]Node) error {
 		readValue = readNode.AsNumber
 	}
 
-	byteBuffer, err := fileStack.ProcessBinFile(newBinFileName, seekValue, readValue)
+	byteBuffer, err := fileHandler.ProcessBinFile(newBinFileName, seekValue, readValue)
 	if err != nil {
 		return err
 	}

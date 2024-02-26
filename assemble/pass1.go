@@ -3,7 +3,10 @@ package assemble
 import (
 	"fmt"
 	"misc/nintasm/assemble/blockStack"
+	"misc/nintasm/assemble/errorHandler"
+	"misc/nintasm/assemble/fileHandler"
 	"misc/nintasm/assemble/fileStack"
+	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
 	enumParserTypes "misc/nintasm/constants/enums/parserTypes"
 	"misc/nintasm/interpreter"
 	"misc/nintasm/parser"
@@ -15,23 +18,28 @@ var instructionOperandParser = parser.NewInstructionOperandParser()
 var labelOperandParser = parser.NewLabelOperandParser()
 var macroOperandParser = parser.NewMacroOperandParser()
 
+// Main process starts - open input primary input file
 func Start(initialInputFile string) error {
-	err := fileStack.GetFirstInputFile(initialInputFile)
+	var err error
+
+	err = fileHandler.GetFirstInputFile(initialInputFile)
 	if err != nil {
+		errorHandler.AddNew(enumErrorCodes.IncludeFileNotExist, initialInputFile)
+		errorHandler.ProcessError(err)
 		return err
 	}
-	err = GetLinesTopFileStack()
+	err = startReadingLinesTopFileStack()
 	if err != nil {
 		fileData := fileStack.GetTopOfFileStack()
 		fmt.Print("\x1b[38;5;208m")
 		fmt.Println(fileData.FileName, "\x1b[0m")
 		return err
 	}
-	fmt.Println("End of the line!")
 	return nil
 }
 
-func GetLinesTopFileStack() error {
+// Will get whatever's on the top of the file stack and prep the loop
+func startReadingLinesTopFileStack() error {
 	fileData := fileStack.GetTopOfFileStack()
 	err := ReadLines(&fileData.ProcessedLines, &fileData.CurrentLineNumber)
 	if err != nil {
@@ -229,9 +237,9 @@ func parseOperandStringAndProcess(
 	default:
 		panic("🛑 Parent parsing operation could not be determined!")
 	}
-	if fileStack.TriggerNewStackCall {
-		fileStack.TriggerNewStackCall = false
-		err := GetLinesTopFileStack()
+	if fileHandler.TriggerNewStackCall {
+		fileHandler.TriggerNewStackCall = false
+		err := startReadingLinesTopFileStack()
 		if err != nil {
 			return err
 		}
