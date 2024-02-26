@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"misc/nintasm/assemble/fileStack"
 	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
+	"strings"
 )
 
 type ErrorTableEntry struct {
@@ -31,34 +32,64 @@ var errorTable = map[enumErrorCodes.Def]ErrorTableEntry{
 	enumErrorCodes.INESCHRUnacceptable: newErrorTableEntry(enumErrorCodes.Error, "Unacceptable INES CHR size declared!"),
 }
 
+// ++++++++++++++++++++++++++++++++++++++++
+
 type ErrorEntry struct {
-	code       enumErrorCodes.Def
-	lineNumber uint
-	fileName   string
-	message    string
-	hint       string
+	code        enumErrorCodes.Def
+	lineNumber  uint
+	lineContent string
+	fileName    string
+	message     string
+	hint        string
+	severity    enumErrorCodes.Severity
 }
 
-func NewErrorEntry(code enumErrorCodes.Def) ErrorEntry {
+func NewErrorEntry(code enumErrorCodes.Def, message string, severity enumErrorCodes.Severity) ErrorEntry {
 	fileData := fileStack.GetTopOfFileStack()
+
+	if fileData != nil {
+		return ErrorEntry{
+			code:        code,
+			message:     message,
+			fileName:    fileData.FileName,
+			lineNumber:  fileData.CurrentLineNumber,
+			lineContent: fileData.ProcessedLines[fileData.CurrentLineNumber-1],
+			severity:    severity,
+		}
+	}
 	return ErrorEntry{
 		code:       code,
-		fileName:   fileData.FileName,
-		lineNumber: fileData.CurrentLineNumber,
+		message:    message,
+		fileName:   "NO FILE",
+		lineNumber: 0,
 	}
 }
-
-// xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
 // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
 func AddNew(errorTableKey enumErrorCodes.Def, args ...interface{}) {
-	errData, ok := errorTable[errorTableKey]
-	if ok {
+	errData, tableKeyExists := errorTable[errorTableKey]
+	if tableKeyExists {
 		errMsg := fmt.Sprintf(errData.description, args...)
-		fmt.Println(errMsg)
-	}
+		entry := NewErrorEntry(errorTableKey, errMsg, errData.severity)
 
+		fmt.Println("\x1b[41m", entry.fileName, "\x1b[0m")
+		if entry.lineNumber > 0 {
+			lineData := fmt.Sprintf("%d %v", entry.lineNumber, entry.lineContent)
+			fmt.Println(lineData)
+		}
+		paddedStr := padStringLeft("1", 5, '░')
+		fmt.Println(paddedStr)
+
+	}
+}
+
+func padStringLeft(s string, length int, char rune) string {
+	padding := length - len(s)
+	if padding <= 0 {
+		return s // No padding needed or negative padding
+	}
+	return strings.Repeat(string(char), padding) + s
 }
 
 // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx

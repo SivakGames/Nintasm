@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"misc/nintasm/assemble/errorHandler"
 	"misc/nintasm/assemble/fileStack"
 	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
 	"os"
@@ -14,13 +15,16 @@ import (
 var relativeFileDirectory string
 var TriggerNewStackCall bool = false
 
-// The primary source file from the command line
+// ---------------------------------------------------
+
+// Get and process the primary source file from the command line
 func GetFirstInputFile(inputFileName string) error {
 	var err error
 
 	_, err = os.Stat(inputFileName)
 	if err != nil {
 		if os.IsNotExist(err) {
+			errorHandler.AddNew(enumErrorCodes.IncludeFileNotExist, inputFileName)
 			return errors.New(enumErrorCodes.IncludeFileNotExist)
 		} else {
 			return err

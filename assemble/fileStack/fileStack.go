@@ -14,18 +14,21 @@ func newFileStackEntry(fileName string, processedLines []string) fileStackEntry 
 	}
 }
 
-var InputFileLines []fileStackEntry
+var fileStackEntries []fileStackEntry
 
 // +++++++++++++++++++++++++++++++++
 
-func GetTopOfFileStack() fileStackEntry {
-	return InputFileLines[len(InputFileLines)-1]
+func GetTopOfFileStack() *fileStackEntry {
+	if len(fileStackEntries) > 0 {
+		return &fileStackEntries[len(fileStackEntries)-1]
+	}
+	return nil
 }
 
 func PushToTopOfStack(inputFileName string, processedLines []string) {
-	InputFileLines = append(InputFileLines, newFileStackEntry(inputFileName, processedLines))
+	fileStackEntries = append(fileStackEntries, newFileStackEntry(inputFileName, processedLines))
 }
 
 func PopFromFileStack() {
-	InputFileLines = InputFileLines[:len(InputFileLines)-1]
+	fileStackEntries = fileStackEntries[:len(fileStackEntries)-1]
 }
