@@ -85,11 +85,10 @@ func (p *Parser) eatFreelyAndAdvance(desiredTokenType tokenEnum) error {
 // Should be called before parsing any operands.
 // Will set the tokenizer spec to operand, put the cursor where operands are supposed to start,
 // and advance the lookahead where it needs to be.
-func (p *OperandParser) SetupOperandParser(line string, operandPosition int) error {
-	p.operandLine = line
-	p.operandPosition = operandPosition
+func (p *OperandParser) SetupOperandParser(line string, operandListStringStartPosition int) error {
+	p.operandListStringStartPosition = operandListStringStartPosition
 	p.tokenizer.Start(line, OPERAND_TARGET_TOKENIZER)
-	p.tokenizer.RepositionCursor(operandPosition)
+	p.tokenizer.RepositionCursor(operandListStringStartPosition)
 	err := p.advanceToNext()
 	if err != nil {
 		return err

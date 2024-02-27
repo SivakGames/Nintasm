@@ -7,11 +7,11 @@
 	.bank 0
 	.org $8000
 
-	;LDA #high(label11)
 
 label11:
 	LDX #5
 	.include "__.6502"
+	lda #6
 
 	.romSegment "8kb","8kb","CHR"
 	.bank 0

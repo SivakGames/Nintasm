@@ -42,15 +42,13 @@ func startReadingLinesTopFileStack() error {
 }
 
 func ReadLines(lines *[]string, lineCounter *uint) error {
-	instructionOperandParser.ShouldParseInstructions = true
-
 	lineInitParser := parser.NewInitialLineParser()
 	lineOperationParser := parser.NewOperationParser()
 
 	// Iterate over all lines
 
 	for i, rawLine := range *lines {
-		*lineCounter++
+		*lineCounter += 1
 
 		//Step 1 - Reformat line
 		reformattedLine, lineInitErr := lineInitParser.Process(rawLine)

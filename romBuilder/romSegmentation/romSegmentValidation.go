@@ -1,7 +1,8 @@
 package romSegmentation
 
 import (
-	"errors"
+	"misc/nintasm/assemble/errorHandler"
+	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
 	enumSizeAliases "misc/nintasm/constants/enums/sizeAliases"
 	"misc/nintasm/interpreter/operandFactory"
 	"misc/nintasm/romBuilder"
@@ -79,13 +80,11 @@ func ValidateAndAddRomSegment(segmentSizeNode *Node, segmentBankSizeNode *Node, 
 
 func validateNodeNumerics(node *Node) error {
 	if !operandFactory.ValidateNodeIsNumeric(node) {
-		return errors.New("ROM Segment size must be a number")
-	}
-	if !operandFactory.ValidateNumericNodeIsGTEandLTEValues(node, ROM_SEGMENT_MIN_SIZE, ROM_SEGMENT_MAX_SIZE) {
-		return errors.New("Unacceptable ROM Segment size!")
-	}
-	if !util.ValidateIsPowerOfTwo(node.AsNumber) {
-		return errors.New("ROM Segment size must be a power of 2")
+		return errorHandler.AddNew(enumErrorCodes.NodeTypeNotNumeric)
+	} else if !operandFactory.ValidateNumericNodeIsGTEandLTEValues(node, ROM_SEGMENT_MIN_SIZE, ROM_SEGMENT_MAX_SIZE) {
+		return errorHandler.AddNew(enumErrorCodes.NodeValueNotGTEandLTE, ROM_SEGMENT_MIN_SIZE, ROM_SEGMENT_MAX_SIZE)
+	} else if !util.ValidateIsPowerOfTwo(node.AsNumber) {
+		return errorHandler.AddNew(enumErrorCodes.NodeValueNotPowerOf2)
 	}
 	return nil
 }

@@ -15,12 +15,11 @@ type Node = operandFactory.Node
 
 // General type for other operand parsers to borrow from
 type OperandParser struct {
-	operandLine             string
-	operandPosition         int
-	ShouldParseInstructions bool
-	instructionMode         instModeEnum
-	instructionXYIndex      tokenEnum
-	manuallyEvalOperands    bool
+	operandListStringStartPosition int
+	operandStartPosition           int
+	instructionMode                instModeEnum
+	instructionXYIndex             tokenEnum
+	manuallyEvalOperands           bool
 	Parser
 }
 
@@ -34,7 +33,6 @@ type OperandParser struct {
 func (p *OperandParser) GetOperandList(
 	minOperands int, maxOperands int,
 	manuallyEvalOperands bool, captureMasks []string) ([]Node, error) {
-	//var captureStatementFunction func() (Node, error)
 
 	operandList := []Node{}
 	operandCount := 0
@@ -62,7 +60,6 @@ func (p *OperandParser) GetOperandList(
 		if err != nil {
 			return operandList, err // ❌ Fails
 		}
-
 		err := p.getOperandAndAppend(&operandList, &captureMasks)
 		if err != nil {
 			return operandList, nil
@@ -705,6 +702,7 @@ func (p *OperandParser) parenthesizedExpression() (Node, error) {
 func (p *OperandParser) literal() (Node, error) {
 	literalType := p.lookaheadType
 	literalValue := p.lookaheadValue
+
 	err := p.eatFreelyAndAdvance(p.lookaheadType)
 	if err != nil {
 		return operandFactory.EmptyNode(), err
