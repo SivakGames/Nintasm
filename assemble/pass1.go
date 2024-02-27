@@ -1,12 +1,9 @@
 package assemble
 
 import (
-	"fmt"
 	"misc/nintasm/assemble/blockStack"
-	"misc/nintasm/assemble/errorHandler"
 	"misc/nintasm/assemble/fileHandler"
 	"misc/nintasm/assemble/fileStack"
-	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
 	enumParserTypes "misc/nintasm/constants/enums/parserTypes"
 	"misc/nintasm/interpreter"
 	"misc/nintasm/parser"
@@ -24,15 +21,10 @@ func Start(initialInputFile string) error {
 
 	err = fileHandler.GetFirstInputFile(initialInputFile)
 	if err != nil {
-		errorHandler.AddNew(enumErrorCodes.IncludeFileNotExist, initialInputFile)
-		errorHandler.ProcessError(err)
 		return err
 	}
 	err = startReadingLinesTopFileStack()
 	if err != nil {
-		fileData := fileStack.GetTopOfFileStack()
-		fmt.Print("\x1b[38;5;208m")
-		fmt.Println(fileData.FileName, "\x1b[0m")
 		return err
 	}
 	return nil

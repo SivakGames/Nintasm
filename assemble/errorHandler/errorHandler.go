@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"misc/nintasm/assemble/fileStack"
 	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
-	"strings"
+	"misc/nintasm/util"
 )
 
 type ErrorTableEntry struct {
@@ -20,7 +20,7 @@ func newErrorTableEntry(severity enumErrorCodes.Severity, description string) Er
 }
 
 var errorTable = map[enumErrorCodes.Def]ErrorTableEntry{
-	enumErrorCodes.IncludeFileNotExist: newErrorTableEntry(enumErrorCodes.Fatal, "Source file %v does not exist!"),
+	enumErrorCodes.IncludeFileNotExist: newErrorTableEntry(enumErrorCodes.Fatal, "Source file \x1b[92m%v\x1b[0m does not exist!"),
 	enumErrorCodes.FailOpenFile:        newErrorTableEntry(enumErrorCodes.Fatal, "Failed to open source file: %v"),
 	enumErrorCodes.FailScanFile:        newErrorTableEntry(enumErrorCodes.Fatal, "Failed to scan file!\n%v"),
 
@@ -58,12 +58,26 @@ func NewErrorEntry(code enumErrorCodes.Def, message string, severity enumErrorCo
 		}
 	}
 	return ErrorEntry{
-		code:       code,
-		message:    message,
-		fileName:   "NO FILE",
-		lineNumber: 0,
+		code:        code,
+		message:     message,
+		fileName:    "NO FILE",
+		lineNumber:  0,
+		lineContent: "",
+		severity:    severity,
 	}
 }
+
+/*
+
+░ >> D:\Emulate\NES\Disassemblies\Lolo 3\prg\fixed.6502
+▓   2711   .include "prg/music-engine/dpcm-samples.6502a"
+▓  FATAL ERROR  Source  .INCLUDE  file prg/music-engine/dpcm-samples.6502a does not exist!!!
+
+ >>> Assembly WILL NOT continue due to fatal errors! <<<
+Assembly could not be completed due to errors!
+Total Error Count: 1 / Total Warning Count: 0
+
+*/
 
 // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
@@ -73,23 +87,30 @@ func AddNew(errorTableKey enumErrorCodes.Def, args ...interface{}) {
 		errMsg := fmt.Sprintf(errData.description, args...)
 		entry := NewErrorEntry(errorTableKey, errMsg, errData.severity)
 
-		fmt.Println("\x1b[41m", entry.fileName, "\x1b[0m")
-		if entry.lineNumber > 0 {
-			lineData := fmt.Sprintf("%d %v", entry.lineNumber, entry.lineContent)
-			fmt.Println(lineData)
+		colorizedFileName := util.Colorize(fmt.Sprintf(" >> %v ", entry.fileName), "red", true)
+		fmt.Println("░", colorizedFileName)
+
+		//Line number and content
+		colorizedLineNumber := util.Colorize(util.PadStringLeft(fmt.Sprintf(" %d ", entry.lineNumber), 7, ' '), "blue", true)
+		fmt.Println("▓", colorizedLineNumber)
+
+		severityDescription, severityColor := "", ""
+
+		switch entry.severity {
+		case enumErrorCodes.Warning:
+			severityColor = "yellow"
+			severityDescription = "WARN"
+		case enumErrorCodes.Error:
+			severityColor = "red"
+			severityDescription = "ERROR"
+		case enumErrorCodes.Fatal:
+			severityColor = "magenta"
+			severityDescription = "FATAL ERROR"
 		}
-		paddedStr := padStringLeft("1", 5, '░')
-		fmt.Println(paddedStr)
+		colorizedSeverity := util.Colorize(util.PadStringLeft(fmt.Sprintf(" %v ", severityDescription), 7, ' '), severityColor, true)
+		fmt.Println("▓", colorizedSeverity, errMsg)
 
 	}
-}
-
-func padStringLeft(s string, length int, char rune) string {
-	padding := length - len(s)
-	if padding <= 0 {
-		return s // No padding needed or negative padding
-	}
-	return strings.Repeat(string(char), padding) + s
 }
 
 // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx

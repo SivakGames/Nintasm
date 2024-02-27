@@ -71,7 +71,11 @@ func (p *DirectiveOperandParser) Process(operationTokenEnum tokenEnum, operation
 		return err // ❌ Fails
 	}
 
-	err = directiveHandler.Process(operationTokenEnum, directiveName, operationLabel, &operandList)
+	err = directiveHandler.EvaluateDirective(operationTokenEnum, directiveName, operationLabel, &operandList)
+	if err != nil {
+		fmt.Println("Error while evaluatin'")
+	}
+
 	return err
 
 }

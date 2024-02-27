@@ -1,5 +1,6 @@
 	.inesMap 0
 	.inesPrg "32kb"
+	.inesPrg "32kb"
 	.inesChr "8kb"
 	.inesMir 0
 

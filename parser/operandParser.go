@@ -34,7 +34,7 @@ type OperandParser struct {
 func (p *OperandParser) GetOperandList(
 	minOperands int, maxOperands int,
 	manuallyEvalOperands bool, captureMasks []string) ([]Node, error) {
-	var captureStatementFunction func() (Node, error)
+	//var captureStatementFunction func() (Node, error)
 
 	operandList := []Node{}
 	operandCount := 0
@@ -50,49 +50,23 @@ func (p *OperandParser) GetOperandList(
 		return operandList, errors.New("Operand list \x1b[38;5;202mCANNOT\x1b[0m start with a comma!") // ❌ Fails
 	}
 
-	captureStatementFunction = p.statement
-
-	if len(captureMasks) > len(operandList) {
-		switch captureMasks[len(operandList)] {
-		case "instruction":
-			captureStatementFunction = p.instructionPrefix
-		case "macro":
-			captureStatementFunction = p.macroReplaceStatement
-		default:
-			captureStatementFunction = p.statement
-		}
-	}
-
-	//There is at least one operand
-	firstOperand, err := captureStatementFunction()
+	// Get first operand
+	err := p.getOperandAndAppend(&operandList, &captureMasks)
 	if err != nil {
-		return operandList, err // ❌ Fails
+		return operandList, nil
 	}
 
-	operandList = append(operandList, firstOperand)
-	//From here, operands are comma separated
+	//From here get subsequent operands, if any. Operands are comma-separated
 	for p.lookaheadType != enumTokenTypes.None && p.lookaheadType == enumTokenTypes.DELIMITER_comma {
 		err = p.eatFreelyAndAdvance(enumTokenTypes.DELIMITER_comma)
 		if err != nil {
 			return operandList, err // ❌ Fails
 		}
 
-		if len(captureMasks) > len(operandList) {
-			switch captureMasks[len(operandList)] {
-			case "instruction":
-				captureStatementFunction = p.instructionPrefix
-			case "macro":
-				captureStatementFunction = p.macroReplaceStatement
-			default:
-				captureStatementFunction = p.statement
-			}
-		}
-
-		subsequentOperand, err := captureStatementFunction()
+		err := p.getOperandAndAppend(&operandList, &captureMasks)
 		if err != nil {
-			return operandList, err // ❌ Fails
+			return operandList, nil
 		}
-		operandList = append(operandList, subsequentOperand)
 		operandCount++
 	}
 
@@ -104,6 +78,32 @@ func (p *OperandParser) GetOperandList(
 	}
 
 	return operandList, nil // 🟢 Succeeds
+}
+
+// =============================================
+
+// =============================================
+func (p *OperandParser) getOperandAndAppend(operandList *[]Node, captureMasks *[]string) error {
+	captureStatementFunction := p.statement
+
+	if len(*captureMasks) > len(*operandList) {
+		switch (*captureMasks)[len(*operandList)] {
+		case "instruction":
+			captureStatementFunction = p.instructionPrefix
+		case "macro":
+			captureStatementFunction = p.macroReplaceStatement
+		default:
+			captureStatementFunction = p.statement
+		}
+	}
+
+	operand, err := captureStatementFunction()
+	if err != nil {
+		fmt.Println("Parsing operand has failed!")
+		return err // ❌ Fails
+	}
+	*operandList = append(*operandList, operand)
+	return nil
 }
 
 // =============================================
