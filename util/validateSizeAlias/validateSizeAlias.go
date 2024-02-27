@@ -1,8 +1,8 @@
-package util
+package validateSizeAlias
 
 import (
-	"errors"
-	"fmt"
+	"misc/nintasm/assemble/errorHandler"
+	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
 	enumSizeAliases "misc/nintasm/constants/enums/sizeAliases"
 	"misc/nintasm/interpreter/operandFactory"
 	"strings"
@@ -46,13 +46,11 @@ var sizeNumericAliases = map[int]enumSizeAliases.Def{
 func ValidateSizeStringAliasUsable(node *Node, aliasTable *map[enumSizeAliases.Def]int, operationDescription string) error {
 	enumValue, enumOk := ValidateSizeStringAlias(node.NodeValue)
 	if !enumOk {
-		errMessage := fmt.Sprintf("Invalid %v value alias!", operationDescription)
-		return errors.New(errMessage)
+		return errorHandler.AddNew(enumErrorCodes.InvalidValueAlias)
 	}
 	value, ok := (*aliasTable)[enumValue]
 	if !ok {
-		errMessage := fmt.Sprintf("Unacceptable %v size declared!", operationDescription)
-		return errors.New(errMessage)
+		return errorHandler.AddNew(enumErrorCodes.UnacceptableAlias)
 	}
 	node.AsNumber = value
 	operandFactory.ConvertNodeToNumericLiteral(node)
@@ -66,8 +64,7 @@ func ValidateSizeNumberAliasUsable(node *Node, aliasTable *map[enumSizeAliases.D
 	if enumOk {
 		value, ok := (*aliasTable)[enumValue]
 		if !ok {
-			errMessage := fmt.Sprintf("Unacceptable %v size declared!", inesOperationDescription)
-			return errors.New(errMessage)
+			return errorHandler.AddNew(enumErrorCodes.UnacceptableAlias)
 		}
 		node.AsNumber = value
 	}

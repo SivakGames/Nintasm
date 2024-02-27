@@ -6,6 +6,7 @@ import (
 	"misc/nintasm/interpreter/operandFactory"
 	"misc/nintasm/romBuilder"
 	"misc/nintasm/util"
+	"misc/nintasm/util/validateSizeAlias"
 )
 
 type Node = operandFactory.Node
@@ -41,7 +42,7 @@ func ValidateAndAddRomSegment(segmentSizeNode *Node, segmentBankSizeNode *Node, 
 	// Check segment size
 
 	if operandFactory.ValidateNodeIsString(segmentSizeNode) {
-		err = util.ValidateSizeStringAliasUsable(segmentSizeNode, &romSegmentEnumAliases, "ROM SEGMENT - segment size")
+		err = validateSizeAlias.ValidateSizeStringAliasUsable(segmentSizeNode, &romSegmentEnumAliases, "ROM SEGMENT - segment size")
 		if err != nil {
 			return err
 		}
@@ -58,7 +59,7 @@ func ValidateAndAddRomSegment(segmentSizeNode *Node, segmentBankSizeNode *Node, 
 		segmentBankSize = segmentSize
 	} else {
 		if operandFactory.ValidateNodeIsString(segmentBankSizeNode) {
-			err := util.ValidateSizeStringAliasUsable(segmentBankSizeNode, &romSegmentEnumAliases, "ROM SEGMENT - bank size")
+			err := validateSizeAlias.ValidateSizeStringAliasUsable(segmentBankSizeNode, &romSegmentEnumAliases, "ROM SEGMENT - bank size")
 			if err != nil {
 				return err
 			}

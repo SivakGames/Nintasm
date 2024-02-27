@@ -1,6 +1,7 @@
 package errorHandler
 
 import (
+	"errors"
 	"fmt"
 	"misc/nintasm/assemble/fileStack"
 	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
@@ -19,17 +20,33 @@ func newErrorTableEntry(severity enumErrorCodes.Severity, description string) Er
 	}
 }
 
+func coloredSymbol(s string) string {
+	return util.Colorize(s, "lightcyan", false)
+}
+func coloredNumber(s string) string {
+	return util.Colorize(s, "yellow", false)
+}
+
 var errorTable = map[enumErrorCodes.Def]ErrorTableEntry{
 	enumErrorCodes.IncludeFileNotExist: newErrorTableEntry(enumErrorCodes.Fatal, "Source file \x1b[92m%v\x1b[0m does not exist!"),
 	enumErrorCodes.FailOpenFile:        newErrorTableEntry(enumErrorCodes.Fatal, "Failed to open source file: %v"),
 	enumErrorCodes.FailScanFile:        newErrorTableEntry(enumErrorCodes.Fatal, "Failed to scan file!\n%v"),
 
-	enumErrorCodes.INESPRGSet:          newErrorTableEntry(enumErrorCodes.Error, "INES PRG has already been set!!!"),
-	enumErrorCodes.INESPRGBadValue:     newErrorTableEntry(enumErrorCodes.Error, "INES PRG must be >= 1 or use a valid alias"),
-	enumErrorCodes.INESPRGUnacceptable: newErrorTableEntry(enumErrorCodes.Error, "Unacceptable INES PRG size declared!"),
-	enumErrorCodes.INESCHRSet:          newErrorTableEntry(enumErrorCodes.Error, "INES CHR has already been set!!!"),
-	enumErrorCodes.INESCHRBadValue:     newErrorTableEntry(enumErrorCodes.Error, "INES CHR must be >= 1 or use a valid alias"),
-	enumErrorCodes.INESCHRUnacceptable: newErrorTableEntry(enumErrorCodes.Error, "Unacceptable INES CHR size declared!"),
+	enumErrorCodes.NodeTypeNotNumeric:   newErrorTableEntry(enumErrorCodes.Error, "Value must be numeric!"),
+	enumErrorCodes.NodeValueNotPositive: newErrorTableEntry(enumErrorCodes.Error, "Value must be positive!"),
+	enumErrorCodes.NodeValueNot8Bit:     newErrorTableEntry(enumErrorCodes.Error, "Value must be 8 bit!"),
+	enumErrorCodes.NodeValueNotPowerOf2: newErrorTableEntry(enumErrorCodes.Error, "Value must be a power of 2!"),
+
+	enumErrorCodes.NodeValueNotGT:        newErrorTableEntry(enumErrorCodes.Error, fmt.Sprintf("Value must be %v %v", coloredSymbol(">"), coloredNumber("%d"))),
+	enumErrorCodes.NodeValueNotLT:        newErrorTableEntry(enumErrorCodes.Error, fmt.Sprintf("Value must be %v %v", coloredSymbol("<"), coloredNumber("%d"))),
+	enumErrorCodes.NodeValueNotGTE:       newErrorTableEntry(enumErrorCodes.Error, fmt.Sprintf("Value must be %v %v", coloredSymbol(">="), coloredNumber("%d"))),
+	enumErrorCodes.NodeValueNotLTE:       newErrorTableEntry(enumErrorCodes.Error, fmt.Sprintf("Value must be %v %v", coloredSymbol("<="), coloredNumber("%d"))),
+	enumErrorCodes.NodeValueNotGTEandLTE: newErrorTableEntry(enumErrorCodes.Error, fmt.Sprintf("Value must be %v %v and %v %v", coloredSymbol(">="), coloredNumber("%d"), coloredSymbol("<="), coloredNumber("%d"))),
+
+	enumErrorCodes.InvalidValueAlias: newErrorTableEntry(enumErrorCodes.Error, "Invalid value alias!"),
+	enumErrorCodes.UnacceptableAlias: newErrorTableEntry(enumErrorCodes.Error, "Unacceptable value alias!"),
+
+	enumErrorCodes.INESValueAlreadySet: newErrorTableEntry(enumErrorCodes.Error, "%v value has already been set!!!"),
 }
 
 // ++++++++++++++++++++++++++++++++++++++++
@@ -81,7 +98,7 @@ Total Error Count: 1 / Total Warning Count: 0
 
 // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
-func AddNew(errorTableKey enumErrorCodes.Def, args ...interface{}) {
+func AddNew(errorTableKey enumErrorCodes.Def, args ...interface{}) error {
 	errData, tableKeyExists := errorTable[errorTableKey]
 	if tableKeyExists {
 		errMsg := fmt.Sprintf(errData.description, args...)
@@ -92,7 +109,7 @@ func AddNew(errorTableKey enumErrorCodes.Def, args ...interface{}) {
 
 		//Line number and content
 		colorizedLineNumber := util.Colorize(util.PadStringLeft(fmt.Sprintf(" %d ", entry.lineNumber), 7, ' '), "blue", true)
-		fmt.Println("▓", colorizedLineNumber)
+		fmt.Println("▓", colorizedLineNumber, entry.lineContent)
 
 		severityDescription, severityColor := "", ""
 
@@ -109,20 +126,16 @@ func AddNew(errorTableKey enumErrorCodes.Def, args ...interface{}) {
 		}
 		colorizedSeverity := util.Colorize(util.PadStringLeft(fmt.Sprintf(" %v ", severityDescription), 7, ' '), severityColor, true)
 		fmt.Println("▓", colorizedSeverity, errMsg)
-
+		return errors.New(fmt.Sprintf("SEVERITY_%d", entry.severity))
 	}
+	return errors.New("Non-error-code error???")
 }
 
 // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
-func ProcessError(err error) {
+func IsErrorCode(err error) (bool, enumErrorCodes.Def) {
 	errorCode := err.Error()
 	errorTableKey := enumErrorCodes.Def(errorCode)
-	errData, ok := errorTable[errorTableKey]
-	if ok {
-		fmt.Println(errData)
-
-	} else {
-		fmt.Println("Non-coded error has occurred!")
-	}
+	_, isValidErrorCode := errorTable[errorTableKey]
+	return isValidErrorCode, errorTableKey
 }

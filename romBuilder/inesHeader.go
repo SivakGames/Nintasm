@@ -1,11 +1,12 @@
 package romBuilder
 
 import (
-	"errors"
+	"misc/nintasm/assemble/errorHandler"
 	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
 	enumSizeAliases "misc/nintasm/constants/enums/sizeAliases"
 	"misc/nintasm/interpreter/operandFactory"
 	"misc/nintasm/util"
+	"misc/nintasm/util/validateSizeAlias"
 )
 
 type iNESHeaderFormat struct {
@@ -54,13 +55,14 @@ var inesChrSizeEnumAliases = map[enumSizeAliases.Def]int{
 // INES Mapper declaration
 func ValidateInesMap(inesNode *Node) error {
 	if INESHeader.hasSetMapper {
-		return errors.New("INES mapper has already been set!!!")
+		return errorHandler.AddNew(enumErrorCodes.INESValueAlreadySet, "INES mapper")
 	}
-
-	if !(operandFactory.ValidateNodeIsNumeric(inesNode) &&
-		operandFactory.ValidateNumericNodeIsPositive(inesNode) &&
-		operandFactory.ValidateNumericNodeIs8BitValue(inesNode)) {
-		return errors.New("INES mapper must be a non-negative 8-bit number")
+	if !operandFactory.ValidateNodeIsNumeric(inesNode) {
+		return errorHandler.AddNew(enumErrorCodes.NodeTypeNotNumeric)
+	} else if !operandFactory.ValidateNumericNodeIsPositive(inesNode) {
+		return errorHandler.AddNew(enumErrorCodes.NodeValueNotPositive)
+	} else if !(operandFactory.ValidateNumericNodeIs8BitValue(inesNode)) {
+		return errorHandler.AddNew(enumErrorCodes.NodeValueNot8Bit)
 	}
 
 	INESHeader.hasSetMapper = true
@@ -73,11 +75,11 @@ func ValidateInesMap(inesNode *Node) error {
 // INES Mirroring declaration
 func ValidateInesMirroring(inesNode *Node) error {
 	if INESHeader.hasSetMirroring {
-		return errors.New("INES mirroring has already been set!!!")
-	}
-	if !(operandFactory.ValidateNodeIsNumeric(inesNode) &&
-		operandFactory.ValidateNumericNodeIsGTEandLTEValues(inesNode, 0, 1)) {
-		return errors.New("INES mirroring must be either 0 or 1")
+		return errorHandler.AddNew(enumErrorCodes.INESValueAlreadySet, "INES mirroring")
+	} else if !operandFactory.ValidateNodeIsNumeric(inesNode) {
+		return errorHandler.AddNew(enumErrorCodes.NodeTypeNotNumeric)
+	} else if !operandFactory.ValidateNumericNodeIsGTEandLTEValues(inesNode, 0, 1) {
+		return errorHandler.AddNew(enumErrorCodes.NodeValueNotGTEandLTE, 0, 1)
 	}
 
 	INESHeader.hasSetMirroring = true
@@ -92,29 +94,31 @@ func ValidateInesPrg(inesNode *Node) error {
 	inesOperationDescription := "INES PRG"
 
 	if INESHeader.hasSetPrg {
-		return errors.New(enumErrorCodes.INESPRGSet)
+		return errorHandler.AddNew(enumErrorCodes.INESValueAlreadySet, inesOperationDescription)
 	}
 
 	if operandFactory.ValidateNodeIsString(inesNode) {
-		err := util.ValidateSizeStringAliasUsable(inesNode, &inesPrgSizeEnumAliases, inesOperationDescription)
+		err := validateSizeAlias.ValidateSizeStringAliasUsable(inesNode, &inesPrgSizeEnumAliases, inesOperationDescription)
 		if err != nil {
 			return err
 		}
 	}
 
-	if !(operandFactory.ValidateNodeIsNumeric(inesNode) &&
-		operandFactory.ValidateNumericNodeIsPositive(inesNode)) {
-		return errors.New(enumErrorCodes.INESPRGSet)
+	if !operandFactory.ValidateNodeIsNumeric(inesNode) {
+		return errorHandler.AddNew(enumErrorCodes.NodeTypeNotNumeric)
+	} else if !operandFactory.ValidateNumericNodeIsPositive(inesNode) {
+		return errorHandler.AddNew(enumErrorCodes.NodeValueNotPositive)
 	}
 
-	err := util.ValidateSizeNumberAliasUsable(inesNode, &inesPrgSizeEnumAliases, inesOperationDescription)
+	err := validateSizeAlias.ValidateSizeNumberAliasUsable(inesNode, &inesPrgSizeEnumAliases, inesOperationDescription)
 	if err != nil {
 		return err
 	}
 
-	if !util.ValidateIsPowerOfTwo(inesNode.AsNumber) ||
-		operandFactory.ValidateNumericNodeIsGTValue(inesNode, 128) {
-		return errors.New(enumErrorCodes.INESPRGUnacceptable)
+	if !util.ValidateIsPowerOfTwo(inesNode.AsNumber) {
+		return errorHandler.AddNew(enumErrorCodes.NodeValueNotPowerOf2)
+	} else if operandFactory.ValidateNumericNodeIsGTValue(inesNode, 128) {
+		return errorHandler.AddNew(enumErrorCodes.NodeValueNotLTE, 128)
 	}
 
 	INESHeader.hasSetPrg = true
@@ -130,29 +134,31 @@ func ValidateInesChr(inesNode *Node) error {
 	inesOperationDescription := "INES CHR"
 
 	if INESHeader.hasSetChr {
-		return errors.New(enumErrorCodes.INESCHRSet)
+		return errorHandler.AddNew(enumErrorCodes.INESValueAlreadySet, inesOperationDescription)
 	}
 
 	if operandFactory.ValidateNodeIsString(inesNode) {
-		err := util.ValidateSizeStringAliasUsable(inesNode, &inesChrSizeEnumAliases, inesOperationDescription)
+		err := validateSizeAlias.ValidateSizeStringAliasUsable(inesNode, &inesChrSizeEnumAliases, inesOperationDescription)
 		if err != nil {
 			return err
 		}
 	}
 
-	if !(operandFactory.ValidateNodeIsNumeric(inesNode) &&
-		operandFactory.ValidateNumericNodeIsPositive(inesNode)) {
-		return errors.New(enumErrorCodes.INESCHRBadValue)
+	if !operandFactory.ValidateNodeIsNumeric(inesNode) {
+		return errorHandler.AddNew(enumErrorCodes.NodeTypeNotNumeric)
+	} else if !operandFactory.ValidateNumericNodeIsPositive(inesNode) {
+		return errorHandler.AddNew(enumErrorCodes.NodeValueNotPositive)
 	}
 
-	err := util.ValidateSizeNumberAliasUsable(inesNode, &inesChrSizeEnumAliases, inesOperationDescription)
+	err := validateSizeAlias.ValidateSizeNumberAliasUsable(inesNode, &inesChrSizeEnumAliases, inesOperationDescription)
 	if err != nil {
 		return err
 	}
 
-	if !util.ValidateIsPowerOfTwo(inesNode.AsNumber) ||
-		operandFactory.ValidateNumericNodeIsGTValue(inesNode, 256) {
-		return errors.New(enumErrorCodes.INESCHRUnacceptable)
+	if !util.ValidateIsPowerOfTwo(inesNode.AsNumber) {
+		return errorHandler.AddNew(enumErrorCodes.NodeValueNotPowerOf2)
+	} else if operandFactory.ValidateNumericNodeIsGTValue(inesNode, 256) {
+		return errorHandler.AddNew(enumErrorCodes.NodeValueNotLTE, 256)
 	}
 
 	INESHeader.hasSetChr = true

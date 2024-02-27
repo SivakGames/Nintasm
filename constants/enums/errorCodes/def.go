@@ -10,12 +10,22 @@ const (
 	FailOpenFile        = "FailOpenFile"
 	FailScanFile        = "FailScanFile"
 
-	INESPRGSet            = "INESPRGSet"
-	INESPRGBadValue       = "INESPRGBadValue"
-	INESPRGUnacceptable   = "INESPRGUnacceptable"
-	INESCHRSet            = "INESCHRSet"
-	INESCHRBadValue       = "INESCHRBadValue"
-	INESCHRUnacceptable   = "INESCHRUnacceptable"
+	NodeTypeNotNumeric   = "NodeTypeNotNumeric"
+	NodeTypeNotString    = "NodeTypeNotString"
+	NodeValueNotPositive = "NodeValueNotPositive"
+	NodeValueNot8Bit     = "NodeValueNot8Bit"
+	NodeValueNotPowerOf2 = "NodeValueNotPowerOf2"
+
+	NodeValueNotGT        = "NodeValueNotGT"
+	NodeValueNotLT        = "NodeValueNotLT"
+	NodeValueNotGTE       = "NodeValueNotGTE"
+	NodeValueNotLTE       = "NodeValueNotLTE"
+	NodeValueNotGTEandLTE = "NodeValueNotGTEandLTE"
+
+	InvalidValueAlias = "InvalidValueAlias"
+	UnacceptableAlias = "UnacceptableAlias"
+
+	INESValueAlreadySet   = "INESValueAlreadySet"
 	INESMapperSet         = "INESMapperSet"
 	INESMapperBadValue    = "INESMapperBadValue"
 	INESMirroringSet      = "INESMirroringSet"

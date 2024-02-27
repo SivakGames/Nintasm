@@ -49,11 +49,13 @@ func ReadLines(lines *[]string, lineCounter *uint) error {
 
 	// Iterate over all lines
 
-	for _, rawLine := range *lines {
+	for i, rawLine := range *lines {
 		*lineCounter++
 
 		//Step 1 - Reformat line
 		reformattedLine, lineInitErr := lineInitParser.Process(rawLine)
+		(*lines)[i] = reformattedLine
+
 		if lineInitErr != nil {
 			return lineInitErr
 		}

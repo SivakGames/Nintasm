@@ -17,6 +17,18 @@ func Colorize(text string, color string, isBG bool) string {
 		colorValue = 35
 	case "cyan":
 		colorValue = 36
+	case "lightred":
+		colorValue = 91
+	case "lightgreen":
+		colorValue = 92
+	case "lightyellow":
+		colorValue = 93
+	case "lightblue":
+		colorValue = 94
+	case "lightmagenta":
+		colorValue = 95
+	case "lightcyan":
+		colorValue = 96
 	}
 	if isBG {
 		colorValue += 10
