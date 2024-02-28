@@ -1,8 +1,8 @@
 package charmapTable
 
 import (
-	"errors"
-	"fmt"
+	"misc/nintasm/assemble/errorHandler"
+	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
 	"misc/nintasm/interpreter/operandFactory"
 )
 
@@ -40,18 +40,18 @@ func AddCharToCharmap(newChar rune, charNodes []Node) error {
 
 func GetCurrentCharmap() (CharmapTableType, error) {
 	if currentCharmapName == "" {
-		return nil, errors.New("No charmaps have been defined!!!!")
+		return nil, errorHandler.AddNew(enumErrorCodes.CharMapNoneDefined) // ❌ Fails
 	}
 	return charmapSymbolTable[currentCharmapName], nil
 }
 
 func GetSpecifiedCharmap(specifiedCharmapName string) (CharmapTableType, error) {
 	if currentCharmapName == "" {
-		return nil, errors.New("No charmaps have been defined!!!!")
+		return nil, errorHandler.AddNew(enumErrorCodes.CharMapNoneDefined) // ❌ Fails
 	}
 	specifiedCharmap, exists := charmapSymbolTable[specifiedCharmapName]
 	if !exists {
-		return nil, errors.New("Specified charmap doesn't exist!")
+		return nil, errorHandler.AddNew(enumErrorCodes.CharMapNotExist) // ❌ Fails
 	}
 	return specifiedCharmap, nil
 }
@@ -70,8 +70,7 @@ func MapStringToCharmap(stringToConvert string) (string, error) {
 	for _, r := range stringAsRuneArray {
 		nodes, exists := currCharmap[r]
 		if !exists {
-			errMsg := fmt.Sprintf("Character `%c` is not defined in currently used charmap %v", r, currentCharmapName)
-			return replacedString, errors.New(errMsg)
+			return replacedString, errorHandler.AddNew(enumErrorCodes.ToCharMapUndefChar, r, currentCharmapName) // ❌ Fails
 		}
 		for _, v := range nodes {
 			replacedString += string(rune(v.AsNumber))
@@ -91,8 +90,7 @@ func checkIfDefinedInCharmap(lookupChar rune) ([]Node, bool) {
 func CheckIfCharAlreadyExistsInCharmap(lookupChar rune) ([]Node, error) {
 	target, exists := checkIfDefinedInCharmap(lookupChar)
 	if exists {
-		errMsg := fmt.Sprintf("Target char %c already defined!", lookupChar)
-		return target, errors.New(errMsg)
+		return target, errorHandler.AddNew(enumErrorCodes.CharMapDuplicateKey, lookupChar) // ❌ Fails
 	}
 	return target, nil
 }
@@ -101,7 +99,7 @@ func CheckIfCharAlreadyExistsInCharmap(lookupChar rune) ([]Node, error) {
 
 func SetCharmapToDefault() error {
 	if defaultCharmapName == "" {
-		return errors.New("Cannot reset - No charmaps have been defined!!!!")
+		return errorHandler.AddNew(enumErrorCodes.CharMapNoneDefined) // ❌ Fails
 	}
 	currentCharmapName = defaultCharmapName
 	return nil
@@ -109,7 +107,7 @@ func SetCharmapToDefault() error {
 
 func SetCharmapTo__(newCharmapName string) error {
 	if defaultCharmapName == "" {
-		return errors.New("Cannot set - No charmaps have been defined!!!!")
+		return errorHandler.AddNew(enumErrorCodes.CharMapNoneDefined) // ❌ Fails
 	}
 	_, err := GetSpecifiedCharmap(newCharmapName)
 	if err != nil {

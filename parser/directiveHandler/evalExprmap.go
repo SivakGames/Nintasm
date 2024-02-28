@@ -1,8 +1,9 @@
 package directiveHandler
 
 import (
-	"errors"
 	"misc/nintasm/assemble/blockStack"
+	"misc/nintasm/assemble/errorHandler"
+	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
 	"misc/nintasm/interpreter/environment/exprmapTable"
 	"misc/nintasm/interpreter/operandFactory"
 )
@@ -24,12 +25,13 @@ func evalEndExprmap() error {
 func evalDefExpr(directiveName string, operandList *[]Node) error {
 	exprNode := &(*operandList)[0]
 	if !(operandFactory.ValidateNodeIsString(exprNode)) {
-		return errors.New("Expression must be a string!")
+		return errorHandler.AddNew(enumErrorCodes.NodeTypeNotString) // ❌ Fails
 	}
 	exprValueNode := &(*operandList)[1]
-	if !operandFactory.ValidateNodeIsNumeric(exprValueNode) ||
-		!operandFactory.ValidateNumericNodeIs8BitValue(exprValueNode) {
-		return errors.New("Expression value must be a number and be 8 bit!")
+	if !operandFactory.ValidateNodeIsNumeric(exprValueNode) {
+		return errorHandler.AddNew(enumErrorCodes.NodeTypeNotNumeric) // ❌ Fails
+	} else if !operandFactory.ValidateNumericNodeIs8BitValue(exprValueNode) {
+		return errorHandler.AddNew(enumErrorCodes.NodeValueNot8Bit) // ❌ Fails
 	}
 
 	_, err := exprmapTable.CheckIfAlreadyExistsInExprmap(exprValueNode.NodeValue)

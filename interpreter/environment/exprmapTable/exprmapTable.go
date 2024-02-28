@@ -37,7 +37,7 @@ func AddExprToExprmap(newExpr string, exprValue int) error {
 
 func GetCurrentExprmap() (ExprmapTableType, error) {
 	if currentExprmapName == "" {
-		return nil, errorHandler.AddNew(enumErrorCodes.ExprMapNoneDefined)
+		return nil, errorHandler.AddNew(enumErrorCodes.ExprMapNoneDefined) // ❌ Fails
 	}
 
 	return exprmapSymbolTable[currentExprmapName], nil
@@ -45,11 +45,11 @@ func GetCurrentExprmap() (ExprmapTableType, error) {
 
 func GetSpecifiedExprmap(specifiedExprmapName string) (ExprmapTableType, error) {
 	if currentExprmapName == "" {
-		return nil, errorHandler.AddNew(enumErrorCodes.ExprMapNoneDefined)
+		return nil, errorHandler.AddNew(enumErrorCodes.ExprMapNoneDefined) // ❌ Fails
 	}
 	specifiedExprmap, exists := exprmapSymbolTable[specifiedExprmapName]
 	if !exists {
-		return nil, errorHandler.AddNew(enumErrorCodes.ExprMapNotExist)
+		return nil, errorHandler.AddNew(enumErrorCodes.ExprMapNotExist) // ❌ Fails
 	}
 	return specifiedExprmap, nil
 }
@@ -64,7 +64,7 @@ func CheckIfDefinedInExprmap(lookupExpr string) (int, bool) {
 func CheckIfAlreadyExistsInExprmap(lookupExpr string) (int, error) {
 	target, exists := CheckIfDefinedInExprmap(lookupExpr)
 	if exists {
-		return target, errorHandler.AddNew(enumErrorCodes.ExprMapDuplicateKey, lookupExpr)
+		return target, errorHandler.AddNew(enumErrorCodes.ExprMapDuplicateKey, lookupExpr) // ❌ Fails
 	}
 	return target, nil
 }
@@ -81,7 +81,7 @@ func SetExprmapToDefault() error {
 
 func SetExprmapTo__(newExprmapName string) error {
 	if defaultExprmapName == "" {
-		return errorHandler.AddNew(enumErrorCodes.ExprMapNoneDefined)
+		return errorHandler.AddNew(enumErrorCodes.ExprMapNoneDefined) // ❌ Fails
 	}
 	_, err := GetSpecifiedExprmap(newExprmapName)
 	if err != nil {

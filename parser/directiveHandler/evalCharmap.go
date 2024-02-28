@@ -1,9 +1,10 @@
 package directiveHandler
 
 import (
-	"errors"
 	"fmt"
 	"misc/nintasm/assemble/blockStack"
+	"misc/nintasm/assemble/errorHandler"
+	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
 	"misc/nintasm/interpreter/environment/charmapTable"
 	"misc/nintasm/interpreter/operandFactory"
 )
@@ -63,7 +64,7 @@ func evalDefChar(directiveName string, operandList *[]Node) error {
 		}
 
 		if targetStartRune >= targetEndRune {
-			return errors.New("End bigger than start")
+			return errorHandler.AddNew(enumErrorCodes.DefCharRangeEndSmaller)
 		}
 
 		charBaseNode := (*operandList)[2]
@@ -83,21 +84,22 @@ func evalDefChar(directiveName string, operandList *[]Node) error {
 
 func validateCharmapTextNodeGetRune(runeNode *Node) (rune, error) {
 	if !operandFactory.ValidateNodeIsString(runeNode) {
-		return ' ', errors.New("First operand must be a string!")
+		return ' ', errorHandler.AddNew(enumErrorCodes.NodeTypeNotString) // ❌ Fails
 	}
 	runeArray := []rune(runeNode.NodeValue)
 	if len(runeArray) != 1 {
-		errMsg := fmt.Sprintf("%v Character definition must be 1 character long!", runeNode.NodeValue)
-		return ' ', errors.New(errMsg)
+		return ' ', errorHandler.AddNew(enumErrorCodes.DefCharTooLong, runeNode.NodeValue)
 	}
 	return runeArray[0], nil
 }
 
 func validateCharmapNumberNode(node *Node) error {
-	if !operandFactory.ValidateNodeIsNumeric(node) ||
-		!operandFactory.ValidateNumericNodeIsPositive(node) ||
-		!operandFactory.ValidateNumericNodeIs8BitValue(node) {
-		return errors.New("Node must be positive, 8 bit, and numeric...")
+	if !operandFactory.ValidateNodeIsNumeric(node) {
+		return errorHandler.AddNew(enumErrorCodes.NodeTypeNotNumeric) // ❌ Fails
+	} else if !operandFactory.ValidateNumericNodeIsPositive(node) {
+		return errorHandler.AddNew(enumErrorCodes.NodeValueNotPositive) // ❌ Fails
+	} else if !operandFactory.ValidateNumericNodeIs8BitValue(node) {
+		return errorHandler.AddNew(enumErrorCodes.NodeValueNot8Bit) // ❌ Fails
 	}
 	return nil
 }

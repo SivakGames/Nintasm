@@ -80,6 +80,13 @@ const (
 	MacroInvokeDoubleCurlyBrace   = "MacroInvokeDoubleCurlyBrace"
 	MacroInvokeUnclosedCurlyBrace = "MacroInvokeUnclosedCurlyBrace"
 
+	CharMapNoneDefined     = "CharMapNoneDefined"
+	CharMapNotExist        = "CharMapNotExist"
+	CharMapDuplicateKey    = "CharMapDuplicateKey"
+	ToCharMapUndefChar     = "ToCharMapUndefChar"
+	DefCharTooLong         = "DefCharTooLong"
+	DefCharRangeEndSmaller = "DefCharRangeEndSmaller"
+
 	ExprMapNoneDefined  = "ExprMapNoneDefined"
 	ExprMapNotExist     = "ExprMapNotExist"
 	ExprMapDuplicateKey = "ExprMapDuplicateKey"
