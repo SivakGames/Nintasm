@@ -51,6 +51,7 @@ var errorTable = map[enumErrorCodes.Def]ErrorTableEntry{
 	enumErrorCodes.OperandListStartingComma: newErrorTableEntry(enumErrorCodes.Error, "Operand list cannot start with a comma!"),
 	enumErrorCodes.OperandListTooMany:       newErrorTableEntry(enumErrorCodes.Error, "Too many operands for operation! Takes at most: %d"),
 	enumErrorCodes.OperandListTooFew:        newErrorTableEntry(enumErrorCodes.Error, "Too few operands for operation! Needs at least: %d"),
+	enumErrorCodes.OperandBadCalleeName:     newErrorTableEntry(enumErrorCodes.Error, "Illegal functional callee name: %v"),
 
 	enumErrorCodes.NodeTypeNotNumeric:   newErrorTableEntry(enumErrorCodes.Error, "Value must be numeric!"),
 	enumErrorCodes.NodeValueNotPositive: newErrorTableEntry(enumErrorCodes.Error, "Value must be positive!"),
@@ -68,9 +69,16 @@ var errorTable = map[enumErrorCodes.Def]ErrorTableEntry{
 
 	enumErrorCodes.INESValueAlreadySet: newErrorTableEntry(enumErrorCodes.Error, "%v value has already been set!!!"),
 
-	enumErrorCodes.InstUnsupportedMode: newErrorTableEntry(enumErrorCodes.Error, "Mode is not supported by instruction!"),
-	enumErrorCodes.InstXYUnusableMode:  newErrorTableEntry(enumErrorCodes.Error, "X or Y indexes cannot be used with target mode"),
-	enumErrorCodes.InstBadAccumMode:    newErrorTableEntry(enumErrorCodes.Error, "No tokens can follow A for accumulator mode."),
+	enumErrorCodes.InstUnsupportedMode:      newErrorTableEntry(enumErrorCodes.Error, "Mode is not supported by instruction!"),
+	enumErrorCodes.InstTokenAfterOperand:    newErrorTableEntry(enumErrorCodes.Error, "No more tokens can follow this instruction's operands! %v"),
+	enumErrorCodes.InstBadAccumMode:         newErrorTableEntry(enumErrorCodes.Error, "No tokens can follow A for accumulator mode."),
+	enumErrorCodes.InstXYUnusableMode:       newErrorTableEntry(enumErrorCodes.Error, "X or Y indexes cannot be used with target mode"),
+	enumErrorCodes.InstBadIndexValue:        newErrorTableEntry(enumErrorCodes.Error, "Bad/Unknown index value! %v"),
+	enumErrorCodes.InstIndirectIndexMustBeX: newErrorTableEntry(enumErrorCodes.Error, "Must use X index for this kind of indirect addressing"),
+	enumErrorCodes.InstIndirectIndexMustBeY: newErrorTableEntry(enumErrorCodes.Error, "Must use Y index for this kind of indirect addressing"),
+
+	enumErrorCodes.MacroInvokeDoubleCurlyBrace:   newErrorTableEntry(enumErrorCodes.Error, "Macro invoking error - Must close curly brace before opening another!"),
+	enumErrorCodes.MacroInvokeUnclosedCurlyBrace: newErrorTableEntry(enumErrorCodes.Error, "Macro invoking error - Unclosed curly brace!"),
 }
 
 // ++++++++++++++++++++++++++++++++++++++++

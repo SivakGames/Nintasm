@@ -140,7 +140,7 @@ func (p *OperandParser) instructionPrefix() (Node, error) {
 				return statement, err // ❌ Fails
 			}
 			if xyIndex != enumTokenTypes.REGISTER_X {
-				return statement, errors.New("Must use X index for this kind of indirect addressing")
+				return statement, errorHandler.AddNew(enumErrorCodes.InstIndirectIndexMustBeX) // ❌ Fails
 			}
 			err = p.eatFreelyAndAdvance(enumTokenTypes.DELIMITER_rightSquareBracket)
 			if err != nil {
@@ -157,7 +157,7 @@ func (p *OperandParser) instructionPrefix() (Node, error) {
 					return statement, err // ❌ Fails
 				}
 				if xyIndex != enumTokenTypes.REGISTER_Y {
-					return statement, errors.New("Must use Y index for this kind of indirect addressing")
+					return statement, errorHandler.AddNew(enumErrorCodes.InstIndirectIndexMustBeY) // ❌ Fails
 				}
 			}
 		}
@@ -217,7 +217,7 @@ func (p *OperandParser) instructionPrefix() (Node, error) {
 	p.instructionXYIndex = xyIndex
 
 	if p.lookaheadType != enumTokenTypes.None {
-		return statement, errors.New("No more tokens can follow this instruction's operands!")
+		return statement, errorHandler.AddNew(enumErrorCodes.InstTokenAfterOperand, p.lookaheadValue)
 	}
 
 	return statement, nil // 🟢 Succeeds
@@ -233,7 +233,7 @@ func (p *OperandParser) checkInstructionXYIndex() (tokenEnum, error) {
 	}
 
 	if p.lookaheadType != enumTokenTypes.REGISTER_X && p.lookaheadType != enumTokenTypes.REGISTER_Y {
-		return targetIndex, errors.New("BAD INDEX!")
+		return targetIndex, errorHandler.AddNew(enumErrorCodes.InstBadIndexValue, p.lookaheadValue)
 	}
 
 	targetIndex = p.lookaheadType
@@ -297,7 +297,8 @@ func (p *OperandParser) macroReplaceStatement() (Node, error) {
 
 		case enumTokenTypes.DELIMITER_leftCurlyBrace:
 			if topOfStackEnum == enumTokenTypes.DELIMITER_rightCurlyBrace {
-				return operandFactory.ErrorNode(p.lookaheadValue), errors.New("Macro args - Must close curly brace before opening another!")
+				return operandFactory.ErrorNode(p.lookaheadValue),
+					errorHandler.AddNew(enumErrorCodes.MacroInvokeDoubleCurlyBrace) // ❌ Fails
 			}
 			err := p.eatFreelyAndAdvance(enumTokenTypes.DELIMITER_leftCurlyBrace)
 			if err != nil {
@@ -314,7 +315,8 @@ func (p *OperandParser) macroReplaceStatement() (Node, error) {
 		}
 	}
 	if len(closingTokenEnum) > 1 {
-		return operandFactory.ErrorNode(p.lookaheadValue), errors.New("Unclosed???") // ❌ Fails
+		return operandFactory.ErrorNode(p.lookaheadValue),
+			errorHandler.AddNew(enumErrorCodes.MacroInvokeUnclosedCurlyBrace) // ❌ Fails
 	}
 
 	return operandFactory.CreateMacroReplacementNode(replacement), nil
@@ -440,8 +442,8 @@ func (p *OperandParser) callMemberExpression() (Node, error) {
 
 	if p.lookaheadType == enumTokenTypes.DELIMITER_leftParenthesis {
 		if !_checkValidAssignmentTarget(callMemberType) {
-			badCallee := fmt.Sprintf("Illegal functional callee name: %v", callMemberValue)
-			return operandFactory.ErrorNode(p.lookaheadValue), errors.New(badCallee) // ❌ Fails
+			return operandFactory.ErrorNode(p.lookaheadValue),
+				errorHandler.AddNew(enumErrorCodes.OperandBadCalleeName, callMemberValue) // ❌ Fails
 		}
 		return p._callExpression(callMemberValue)
 	}

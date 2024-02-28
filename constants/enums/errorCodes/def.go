@@ -28,6 +28,7 @@ const (
 	OperandListStartingComma = "OperandListStartingComma"
 	OperandListTooMany       = "OperandListTooMany"
 	OperandListTooFew        = "OperandListTooFew"
+	OperandBadCalleeName     = "OperandBadCalleeName"
 
 	NodeTypeNotNumeric   = "NodeTypeNotNumeric"
 	NodeTypeNotString    = "NodeTypeNotString"
@@ -50,9 +51,16 @@ const (
 	INESMirroringSet      = "INESMirroringSet"
 	INESMirroringBadValue = "INESMirroringBadValue"
 
-	InstUnsupportedMode = "InstUnsupportedMode"
-	InstXYUnusableMode  = "InstXYUnusableMode"
-	InstBadAccumMode    = "InstBadAccumMode"
+	InstUnsupportedMode      = "InstUnsupportedMode"
+	InstTokenAfterOperand    = "InstTokenAfterOperand"
+	InstBadAccumMode         = "InstBadAccumMode"
+	InstBadIndexValue        = "InstBadIndexValue"
+	InstXYUnusableMode       = "InstXYUnusableMode"
+	InstIndirectIndexMustBeX = "InstIndirectIndexMustBeX"
+	InstIndirectIndexMustBeY = "InstIndirectIndexMustBeY"
+
+	MacroInvokeDoubleCurlyBrace   = "MacroInvokeDoubleCurlyBrace"
+	MacroInvokeUnclosedCurlyBrace = "MacroInvokeUnclosedCurlyBrace"
 )
 
 type Severity int
