@@ -48,6 +48,10 @@ var errorTable = map[enumErrorCodes.Def]ErrorTableEntry{
 	enumErrorCodes.OperationLabeledDirectiveNoSpace: newErrorTableEntry(enumErrorCodes.Error, "Operation parsing failed - Labeled directive needs space between label and directive"),
 	enumErrorCodes.OperationLabeledDirectiveUnknown: newErrorTableEntry(enumErrorCodes.Error, "Operation parsing failed - Unknown labeled directive!"),
 
+	enumErrorCodes.OperandListStartingComma: newErrorTableEntry(enumErrorCodes.Error, "Operand list cannot start with a comma!"),
+	enumErrorCodes.OperandListTooMany:       newErrorTableEntry(enumErrorCodes.Error, "Too many operands for operation! Takes at most: %d"),
+	enumErrorCodes.OperandListTooFew:        newErrorTableEntry(enumErrorCodes.Error, "Too few operands for operation! Needs at least: %d"),
+
 	enumErrorCodes.NodeTypeNotNumeric:   newErrorTableEntry(enumErrorCodes.Error, "Value must be numeric!"),
 	enumErrorCodes.NodeValueNotPositive: newErrorTableEntry(enumErrorCodes.Error, "Value must be positive!"),
 	enumErrorCodes.NodeValueNot8Bit:     newErrorTableEntry(enumErrorCodes.Error, "Value must be 8 bit!"),

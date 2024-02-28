@@ -3,6 +3,8 @@ package parser
 import (
 	"errors"
 	"fmt"
+	"misc/nintasm/assemble/errorHandler"
+	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
 	enumInstructionModes "misc/nintasm/constants/enums/instructionModes"
 	enumTokenTypes "misc/nintasm/constants/enums/tokenTypes"
 	"misc/nintasm/interpreter"
@@ -38,48 +40,49 @@ func (p *OperandParser) GetOperandList(
 	operandCount := 0
 	p.manuallyEvalOperands = manuallyEvalOperands
 
-	//No operands at all
-	if p.lookaheadType == enumTokenTypes.None {
-		return operandList, nil // 🟢 Succeeds
-	}
+	//See if there are no operands at all
+	if p.lookaheadType != enumTokenTypes.None {
 
-	//No commas at the beginning...
-	if p.lookaheadType == enumTokenTypes.DELIMITER_comma {
-		return operandList, errors.New("Operand list \x1b[38;5;202mCANNOT\x1b[0m start with a comma!") // ❌ Fails
-	}
-
-	// Get first operand
-	err := p.getOperandAndAppend(&operandList, &captureMasks)
-	if err != nil {
-		return operandList, nil
-	}
-
-	//From here get subsequent operands, if any. Operands are comma-separated
-	for p.lookaheadType != enumTokenTypes.None && p.lookaheadType == enumTokenTypes.DELIMITER_comma {
-		err = p.eatFreelyAndAdvance(enumTokenTypes.DELIMITER_comma)
-		if err != nil {
-			return operandList, err // ❌ Fails
+		//No commas allowed at the beginning...
+		if p.lookaheadType == enumTokenTypes.DELIMITER_comma {
+			return operandList, errorHandler.AddNew(enumErrorCodes.OperandListStartingComma) // ❌ Fails
 		}
+
+		// Get first operand
 		err := p.getOperandAndAppend(&operandList, &captureMasks)
 		if err != nil {
-			return operandList, nil
+			return operandList, nil // ❌ Fails
 		}
-		operandCount++
+
+		//From here get subsequent operands, if any. Operands are comma-separated
+		for p.lookaheadType != enumTokenTypes.None && p.lookaheadType == enumTokenTypes.DELIMITER_comma {
+			err := p.eatFreelyAndAdvance(enumTokenTypes.DELIMITER_comma)
+			if err != nil {
+				return operandList, err // ❌ Fails
+			}
+			err = p.getOperandAndAppend(&operandList, &captureMasks)
+			if err != nil {
+				return operandList, nil
+			}
+			operandCount++
+		}
 	}
 
+	//Check if too many or too few operands...
+
 	if len(operandList) > maxOperands {
-		return operandList, errors.New("Too many operands for operation!")
-	}
-	if len(operandList) < minOperands {
-		return operandList, errors.New("Too few operands for operation!")
+		return operandList, errorHandler.AddNew(enumErrorCodes.OperandListTooMany, maxOperands) // ❌ Fails
+	} else if len(operandList) < minOperands {
+		return operandList, errorHandler.AddNew(enumErrorCodes.OperandListTooFew, minOperands) // ❌ Fails
 	}
 
 	return operandList, nil // 🟢 Succeeds
 }
 
 // =============================================
-
 // =============================================
+
+// Get the actual operand. What type of operand being captured dictates the followup function
 func (p *OperandParser) getOperandAndAppend(operandList *[]Node, captureMasks *[]string) error {
 	captureStatementFunction := p.statement
 

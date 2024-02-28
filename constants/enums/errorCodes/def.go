@@ -25,6 +25,10 @@ const (
 	OperationLabeledDirectiveUnknown = "OperationLabeledDirectiveUnknown"
 	OperationUNKNOWN                 = "OperationUNKNOWN"
 
+	OperandListStartingComma = "OperandListStartingComma"
+	OperandListTooMany       = "OperandListTooMany"
+	OperandListTooFew        = "OperandListTooFew"
+
 	NodeTypeNotNumeric   = "NodeTypeNotNumeric"
 	NodeTypeNotString    = "NodeTypeNotString"
 	NodeValueNotPositive = "NodeValueNotPositive"
