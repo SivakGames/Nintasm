@@ -1,7 +1,6 @@
 package parser
 
 import (
-	"errors"
 	"fmt"
 	"misc/nintasm/assemble/errorHandler"
 	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
@@ -568,11 +567,13 @@ func (p *OperandParser) memberExpression() (Node, error) {
 	}
 
 	if p._isLiteral(p.lookaheadType) {
-		return operandFactory.ErrorNode(p.lookaheadValue), errors.New("Misplaced literal") // ❌ Fails
+		return operandFactory.ErrorNode(p.lookaheadValue),
+			errorHandler.AddNew(enumErrorCodes.OperandMisplacedLiteral, p.lookaheadValue) // ❌ Fails
 	}
 
 	if p.lookaheadType == enumTokenTypes.IDENTIFIER {
-		return operandFactory.ErrorNode(p.lookaheadValue), errors.New("Misplaced identifier") // ❌ Fails
+		return operandFactory.ErrorNode(p.lookaheadValue),
+			errorHandler.AddNew(enumErrorCodes.OperandMisplacedIdentifier, p.lookaheadValue) // ❌ Fails
 	}
 
 	//A dot indicates member
@@ -603,7 +604,8 @@ func (p *OperandParser) memberExpression() (Node, error) {
 // Top of the food chain - highest precedence
 func (p *OperandParser) primaryExpression() (Node, error) {
 	if p.lookaheadType == enumTokenTypes.None {
-		return operandFactory.ErrorNode(p.lookaheadValue), errors.New("THERE'S NO PRIMARY EXPR!!!") // ❌ Fails
+		return operandFactory.ErrorNode(p.lookaheadValue),
+			errorHandler.AddNew(enumErrorCodes.OperandMissingPrimaryExpr) // ❌ Fails
 	}
 	if p._isLiteral(p.lookaheadType) {
 		return p.literal()
@@ -627,15 +629,16 @@ func (p *OperandParser) primaryExpression() (Node, error) {
 			p.lookaheadValue = parentLabel + "." + p.lookaheadValue
 			return p.identifier()
 		}
-		return operandFactory.ErrorNode(p.lookaheadValue), errors.New("Identifier must follow period!") // ❌ Fails
+		return operandFactory.ErrorNode(p.lookaheadValue),
+			errorHandler.AddNew(enumErrorCodes.OperandPeriodMissingIdentifier) // ❌ Fails
 
 	case enumTokenTypes.IDENTIFIER:
 		return p.identifier()
 	}
 
 	// ❌ Fails
-	badPrimary := fmt.Sprintf("\x1b[31mBAD primary expr!!!\x1b[0m - \x1b[33m%v\x1b[0m", p.lookaheadValue)
-	return operandFactory.ErrorNode(p.lookaheadValue), errors.New(badPrimary)
+	return operandFactory.ErrorNode(p.lookaheadValue),
+		errorHandler.AddNew(enumErrorCodes.OperandBadPrimaryExpr, p.lookaheadValue)
 }
 
 // ++++++++++++++++++++++++++++
@@ -735,7 +738,7 @@ func (p *OperandParser) literal() (Node, error) {
 		return operandFactory.CreateSubstitutionIdNode(literalType, literalValue), nil
 	}
 	// ❌ Fails
-	return operandFactory.ErrorNode(p.lookaheadValue), errors.New("\x1b[31mERROR!!!!!!!!\x1b[0m")
+	panic("Something is greatly wrong with literal type")
 }
 
 // -----------------

@@ -13,6 +13,8 @@ const (
 	BinFileSeekAfterEnd       = "BinFileSeekAfterEnd"
 	BinFileReadBeyondFileSize = "BinFileReadBeyondFileSize"
 
+	TokenizerUnknownIllegalToken = "TokenizerUnknownIllegalToken"
+
 	ParserEndOfInput      = "ParserEndOfInput"
 	ParserUnexpectedToken = "ParserUnexpectedToken"
 
@@ -25,15 +27,23 @@ const (
 	OperationLabeledDirectiveUnknown = "OperationLabeledDirectiveUnknown"
 	OperationUNKNOWN                 = "OperationUNKNOWN"
 
-	OperandListStartingComma = "OperandListStartingComma"
-	OperandListTooMany       = "OperandListTooMany"
-	OperandListTooFew        = "OperandListTooFew"
-	OperandBadCalleeName     = "OperandBadCalleeName"
+	OperandListStartingComma       = "OperandListStartingComma"
+	OperandListTooMany             = "OperandListTooMany"
+	OperandListTooFew              = "OperandListTooFew"
+	OperandBadCalleeName           = "OperandBadCalleeName"
+	OperandMisplacedLiteral        = "OperandMisplacedLiteral"
+	OperandMisplacedIdentifier     = "OperandMisplacedIdentifier"
+	OperandMissingPrimaryExpr      = "OperandMissingPrimaryExpr"
+	OperandPeriodMissingIdentifier = "OperandPeriodMissingIdentifier"
+	OperandBadPrimaryExpr          = "OperandBadPrimaryExpr"
+
+	NodeTypeNotString     = "NodeTypeNotString"
+	NodeTypeNotIdentifier = "NodeTypeNotIdentifier"
 
 	NodeTypeNotNumeric   = "NodeTypeNotNumeric"
-	NodeTypeNotString    = "NodeTypeNotString"
 	NodeValueNotPositive = "NodeValueNotPositive"
 	NodeValueNot8Bit     = "NodeValueNot8Bit"
+	NodeValueNot16Bit    = "NodeValueNot16Bit"
 	NodeValueNotPowerOf2 = "NodeValueNotPowerOf2"
 
 	NodeValueNotGT        = "NodeValueNotGT"
@@ -45,11 +55,15 @@ const (
 	InvalidValueAlias = "InvalidValueAlias"
 	UnacceptableAlias = "UnacceptableAlias"
 
-	INESValueAlreadySet   = "INESValueAlreadySet"
-	INESMapperSet         = "INESMapperSet"
-	INESMapperBadValue    = "INESMapperBadValue"
-	INESMirroringSet      = "INESMirroringSet"
-	INESMirroringBadValue = "INESMirroringBadValue"
+	INESValueAlreadySet = "INESValueAlreadySet"
+
+	BankSizeUneven       = "BankSizeUneven"
+	BankNotSequential    = "BankNotSequential"
+	BankNumberTooHigh    = "BankNumberTooHigh"
+	BankOverflow         = "BankOverflow"
+	OrgTooSmall          = "OrgTooSmall"
+	OrgTooBig            = "OrgTooBig"
+	OrgLTEProgramCounter = "OrgLTEProgramCounter"
 
 	InstUnsupportedMode      = "InstUnsupportedMode"
 	InstTokenAfterOperand    = "InstTokenAfterOperand"

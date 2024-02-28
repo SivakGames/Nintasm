@@ -36,6 +36,8 @@ var errorTable = map[enumErrorCodes.Def]ErrorTableEntry{
 	enumErrorCodes.BinFileSeekAfterEnd:       newErrorTableEntry(enumErrorCodes.Fatal, "Seek value of %d goes beyond the size of file by %d byte(s)"),
 	enumErrorCodes.BinFileReadBeyondFileSize: newErrorTableEntry(enumErrorCodes.Fatal, "Read value of %d goes beyond the size of file by %d byte(s)"),
 
+	enumErrorCodes.TokenizerUnknownIllegalToken: newErrorTableEntry(enumErrorCodes.Error, "Unknown/Illegal token: %v"),
+
 	enumErrorCodes.ParserEndOfInput:      newErrorTableEntry(enumErrorCodes.Error, "Parsing error - Unexpected end of input!"),
 	enumErrorCodes.ParserUnexpectedToken: newErrorTableEntry(enumErrorCodes.Error, fmt.Sprintf("Parsing error - Unexpected token: %v", coloredSymbol("%v"))),
 
@@ -48,14 +50,23 @@ var errorTable = map[enumErrorCodes.Def]ErrorTableEntry{
 	enumErrorCodes.OperationLabeledDirectiveNoSpace: newErrorTableEntry(enumErrorCodes.Error, "Operation parsing failed - Labeled directive needs space between label and directive"),
 	enumErrorCodes.OperationLabeledDirectiveUnknown: newErrorTableEntry(enumErrorCodes.Error, "Operation parsing failed - Unknown labeled directive!"),
 
-	enumErrorCodes.OperandListStartingComma: newErrorTableEntry(enumErrorCodes.Error, "Operand list cannot start with a comma!"),
-	enumErrorCodes.OperandListTooMany:       newErrorTableEntry(enumErrorCodes.Error, "Too many operands for operation! Takes at most: %d"),
-	enumErrorCodes.OperandListTooFew:        newErrorTableEntry(enumErrorCodes.Error, "Too few operands for operation! Needs at least: %d"),
-	enumErrorCodes.OperandBadCalleeName:     newErrorTableEntry(enumErrorCodes.Error, "Illegal functional callee name: %v"),
+	enumErrorCodes.OperandListStartingComma:       newErrorTableEntry(enumErrorCodes.Error, "Operand list cannot start with a comma!"),
+	enumErrorCodes.OperandListTooMany:             newErrorTableEntry(enumErrorCodes.Error, "Too many operands for operation! Takes at most: %d"),
+	enumErrorCodes.OperandListTooFew:              newErrorTableEntry(enumErrorCodes.Error, "Too few operands for operation! Needs at least: %d"),
+	enumErrorCodes.OperandBadCalleeName:           newErrorTableEntry(enumErrorCodes.Error, "Illegal functional callee name: %v"),
+	enumErrorCodes.OperandMisplacedLiteral:        newErrorTableEntry(enumErrorCodes.Error, "Misplaced literal - %v"),
+	enumErrorCodes.OperandMisplacedIdentifier:     newErrorTableEntry(enumErrorCodes.Error, "Misplaced identifier - %v"),
+	enumErrorCodes.OperandMissingPrimaryExpr:      newErrorTableEntry(enumErrorCodes.Error, "No primary expression found"),
+	enumErrorCodes.OperandPeriodMissingIdentifier: newErrorTableEntry(enumErrorCodes.Error, "Identifier must follow period!"),
+	enumErrorCodes.OperandBadPrimaryExpr:          newErrorTableEntry(enumErrorCodes.Error, "Bad primary expression - %v"),
+
+	enumErrorCodes.NodeTypeNotIdentifier: newErrorTableEntry(enumErrorCodes.Error, "Value must be an identifier!"),
+	enumErrorCodes.NodeTypeNotString:     newErrorTableEntry(enumErrorCodes.Error, "Value must be a string!"),
 
 	enumErrorCodes.NodeTypeNotNumeric:   newErrorTableEntry(enumErrorCodes.Error, "Value must be numeric!"),
 	enumErrorCodes.NodeValueNotPositive: newErrorTableEntry(enumErrorCodes.Error, "Value must be positive!"),
 	enumErrorCodes.NodeValueNot8Bit:     newErrorTableEntry(enumErrorCodes.Error, "Value must be 8 bit!"),
+	enumErrorCodes.NodeValueNot16Bit:    newErrorTableEntry(enumErrorCodes.Error, "Value must be 16 bit!"),
 	enumErrorCodes.NodeValueNotPowerOf2: newErrorTableEntry(enumErrorCodes.Error, "Value must be a power of 2!"),
 
 	enumErrorCodes.NodeValueNotGT:        newErrorTableEntry(enumErrorCodes.Error, fmt.Sprintf("Value must be %v %v", coloredSymbol(">"), coloredNumber("%d"))),
@@ -68,6 +79,14 @@ var errorTable = map[enumErrorCodes.Def]ErrorTableEntry{
 	enumErrorCodes.UnacceptableAlias: newErrorTableEntry(enumErrorCodes.Error, "Unacceptable value alias!"),
 
 	enumErrorCodes.INESValueAlreadySet: newErrorTableEntry(enumErrorCodes.Error, "%v value has already been set!!!"),
+
+	enumErrorCodes.BankSizeUneven:       newErrorTableEntry(enumErrorCodes.Error, "Bank size is not evenly distributable"),
+	enumErrorCodes.BankOverflow:         newErrorTableEntry(enumErrorCodes.Error, "Bank will overflow by: %d byte(s) here"),
+	enumErrorCodes.BankNotSequential:    newErrorTableEntry(enumErrorCodes.Error, "Bank declarations must be sequentially incrementing"),
+	enumErrorCodes.BankNumberTooHigh:    newErrorTableEntry(enumErrorCodes.Error, "Too high of a bank number!"),
+	enumErrorCodes.OrgTooSmall:          newErrorTableEntry(enumErrorCodes.Error, "ORG is too small! Attempted: %d / Minimum Allowed: %d"),
+	enumErrorCodes.OrgTooBig:            newErrorTableEntry(enumErrorCodes.Error, "ORG is too big! Attempted: %d / Max Allowed: %d"),
+	enumErrorCodes.OrgLTEProgramCounter: newErrorTableEntry(enumErrorCodes.Error, "Cannot set ORG to a value less than where the program counter currently is!\nThis would overwrite data!\n Attempted: %d / Currently at: %d"),
 
 	enumErrorCodes.InstUnsupportedMode:      newErrorTableEntry(enumErrorCodes.Error, "Mode is not supported by instruction!"),
 	enumErrorCodes.InstTokenAfterOperand:    newErrorTableEntry(enumErrorCodes.Error, "No more tokens can follow this instruction's operands! %v"),

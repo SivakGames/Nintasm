@@ -1,8 +1,8 @@
 package tokenizer
 
 import (
-	"errors"
-	"fmt"
+	"misc/nintasm/assemble/errorHandler"
+	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
 	enumTokenTypes "misc/nintasm/constants/enums/tokenTypes"
 	"regexp"
 )
@@ -66,9 +66,9 @@ func (t *Tokenizer) GetNextToken() (hasMore bool, tokenType tokenEnum, tokenValu
 	}
 
 	//If reached then it's an unknown/illegal token
-	illegalTokenMessage := fmt.Sprintf("UNKNOWN/ILLEGAL TOKEN: \x1b[31m%v\x1b[0m", stringSegment)
+	return false, enumTokenTypes.None, "",
+		errorHandler.AddNew(enumErrorCodes.TokenizerUnknownIllegalToken, stringSegment)
 
-	return false, enumTokenTypes.None, "", errors.New(illegalTokenMessage)
 }
 
 func (t *Tokenizer) GoBackToPrev() {

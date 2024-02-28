@@ -1,9 +1,9 @@
 package romBuilder
 
 import (
-	"errors"
-	"fmt"
 	"math"
+	"misc/nintasm/assemble/errorHandler"
+	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
 	"misc/nintasm/interpreter/operandFactory"
 )
 
@@ -34,7 +34,7 @@ func AddNewRomSegment(totalSize int, bankSize int) error {
 	floatResult := float64(totalSize) / float64(bankSize)
 	numBanks, deci := math.Modf(floatResult)
 	if deci != 0 {
-		return errors.New("Bank size is not evenly distributable")
+		return errorHandler.AddNew(enumErrorCodes.BankSizeUneven)
 	}
 
 	newSegment := make([]bankType, int(numBanks))
@@ -123,14 +123,11 @@ func SetOrg(newOrg int) error {
 	} else {
 		currentOrg := bank.minOrg + currentInsertionIndex
 		if newOrg < bank.minOrg {
-			errMsg := fmt.Sprintf("ORG is too small! Attempted: %d / Minimum Allowed: %d ", newOrg, bank.minOrg)
-			return errors.New(errMsg)
+			return errorHandler.AddNew(enumErrorCodes.OrgTooSmall, newOrg, bank.minOrg)
 		} else if newOrg > bank.maxOrg {
-			errMsg := fmt.Sprintf("ORG is too big! Attempted: %d / Max Allowed: %d ", newOrg, bank.maxOrg)
-			return errors.New(errMsg)
+			return errorHandler.AddNew(enumErrorCodes.OrgTooBig, newOrg, bank.maxOrg)
 		} else if newOrg <= currentOrg {
-			errMsg := fmt.Sprintf("Cannot set ORG to a value less than where the program counter currently is!\nThis would overwrite data!\n Attempted: %d / Currently at: %d ", newOrg, currentOrg)
-			return errors.New(errMsg)
+			return errorHandler.AddNew(enumErrorCodes.OrgLTEProgramCounter, newOrg, currentOrg)
 		}
 	}
 	currentInsertionIndex = newOrg % bankSize
@@ -146,8 +143,7 @@ func AddBytesToRom(insertions []uint8) error {
 	overflowByteTotal := toInsertSpace - len(*currentBankSegment)
 
 	if overflowByteTotal > 0 {
-		errMsg := fmt.Sprintf("Bank will overflow by: %d byte(s) here", overflowByteTotal)
-		return errors.New(errMsg)
+		return errorHandler.AddNew(enumErrorCodes.OrgLTEProgramCounter, overflowByteTotal)
 	}
 	for i := range insertions {
 		(*currentBankSegment)[currentInsertionIndex] = insertions[i]

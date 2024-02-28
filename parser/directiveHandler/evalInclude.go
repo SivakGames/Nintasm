@@ -1,8 +1,9 @@
 package directiveHandler
 
 import (
-	"errors"
+	"misc/nintasm/assemble/errorHandler"
 	"misc/nintasm/assemble/fileHandler"
+	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
 	"misc/nintasm/interpreter/operandFactory"
 	"misc/nintasm/romBuilder"
 )
@@ -10,7 +11,7 @@ import (
 func evalInclude(operandList *[]Node) error {
 	fileNameNode := (*operandList)[0]
 	if !operandFactory.ValidateNodeIsString(&fileNameNode) {
-		return errors.New("Input file has to be a string!!!")
+		return errorHandler.AddNew(enumErrorCodes.NodeTypeNotString) // ❌ Fails
 	}
 	newFileName := fileHandler.AddRelativePathIncludeFileName(fileNameNode.NodeValue)
 	err := fileHandler.OpenInputFileAndPushLinesToStack(newFileName)
@@ -30,24 +31,26 @@ func evalIncbin(operandList *[]Node) error {
 
 	fileNameNode := (*operandList)[0]
 	if !operandFactory.ValidateNodeIsString(&fileNameNode) {
-		return errors.New("Input file has to be a string!!!")
+		return errorHandler.AddNew(enumErrorCodes.NodeTypeNotString) // ❌ Fails
 	}
 	newBinFileName := fileHandler.AddRelativePathIncludeFileName(fileNameNode.NodeValue)
 
 	if len(*operandList) >= 2 {
 		seekNode := (*operandList)[1]
-		if !operandFactory.ValidateNodeIsNumeric(&seekNode) ||
-			!operandFactory.ValidateNumericNodeIsPositive(&seekNode) {
-			return errors.New("If setting seek value, value must be numeric and positive!")
+		if !operandFactory.ValidateNodeIsNumeric(&seekNode) {
+			return errorHandler.AddNew(enumErrorCodes.NodeTypeNotNumeric) // ❌ Fails
+		} else if !operandFactory.ValidateNumericNodeIsPositive(&seekNode) {
+			return errorHandler.AddNew(enumErrorCodes.NodeValueNotPositive) // ❌ Fails
 		}
 		seekValue = seekNode.AsNumber
 	}
 
 	if len(*operandList) == 3 {
 		readNode := (*operandList)[2]
-		if !operandFactory.ValidateNodeIsNumeric(&readNode) ||
-			!operandFactory.ValidateNumericNodeIsGTEValue(&readNode, 1) {
-			return errors.New("If setting read value, value must be numeric and >= 1!")
+		if !operandFactory.ValidateNodeIsNumeric(&readNode) {
+			return errorHandler.AddNew(enumErrorCodes.NodeTypeNotNumeric) // ❌ Fails
+		} else if !operandFactory.ValidateNumericNodeIsGTEValue(&readNode, 1) {
+			return errorHandler.AddNew(enumErrorCodes.NodeValueNotGTE, 1) // ❌ Fails
 		}
 		readValue = readNode.AsNumber
 	}

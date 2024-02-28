@@ -59,7 +59,7 @@ func EvaluateDirective(operationTokenEnum enumTokenTypes.Def, directiveName stri
 		case "INCBIN":
 			return evalIncbin(operandList)
 		default:
-			return errors.New("BAD INCLUDE DIRECTIVE!!!" + directiveName)
+			panic("BAD INCLUDE DIRECTIVE!!!" + directiveName)
 		}
 
 	case enumTokenTypes.DIRECTIVE_labeled:
@@ -67,7 +67,7 @@ func EvaluateDirective(operationTokenEnum enumTokenTypes.Def, directiveName stri
 		case "RS":
 			return evalRs(operandList)
 		default:
-			return errors.New("BAD LABELED DIRECTIVE!!!" + directiveName)
+			panic("BAD LABELED DIRECTIVE!!!" + directiveName)
 		}
 
 	case enumTokenTypes.DIRECTIVE_blockStart:
@@ -83,7 +83,7 @@ func EvaluateDirective(operationTokenEnum enumTokenTypes.Def, directiveName stri
 		case "REPEAT":
 			return evalRepeat(directiveName, operandList)
 		default:
-			return errors.New("BAD BLOCK START DIRECTIVE!!!" + directiveName)
+			panic("BAD BLOCK START DIRECTIVE!!!" + directiveName)
 		}
 
 	case enumTokenTypes.DIRECTIVE_blockEnd:
@@ -95,7 +95,7 @@ func EvaluateDirective(operationTokenEnum enumTokenTypes.Def, directiveName stri
 		case "ENDREPEAT":
 			return evalEndRepeat(operandList)
 		default:
-			return errors.New("BAD BLOCK END DIRECTIVE!!!" + directiveName)
+			panic("BAD BLOCK END DIRECTIVE!!!" + directiveName)
 		}
 		//return evalRomBuildingOperands(directiveName, operandList)
 
@@ -116,9 +116,8 @@ func EvaluateDirective(operationTokenEnum enumTokenTypes.Def, directiveName stri
 			return evalMacro(directiveName, operationLabel, operandList)
 		case "NAMESPACE":
 			return evalNamespace(directiveName, operationLabel, operandList)
-
 		default:
-			return errors.New("BAD LABELED BLOCK START DIRECTIVE!!!" + directiveName)
+			panic("BAD LABELED BLOCK START DIRECTIVE!!!" + directiveName)
 		}
 
 	case enumTokenTypes.DIRECTIVE_labeledBlockEnd:
@@ -134,7 +133,7 @@ func EvaluateDirective(operationTokenEnum enumTokenTypes.Def, directiveName stri
 		case "ENDNAMESPACE":
 			return evalEndNamespace()
 		default:
-			return errors.New("BAD LABELED BLOCK END DIRECTIVE!!!" + directiveName)
+			panic("BAD LABELED BLOCK END DIRECTIVE!!!" + directiveName)
 		}
 
 	default:

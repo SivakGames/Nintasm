@@ -1,23 +1,24 @@
 package romSegmentation
 
 import (
-	"errors"
+	"misc/nintasm/assemble/errorHandler"
+	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
 	"misc/nintasm/interpreter/operandFactory"
 	"misc/nintasm/romBuilder"
 )
 
 func ValidateAndSetBank(bankNode *Node) error {
 	if !operandFactory.ValidateNodeIsNumeric(bankNode) {
-		return errors.New("MUST be a number!")
+		return errorHandler.AddNew(enumErrorCodes.NodeTypeNotNumeric)
 	}
 	newBankIndex := bankNode.AsNumber
 	currentBankIndex := romBuilder.GetBankIndex()
 	if currentBankIndex+1 != newBankIndex {
-		return errors.New("Bank declarations must be sequentially incrementing")
+		return errorHandler.AddNew(enumErrorCodes.BankNotSequential)
 	}
 	totalBanksInRomSegment := romBuilder.GetTotalBanksInCurrentRomSegment()
 	if newBankIndex >= totalBanksInRomSegment {
-		return errors.New("Too high bank number")
+		return errorHandler.AddNew(enumErrorCodes.BankNumberTooHigh)
 	}
 
 	romBuilder.SetBankIndex(newBankIndex)
@@ -27,13 +28,13 @@ func ValidateAndSetBank(bankNode *Node) error {
 
 func ValidateAndSetOrg(orgNode *Node) error {
 	if !operandFactory.ValidateNodeIsNumeric(orgNode) {
-		return errors.New("MUST be a number!")
+		return errorHandler.AddNew(enumErrorCodes.NodeTypeNotNumeric)
 	}
 	if !operandFactory.ValidateNumericNodeIsPositive(orgNode) {
-		return errors.New("ORG MUST be a positive number!")
+		return errorHandler.AddNew(enumErrorCodes.NodeValueNotPositive)
 	}
 	if !operandFactory.ValidateNumericNodeIs16BitValue(orgNode) {
-		return errors.New("ORG MUST be a 16 bit value")
+		return errorHandler.AddNew(enumErrorCodes.NodeValueNot16Bit)
 	}
 
 	newOrg := orgNode.AsNumber

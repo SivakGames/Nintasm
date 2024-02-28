@@ -7,7 +7,6 @@
 	.bank 0
 	.org $8000
 
-	lda [6], x
 
 label11:
 	LDX #5
