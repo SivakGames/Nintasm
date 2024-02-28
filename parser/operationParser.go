@@ -1,8 +1,8 @@
 package parser
 
 import (
-	"errors"
-	"fmt"
+	"misc/nintasm/assemble/errorHandler"
+	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
 	enumParserTypes "misc/nintasm/constants/enums/parserTypes"
 	enumTokenTypes "misc/nintasm/constants/enums/tokenTypes"
 	"misc/nintasm/util"
@@ -103,15 +103,15 @@ func (p *OperationParser) getRegularOperation() error {
 			parentParserEnum = enumParserTypes.Directive
 			break
 		}
+		return errorHandler.AddNew(enumErrorCodes.OperationDirectiveUnknown) // ❌ Fails
 
-		return errors.New("UNKNOWN DIRECTIVE")
 	case enumTokenTypes.IDENTIFIER:
 		parentParserEnum = enumParserTypes.Macro
 		break
 	case enumTokenTypes.None:
-		return errors.New("UNEXPECTED EMPTY OPERATION???")
+		return errorHandler.AddNew(enumErrorCodes.OperationEmpty) // ❌ Fails
 	default:
-		return errors.New("UNKNOWN OPERATION")
+		return errorHandler.AddNew(enumErrorCodes.OperationUNKNOWN) // ❌ Fails
 	}
 
 	operationTokenEnum := p.lookaheadType
@@ -131,9 +131,7 @@ func (p *OperationParser) getRegularOperation() error {
 		return nil
 	}
 
-	// ❌ Fails
-	badTokenAfterOperationMessage := fmt.Sprintf("ILLEGAL token after operation: %v", p.lookaheadValue)
-	return errors.New(badTokenAfterOperationMessage)
+	return errorHandler.AddNew(enumErrorCodes.OperationBadTokenAfter, p.lookaheadValue) // ❌ Fails
 
 }
 
@@ -177,8 +175,7 @@ func (p *OperationParser) getLabelOperation() error {
 	//See what follows the label
 	switch p.lookaheadType {
 	case enumTokenTypes.None:
-		// ❌ Fails if NO colon
-		return errors.New("LABEL IS INCOMPLETE - WHERE'S YOUR COLON!?")
+		return errorHandler.AddNew(enumErrorCodes.OperationLabelMissingColon) // ❌ Fails if NO colon
 
 	case enumTokenTypes.DELIMITER_colon:
 		err := p.eatFreelyAndAdvance(enumTokenTypes.DELIMITER_colon)
@@ -194,8 +191,7 @@ func (p *OperationParser) getLabelOperation() error {
 			p.parentParserEnum = enumParserTypes.Label
 			return nil
 		}
-		// ❌ Fails if tokens follow colon
-		return errors.New("STUFF FOLLOWS THE COLON!!!")
+		return errorHandler.AddNew(enumErrorCodes.OperationLabelBadTokenAfter, p.lookaheadValue) // ❌ Fails if tokens follow colon
 	}
 
 	//Potential labeled directive or assignment statement
@@ -246,7 +242,7 @@ func (p *OperationParser) getLabelFollowup(operationLabel string, hadWhitespace 
 	//Actual directive
 	case enumTokenTypes.DELIMITER_period:
 		if !hadWhitespace {
-			return errors.New("need spacing for labeled directive")
+			return errorHandler.AddNew(enumErrorCodes.OperationLabeledDirectiveNoSpace) // ❌ Fails
 		}
 		err := p.eatFreelyAndAdvance(enumTokenTypes.DELIMITER_period)
 		if err != nil {
@@ -266,18 +262,17 @@ func (p *OperationParser) getLabelFollowup(operationLabel string, hadWhitespace 
 			}
 
 			if p.lookaheadType != enumTokenTypes.None && p.lookaheadType != enumTokenTypes.WHITESPACE {
-				// ❌ Fails
+				// ❌ Fails as unexpected token
 				err := p.eat(enumTokenTypes.WHITESPACE)
 				return err
 			}
 
 		default:
-			return errors.New("Unknown labeled directive")
+			return errorHandler.AddNew(enumErrorCodes.OperationLabeledDirectiveUnknown) // ❌ Fails
 
 		}
 	default:
-		// ❌ Fails
-		return errors.New("Illegal token for labeled operation")
+		return errorHandler.AddNew(enumErrorCodes.OperationLabelBadTokenAfter, p.lookaheadValue) // ❌ Fails
 	}
 
 	// 🟢 Labeled directive parsing succeeds

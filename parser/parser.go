@@ -1,8 +1,8 @@
 package parser
 
 import (
-	"errors"
-	"fmt"
+	"misc/nintasm/assemble/errorHandler"
+	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
 	enumTokenTypes "misc/nintasm/constants/enums/tokenTypes"
 	"misc/nintasm/tokenizer"
 )
@@ -51,11 +51,11 @@ func (p *Parser) advanceToNext() error {
 // See if the next token type is the desired token to follow
 func (p *Parser) eat(desiredTokenType tokenEnum) error {
 	if p.lookaheadType == enumTokenTypes.None {
-		return errors.New("UNEXPECTED END OF INPUT")
+		return errorHandler.AddNew(enumErrorCodes.ParserEndOfInput) // ❌ Fails
+
 	}
 	if p.lookaheadType != desiredTokenType {
-		errMsg := fmt.Sprintf("UNEXPECTED TOKEN: \x1b[33m%v\x1b[0m", p.lookaheadValue)
-		return errors.New(errMsg)
+		return errorHandler.AddNew(enumErrorCodes.ParserUnexpectedToken, p.lookaheadValue) // ❌ Fails
 	}
 	return nil
 }

@@ -3,12 +3,27 @@ package enumErrorCodes
 type Def string
 
 const (
-	None             Def = "None"
-	UnresolvedSymbol     = "UnresolvedSymbol"
+	None Def = "None"
 
 	IncludeFileNotExist = "IncludeFileNotExist"
 	FailOpenFile        = "FailOpenFile"
 	FailScanFile        = "FailScanFile"
+
+	BinFileSeekAtEnd          = "BinFileSeekAtEnd"
+	BinFileSeekAfterEnd       = "BinFileSeekAfterEnd"
+	BinFileReadBeyondFileSize = "BinFileReadBeyondFileSize"
+
+	ParserEndOfInput      = "ParserEndOfInput"
+	ParserUnexpectedToken = "ParserUnexpectedToken"
+
+	OperationBadTokenAfter           = "OperationBadTokenAfter"
+	OperationDirectiveUnknown        = "OperationDirectiveUnknown"
+	OperationEmpty                   = "OperationEmpty"
+	OperationLabelBadTokenAfter      = "OperationLabelBadTokenAfter"
+	OperationLabelMissingColon       = "OperationLabelMissingColon"
+	OperationLabeledDirectiveNoSpace = "OperationLabeledDirectiveNoSpace"
+	OperationLabeledDirectiveUnknown = "OperationLabeledDirectiveUnknown"
+	OperationUNKNOWN                 = "OperationUNKNOWN"
 
 	NodeTypeNotNumeric   = "NodeTypeNotNumeric"
 	NodeTypeNotString    = "NodeTypeNotString"
@@ -30,6 +45,10 @@ const (
 	INESMapperBadValue    = "INESMapperBadValue"
 	INESMirroringSet      = "INESMirroringSet"
 	INESMirroringBadValue = "INESMirroringBadValue"
+
+	InstUnsupportedMode = "InstUnsupportedMode"
+	InstXYUnusableMode  = "InstXYUnusableMode"
+	InstBadAccumMode    = "InstBadAccumMode"
 )
 
 type Severity int

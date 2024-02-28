@@ -2,8 +2,6 @@ package fileHandler
 
 import (
 	"bufio"
-	"errors"
-	"fmt"
 	"io"
 	"misc/nintasm/assemble/errorHandler"
 	"misc/nintasm/assemble/fileStack"
@@ -24,8 +22,7 @@ func GetFirstInputFile(inputFileName string) error {
 	_, err = os.Stat(inputFileName)
 	if err != nil {
 		if os.IsNotExist(err) {
-			errorHandler.AddNew(enumErrorCodes.IncludeFileNotExist, inputFileName)
-			return errors.New(enumErrorCodes.IncludeFileNotExist)
+			return errorHandler.AddNew(enumErrorCodes.IncludeFileNotExist, inputFileName) // ❌ Fails
 		} else {
 			return err
 		}
@@ -58,7 +55,7 @@ func AddRelativePathIncludeFileName(inputFileName string) string {
 func OpenInputFileAndPushLinesToStack(inputFileName string) error {
 	file, err := os.Open(inputFileName)
 	if err != nil {
-		return errors.New(enumErrorCodes.FailOpenFile)
+		return errorHandler.AddNew(enumErrorCodes.FailOpenFile) // ❌ Fails
 	}
 	defer file.Close()
 
@@ -70,7 +67,7 @@ func OpenInputFileAndPushLinesToStack(inputFileName string) error {
 
 	err = scanner.Err()
 	if err != nil {
-		return errors.New(enumErrorCodes.FailScanFile)
+		return errorHandler.AddNew(enumErrorCodes.FailScanFile) // ❌ Fails
 	}
 
 	fileStack.PushToTopOfStack(inputFileName, processedLines)
@@ -98,11 +95,10 @@ func ProcessBinFile(binFileName string, seek int, read int) ([]byte, error) {
 	seekFileSizeDifference := fileInfo.Size() - seekPosition
 
 	if seekFileSizeDifference == 0 {
-		errMsg := fmt.Sprintf("Seek value of %d is at the very end of file so no bytes can be read!", seekPosition)
-		return []byte{}, errors.New(errMsg)
+		return []byte{}, errorHandler.AddNew(enumErrorCodes.BinFileSeekAtEnd, seekPosition) // ❌ Fails
+
 	} else if seekFileSizeDifference < 0 {
-		errMsg := fmt.Sprintf("Seek value of %d goes beyond the size of file by %d byte(s)", seekPosition, -seekFileSizeDifference)
-		return []byte{}, errors.New(errMsg)
+		return []byte{}, errorHandler.AddNew(enumErrorCodes.BinFileSeekAfterEnd, seekPosition, -seekFileSizeDifference) // ❌ Fails
 	}
 	_, err = file.Seek(seekPosition, 0)
 	if err != nil {
@@ -111,8 +107,7 @@ func ProcessBinFile(binFileName string, seek int, read int) ([]byte, error) {
 
 	if read > int(seekFileSizeDifference) {
 		diff := read - int(seekFileSizeDifference)
-		errMsg := fmt.Sprintf("Read value of %d goes beyond the size of file by %d byte(s)", read, diff)
-		return []byte{}, errors.New(errMsg)
+		return []byte{}, errorHandler.AddNew(enumErrorCodes.BinFileReadBeyondFileSize, read, diff) // ❌ Fails
 	}
 
 	if read != 0 {

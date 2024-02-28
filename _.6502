@@ -18,5 +18,3 @@ label11:
 	.org $0000
 	;.db toCharmap("💗1")
 
-
-

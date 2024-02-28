@@ -1,7 +1,8 @@
 package parser
 
 import (
-	"errors"
+	"misc/nintasm/assemble/errorHandler"
+	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
 	enumInstructionModes "misc/nintasm/constants/enums/instructionModes"
 	enumTokenTypes "misc/nintasm/constants/enums/tokenTypes"
 	"misc/nintasm/constants/instructionData"
@@ -45,7 +46,7 @@ func (p *InstructionOperandParser) Process(operationValue string) error {
 			return err // ❌ Fails
 		}
 		if p.lookaheadType != enumTokenTypes.None {
-			return errors.New("No tokens can follow the A")
+			return errorHandler.AddNew(enumErrorCodes.InstBadAccumMode) // ❌ Fails
 		}
 
 	default:
@@ -92,7 +93,7 @@ func (p *InstructionOperandParser) Process(operationValue string) error {
 	}
 
 	if useInstructionMode == enumInstructionModes.None {
-		return errors.New("Mode is not supported by instruction!") // ❌ Fails
+		return errorHandler.AddNew(enumErrorCodes.InstUnsupportedMode) // ❌ Fails
 	}
 	//Overwrite mode with ZP version if possible
 	if useInstructionZPMode != enumInstructionModes.None {
@@ -148,7 +149,7 @@ func checkModeSupportsXY(instructionMode instModeEnum, instructionIndex tokenEnu
 		return xyMode.Y, nil
 	}
 
-	return instructionMode, errors.New("X or Y indexes cannot be used with target mode")
+	return instructionMode, errorHandler.AddNew(enumErrorCodes.InstXYUnusableMode) // ❌ Fails
 }
 
 // If absolute mode (X,Y too) get the ZP version for auto convert. Get None otherwise
