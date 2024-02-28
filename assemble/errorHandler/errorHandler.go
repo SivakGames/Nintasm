@@ -96,8 +96,19 @@ var errorTable = map[enumErrorCodes.Def]ErrorTableEntry{
 	enumErrorCodes.InstIndirectIndexMustBeX: newErrorTableEntry(enumErrorCodes.Error, "Must use X index for this kind of indirect addressing"),
 	enumErrorCodes.InstIndirectIndexMustBeY: newErrorTableEntry(enumErrorCodes.Error, "Must use Y index for this kind of indirect addressing"),
 
+	enumErrorCodes.DirectiveUnopenedEndBlock:  newErrorTableEntry(enumErrorCodes.Error, "%v with no opening operation found!"),
+	enumErrorCodes.DirectiveUnmatchedEndBlock: newErrorTableEntry(enumErrorCodes.Error, "Non-matching closing block with parent operation, %v"),
+	enumErrorCodes.DirectiveNestedLabelBlock:  newErrorTableEntry(enumErrorCodes.Error, "Cannot define a labeled block when in another block statement!"),
+
 	enumErrorCodes.MacroInvokeDoubleCurlyBrace:   newErrorTableEntry(enumErrorCodes.Error, "Macro invoking error - Must close curly brace before opening another!"),
 	enumErrorCodes.MacroInvokeUnclosedCurlyBrace: newErrorTableEntry(enumErrorCodes.Error, "Macro invoking error - Unclosed curly brace!"),
+
+	enumErrorCodes.ResolvedValueNot8Bit:       newErrorTableEntry(enumErrorCodes.Error, "Operand must resolve to an 8 bit value!"),
+	enumErrorCodes.ResolvedValueNot16Bit:      newErrorTableEntry(enumErrorCodes.Error, "Operand must resolve to a 16 bit value!"),
+	enumErrorCodes.ResolvedValueIsBool:        newErrorTableEntry(enumErrorCodes.Warning, "Operand has resolved as bool; Will be converted to: %d"),
+	enumErrorCodes.ResolvedValue16BitBool:     newErrorTableEntry(enumErrorCodes.Error, "Boolean value cannot be used as a 16 bit operand"),
+	enumErrorCodes.ResolvedValueMultiByteChar: newErrorTableEntry(enumErrorCodes.Warning, "Character %v encoding requires more than a single byte. Using %d bytes"),
+	enumErrorCodes.ResolvedValue16BitString:   newErrorTableEntry(enumErrorCodes.Error, "String value cannot be used as a 16 bit operand"),
 }
 
 // ++++++++++++++++++++++++++++++++++++++++

@@ -1,9 +1,8 @@
 package nodesToBytes
 
 import (
-	"errors"
-	"fmt"
-	"log"
+	"misc/nintasm/assemble/errorHandler"
+	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
 	enumNodeTypes "misc/nintasm/constants/enums/nodeTypes"
 	"misc/nintasm/interpreter/operandFactory"
 	"unicode/utf8"
@@ -39,12 +38,12 @@ func ConvertNodeValueToUInts(node Node, neededBytes int, isBigEndian bool) ([]ui
 		switch neededBytes {
 		case 1:
 			if node.AsNumber < -0x000ff || node.AsNumber > 0x000ff {
-				return nil, errors.New("Instruction operand for mode must resolve to an 8 bit value")
+				return nil, errorHandler.AddNew(enumErrorCodes.ResolvedValueNot8Bit) // ❌ Fails
 			}
 			convertedValue = append(convertedValue, uint8(lowByte))
 		case 2:
 			if node.AsNumber < -0x0ffff || node.AsNumber > 0x0ffff {
-				return nil, errors.New("Instruction operand for mode must resolve to a 16 bit value")
+				return nil, errorHandler.AddNew(enumErrorCodes.ResolvedValueNot16Bit) // ❌ Fails
 			}
 			if !isBigEndian {
 				convertedValue = append(convertedValue, uint8(lowByte))
@@ -65,10 +64,10 @@ func ConvertNodeValueToUInts(node Node, neededBytes int, isBigEndian bool) ([]ui
 
 		switch neededBytes {
 		case 1:
-			fmt.Println("\x1b[33mWARNING\x1b[0m: Value is boolean; Resolving to", lowByte)
+			errorHandler.AddNew(enumErrorCodes.ResolvedValueIsBool, lowByte) // ⚠️ Warns
 			convertedValue = append(convertedValue, uint8(lowByte))
 		case 2:
-			return convertedValue, errors.New("Boolean value cannot be used in 16 bit operations")
+			return convertedValue, errorHandler.AddNew(enumErrorCodes.ResolvedValue16BitBool) // ❌ Fails
 		default:
 			panic("Something is very wrong with boolean byte conversion!")
 		}
@@ -79,7 +78,7 @@ func ConvertNodeValueToUInts(node Node, neededBytes int, isBigEndian bool) ([]ui
 			for _, c := range node.NodeValue {
 				runeLen := utf8.RuneLen(c)
 				if runeLen > 1 {
-					log.Println("\x1b[43m WARN \x1b[0mCharacter", c, "encoding requires more than a single byte. Using", runeLen, "bytes")
+					errorHandler.AddNew(enumErrorCodes.ResolvedValueMultiByteChar, c, runeLen) // ⚠️ Warns
 					for i := 0; i < runeLen; i++ {
 						writeRune := (rune(c) >> (i * 8)) & 0x000ff
 						convertedStringAsBytes = append(convertedStringAsBytes, uint8(writeRune))
@@ -90,7 +89,7 @@ func ConvertNodeValueToUInts(node Node, neededBytes int, isBigEndian bool) ([]ui
 			}
 			convertedValue = append(convertedValue, convertedStringAsBytes...)
 		case 2:
-			return convertedValue, errors.New("String values cannot be used in 16 bit operations")
+			return convertedValue, errorHandler.AddNew(enumErrorCodes.ResolvedValue16BitString) // ❌ Fails
 		default:
 			panic("Something is very wrong with string byte conversion!")
 		}

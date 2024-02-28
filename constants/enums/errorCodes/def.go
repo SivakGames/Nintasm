@@ -73,8 +73,19 @@ const (
 	InstIndirectIndexMustBeX = "InstIndirectIndexMustBeX"
 	InstIndirectIndexMustBeY = "InstIndirectIndexMustBeY"
 
+	DirectiveUnopenedEndBlock  = "DirectiveUnopenedEndBlock"
+	DirectiveUnmatchedEndBlock = "DirectiveUnmatchedEndBlock"
+	DirectiveNestedLabelBlock  = "DirectiveNestedLabelBlock"
+
 	MacroInvokeDoubleCurlyBrace   = "MacroInvokeDoubleCurlyBrace"
 	MacroInvokeUnclosedCurlyBrace = "MacroInvokeUnclosedCurlyBrace"
+
+	ResolvedValueNot8Bit       = "ResolvedValueNot8Bit"
+	ResolvedValueNot16Bit      = "ResolvedValueNot16Bit"
+	ResolvedValueIsBool        = "ResolvedValueIsBool"
+	ResolvedValue16BitBool     = "ResolvedValue16BitBool"
+	ResolvedValueMultiByteChar = "ResolvedValueMultiByteChar"
+	ResolvedValue16BitString   = "ResolvedValue16BitString"
 )
 
 type Severity int

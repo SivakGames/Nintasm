@@ -1,9 +1,10 @@
 package directiveHandler
 
 import (
-	"errors"
 	"fmt"
 	"misc/nintasm/assemble/blockStack"
+	"misc/nintasm/assemble/errorHandler"
+	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
 	enumTokenTypes "misc/nintasm/constants/enums/tokenTypes"
 	"misc/nintasm/interpreter/environment"
 	"misc/nintasm/interpreter/operandFactory"
@@ -16,13 +17,11 @@ func EvaluateDirective(operationTokenEnum enumTokenTypes.Def, directiveName stri
 	if operationTokenEnum == enumTokenTypes.DIRECTIVE_blockEnd ||
 		operationTokenEnum == enumTokenTypes.DIRECTIVE_labeledBlockEnd {
 		if len(blockStack.Stack) == 0 {
-			errMsg := fmt.Sprintf("%v with no opening operation found!", directiveName)
-			return errors.New(errMsg)
+			return errorHandler.AddNew(enumErrorCodes.DirectiveUnopenedEndBlock, directiveName)
 		}
 
 		if !blockStack.CheckIfEndOpMatchesOpeningOp(directiveName) {
-			errMsg := fmt.Sprintf("Non-matching closing block with parent operation, %v", directiveName)
-			return errors.New(errMsg)
+			return errorHandler.AddNew(enumErrorCodes.DirectiveUnopenedEndBlock, directiveName)
 		}
 	}
 
@@ -138,7 +137,7 @@ func EvaluateDirective(operationTokenEnum enumTokenTypes.Def, directiveName stri
 
 	default:
 		errMsg := fmt.Sprintf("BAD DIRECTIVE OPERATION TYPE!!! %v", directiveName)
-		return errors.New(errMsg)
+		panic(errMsg)
 	}
 }
 
@@ -151,8 +150,7 @@ func ProcessOpenLabelBlock(openBlockLabel string) error {
 	var err error
 
 	if len(blockStack.Stack) > 0 {
-		errMsg := fmt.Sprintf("Cannot define a labeled block when in another block statement!")
-		return errors.New(errMsg) // ❌ Fails
+		return errorHandler.AddNew(enumErrorCodes.DirectiveNestedLabelBlock) // ❌ Fails
 	}
 	err = environment.CheckIfSymbolAlreadyDefined(openBlockLabel)
 	if err != nil {
