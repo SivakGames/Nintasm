@@ -80,6 +80,10 @@ const (
 	MacroInvokeDoubleCurlyBrace   = "MacroInvokeDoubleCurlyBrace"
 	MacroInvokeUnclosedCurlyBrace = "MacroInvokeUnclosedCurlyBrace"
 
+	ExprMapNoneDefined  = "ExprMapNoneDefined"
+	ExprMapNotExist     = "ExprMapNotExist"
+	ExprMapDuplicateKey = "ExprMapDuplicateKey"
+
 	ResolvedValueNot8Bit       = "ResolvedValueNot8Bit"
 	ResolvedValueNot16Bit      = "ResolvedValueNot16Bit"
 	ResolvedValueIsBool        = "ResolvedValueIsBool"

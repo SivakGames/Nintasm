@@ -1,8 +1,8 @@
 package exprmapTable
 
 import (
-	"errors"
-	"fmt"
+	"misc/nintasm/assemble/errorHandler"
+	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
 )
 
 // ++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -37,7 +37,7 @@ func AddExprToExprmap(newExpr string, exprValue int) error {
 
 func GetCurrentExprmap() (ExprmapTableType, error) {
 	if currentExprmapName == "" {
-		return nil, errors.New("No exprmaps have been defined!!!!")
+		return nil, errorHandler.AddNew(enumErrorCodes.ExprMapNoneDefined)
 	}
 
 	return exprmapSymbolTable[currentExprmapName], nil
@@ -45,11 +45,11 @@ func GetCurrentExprmap() (ExprmapTableType, error) {
 
 func GetSpecifiedExprmap(specifiedExprmapName string) (ExprmapTableType, error) {
 	if currentExprmapName == "" {
-		return nil, errors.New("No exprmaps have been defined!!!!")
+		return nil, errorHandler.AddNew(enumErrorCodes.ExprMapNoneDefined)
 	}
 	specifiedExprmap, exists := exprmapSymbolTable[specifiedExprmapName]
 	if !exists {
-		return nil, errors.New("Specified exprmap doesn't exist!")
+		return nil, errorHandler.AddNew(enumErrorCodes.ExprMapNotExist)
 	}
 	return specifiedExprmap, nil
 }
@@ -64,8 +64,7 @@ func CheckIfDefinedInExprmap(lookupExpr string) (int, bool) {
 func CheckIfAlreadyExistsInExprmap(lookupExpr string) (int, error) {
 	target, exists := CheckIfDefinedInExprmap(lookupExpr)
 	if exists {
-		errMsg := fmt.Sprintf("Target expr %v already defined in exprmap!", lookupExpr)
-		return target, errors.New(errMsg)
+		return target, errorHandler.AddNew(enumErrorCodes.ExprMapDuplicateKey, lookupExpr)
 	}
 	return target, nil
 }
@@ -74,7 +73,7 @@ func CheckIfAlreadyExistsInExprmap(lookupExpr string) (int, error) {
 
 func SetExprmapToDefault() error {
 	if defaultExprmapName == "" {
-		return errors.New("Cannot reset - No exprmaps have been defined!!!!")
+		return errorHandler.AddNew(enumErrorCodes.ExprMapNoneDefined)
 	}
 	currentExprmapName = defaultExprmapName
 	return nil
@@ -82,7 +81,7 @@ func SetExprmapToDefault() error {
 
 func SetExprmapTo__(newExprmapName string) error {
 	if defaultExprmapName == "" {
-		return errors.New("Cannot set - No exprmaps have been defined!!!!")
+		return errorHandler.AddNew(enumErrorCodes.ExprMapNoneDefined)
 	}
 	_, err := GetSpecifiedExprmap(newExprmapName)
 	if err != nil {

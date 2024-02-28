@@ -103,6 +103,10 @@ var errorTable = map[enumErrorCodes.Def]ErrorTableEntry{
 	enumErrorCodes.MacroInvokeDoubleCurlyBrace:   newErrorTableEntry(enumErrorCodes.Error, "Macro invoking error - Must close curly brace before opening another!"),
 	enumErrorCodes.MacroInvokeUnclosedCurlyBrace: newErrorTableEntry(enumErrorCodes.Error, "Macro invoking error - Unclosed curly brace!"),
 
+	enumErrorCodes.ExprMapNoneDefined:  newErrorTableEntry(enumErrorCodes.Error, "No expression maps have been defined!"),
+	enumErrorCodes.ExprMapNotExist:     newErrorTableEntry(enumErrorCodes.Error, "Specified exprmap doesn't exist!"),
+	enumErrorCodes.ExprMapDuplicateKey: newErrorTableEntry(enumErrorCodes.Error, "Expression %v has already been defined in current map"),
+
 	enumErrorCodes.ResolvedValueNot8Bit:       newErrorTableEntry(enumErrorCodes.Error, "Operand must resolve to an 8 bit value!"),
 	enumErrorCodes.ResolvedValueNot16Bit:      newErrorTableEntry(enumErrorCodes.Error, "Operand must resolve to a 16 bit value!"),
 	enumErrorCodes.ResolvedValueIsBool:        newErrorTableEntry(enumErrorCodes.Warning, "Operand has resolved as bool; Will be converted to: %d"),
