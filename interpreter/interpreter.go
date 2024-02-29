@@ -180,9 +180,6 @@ func EvaluateNode(node Node) (Node, error) {
 			return node, nil
 		}
 
-		// Look up user def functions
-		fmt.Println(node)
-
 	default:
 		errMsg := fmt.Sprintf("UNKNOWN NODE BEING INTERPRETED!!! %v", node.NodeValue)
 		panic(errMsg)

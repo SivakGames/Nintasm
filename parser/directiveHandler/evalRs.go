@@ -1,7 +1,6 @@
 package directiveHandler
 
 import (
-	"fmt"
 	"misc/nintasm/assemble/errorHandler"
 	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
 	"misc/nintasm/interpreter/operandFactory"
@@ -22,8 +21,8 @@ func evalRs(operandList *[]Node) error {
 		return err
 	}
 
+	//TODO - Something with value?
 	_ = rsCurrentValue
-	fmt.Println(rsCurrentValue)
 
 	romBuildingSettings.AddToRSValue(uint(rsValueNode.AsNumber))
 

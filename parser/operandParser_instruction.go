@@ -62,6 +62,8 @@ func (p *InstructionOperandParser) Process(operationValue string) error {
 		}
 	}
 
+	// -----------------------------
+
 	//If an index is present, see if it's usable with desired mode and set it
 	if instructionXYIndex == enumTokenTypes.REGISTER_X || instructionXYIndex == enumTokenTypes.REGISTER_Y {
 		instructionMode, err = checkModeSupportsXY(instructionMode, instructionXYIndex)

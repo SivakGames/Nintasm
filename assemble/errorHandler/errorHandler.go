@@ -6,12 +6,16 @@ import (
 	"misc/nintasm/assemble/fileStack"
 	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
 	"misc/nintasm/util"
+	"strconv"
+	"strings"
 )
 
 type ErrorTableEntry struct {
 	description string
 	severity    enumErrorCodes.Severity
 }
+
+const SEVERITY_PREFIX = "SEVERITY_"
 
 func newErrorTableEntry(severity enumErrorCodes.Severity, description string) ErrorTableEntry {
 	return ErrorTableEntry{
@@ -82,10 +86,10 @@ var errorTable = map[enumErrorCodes.Def]ErrorTableEntry{
 
 	enumErrorCodes.INESValueAlreadySet: newErrorTableEntry(enumErrorCodes.Error, "%v value has already been set!!!"),
 
-	enumErrorCodes.BankSizeUneven:       newErrorTableEntry(enumErrorCodes.Error, "Bank size is not evenly distributable"),
-	enumErrorCodes.BankOverflow:         newErrorTableEntry(enumErrorCodes.Error, "Bank will overflow by: %d byte(s) here"),
-	enumErrorCodes.BankNotSequential:    newErrorTableEntry(enumErrorCodes.Error, "Bank declarations must be sequentially incrementing"),
-	enumErrorCodes.BankNumberTooHigh:    newErrorTableEntry(enumErrorCodes.Error, "Too high of a bank number!"),
+	enumErrorCodes.BankSizeUneven:       newErrorTableEntry(enumErrorCodes.Fatal, "Bank size is not evenly distributable"),
+	enumErrorCodes.BankOverflow:         newErrorTableEntry(enumErrorCodes.Fatal, "Bank will overflow by: %d byte(s) here"),
+	enumErrorCodes.BankNotSequential:    newErrorTableEntry(enumErrorCodes.Fatal, "Bank declarations must be sequentially incrementing"),
+	enumErrorCodes.BankNumberTooHigh:    newErrorTableEntry(enumErrorCodes.Fatal, "Too high of a bank number!"),
 	enumErrorCodes.OrgTooSmall:          newErrorTableEntry(enumErrorCodes.Error, "ORG is too small! Attempted: %d / Minimum Allowed: %d"),
 	enumErrorCodes.OrgTooBig:            newErrorTableEntry(enumErrorCodes.Error, "ORG is too big! Attempted: %d / Max Allowed: %d"),
 	enumErrorCodes.OrgLTEProgramCounter: newErrorTableEntry(enumErrorCodes.Error, "Cannot set ORG to a value less than where the program counter currently is!\nThis would overwrite data!\n Attempted: %d / Currently at: %d"),
@@ -129,13 +133,15 @@ var errorTable = map[enumErrorCodes.Def]ErrorTableEntry{
 	enumErrorCodes.InterpreterAlreadyDefined:   newErrorTableEntry(enumErrorCodes.Error, "Symbol %v has been previously defined! (Defined as %v)"),
 	enumErrorCodes.InterpreterSymbolNotFound:   newErrorTableEntry(enumErrorCodes.Error, "Symbol %v was not found!"),
 
+	enumErrorCodes.BlockIsEmpty:                newErrorTableEntry(enumErrorCodes.Warning, "Block is empty..."),
 	enumErrorCodes.BlockOpUncapturableByParent: newErrorTableEntry(enumErrorCodes.Error, "%v - This operation is uncapturable by block"),
-	enumErrorCodes.ResolvedValueNot8Bit:        newErrorTableEntry(enumErrorCodes.Error, "Operand must resolve to an 8 bit value!"),
-	enumErrorCodes.ResolvedValueNot16Bit:       newErrorTableEntry(enumErrorCodes.Error, "Operand must resolve to a 16 bit value!"),
-	enumErrorCodes.ResolvedValueIsBool:         newErrorTableEntry(enumErrorCodes.Warning, "Operand has resolved as bool; Will be converted to: %d"),
-	enumErrorCodes.ResolvedValue16BitBool:      newErrorTableEntry(enumErrorCodes.Error, "Boolean value cannot be used as a 16 bit operand"),
-	enumErrorCodes.ResolvedValueMultiByteChar:  newErrorTableEntry(enumErrorCodes.Warning, "Character %v encoding requires more than a single byte. Using %d bytes"),
-	enumErrorCodes.ResolvedValue16BitString:    newErrorTableEntry(enumErrorCodes.Error, "String value cannot be used as a 16 bit operand"),
+
+	enumErrorCodes.ResolvedValueNot8Bit:       newErrorTableEntry(enumErrorCodes.Error, "Operand must resolve to an 8 bit value!"),
+	enumErrorCodes.ResolvedValueNot16Bit:      newErrorTableEntry(enumErrorCodes.Error, "Operand must resolve to a 16 bit value!"),
+	enumErrorCodes.ResolvedValueIsBool:        newErrorTableEntry(enumErrorCodes.Warning, "Operand has resolved as bool; Will be converted to: %d"),
+	enumErrorCodes.ResolvedValue16BitBool:     newErrorTableEntry(enumErrorCodes.Error, "Boolean value cannot be used as a 16 bit operand"),
+	enumErrorCodes.ResolvedValueMultiByteChar: newErrorTableEntry(enumErrorCodes.Warning, "Character %v encoding requires more than a single byte. Using %d bytes"),
+	enumErrorCodes.ResolvedValue16BitString:   newErrorTableEntry(enumErrorCodes.Error, "String value cannot be used as a 16 bit operand"),
 
 	enumErrorCodes.RsNotSet: newErrorTableEntry(enumErrorCodes.Error, "RS has not yet been set!"),
 }
@@ -173,6 +179,23 @@ func NewErrorEntry(code enumErrorCodes.Def, message string, severity enumErrorCo
 		lineContent: "",
 		severity:    severity,
 	}
+}
+
+// If severity is >= threshold it should stop propagating up
+func CheckErrorContinuesUpwardPropagation(err error, threshold enumErrorCodes.Severity) error {
+	severityValue := err.Error()
+
+	modded, ok := strings.CutPrefix(severityValue, SEVERITY_PREFIX)
+	if ok {
+		severityAmt, err := strconv.Atoi(modded)
+		if err != nil {
+			return err
+		}
+		if severityAmt <= int(threshold) {
+			return nil
+		}
+	}
+	return err
 }
 
 /*
@@ -217,7 +240,7 @@ func AddNew(errorTableKey enumErrorCodes.Def, args ...interface{}) error {
 		}
 		colorizedSeverity := util.Colorize(util.PadStringLeft(fmt.Sprintf(" %v ", severityDescription), 7, ' '), severityColor, true)
 		fmt.Println("▓", colorizedSeverity, errMsg)
-		return errors.New(fmt.Sprintf("SEVERITY_%d", entry.severity))
+		return errors.New(fmt.Sprintf("%v%d", SEVERITY_PREFIX, entry.severity))
 	}
 	return errors.New("Non-error-code error???")
 }

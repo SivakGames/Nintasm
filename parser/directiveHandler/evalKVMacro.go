@@ -1,8 +1,9 @@
 package directiveHandler
 
 import (
-	"fmt"
 	"misc/nintasm/assemble/blockStack"
+	"misc/nintasm/assemble/errorHandler"
+	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
 	"misc/nintasm/interpreter/environment/macroTable"
 )
 
@@ -19,7 +20,7 @@ func evalEndKVMacro() error {
 	macroTable.AddMacroToEnvironment(macroLabel, macroTable.KVMacro, *capturedLines)
 
 	if len(*capturedLines) == 0 {
-		fmt.Println("Warning: KVMacro is empty!")
+		errorHandler.AddNew(enumErrorCodes.BlockIsEmpty) // ⚠️ Warns
 	}
 
 	blockStack.ClearBottomOfStackCapturedLines()

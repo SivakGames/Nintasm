@@ -8,6 +8,7 @@
 	.org $8000
 	
 	LDA #high(TESTING)
+	LDA #high(TESTING)
 
 TESTING:
 	ldx #6

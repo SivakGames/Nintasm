@@ -143,7 +143,7 @@ func AddBytesToRom(insertions []uint8) error {
 	overflowByteTotal := toInsertSpace - len(*currentBankSegment)
 
 	if overflowByteTotal > 0 {
-		return errorHandler.AddNew(enumErrorCodes.BankOverflow, overflowByteTotal)
+		return errorHandler.AddNew(enumErrorCodes.BankOverflow, overflowByteTotal) //❌☠️ FATAL ERROR
 	}
 	for i := range insertions {
 		(*currentBankSegment)[currentInsertionIndex] = insertions[i]

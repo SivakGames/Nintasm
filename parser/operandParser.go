@@ -1,7 +1,6 @@
 package parser
 
 import (
-	"fmt"
 	"misc/nintasm/assemble/errorHandler"
 	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
 	enumInstructionModes "misc/nintasm/constants/enums/instructionModes"
@@ -50,7 +49,7 @@ func (p *OperandParser) GetOperandList(
 		// Get first operand
 		err := p.getOperandAndAppend(&operandList, &captureMasks)
 		if err != nil {
-			return operandList, nil // ❌ Fails
+			return operandList, err // ❌ Fails
 		}
 
 		//From here get subsequent operands, if any. Operands are comma-separated
@@ -61,7 +60,7 @@ func (p *OperandParser) GetOperandList(
 			}
 			err = p.getOperandAndAppend(&operandList, &captureMasks)
 			if err != nil {
-				return operandList, nil
+				return operandList, err // ❌ Fails
 			}
 			operandCount++
 		}
@@ -98,8 +97,10 @@ func (p *OperandParser) getOperandAndAppend(operandList *[]Node, captureMasks *[
 
 	operand, err := captureStatementFunction()
 	if err != nil {
-		fmt.Println("Parsing operand has failed!")
-		return err // ❌ Fails
+		err := errorHandler.CheckErrorContinuesUpwardPropagation(err, enumErrorCodes.Error)
+		if err != nil {
+			return err // ❌❌ CONTINUES Failing!
+		}
 	}
 	*operandList = append(*operandList, operand)
 	return nil

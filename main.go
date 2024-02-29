@@ -32,7 +32,7 @@ func main() {
 	start := time.Now()
 	err = assemble.Start(baseInputFileName)
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("\x1b[31mERRORZ HAPPENED\x1b[0m")
 	}
 
 	assemblyTime := fmt.Sprintf("%.2f", time.Since(start).Seconds())
