@@ -106,12 +106,13 @@ const (
 	InterpreterAlreadyDefined   = "InterpreterAlreadyDefined"
 	InterpreterSymbolNotFound   = "InterpreterSymbolNotFound"
 
-	ResolvedValueNot8Bit       = "ResolvedValueNot8Bit"
-	ResolvedValueNot16Bit      = "ResolvedValueNot16Bit"
-	ResolvedValueIsBool        = "ResolvedValueIsBool"
-	ResolvedValue16BitBool     = "ResolvedValue16BitBool"
-	ResolvedValueMultiByteChar = "ResolvedValueMultiByteChar"
-	ResolvedValue16BitString   = "ResolvedValue16BitString"
+	BlockOpUncapturableByParent = "BlockOpUncapturableByParent"
+	ResolvedValueNot8Bit        = "ResolvedValueNot8Bit"
+	ResolvedValueNot16Bit       = "ResolvedValueNot16Bit"
+	ResolvedValueIsBool         = "ResolvedValueIsBool"
+	ResolvedValue16BitBool      = "ResolvedValue16BitBool"
+	ResolvedValueMultiByteChar  = "ResolvedValueMultiByteChar"
+	ResolvedValue16BitString    = "ResolvedValue16BitString"
 
 	RsNotSet = "RsNotSet"
 )

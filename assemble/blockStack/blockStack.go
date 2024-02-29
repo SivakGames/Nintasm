@@ -1,8 +1,9 @@
 package blockStack
 
 import (
-	"errors"
 	"fmt"
+	"misc/nintasm/assemble/errorHandler"
+	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
 	enumParserTypes "misc/nintasm/constants/enums/parserTypes"
 	enumTokenTypes "misc/nintasm/constants/enums/tokenTypes"
 	"misc/nintasm/interpreter/operandFactory"
@@ -141,7 +142,7 @@ func GetCurrentOperationLabel() string {
 // If one was previously set then error because it hasn't finished.
 func SetCurrentOperationLabel(label string) error {
 	if currentBlockOperationLabel != "" {
-		return errors.New("Somehow entering another label block operation while first is not done...")
+		panic("Somehow entering another label block operation while first is not done...")
 	}
 
 	currentBlockOperationLabel = label
@@ -269,8 +270,7 @@ func CheckOperationIsCapturable(
 
 	_, ok = checka[lineOperationParsedValues.OperationTokenEnum]
 	if !ok {
-		errMsg := fmt.Sprintf("Uncapturable! %v", lineOperationParsedValues.OperationTokenValue)
-		return errors.New(errMsg)
+		return errorHandler.AddNew(enumErrorCodes.BlockOpUncapturableByParent, lineOperationParsedValues.OperationTokenValue)
 	}
 	return nil
 }

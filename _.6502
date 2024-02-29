@@ -1,112 +1,18 @@
 	.inesMap 0
-	.inesPrg "128kb"
+	.inesPrg "32kb"
 	.inesChr "8kb"
 	.inesMir 0
 
-	.romSegment "128kb","16kb","PRG"
+	.romSegment "32kb","32kb","PRG"
 	.bank 0
 	.org $8000
-	.repeat 1024
-	LDA [0], y
-	LDA [1, x]
-	LDx 22
-	LDy #-33
-	LDa [44], y
-	LDa [55], y
-	LDa 66
-	LDa #77
-	.endrepeat
+	
+	LDA #high(TESTING)
 
-	.bank 1
-	.org $8000
-	.repeat 1024
-	LDA [0], y
-	LDA [1, x]
-	LDx 22
-	LDy #-33
-	LDa [44], y
-	LDa [55], y
-	LDa 66
-	LDa #77
-	.endrepeat
+TESTING:
+	ldx #6
 
-	.bank 2
-	.org $8000
-	.repeat 1024
-	LDA [0], y
-	LDA [1, x]
-	LDx 22
-	LDy #-33
-	LDa [44], y
-	LDa [55], y
-	LDa 66
-	LDa #77
-	.endrepeat
 
-	.bank 3
-	.org $8000
-	.repeat 1024
-	LDA [0], y
-	LDA [1, x]
-	LDx 22
-	LDy #-33
-	LDa [44], y
-	LDa [55], y
-	LDa 66
-	LDa #77
-	.endrepeat
-
-	.bank 4
-	.org $8000
-	.repeat 1024
-	LDA [0], y
-	LDA [1, x]
-	LDx 22
-	LDy #-33
-	LDa [44], y
-	LDa [55], y
-	LDa 66
-	LDa #77
-	.endrepeat
-
-	.bank 5
-	.org $8000
-	.repeat 1024
-	LDA [0], y
-	LDA [1, x]
-	LDx 22
-	LDy #-33
-	LDa [44], y
-	LDa [55], y
-	LDa 66
-	LDa #77
-	.endrepeat
-
-	.bank 6
-	.org $8000
-	.repeat 1024
-	LDA [0], y
-	LDA [1, x]
-	LDx 22
-	LDy #-33
-	LDa [44], y
-	LDa [55], y
-	LDa 66
-	LDa #77
-	.endrepeat
-
-	.bank 7
-	.org $8000
-	.repeat 1024
-	LDA [0], y
-	LDA [1, x]
-	LDx 22
-	LDy #-33
-	LDa [44], y
-	LDa [55], y
-	LDa 66
-	LDa #77
-	.endrepeat
 
 	.romSegment "8kb","8kb","CHR"
 	.bank 0

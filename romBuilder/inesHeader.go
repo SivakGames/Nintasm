@@ -117,7 +117,7 @@ func ValidateInesPrg(inesNode *Node) error {
 
 	if !util.ValidateIsPowerOfTwo(inesNode.AsNumber) {
 		return errorHandler.AddNew(enumErrorCodes.NodeValueNotPowerOf2)
-	} else if !operandFactory.ValidateNumericNodeIsGTValue(inesNode, 128) {
+	} else if operandFactory.ValidateNumericNodeIsGTValue(inesNode, 128) {
 		return errorHandler.AddNew(enumErrorCodes.NodeValueNotLTE, 128)
 	}
 
