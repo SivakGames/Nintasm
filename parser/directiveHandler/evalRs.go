@@ -1,8 +1,9 @@
 package directiveHandler
 
 import (
-	"errors"
 	"fmt"
+	"misc/nintasm/assemble/errorHandler"
+	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
 	"misc/nintasm/interpreter/operandFactory"
 	"misc/nintasm/romBuilder/romBuildingSettings"
 )
@@ -10,9 +11,10 @@ import (
 func evalRs(operandList *[]Node) error {
 	rsValueNode := (*operandList)[0]
 
-	if !(operandFactory.ValidateNodeIsNumeric(&rsValueNode) &&
-		operandFactory.ValidateNumericNodeIsGTEValue(&rsValueNode, 1)) {
-		return errors.New("RS value must be numeric and >= 1") // ❌ Fails
+	if !operandFactory.ValidateNodeIsNumeric(&rsValueNode) {
+		return errorHandler.AddNew(enumErrorCodes.NodeTypeNotNumeric) // ❌ Fails
+	} else if !operandFactory.ValidateNumericNodeIsGTEValue(&rsValueNode, 1) {
+		return errorHandler.AddNew(enumErrorCodes.NodeValueNotGTE, 1) // ❌ Fails
 	}
 
 	rsCurrentValue, err := romBuildingSettings.GetRSValue()

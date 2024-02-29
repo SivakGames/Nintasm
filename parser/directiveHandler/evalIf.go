@@ -1,8 +1,9 @@
 package directiveHandler
 
 import (
-	"errors"
 	"misc/nintasm/assemble/blockStack"
+	"misc/nintasm/assemble/errorHandler"
+	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
 	enumTokenTypes "misc/nintasm/constants/enums/tokenTypes"
 	"misc/nintasm/interpreter/operandFactory"
 )
@@ -15,7 +16,7 @@ func evalIf(directiveName string, operandList *[]Node) error {
 func evalElseIf(directiveName string, operandList *[]Node) error {
 	lastOp := blockStack.GetTopOfStackLastAlternateOperation()
 	if lastOp.BlockOperationName == "ELSE" {
-		return errors.New("Cannot have elseif after else")
+		return errorHandler.AddNew(enumErrorCodes.IfStatementElseIfAfterElse)
 	}
 	blockStack.AppendToTopOfStackAlternateBlock(directiveName, *operandList)
 	return nil
@@ -24,7 +25,7 @@ func evalElseIf(directiveName string, operandList *[]Node) error {
 func evalElse(directiveName string, operandList *[]Node) error {
 	lastOp := blockStack.GetTopOfStackLastAlternateOperation()
 	if lastOp.BlockOperationName == "ELSE" {
-		return errors.New("Cannot only have 1 else in this block")
+		return errorHandler.AddNew(enumErrorCodes.IfStatementDuplicateElse)
 	}
 
 	*operandList = append(*operandList, operandFactory.CreateBooleanLiteralNode(enumTokenTypes.NUMBER_decimal, "1", true))
@@ -42,7 +43,7 @@ func evalEndIf(operandList *[]Node) error {
 	for currentStackOperation != nil {
 		ifData := &currentStackOperation.OperandList[0]
 		if !operandFactory.ValidateNodeIsBoolean(ifData) {
-			return errors.New("UNEXPECTED NON-BOOLEAN FOR IF!")
+			return errorHandler.AddNew(enumErrorCodes.NodeTypeNotBool)
 		}
 		if ifData.AsBool {
 			break

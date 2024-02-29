@@ -1,8 +1,9 @@
 package directiveHandler
 
 import (
-	"errors"
 	"misc/nintasm/assemble/blockStack"
+	"misc/nintasm/assemble/errorHandler"
+	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
 	"misc/nintasm/interpreter"
 	"misc/nintasm/interpreter/operandFactory"
 	"regexp"
@@ -15,9 +16,10 @@ func evalRepeat(directiveName string, operandList *[]Node) error {
 		return err
 	}
 
-	if !(operandFactory.ValidateNodeIsNumeric(&numRepeatsNode) &&
-		operandFactory.ValidateNumericNodeIsGTEValue(&numRepeatsNode, 1)) {
-		return errors.New("Repeat must be numeric and >= 1") // ❌ Fails
+	if !operandFactory.ValidateNodeIsNumeric(&numRepeatsNode) {
+		return errorHandler.AddNew(enumErrorCodes.NodeTypeNotNumeric) // ❌ Fails
+	} else if !operandFactory.ValidateNumericNodeIsGTEValue(&numRepeatsNode, 1) {
+		return errorHandler.AddNew(enumErrorCodes.NodeValueNotGTE, 1) // ❌ Fails
 	}
 
 	evaluatedNodes := []Node{numRepeatsNode}
@@ -25,7 +27,7 @@ func evalRepeat(directiveName string, operandList *[]Node) error {
 	if len(*operandList) > 1 {
 		iterNameNode := (*operandList)[1]
 		if !operandFactory.ValidateNodeIsSubstitutionID(&iterNameNode) {
-			return errors.New("Bad iterator name for repeat. Must be an \\iter") // ❌ Fails
+			return errorHandler.AddNew(enumErrorCodes.NodeTypeNotSubstitutionID) // ❌ Fails
 		}
 		evaluatedNodes = append(evaluatedNodes, (*operandList)[1])
 	}

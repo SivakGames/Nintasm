@@ -60,8 +60,10 @@ var errorTable = map[enumErrorCodes.Def]ErrorTableEntry{
 	enumErrorCodes.OperandPeriodMissingIdentifier: newErrorTableEntry(enumErrorCodes.Error, "Identifier must follow period!"),
 	enumErrorCodes.OperandBadPrimaryExpr:          newErrorTableEntry(enumErrorCodes.Error, "Bad primary expression - %v"),
 
-	enumErrorCodes.NodeTypeNotIdentifier: newErrorTableEntry(enumErrorCodes.Error, "Value must be an identifier!"),
-	enumErrorCodes.NodeTypeNotString:     newErrorTableEntry(enumErrorCodes.Error, "Value must be a string!"),
+	enumErrorCodes.NodeTypeNotBool:           newErrorTableEntry(enumErrorCodes.Error, "Value must be a boolean!"),
+	enumErrorCodes.NodeTypeNotIdentifier:     newErrorTableEntry(enumErrorCodes.Error, "Value must be an identifier!"),
+	enumErrorCodes.NodeTypeNotString:         newErrorTableEntry(enumErrorCodes.Error, "Value must be a string!"),
+	enumErrorCodes.NodeTypeNotSubstitutionID: newErrorTableEntry(enumErrorCodes.Error, "Value must be a substitution ID!"),
 
 	enumErrorCodes.NodeTypeNotNumeric:   newErrorTableEntry(enumErrorCodes.Error, "Value must be numeric!"),
 	enumErrorCodes.NodeValueNotPositive: newErrorTableEntry(enumErrorCodes.Error, "Value must be positive!"),
@@ -103,6 +105,11 @@ var errorTable = map[enumErrorCodes.Def]ErrorTableEntry{
 	enumErrorCodes.MacroInvokeDoubleCurlyBrace:   newErrorTableEntry(enumErrorCodes.Error, "Macro invoking error - Must close curly brace before opening another!"),
 	enumErrorCodes.MacroInvokeUnclosedCurlyBrace: newErrorTableEntry(enumErrorCodes.Error, "Macro invoking error - Unclosed curly brace!"),
 
+	enumErrorCodes.AssignmentMissingOperand: newErrorTableEntry(enumErrorCodes.Error, "Missing operand for assignment!"),
+
+	enumErrorCodes.IfStatementElseIfAfterElse: newErrorTableEntry(enumErrorCodes.Error, "Cannot have elseif after else"),
+	enumErrorCodes.IfStatementDuplicateElse:   newErrorTableEntry(enumErrorCodes.Error, "Cannot only have 1 else in this block"),
+
 	enumErrorCodes.CharMapNoneDefined:     newErrorTableEntry(enumErrorCodes.Error, "No character maps have been defined!"),
 	enumErrorCodes.CharMapNotExist:        newErrorTableEntry(enumErrorCodes.Error, "Specified charmap doesn't exist!"),
 	enumErrorCodes.CharMapDuplicateKey:    newErrorTableEntry(enumErrorCodes.Error, "Character %c has already been defined in current map"),
@@ -113,6 +120,14 @@ var errorTable = map[enumErrorCodes.Def]ErrorTableEntry{
 	enumErrorCodes.ExprMapNoneDefined:  newErrorTableEntry(enumErrorCodes.Error, "No expression maps have been defined!"),
 	enumErrorCodes.ExprMapNotExist:     newErrorTableEntry(enumErrorCodes.Error, "Specified exprmap doesn't exist!"),
 	enumErrorCodes.ExprMapDuplicateKey: newErrorTableEntry(enumErrorCodes.Error, "Expression %v has already been defined in current map"),
+	enumErrorCodes.ToExprMapUndefExpr:  newErrorTableEntry(enumErrorCodes.Error, "Expression `%v` is not defined in currently used exprmap"),
+
+	enumErrorCodes.InterpreterNoParentLabel:    newErrorTableEntry(enumErrorCodes.Error, "Cannot use operation! No parent label!"),
+	enumErrorCodes.InterpreterFuncTooFewArgs:   newErrorTableEntry(enumErrorCodes.Error, "Too few arguments for function!"),
+	enumErrorCodes.InterpreterFuncTooManyArgs:  newErrorTableEntry(enumErrorCodes.Error, "Too many arguments for function!"),
+	enumErrorCodes.InterpreterFuncArgWrongType: newErrorTableEntry(enumErrorCodes.Error, "Argument is wrong type"),
+	enumErrorCodes.InterpreterAlreadyDefined:   newErrorTableEntry(enumErrorCodes.Error, "Symbol %v has been previously defined! (Defined as %v)"),
+	enumErrorCodes.InterpreterSymbolNotFound:   newErrorTableEntry(enumErrorCodes.Error, "Symbol %v was not found!"),
 
 	enumErrorCodes.ResolvedValueNot8Bit:       newErrorTableEntry(enumErrorCodes.Error, "Operand must resolve to an 8 bit value!"),
 	enumErrorCodes.ResolvedValueNot16Bit:      newErrorTableEntry(enumErrorCodes.Error, "Operand must resolve to a 16 bit value!"),
@@ -120,6 +135,8 @@ var errorTable = map[enumErrorCodes.Def]ErrorTableEntry{
 	enumErrorCodes.ResolvedValue16BitBool:     newErrorTableEntry(enumErrorCodes.Error, "Boolean value cannot be used as a 16 bit operand"),
 	enumErrorCodes.ResolvedValueMultiByteChar: newErrorTableEntry(enumErrorCodes.Warning, "Character %v encoding requires more than a single byte. Using %d bytes"),
 	enumErrorCodes.ResolvedValue16BitString:   newErrorTableEntry(enumErrorCodes.Error, "String value cannot be used as a 16 bit operand"),
+
+	enumErrorCodes.RsNotSet: newErrorTableEntry(enumErrorCodes.Error, "RS has not yet been set!"),
 }
 
 // ++++++++++++++++++++++++++++++++++++++++

@@ -1,6 +1,9 @@
 package romBuildingSettings
 
-import "errors"
+import (
+	"misc/nintasm/assemble/errorHandler"
+	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
+)
 
 // ------------------------------------
 
@@ -31,7 +34,7 @@ var rsHasBeenSetOnce bool
 
 func GetRSValue() (uint, error) {
 	if !rsHasBeenSetOnce {
-		return rsValue, errors.New("RS has not been set!")
+		return rsValue, errorHandler.AddNew(enumErrorCodes.RsNotSet)
 	}
 	return rsValue, nil
 }
@@ -41,7 +44,7 @@ func SetRSValue(newRSValue uint) {
 }
 func AddToRSValue(addRSValue uint) error {
 	if !rsHasBeenSetOnce {
-		return errors.New("RS has not yet been set!")
+		return errorHandler.AddNew(enumErrorCodes.RsNotSet)
 	}
 	rsValue += addRSValue
 	return nil

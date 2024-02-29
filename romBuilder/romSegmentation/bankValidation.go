@@ -29,11 +29,9 @@ func ValidateAndSetBank(bankNode *Node) error {
 func ValidateAndSetOrg(orgNode *Node) error {
 	if !operandFactory.ValidateNodeIsNumeric(orgNode) {
 		return errorHandler.AddNew(enumErrorCodes.NodeTypeNotNumeric)
-	}
-	if !operandFactory.ValidateNumericNodeIsPositive(orgNode) {
+	} else if !operandFactory.ValidateNumericNodeIsPositive(orgNode) {
 		return errorHandler.AddNew(enumErrorCodes.NodeValueNotPositive)
-	}
-	if !operandFactory.ValidateNumericNodeIs16BitValue(orgNode) {
+	} else if !operandFactory.ValidateNumericNodeIs16BitValue(orgNode) {
 		return errorHandler.AddNew(enumErrorCodes.NodeValueNot16Bit)
 	}
 

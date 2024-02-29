@@ -1,8 +1,9 @@
 package directiveHandler
 
 import (
-	"errors"
 	"misc/nintasm/assemble/blockStack"
+	"misc/nintasm/assemble/errorHandler"
+	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
 	"misc/nintasm/interpreter/environment/macroTable"
 	"misc/nintasm/interpreter/operandFactory"
 )
@@ -12,7 +13,7 @@ var ikvKeys map[string]string
 func evalIkv(directiveName string, operandList *[]Node) error {
 	macroNameNode := &(*operandList)[0]
 	if !operandFactory.ValidateNodeIsIdentifier(macroNameNode) {
-		return errors.New("IKV name must be an Identifier!")
+		return errorHandler.AddNew(enumErrorCodes.NodeTypeNotIdentifier) // ❌ Fails
 	}
 
 	blockStack.PushOntoStack(directiveName, *operandList)
@@ -20,7 +21,6 @@ func evalIkv(directiveName string, operandList *[]Node) error {
 	blockStack.SetCurrentOperationEvaluatesFlag()
 
 	macroTable.AppendToReplacementStack()
-
 	return nil
 }
 
@@ -55,7 +55,7 @@ func evalEndIkv(operandList *[]Node) error {
 func evalKv(operandList *[]Node) error {
 	macroKeyNode := &(*operandList)[0]
 	if !operandFactory.ValidateNodeIsSubstitutionID(macroKeyNode) {
-		return errors.New("Must use a substitution type node for KV")
+		return errorHandler.AddNew(enumErrorCodes.NodeTypeNotSubstitutionID) // ❌ Fails
 	}
 	macroValueNode := &(*operandList)[1]
 	macroTable.AddToReplacementListOnTopOfStack(macroKeyNode.NodeValue, macroValueNode.NodeValue)

@@ -37,8 +37,10 @@ const (
 	OperandPeriodMissingIdentifier = "OperandPeriodMissingIdentifier"
 	OperandBadPrimaryExpr          = "OperandBadPrimaryExpr"
 
-	NodeTypeNotString     = "NodeTypeNotString"
-	NodeTypeNotIdentifier = "NodeTypeNotIdentifier"
+	NodeTypeNotBool           = "NodeTypeNotBool"
+	NodeTypeNotString         = "NodeTypeNotString"
+	NodeTypeNotIdentifier     = "NodeTypeNotIdentifier"
+	NodeTypeNotSubstitutionID = "NodeTypeNotSubstitutionID"
 
 	NodeTypeNotNumeric   = "NodeTypeNotNumeric"
 	NodeValueNotPositive = "NodeValueNotPositive"
@@ -80,6 +82,11 @@ const (
 	MacroInvokeDoubleCurlyBrace   = "MacroInvokeDoubleCurlyBrace"
 	MacroInvokeUnclosedCurlyBrace = "MacroInvokeUnclosedCurlyBrace"
 
+	AssignmentMissingOperand = "AssignmentMissingOperand"
+
+	IfStatementElseIfAfterElse = "IfStatementElseIfAfterElse"
+	IfStatementDuplicateElse   = "IfStatementDuplicateElse"
+
 	CharMapNoneDefined     = "CharMapNoneDefined"
 	CharMapNotExist        = "CharMapNotExist"
 	CharMapDuplicateKey    = "CharMapDuplicateKey"
@@ -90,6 +97,14 @@ const (
 	ExprMapNoneDefined  = "ExprMapNoneDefined"
 	ExprMapNotExist     = "ExprMapNotExist"
 	ExprMapDuplicateKey = "ExprMapDuplicateKey"
+	ToExprMapUndefExpr  = "ToExprMapUndefExpr"
+
+	InterpreterNoParentLabel    = "InterpreterNoParentLabel"
+	InterpreterFuncTooFewArgs   = "InterpreterFuncTooFewArgs"
+	InterpreterFuncTooManyArgs  = "InterpreterFuncTooManyArgs"
+	InterpreterFuncArgWrongType = "InterpreterFuncArgWrongType"
+	InterpreterAlreadyDefined   = "InterpreterAlreadyDefined"
+	InterpreterSymbolNotFound   = "InterpreterSymbolNotFound"
 
 	ResolvedValueNot8Bit       = "ResolvedValueNot8Bit"
 	ResolvedValueNot16Bit      = "ResolvedValueNot16Bit"
@@ -97,6 +112,8 @@ const (
 	ResolvedValue16BitBool     = "ResolvedValue16BitBool"
 	ResolvedValueMultiByteChar = "ResolvedValueMultiByteChar"
 	ResolvedValue16BitString   = "ResolvedValue16BitString"
+
+	RsNotSet = "RsNotSet"
 )
 
 type Severity int

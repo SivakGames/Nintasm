@@ -1,7 +1,6 @@
 package parser
 
 import (
-	"errors"
 	"fmt"
 	enumTokenTypes "misc/nintasm/constants/enums/tokenTypes"
 	"misc/nintasm/parser/directiveHandler"
@@ -128,7 +127,7 @@ func getMinMaxOperandsForDirective(directiveEnum tokenEnum, directiveName string
 	minMaxOperands, checkOk = directiveNameMinMaxOperands[directiveName]
 	if !checkOk {
 		errMsg := fmt.Sprintf("Unable to determine min/max operands for %v directive!", directiveName)
-		return 0, 0, errors.New(errMsg)
+		panic(errMsg)
 	}
 	return minMaxOperands[0], minMaxOperands[1], nil
 }

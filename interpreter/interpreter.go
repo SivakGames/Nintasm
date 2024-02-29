@@ -1,9 +1,10 @@
 package interpreter
 
 import (
-	"errors"
 	"fmt"
 	"log"
+	"misc/nintasm/assemble/errorHandler"
+	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
 	enumNodeTypes "misc/nintasm/constants/enums/nodeTypes"
 	"misc/nintasm/interpreter/environment"
 	"misc/nintasm/interpreter/environment/charmapTable"
@@ -46,7 +47,7 @@ func EvaluateNode(node Node) (Node, error) {
 
 		exprValue, exists := exprmapTable.CheckIfDefinedInExprmap(node.NodeValue)
 		if !exists {
-			return node, errors.New("Bad expr char")
+			return node, errorHandler.AddNew(enumErrorCodes.ToExprMapUndefExpr, node.NodeValue)
 		}
 
 		node.AsNumber = exprValue
@@ -134,8 +135,7 @@ func EvaluateNode(node Node) (Node, error) {
 		case "||":
 			node.AsBool = left.AsBool || right.AsBool
 		default:
-			return node, errors.New("SOMETHING IS VERY WRONG")
-
+			panic("SOMETHING IS VERY WRONG WITH BINARY EXPRESSION INTERPRETING")
 		}
 		switch operation {
 		case "+", "-", "*", "/", "%", "|", "&", "^", "<<", ">>":
@@ -161,7 +161,7 @@ func EvaluateNode(node Node) (Node, error) {
 		case "!":
 			node.AsBool = !right.AsBool
 		default:
-			return node, errors.New("SOMETHING IS VERY WRONG")
+			panic("SOMETHING IS VERY WRONG WITH UNARY EXPRESSION INTERPRETING")
 		}
 
 		switch operation {
@@ -185,7 +185,7 @@ func EvaluateNode(node Node) (Node, error) {
 
 	default:
 		errMsg := fmt.Sprintf("UNKNOWN NODE BEING INTERPRETED!!! %v", node.NodeValue)
-		return node, errors.New(errMsg)
+		panic(errMsg)
 	}
 
 	return node, nil
@@ -197,15 +197,15 @@ func ProcessAssemblerFunction(node *Node) (bool, error) {
 	if isAsmFunc {
 		numArgs := len(*node.ArgumentList)
 		if numArgs < functionData.minArgs {
-			return isAsmFunc, errors.New("Too few arguments for function!")
+			return isAsmFunc, errorHandler.AddNew(enumErrorCodes.InterpreterFuncTooFewArgs)
 		}
 		if numArgs > functionData.maxArgs {
-			return isAsmFunc, errors.New("Too many arguments for function!")
+			return isAsmFunc, errorHandler.AddNew(enumErrorCodes.InterpreterFuncTooManyArgs)
 		}
 
 		for i, a := range *node.ArgumentList {
 			if a.NodeType != functionData.argMustResolveTo[i] {
-				return isAsmFunc, errors.New("Argument for node is wrong type...")
+				return isAsmFunc, errorHandler.AddNew(enumErrorCodes.InterpreterFuncArgWrongType)
 			}
 		}
 
@@ -240,7 +240,7 @@ func ProcessAssemblerFunction(node *Node) (bool, error) {
 
 func GetParentLabel() (string, error) {
 	if len(parentLabelStack) == 0 {
-		return "", errors.New("Cannot use operation! No parent label!")
+		return "", errorHandler.AddNew(enumErrorCodes.InterpreterNoParentLabel)
 	}
 	parentLabel := parentLabelStack[len(parentLabelStack)-1]
 	return parentLabel, nil

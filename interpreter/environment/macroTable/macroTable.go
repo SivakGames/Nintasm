@@ -1,9 +1,9 @@
 package macroTable
 
 import (
-	"errors"
-	"fmt"
 	"misc/nintasm/assemble/blockStack"
+	"misc/nintasm/assemble/errorHandler"
+	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
 )
 
 // ++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -50,7 +50,6 @@ func LookupAndGetMacroInEnvironment(symbolName string, macroEnum LookupMacroType
 	if ok {
 		return macro, nil
 	} else {
-		errMsg := fmt.Sprintf("Macro %v does not exist!", symbolName)
-		return nil, errors.New(errMsg)
+		return nil, errorHandler.AddNew(enumErrorCodes.InterpreterSymbolNotFound, symbolName)
 	}
 }

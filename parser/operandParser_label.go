@@ -2,6 +2,8 @@ package parser
 
 import (
 	"errors"
+	"misc/nintasm/assemble/errorHandler"
+	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
 	enumTokenTypes "misc/nintasm/constants/enums/tokenTypes"
 	"misc/nintasm/interpreter"
 	"misc/nintasm/interpreter/operandFactory"
@@ -45,7 +47,7 @@ func (p *LabelOperandParser) Process(operationType tokenEnum, operationValue str
 
 	case enumTokenTypes.ASSIGN_EQU, enumTokenTypes.ASSIGN_simple:
 		if p.lookaheadType == enumTokenTypes.None {
-			return errors.New("\x1b[31mMissing assignment operand!\x1b[0m")
+			return errorHandler.AddNew(enumErrorCodes.AssignmentMissingOperand)
 		}
 
 		operandList, err := p.GetOperandList(1, 64, false, nil)
@@ -66,6 +68,6 @@ func (p *LabelOperandParser) Process(operationType tokenEnum, operationValue str
 		return nil
 
 	default:
-		return errors.New("BAD LABEL OPERATION TYPE!!!")
+		panic("BAD LABEL OPERATION TYPE!!!")
 	}
 }
