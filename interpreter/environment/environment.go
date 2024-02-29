@@ -1,10 +1,8 @@
 package environment
 
 import (
-	"fmt"
 	"misc/nintasm/assemble/errorHandler"
 	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
-	enumTokenTypes "misc/nintasm/constants/enums/tokenTypes"
 	"misc/nintasm/interpreter/environment/macroTable"
 	"misc/nintasm/interpreter/operandFactory"
 )
@@ -18,7 +16,7 @@ func generateAssemblerReservedWordNode(funcName string) Node {
 }
 
 func generateNumericNodeForEnvironment(number int) Node {
-	return operandFactory.CreateNumericLiteralNode(enumTokenTypes.NUMBER_decimal, fmt.Sprintf("%d", number), number)
+	return operandFactory.CreateNumericLiteralNode(number)
 }
 
 // ----------------------------------

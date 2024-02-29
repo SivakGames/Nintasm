@@ -741,17 +741,17 @@ func (p *OperandParser) literal() (Node, error) {
 	switch literalType {
 	case enumTokenTypes.NUMBER_hex:
 		asNumber, _ := strconv.ParseInt(literalValue[1:], 16, 64)
-		return operandFactory.CreateNumericLiteralNode(literalType, literalValue, int(asNumber)), nil
+		return operandFactory.CreateNumericLiteralNode(int(asNumber)), nil
 	case enumTokenTypes.NUMBER_binary:
 		asNumber, _ := strconv.ParseInt(literalValue[1:], 2, 64)
-		return operandFactory.CreateNumericLiteralNode(literalType, literalValue, int(asNumber)), nil
+		return operandFactory.CreateNumericLiteralNode(int(asNumber)), nil
 	case enumTokenTypes.NUMBER_decimal:
 		asNumber, _ := strconv.ParseInt(literalValue, 10, 64)
-		return operandFactory.CreateNumericLiteralNode(literalType, literalValue, int(asNumber)), nil
+		return operandFactory.CreateNumericLiteralNode(int(asNumber)), nil
 	case enumTokenTypes.STRING:
-		return operandFactory.CreateStringLiteralNode(literalType, literalValue), nil
+		return operandFactory.CreateStringLiteralNode(literalValue), nil
 	case enumTokenTypes.BACKTICK_STRING:
-		return operandFactory.CreateBacktickStringLiteralNode(literalType, literalValue), nil
+		return operandFactory.CreateBacktickStringLiteralNode(literalValue), nil
 	case enumTokenTypes.SUBSTITUTION_numericID:
 		return operandFactory.CreateSubstitutionIdNode(literalType, literalValue), nil
 	case enumTokenTypes.SUBSTITUTION_stringID:

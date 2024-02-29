@@ -8,10 +8,12 @@
 	.org $8000
 	
 	LDA #7, x
-	LDA #high(TESTING)
 
 TESTING:
-	lsr a
+
+	.db 1234
+
+	lsr aada
 
 
 

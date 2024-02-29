@@ -4,6 +4,7 @@ import (
 	"fmt"
 	enumNodeTypes "misc/nintasm/constants/enums/nodeTypes"
 	enumTokenTypes "misc/nintasm/constants/enums/tokenTypes"
+	"strconv"
 	"strings"
 )
 
@@ -105,6 +106,16 @@ func CreateAssignmentNode(left Node, right Node) Node {
 	return node
 }
 
+// """Assign a label symbol"""
+func CreateAssignLabelNode(labelName string, org int) Node {
+	node := newNode(enumTokenTypes.ASSIGN_simple, labelName, enumNodeTypes.AssignLabelExpression)
+	left := CreateIdentifierNode(enumTokenTypes.ASSIGN_EQU, labelName)
+	right := CreateNumericLiteralNode(org)
+	node.Left = &left
+	node.Right = &right
+	return node
+}
+
 //===================================================
 //Types of identifiers
 
@@ -114,10 +125,10 @@ func CreateIdentifierNode(nodeType tokenEnum, nodeValue string) Node {
 }
 
 // """Substitutions for arguments passed to macros or functions"""
-func CreateSubstitutionIdNode(nodeType tokenEnum, nodeValue string) Node {
+func CreateSubstitutionIdNode(tokenEnumType tokenEnum, nodeValue string) Node {
 	capturedString := nodeValue[1:]
 	adjustedString := fmt.Sprintf("\\%v", capturedString)
-	node := newNode(nodeType, adjustedString, enumNodeTypes.SubstitutionID)
+	node := newNode(tokenEnumType, adjustedString, enumNodeTypes.SubstitutionID)
 	return node
 }
 
@@ -130,34 +141,40 @@ func CreateMacroReplacementNode(nodeValue string) Node {
 //===================================================
 //Literals
 
-func CreateBooleanLiteralNode(nodeType tokenEnum, nodeValue string, asBool bool) Node {
-	node := newNode(nodeType, nodeValue, enumNodeTypes.BooleanLiteral)
+func CreateBooleanLiteralNode(asBool bool) Node {
+	var val string
+	if asBool {
+		val = "1"
+	} else {
+		val = "0"
+	}
+	node := newNode(enumTokenTypes.NUMBER_decimal, val, enumNodeTypes.BooleanLiteral)
 	node.AsBool = asBool
 	node.Resolved = true
 	return node
 }
 
 // Numbers
-func CreateNumericLiteralNode(nodeType tokenEnum, nodeValue string, asNumber int) Node {
-	node := newNode(nodeType, nodeValue, enumNodeTypes.NumericLiteral)
+func CreateNumericLiteralNode(asNumber int) Node {
+	node := newNode(enumTokenTypes.NUMBER_decimal, strconv.Itoa(asNumber), enumNodeTypes.NumericLiteral)
 	node.AsNumber = asNumber
 	node.Resolved = true
 	return node
 }
 
 // Any string in 'single' or "double" quotes
-func CreateStringLiteralNode(nodeType tokenEnum, nodeValue string) Node {
+func CreateStringLiteralNode(nodeValue string) Node {
 	capturedString := nodeValue[1 : len(nodeValue)-1]
-	node := newNode(nodeType, capturedString, enumNodeTypes.StringLiteral)
+	node := newNode(enumTokenTypes.STRING, capturedString, enumNodeTypes.StringLiteral)
 	node.Resolved = true
 	return node
 }
 
 // Any string in `backticks` - These will still need to be resolved via interpreter
-func CreateBacktickStringLiteralNode(nodeType tokenEnum, nodeValue string) Node {
+func CreateBacktickStringLiteralNode(nodeValue string) Node {
 	capturedString := nodeValue[1 : len(nodeValue)-1]
 	capturedString = strings.TrimSpace(capturedString)
-	node := newNode(nodeType, capturedString, enumNodeTypes.BacktickStringLiteral)
+	node := newNode(enumTokenTypes.BACKTICK_STRING, capturedString, enumNodeTypes.BacktickStringLiteral)
 	return node
 }
 

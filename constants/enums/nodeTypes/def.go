@@ -8,6 +8,7 @@ const (
 	AssemblerReservedWord
 
 	AssignmentExpression
+	AssignLabelExpression
 	BinaryExpression
 	CallExpression
 	LogicalExpression

@@ -8,7 +8,6 @@ import (
 	"misc/nintasm/interpreter"
 	"misc/nintasm/interpreter/operandFactory"
 	"misc/nintasm/romBuilder"
-	"strconv"
 	"strings"
 )
 
@@ -25,7 +24,7 @@ func (p *LabelOperandParser) Process(operationType tokenEnum, operationValue str
 	if isLocal {
 		_, err := interpreter.GetParentLabel()
 		if err != nil {
-			return err
+			return err // ❌ Fails
 		}
 	}
 
@@ -35,11 +34,8 @@ func (p *LabelOperandParser) Process(operationType tokenEnum, operationValue str
 			interpreter.OverwriteParentLabel(operationLabel)
 		}
 
-		org := romBuilder.GetOrg()
-		identifierNode := operandFactory.CreateIdentifierNode(operationType, operationLabel)
-		numberNode := operandFactory.CreateNumericLiteralNode(enumTokenTypes.NUMBER_decimal, strconv.Itoa(org), org)
-		assignmentNode := operandFactory.CreateAssignmentNode(identifierNode, numberNode)
-		_, err := interpreter.EvaluateNode(assignmentNode)
+		labelAssignNode := operandFactory.CreateAssignLabelNode(operationLabel, romBuilder.GetOrg())
+		_, err := interpreter.EvaluateNode(labelAssignNode)
 		if err != nil {
 			return err // ❌ Fails
 		}

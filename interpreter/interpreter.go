@@ -58,7 +58,8 @@ func EvaluateNode(node Node) (Node, error) {
 		enumNodeTypes.MemberExpression:
 		return environment.LookupInEnvironment(node.NodeValue)
 
-	case enumNodeTypes.AssignmentExpression:
+	case enumNodeTypes.AssignLabelExpression,
+		enumNodeTypes.AssignmentExpression:
 		var err error
 		left := *node.Left
 		right, err := EvaluateNode(*node.Right)

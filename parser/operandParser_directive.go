@@ -2,6 +2,8 @@ package parser
 
 import (
 	"fmt"
+	"misc/nintasm/assemble/errorHandler"
+	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
 	enumTokenTypes "misc/nintasm/constants/enums/tokenTypes"
 	"misc/nintasm/parser/directiveHandler"
 
@@ -54,12 +56,10 @@ func (p *DirectiveOperandParser) Process(operationTokenEnum tokenEnum, operation
 		directiveName = aliasValue
 	}
 
-	minOperands, maxOperands, err := getMinMaxOperandsForDirective(operationTokenEnum, directiveName)
-	if err != nil {
-		return err // ❌ Fails
-	}
-
+	minOperands, maxOperands := getMinMaxOperandsForDirective(operationTokenEnum, directiveName)
 	_, manuallyEvaluatesOperands := directiveManuallyEvaluatesOperands[directiveName]
+
+	//VERY special exception for KV
 	evalLikeMacro, ok := directiveEvaluatesLikeMacroOperands[directiveName]
 	if ok {
 		captureMasks = evalLikeMacro
@@ -72,11 +72,13 @@ func (p *DirectiveOperandParser) Process(operationTokenEnum tokenEnum, operation
 
 	err = directiveHandler.EvaluateDirective(operationTokenEnum, directiveName, operationLabel, &operandList)
 	if err != nil {
-		return err
+		err := errorHandler.CheckErrorContinuesUpwardPropagation(err, enumErrorCodes.Error)
+		if err != nil {
+			return err // ❌❌ CONTINUES Failing!
+		}
 	}
 
 	return nil
-
 }
 
 // +++++++++++++++++++++++++
@@ -116,18 +118,19 @@ var directiveNameMinMaxOperands = map[string][2]int{
 	"ROMSEGMENT":   {1, 3},
 }
 
-func getMinMaxOperandsForDirective(directiveEnum tokenEnum, directiveName string) (int, int, error) {
+func getMinMaxOperandsForDirective(directiveEnum tokenEnum, directiveName string) (int, int) {
 	var minMaxOperands [2]int
 	var checkOk bool
 
 	minMaxOperands, checkOk = directiveMinMaxOperands[directiveEnum]
 	if checkOk {
-		return minMaxOperands[0], minMaxOperands[1], nil
+		return minMaxOperands[0], minMaxOperands[1]
 	}
 	minMaxOperands, checkOk = directiveNameMinMaxOperands[directiveName]
-	if !checkOk {
-		errMsg := fmt.Sprintf("Unable to determine min/max operands for %v directive!", directiveName)
-		panic(errMsg)
+	if checkOk {
+		return minMaxOperands[0], minMaxOperands[1]
 	}
-	return minMaxOperands[0], minMaxOperands[1], nil
+
+	errMsg := fmt.Sprintf("Unable to determine min/max operands for %v directive!", directiveName)
+	panic(errMsg)
 }

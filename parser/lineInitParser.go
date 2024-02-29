@@ -21,7 +21,7 @@ func (p *InitialLineParser) Process(line string) (string, error) {
 
 	err := p.startAndAdvanceToNext(line, INITIAL_LINE_TARGET_TOKENIZER)
 	if err != nil {
-		return "", err
+		return "", err // ❌ Fails
 	}
 
 	reformattedString := ""
@@ -34,7 +34,7 @@ func (p *InitialLineParser) Process(line string) (string, error) {
 		}
 		err = p.eatFreelyAndAdvance(p.lookaheadType)
 		if err != nil {
-			return "", err
+			return "", err // ❌ Fails
 		}
 	}
 	reformattedString = strings.TrimRight(reformattedString, " ")

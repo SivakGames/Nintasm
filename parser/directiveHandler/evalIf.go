@@ -4,7 +4,6 @@ import (
 	"misc/nintasm/assemble/blockStack"
 	"misc/nintasm/assemble/errorHandler"
 	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
-	enumTokenTypes "misc/nintasm/constants/enums/tokenTypes"
 	"misc/nintasm/interpreter/operandFactory"
 )
 
@@ -28,7 +27,7 @@ func evalElse(directiveName string, operandList *[]Node) error {
 		return errorHandler.AddNew(enumErrorCodes.IfStatementDuplicateElse)
 	}
 
-	*operandList = append(*operandList, operandFactory.CreateBooleanLiteralNode(enumTokenTypes.NUMBER_decimal, "1", true))
+	*operandList = append(*operandList, operandFactory.CreateBooleanLiteralNode(true))
 	blockStack.AppendToTopOfStackAlternateBlock(directiveName, *operandList)
 	return nil
 }
