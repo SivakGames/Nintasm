@@ -193,12 +193,23 @@ func ConvertNodeToStringLiteral(node *Node) {
 	return
 }
 
+//-----------------------------------Primitives
+
+func ValidateNodeIsEmpty(node *Node) bool {
+	return node.NodeType == enumNodeTypes.Empty
+}
+
+//-----------------------------------Primitives
+
 func ValidateNodeIsBoolean(node *Node) bool {
 	return node.NodeType == enumNodeTypes.BooleanLiteral
 }
 func ValidateNodeIsString(node *Node) bool {
 	return node.NodeType == enumNodeTypes.StringLiteral
 }
+
+//-----------------------------------Identifiers/IDs
+
 func ValidateNodeIsIdentifier(node *Node) bool {
 	return node.NodeType == enumNodeTypes.Identifier
 }

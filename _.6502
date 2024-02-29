@@ -7,11 +7,11 @@
 	.bank 0
 	.org $8000
 	
-	LDA #high(TESTING)
+	LDA #7, x
 	LDA #high(TESTING)
 
 TESTING:
-	ldx #6
+	lsr a
 
 
 

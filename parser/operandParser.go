@@ -37,8 +37,9 @@ func (p *OperandParser) GetOperandList(
 	operandList := []Node{}
 	operandCount := 0
 	p.manuallyEvalOperands = manuallyEvalOperands
+	p.instructionMode = enumInstructionModes.IMPL
 
-	//See if there are no operands at all
+	//See if there are any operands at all
 	if p.lookaheadType != enumTokenTypes.None {
 
 		//No commas allowed at the beginning...
@@ -66,6 +67,7 @@ func (p *OperandParser) GetOperandList(
 		}
 	}
 
+	//Operand list acquired.
 	//Check if too many or too few operands...
 
 	if len(operandList) > maxOperands {
@@ -102,7 +104,10 @@ func (p *OperandParser) getOperandAndAppend(operandList *[]Node, captureMasks *[
 			return err // ❌❌ CONTINUES Failing!
 		}
 	}
-	*operandList = append(*operandList, operand)
+	if !operandFactory.ValidateNodeIsEmpty(&operand) {
+		*operandList = append(*operandList, operand)
+	}
+
 	return nil
 }
 
@@ -194,6 +199,21 @@ func (p *OperandParser) instructionPrefix() (Node, error) {
 		}
 		checkXYfollowup = true
 
+	//AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+	//Accumulator mode
+
+	case enumTokenTypes.REGISTER_A:
+		p.instructionMode = enumInstructionModes.A
+		err = p.eatFreelyAndAdvance(enumTokenTypes.REGISTER_A)
+		if err != nil {
+			return operandFactory.ErrorNode(p.lookaheadValue), err // ❌ Fails
+		}
+		if p.lookaheadType != enumTokenTypes.None {
+			return operandFactory.ErrorNode(p.lookaheadValue),
+				errorHandler.AddNew(enumErrorCodes.InstBadAccumMode) // ❌ Fails
+		}
+		return operandFactory.EmptyNode(), nil
+
 	//-------------------------------------
 	//Absolute mode
 
@@ -205,8 +225,9 @@ func (p *OperandParser) instructionPrefix() (Node, error) {
 		checkXYfollowup = true
 	}
 
-	//-------------------------------------
-	//-------------------------------------
+	//XYXYXYXXYXYXYXXYXYXYXXYXYXYXXYXYXYXXYXYXYXXYXYXYXXYXYXYXXYXYXYX
+	//Check XY indexes
+	//XYXYXYXXYXYXYXXYXYXYXXYXYXYXXYXYXYXXYXYXYXXYXYXYXXYXYXYXXYXYXYX
 
 	if checkXYfollowup && p.lookaheadType == enumTokenTypes.DELIMITER_comma {
 		xyIndex, err = p.checkInstructionXYIndex()
