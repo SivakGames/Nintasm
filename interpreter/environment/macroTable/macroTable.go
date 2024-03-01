@@ -14,16 +14,16 @@ var macroSymbolTable = map[string]MacroTableType{}
 var kvMacroSymbolTable = map[string]MacroTableType{}
 
 // The possible values for simple operations
-type LookupMacroType int
+type LookupMacroEnumType int
 
 const (
-	Macro LookupMacroType = iota + 0
+	Macro LookupMacroEnumType = iota + 0
 	KVMacro
 )
 
 // ----------------------------------
 
-func AddMacroToEnvironment(symbolName string, macroEnum LookupMacroType, capturedLines MacroTableType) error {
+func AddMacroToEnvironment(symbolName string, macroEnum LookupMacroEnumType, capturedLines MacroTableType) error {
 	if macroEnum == Macro {
 		macroSymbolTable[symbolName] = capturedLines
 	} else {
@@ -32,7 +32,7 @@ func AddMacroToEnvironment(symbolName string, macroEnum LookupMacroType, capture
 	return nil
 }
 
-func LookupMacroInEnvironment(symbolName string, macroEnum LookupMacroType) (MacroTableType, bool) {
+func LookupMacroInEnvironment(symbolName string, macroEnum LookupMacroEnumType) (MacroTableType, bool) {
 	var macro MacroTableType
 	var ok bool
 
@@ -45,7 +45,7 @@ func LookupMacroInEnvironment(symbolName string, macroEnum LookupMacroType) (Mac
 
 }
 
-func LookupAndGetMacroInEnvironment(symbolName string, macroEnum LookupMacroType) (MacroTableType, error) {
+func LookupAndGetMacroInEnvironment(symbolName string, macroEnum LookupMacroEnumType) (MacroTableType, error) {
 	macro, ok := LookupMacroInEnvironment(symbolName, macroEnum)
 	if ok {
 		return macro, nil

@@ -3,57 +3,61 @@ package environment
 import (
 	"misc/nintasm/assemble/errorHandler"
 	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
-	"misc/nintasm/interpreter/environment/macroTable"
+	enumSymbolTableTypes "misc/nintasm/constants/enums/symbolTableTypes"
+	"misc/nintasm/interpreter/environment/symbolAsNodeTable"
 	"misc/nintasm/interpreter/operandFactory"
+	"misc/nintasm/romBuilder"
 )
 
 type Node = operandFactory.Node
 
-// ----------------------------------
-
-func generateAssemblerReservedWordNode(funcName string) Node {
-	return operandFactory.CreateAssemblerReservedWordNode(funcName)
-}
-
-func generateNumericNodeForEnvironment(number int) Node {
-	return operandFactory.CreateNumericLiteralNode(number)
-}
+var masterLookupTable = map[string]enumSymbolTableTypes.Def{}
 
 // ----------------------------------
 
-func CheckIfSymbolAlreadyDefined(symbolName string) error {
+func CheckIfAlreadyDefinedInMasterTable(symbolName string) error {
 	var exists bool
-
-	_, exists = literalNodeSymbolTable[symbolName]
+	_, exists = masterLookupTable[symbolName]
 	if exists {
-		return errorHandler.AddNew(enumErrorCodes.InterpreterAlreadyDefined, symbolName, "literal")
-	}
-	_, exists = macroTable.LookupMacroInEnvironment(symbolName, macroTable.Macro)
-	if exists {
-		return errorHandler.AddNew(enumErrorCodes.InterpreterAlreadyDefined, symbolName, "macro")
-
+		return errorHandler.AddNew(enumErrorCodes.InterpreterAlreadyDefined, symbolName, "TODO TYPE DESC")
 	}
 	return nil
 }
 
 // ----------------------------------
 
-func AddToEnvironment(symbolName string, node Node) (Node, error) {
-	_, exists := literalNodeSymbolTable[symbolName]
-	if exists {
-		return node, errorHandler.AddNew(enumErrorCodes.InterpreterAlreadyDefined, symbolName, "literal")
-
-	} else {
-		literalNodeSymbolTable[symbolName] = node
-	}
-	return literalNodeSymbolTable[symbolName], nil
+func addToMasterTable(symbolName string, symbolEnum enumSymbolTableTypes.Def) error {
+	masterLookupTable[symbolName] = symbolEnum
+	return nil
 }
 
-func LookupInEnvironment(symbolName string) (Node, error) {
-	value, ok := literalNodeSymbolTable[symbolName]
-	if ok {
-		return value, nil
-	} else {
-		return operandFactory.EmptyNode(), errorHandler.AddNew(enumErrorCodes.InterpreterSymbolNotFound, symbolName)
+// ----------------------------------
+
+func AddToSymbolAsNodeTable(symbolName string, node Node) error {
+	err := CheckIfAlreadyDefinedInMasterTable(symbolName)
+	if err != nil {
+		return err
 	}
+	addToMasterTable(symbolName, enumSymbolTableTypes.SymbolAsNode)
+	symbolAsNodeTable.AddToSymbolAsNodeTable(symbolName, node)
+	return nil
+}
+
+func LookupInSymbolAsNodeTable(symbolName string) (Node, error) {
+	node, exists := symbolAsNodeTable.GetNodeFromSymbolAsNodeTable(symbolName)
+	if !exists {
+		_, otherExists := masterLookupTable[symbolName]
+		if otherExists {
+			return node, errorHandler.AddNew(enumErrorCodes.InterpreterAlreadyDefined, symbolName, "TODO TYPE DESC")
+		}
+	}
+	return node, nil
+}
+
+// ----------------------------------
+
+func AddToLabelAsBankTable(symbolName string) error {
+	bankId := romBuilder.GetBankIndex()
+	symbolAsNodeTable.AddToLabelAsBankTable(symbolName, bankId)
+	return nil
 }

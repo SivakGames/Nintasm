@@ -152,7 +152,7 @@ func ProcessOpenLabelBlock(openBlockLabel string) error {
 	if len(blockStack.Stack) > 0 {
 		return errorHandler.AddNew(enumErrorCodes.DirectiveNestedLabelBlock) // ❌ Fails
 	}
-	err = environment.CheckIfSymbolAlreadyDefined(openBlockLabel)
+	err = environment.CheckIfAlreadyDefinedInMasterTable(openBlockLabel)
 	if err != nil {
 		return err // ❌ Fails
 	}

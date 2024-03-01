@@ -56,7 +56,7 @@ func EvaluateNode(node Node) (Node, error) {
 
 	case enumNodeTypes.Identifier,
 		enumNodeTypes.MemberExpression:
-		return environment.LookupInEnvironment(node.NodeValue)
+		return environment.LookupInSymbolAsNodeTable(node.NodeValue)
 
 	case enumNodeTypes.AssignLabelExpression,
 		enumNodeTypes.AssignmentExpression:
@@ -78,10 +78,15 @@ func EvaluateNode(node Node) (Node, error) {
 			symbolName = parentLabel + symbolName
 		}
 
-		_, err = environment.AddToEnvironment(symbolName, right)
+		isLabel := node.NodeType == enumNodeTypes.AssignLabelExpression
+		err = environment.AddToSymbolAsNodeTable(symbolName, right)
 		if err != nil {
 			return node, err
 		}
+		if isLabel {
+			environment.AddToLabelAsBankTable(symbolName)
+		}
+
 		return node, nil
 
 	case enumNodeTypes.BinaryExpression:
