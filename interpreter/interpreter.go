@@ -21,9 +21,6 @@ type assemblerFunction struct {
 	argMustResolveTo []enumNodeTypes.Def
 }
 
-var PopParentLabelWhenBlockOpDone bool = false
-var parentLabelStack []string
-
 var assemblerBuiltInFunctions = map[string]assemblerFunction{
 	"high":      {1, 1, []enumNodeTypes.Def{enumNodeTypes.NumericLiteral}},
 	"low":       {1, 1, []enumNodeTypes.Def{enumNodeTypes.NumericLiteral}},
@@ -39,6 +36,10 @@ func EvaluateNode(node Node) (Node, error) {
 		enumNodeTypes.StringLiteral:
 		return node, nil
 
+	case enumNodeTypes.Identifier,
+		enumNodeTypes.MemberExpression:
+		return environment.LookupInSymbolAsNodeTable(node.NodeValue)
+
 	case enumNodeTypes.BacktickStringLiteral:
 		_, err := exprmapTable.GetCurrentExprmap()
 		if err != nil {
@@ -53,10 +54,6 @@ func EvaluateNode(node Node) (Node, error) {
 		node.AsNumber = exprValue
 		operandFactory.ConvertNodeToNumericLiteral(&node)
 		return node, nil
-
-	case enumNodeTypes.Identifier,
-		enumNodeTypes.MemberExpression:
-		return environment.LookupInSymbolAsNodeTable(node.NodeValue)
 
 	case enumNodeTypes.AssignLabelExpression,
 		enumNodeTypes.AssignmentExpression:
@@ -237,34 +234,4 @@ func ProcessAssemblerFunction(node *Node) (bool, error) {
 		}
 	}
 	return isAsmFunc, nil
-}
-
-//++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-func GetParentLabel() (string, error) {
-	if len(parentLabelStack) == 0 {
-		return "", errorHandler.AddNew(enumErrorCodes.InterpreterNoParentLabel)
-	}
-	parentLabel := parentLabelStack[len(parentLabelStack)-1]
-	return parentLabel, nil
-}
-
-func AppendParentLabel(newLabel string) {
-	parentLabelStack = append(parentLabelStack, newLabel)
-	return
-}
-
-func PopParentLabel() {
-	parentLabelStack = parentLabelStack[:len(parentLabelStack)-1]
-	return
-}
-
-// Will overwrite at current position or add if none
-func OverwriteParentLabel(newLabel string) {
-	if len(parentLabelStack) == 0 {
-		parentLabelStack = append(parentLabelStack, newLabel)
-		return
-	}
-	parentLabelStack[len(parentLabelStack)-1] = newLabel
-	return
 }

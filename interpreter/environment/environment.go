@@ -31,7 +31,8 @@ func addToMasterTable(symbolName string, symbolEnum enumSymbolTableTypes.Def) er
 	return nil
 }
 
-// ----------------------------------
+// ============================================================================
+// ============================================================================
 
 func AddToSymbolAsNodeTable(symbolName string, node Node) error {
 	err := CheckIfAlreadyDefinedInMasterTable(symbolName)
