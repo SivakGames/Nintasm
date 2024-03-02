@@ -179,7 +179,7 @@ func (p *OperandParser) instructionPrefix() (Node, error) {
 		}
 		statement, err = p.statement()
 		if err != nil {
-			return operandFactory.ErrorNode(p.lookaheadValue), err // ❌ Fails
+			return statement, err // ❌ Fails
 		}
 		checkXYfollowup = true
 
@@ -196,7 +196,7 @@ func (p *OperandParser) instructionPrefix() (Node, error) {
 		}
 		statement, err = p.statement()
 		if err != nil {
-			return operandFactory.ErrorNode(p.lookaheadValue), err // ❌ Fails
+			return statement, err // ❌ Fails
 		}
 		checkXYfollowup = true
 
@@ -221,7 +221,7 @@ func (p *OperandParser) instructionPrefix() (Node, error) {
 	default:
 		statement, err = p.statement()
 		if err != nil {
-			return operandFactory.ErrorNode(p.lookaheadValue), err // ❌ Fails
+			return statement, err // ❌ Fails
 		}
 		checkXYfollowup = true
 	}
@@ -233,13 +233,13 @@ func (p *OperandParser) instructionPrefix() (Node, error) {
 	if checkXYfollowup && p.lookaheadType == enumTokenTypes.DELIMITER_comma {
 		xyIndex, err = p.checkInstructionXYIndex()
 		if err != nil {
-			return operandFactory.ErrorNode(p.lookaheadValue), err // ❌ Fails
+			return statement, err // ❌ Fails
 		}
 	}
 	p.instructionXYIndex = xyIndex
 
 	if p.lookaheadType != enumTokenTypes.None {
-		return statement, errorHandler.AddNew(enumErrorCodes.InstTokenAfterOperand, p.lookaheadValue)
+		return statement, errorHandler.AddNew(enumErrorCodes.InstTokenAfterOperand, p.lookaheadValue) // ❌ Fails
 	}
 
 	return statement, nil // 🟢 Succeeds
@@ -266,34 +266,6 @@ func (p *OperandParser) checkInstructionXYIndex() (tokenEnum, error) {
 
 	return targetIndex, nil
 }
-
-// =============================================
-/* func (p *OperandParser) operandStatementList() (Node, error) {
-	return p.statementList(enumTokenTypes.DELIMITER_comma)
-}
-*/
-
-// =============================================
-// Get statements - used for things like function arguments
-/*
-func (p *OperandParser) statementList(stopTokenType tokenEnum) (Node, error) {
-	statementList, err := p.statement()
-	if err != nil {
-		return statementList, err
-	}
-
-	statementList, err = interpreter.EvaluateNode(statementList)
-	if err != nil {
-		return statementList, err
-	}
-	//If somehow, after evaluation, the next token is not the stop token...
-	for p.lookaheadType != enumTokenTypes.None && p.lookaheadType != stopTokenType {
-		log.Println("\x1b[38;5;202mEvaluating next statement...\x1b[0m")
-		return p.statement()
-	}
-
-	return statementList, nil
-} */
 
 // =============================================
 

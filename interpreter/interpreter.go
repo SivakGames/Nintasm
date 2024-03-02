@@ -42,6 +42,7 @@ func EvaluateNode(node Node) (Node, error) {
 		if resolved {
 			return resolvedNode, err
 		}
+		fmt.Println("Un", node)
 		return node, err
 
 	case enumNodeTypes.BacktickStringLiteral:

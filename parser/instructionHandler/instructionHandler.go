@@ -1,6 +1,7 @@
 package instructionHandler
 
 import (
+	"fmt"
 	"misc/nintasm/assemble/errorHandler"
 	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
 	enumInstructionModes "misc/nintasm/constants/enums/instructionModes"
@@ -87,6 +88,7 @@ func EvaluateInstruction(instructionName string,
 			return err // ❌ Fails
 		}
 		bytesToInsert = append(bytesToInsert, asRomData...)
+		fmt.Println(operand.Resolved)
 	}
 
 	err = romBuilder.AddBytesToRom(bytesToInsert)

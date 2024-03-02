@@ -10,10 +10,13 @@
 TESTING2 = 555
 
 	.dw 2 - TESTING + 2
+	LDA TESTRING
+	lda 55
 
 TESTING:
 
 	.db 12
+
 
 
 
