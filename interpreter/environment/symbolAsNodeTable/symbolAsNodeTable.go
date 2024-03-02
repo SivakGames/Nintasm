@@ -1,6 +1,7 @@
 package symbolAsNodeTable
 
 import (
+	"fmt"
 	"misc/nintasm/interpreter/operandFactory"
 )
 
@@ -8,18 +9,70 @@ type Node = operandFactory.Node
 
 // ++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+var labalAsBankTable = map[string]int{}
+
 var symbolTable = map[string]Node{
-	"temp":        generateNumericNodeForEnvironment(100),
-	"PPUCTRL":     generateNumericNodeForEnvironment(0x02000),
-	"PPUMASK":     generateNumericNodeForEnvironment(0x02001),
-	"PPUADDR":     generateNumericNodeForEnvironment(0x02006),
-	"PPUADDR.aba": generateNumericNodeForEnvironment(0b00000001),
-	"bank":        generateAssemblerReservedWordNode("bank"),
-	"high":        generateAssemblerReservedWordNode("high"),
-	"low":         generateAssemblerReservedWordNode("low"),
+	"CTRLBTN.right":  generateNumericNodeForEnvironment(0x01),
+	"CTRLBTN.left":   generateNumericNodeForEnvironment(0x02),
+	"CTRLBTN.down":   generateNumericNodeForEnvironment(0x04),
+	"CTRLBTN.up":     generateNumericNodeForEnvironment(0x08),
+	"CTRLBTN.start":  generateNumericNodeForEnvironment(0x10),
+	"CTRLBTN.select": generateNumericNodeForEnvironment(0x20),
+	"CTRLBTN.b":      generateNumericNodeForEnvironment(0x40),
+	"CTRLBTN.a":      generateNumericNodeForEnvironment(0x80),
+
+	"PPUCTRL":                    generateNumericNodeForEnvironment(0x02000),
+	"PPUCTRL.nameTable0":         generateNumericNodeForEnvironment(0x00),
+	"PPUCTRL.nameTable1":         generateNumericNodeForEnvironment(0x01),
+	"PPUCTRL.nameTable2":         generateNumericNodeForEnvironment(0x02),
+	"PPUCTRL.nameTable3":         generateNumericNodeForEnvironment(0x03),
+	"PPUCTRL.drawDirection":      generateNumericNodeForEnvironment(0x04),
+	"PPUCTRL.spritePatternTable": generateNumericNodeForEnvironment(0x08),
+	"PPUCTRL.bgPatternTable":     generateNumericNodeForEnvironment(0x10),
+	"PPUCTRL.use8x16Sprites":     generateNumericNodeForEnvironment(0x20),
+	"PPUCTRL.masterSlave":        generateNumericNodeForEnvironment(0x40),
+	"PPUCTRL.enableNMI":          generateNumericNodeForEnvironment(0x80),
+
+	"PPUMASK":                   generateNumericNodeForEnvironment(0x02001),
+	"PPUMASK.grayscale":         generateNumericNodeForEnvironment(0x01),
+	"PPUMASK.disableBgClip":     generateNumericNodeForEnvironment(0x02),
+	"PPUMASK.disableSpriteClip": generateNumericNodeForEnvironment(0x04),
+	"PPUMASK.showBg":            generateNumericNodeForEnvironment(0x08),
+	"PPUMASK.showSprites":       generateNumericNodeForEnvironment(0x10),
+	"PPUMASK.emphasizeRed":      generateNumericNodeForEnvironment(0x20),
+	"PPUMASK.emphasizeGreen":    generateNumericNodeForEnvironment(0x40),
+	"PPUMASK.emphasizeBlue":     generateNumericNodeForEnvironment(0x80),
+
+	"PPUADDR": generateNumericNodeForEnvironment(0x02006),
+
+	"bank": generateAssemblerReservedWordNode("bank"),
+	"high": generateAssemblerReservedWordNode("high"),
+	"low":  generateAssemblerReservedWordNode("low"),
 }
 
-var labalAsBankTable = map[string]int{}
+// -----------------------------------------
+func init() {
+	generateKeys := func(baseKey string, startValue int, endValue, step int) {
+		for value := startValue; value < endValue; value += step {
+			key := fmt.Sprintf("%s%d", baseKey, (value-startValue)/step)
+			symbolTable[key] = generateNumericNodeForEnvironment(value)
+		}
+	}
+
+	for i := 0; i < 4; i++ {
+		start := i*0x00400 + 0x02000
+		end := start + 0x003c0
+		name := fmt.Sprintf("PPUADDR.nt%dline", i)
+		generateKeys(name, start, end, 0x20)
+	}
+	for i := 0; i < 4; i++ {
+		start := i*0x00400 + 0x03f00
+		end := start + 0x00004
+		name := fmt.Sprintf("PPUADDR.palBg%d", i)
+		generateKeys(name, start, end, 0x04)
+	}
+
+}
 
 // -----------------------------------------
 

@@ -1,20 +1,58 @@
-	.inesMap 0
+;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+; Sample NES Program
+; Will display a pink screen
+;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+;==========================================
+; iNES header
+;==========================================
 	.inesPrg "32kb"
 	.inesChr "8kb"
-	.inesMir 0
+	.inesMap 0
+	.inesMir 1
 
-	.romSegment "32kb","32kb","PRG"
+;==========================================
+; PRG start
+;==========================================
+	.romSegment "32kb", "32kb", "PRG"
 	.bank 0
 	.org $8000
 
-	.dw TEST, TEST + 2, TEST + 4, TEST + 6
-
-	LDX #5
-	
-TEST:
-	.dw 22
+;-----------------------------------------
+RESET:
+	__resetCode__
 
 
-	.romSegment "8kb","8kb","CHR"
+RESET_end:
+	;Enable NMI
+	LDA #(PPUCTRL.enableNMI | PPUCTRL.spritePatternTable)
+	STA PPUCTRL
+
+	__setPPU__ PPUADDR.palBg0
+
+	;Let the whole screen be PINK!
+	LDA #$25
+	STA $2007
+
+Forever:
+	JMP Forever
+
+;-----------------------------------------
+NMI:
+	LDA #0 
+	STA $2006 
+	STA $2006
+	RTI
+
+;-----------------------------------------
+
+	.org $fffa
+	.dw NMI, RESET, 0
+
+;==========================================
+; CHR start
+; CHR is empty for this demo!
+;==========================================
+	.romSegment "8kb", "8kb", "CHR"
 	.bank 0
 	.org $0000

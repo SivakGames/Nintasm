@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"misc/nintasm/assemble"
+	"misc/nintasm/romBuilder"
 	"os"
 	"time"
 )
@@ -34,6 +35,8 @@ func main() {
 	if err != nil {
 		fmt.Println("\x1b[31mERRORZ HAPPENED\x1b[0m")
 	}
+
+	romBuilder.GenerateRomBinFile()
 
 	assemblyTime := fmt.Sprintf("%.2f", time.Since(start).Seconds())
 	finalMessage := fmt.Sprintf("Assembly took: \x1b[33m%v\x1b[0m seconds", assemblyTime)
