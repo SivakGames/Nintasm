@@ -38,7 +38,7 @@ func EvaluateNode(node Node) (Node, error) {
 
 	case enumNodeTypes.Identifier,
 		enumNodeTypes.MemberExpression:
-		return environment.LookupInSymbolAsNodeTable(node.NodeValue)
+		return environment.LookupIdentifierInSymbolAsNodeTable(node.NodeValue)
 
 	case enumNodeTypes.BacktickStringLiteral:
 		_, err := exprmapTable.GetCurrentExprmap()
@@ -76,7 +76,7 @@ func EvaluateNode(node Node) (Node, error) {
 		}
 
 		isLabel := node.NodeType == enumNodeTypes.AssignLabelExpression
-		err = environment.AddToSymbolAsNodeTable(symbolName, right)
+		err = environment.AddIdentifierToSymbolAsNodeTable(symbolName, right)
 		if err != nil {
 			return node, err
 		}

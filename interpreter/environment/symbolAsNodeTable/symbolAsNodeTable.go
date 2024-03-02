@@ -23,11 +23,11 @@ var labalAsBankTable = map[string]int{}
 
 // -----------------------------------------
 
-func AddToSymbolAsNodeTable(symbolName string, node Node) {
+func AddIdentifierKeyToSymbolAsNodeTable(symbolName string, node Node) {
 	symbolTable[symbolName] = node
 }
 
-func AddToLabelAsBankTable(symbolName string, bankId int) {
+func AddIdentifierKeyToLabelAsBankTable(symbolName string, bankId int) {
 	labalAsBankTable[symbolName] = bankId
 }
 

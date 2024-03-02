@@ -38,17 +38,19 @@ func addToMasterTable(symbolName string, symbolEnum enumSymbolTableTypes.Def) er
 // ============================================================================
 // ============================================================================
 
-func AddToSymbolAsNodeTable(symbolName string, node Node) error {
+// Add identifier to the symbol table
+func AddIdentifierToSymbolAsNodeTable(symbolName string, node Node) error {
 	err := CheckIfAlreadyDefinedInMasterTable(symbolName)
 	if err != nil {
 		return err
 	}
 	addToMasterTable(symbolName, enumSymbolTableTypes.SymbolAsNode)
-	symbolAsNodeTable.AddToSymbolAsNodeTable(symbolName, node)
+	symbolAsNodeTable.AddIdentifierKeyToSymbolAsNodeTable(symbolName, node)
 	return nil
 }
 
-func LookupInSymbolAsNodeTable(symbolName string) (Node, error) {
+// See if identifier has a value in the symbol table
+func LookupIdentifierInSymbolAsNodeTable(symbolName string) (Node, error) {
 	node, exists := symbolAsNodeTable.GetNodeFromSymbolAsNodeTable(symbolName)
 	if !exists {
 		_, otherExists := masterLookupTable[symbolName]
@@ -59,11 +61,12 @@ func LookupInSymbolAsNodeTable(symbolName string) (Node, error) {
 	return node, nil
 }
 
-// ----------------------------------
+// -----------------------------------------------------------------------------
 
+// In the case of labels, the current bank they are in gets added
 func AddToLabelAsBankTable(symbolName string) error {
 	bankId := romBuilder.GetBankIndex()
-	symbolAsNodeTable.AddToLabelAsBankTable(symbolName, bankId)
+	symbolAsNodeTable.AddIdentifierKeyToLabelAsBankTable(symbolName, bankId)
 	return nil
 }
 
