@@ -79,6 +79,8 @@ func EvaluateInstruction(instructionName string,
 
 	instructionOpcode := opcodesAndSupportedModes.ModeOpcodes[instructionMode]
 	operandNeedsNBytes := instructionData.InstructionModeOperandRequiredBytes[instructionMode]
+
+	//Add the opcode to ROM
 	opcodeByteToInsert := make([]uint8, 1)
 	opcodeByteToInsert[0] = instructionOpcode
 	err = romBuilder.AddBytesToRom(opcodeByteToInsert)
@@ -87,18 +89,14 @@ func EvaluateInstruction(instructionName string,
 	}
 
 	if operandNeedsNBytes > 0 {
-		operandBytesToInsert := make([]uint8, operandNeedsNBytes)
 		asRomData, err := nodesToBytes.ConvertNodeValueToUInts(operand, operandNeedsNBytes, false)
 		if err != nil {
 			return err // ❌ Fails
 		}
-
 		if !operand.Resolved {
 			unresolvedTable.AddUnresolvedRomEntry(operand, operandNeedsNBytes)
 		}
-
-		operandBytesToInsert = append(operandBytesToInsert, asRomData...)
-		err = romBuilder.AddBytesToRom(operandBytesToInsert)
+		err = romBuilder.AddBytesToRom(asRomData)
 		if err != nil {
 			return err // ❌ Fails
 		}

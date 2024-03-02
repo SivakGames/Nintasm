@@ -98,9 +98,7 @@ func ResolvedUnresolvedRomEntries() error {
 		if err != nil {
 			continue
 		}
-
 		romBuilder.OverwriteResolvedBytesInRom(entry.originalRomSegment, entry.originalBank, entry.originalOffset, asRomData)
-
 	}
 
 	return nil

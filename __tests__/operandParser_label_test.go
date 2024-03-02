@@ -23,12 +23,12 @@ func TestLabelOperandParser(t *testing.T) {
 			t.Error(err)
 		}
 
-		result1, _ := environment.LookupIdentifierInSymbolAsNodeTable("temp1")
+		result1, _, _ := environment.LookupIdentifierInSymbolAsNodeTable("temp1")
 		if result1.AsNumber != wanted[0] {
 			t.Error("= Result not as expected")
 			t.Log("Wanted:", wanted[0], "Got:", result1.AsNumber)
 		}
-		result2, _ := environment.LookupIdentifierInSymbolAsNodeTable("temp2")
+		result2, _, _ := environment.LookupIdentifierInSymbolAsNodeTable("temp2")
 		if result2.AsNumber != wanted[1] {
 			t.Error("EQU Result not as expected")
 			t.Log("Wanted:", wanted[1], "Got:", result2.AsNumber)
@@ -56,17 +56,17 @@ func TestLabelOperandParser(t *testing.T) {
 			t.Error(err)
 		}
 
-		result1, _ := environment.LookupIdentifierInSymbolAsNodeTable("testNS.var1")
+		result1, _, _ := environment.LookupIdentifierInSymbolAsNodeTable("testNS.var1")
 		if result1.AsNumber != wanted[0] {
 			t.Error("Namespace 0 result not as expected")
 			t.Log("Wanted:", wanted[0], "Got:", result1.AsNumber)
 		}
-		result2, _ := environment.LookupIdentifierInSymbolAsNodeTable("testNS.var2")
+		result2, _, _ := environment.LookupIdentifierInSymbolAsNodeTable("testNS.var2")
 		if result2.AsNumber != wanted[1] {
 			t.Error("Namespace 1 result not as expected")
 			t.Log("Wanted:", wanted[1], "Got:", result2.AsNumber)
 		}
-		result3, _ := environment.LookupIdentifierInSymbolAsNodeTable("testNS.var3")
+		result3, _, _ := environment.LookupIdentifierInSymbolAsNodeTable("testNS.var3")
 		if result3.AsNumber != wanted[2] {
 			t.Error("Namespace 2 result not as expected")
 			t.Log("Wanted:", wanted[2], "Got:", result3.AsNumber)

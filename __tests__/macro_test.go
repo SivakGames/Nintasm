@@ -16,11 +16,14 @@ func TestMacros(t *testing.T) {
 		moduleLines = append(moduleLines, "testMacro .macro", " .db \\1, \\2, \\3", "testMacro .endm")
 		moduleLines = append(moduleLines, "testMacro2 .macro", " lda \\1", "testMacro2 .endm")
 		moduleLines = append(moduleLines, "testMacro3 .kvmacro", " .db \\aa, \\bb", "testMacro3 .endkvm")
+
 		moduleLines = append(moduleLines, " testMacro 1,2,3")
+
 		moduleLines = append(moduleLines, " testMacro2 #11")
 		moduleLines = append(moduleLines, " testMacro2 {22, x}")
 		moduleLines = append(moduleLines, " testMacro2 {44, y}")
 		moduleLines = append(moduleLines, " testMacro2 {[33], y}")
+
 		moduleLines = append(moduleLines, " .ikv testMacro3")
 		moduleLines = append(moduleLines, " .kv \\aa, 55")
 		moduleLines = append(moduleLines, " .kv \\bb, 66")
