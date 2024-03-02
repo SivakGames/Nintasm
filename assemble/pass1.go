@@ -29,7 +29,8 @@ func Start(initialInputFile string) error {
 		return err
 	}
 
-	unresolvedTable.ResolvedUnresolved()
+	unresolvedTable.ResolvedUnresolvedSymbols()
+	unresolvedTable.ResolvedUnresolvedRomEntries()
 
 	return nil
 }

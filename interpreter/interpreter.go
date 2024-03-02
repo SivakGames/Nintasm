@@ -78,6 +78,7 @@ func EvaluateNode(node Node) (Node, error) {
 			}
 			symbolName = parentLabel + symbolName
 		}
+		node.Resolved = true
 
 		isLabel := node.NodeType == enumNodeTypes.AssignLabelExpression
 		err = environment.AddIdentifierToSymbolAsNodeTable(symbolName, right)

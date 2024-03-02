@@ -6,6 +6,7 @@ import (
 	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
 	enumTokenTypes "misc/nintasm/constants/enums/tokenTypes"
 	"misc/nintasm/interpreter"
+	"misc/nintasm/interpreter/environment/unresolvedTable"
 	"misc/nintasm/interpreter/operandFactory"
 	"misc/nintasm/romBuilder"
 	"strings"
@@ -61,9 +62,19 @@ func (p *LabelOperandParser) Process(operationType tokenEnum, operationValue str
 		if len(operandList) == 1 {
 			identifierNode := operandFactory.CreateIdentifierNode(operationLabel)
 			assignmentNode := operandFactory.CreateAssignmentNode(identifierNode, operandList[0])
-			_, err := interpreter.EvaluateNode(assignmentNode)
+			unresolvedAssignNode, err := interpreter.EvaluateNode(assignmentNode)
 			if err != nil {
-				return err // ❌ Fails
+				//Sees if this is unresolvable only...
+				err := errorHandler.CheckErrorContinuesUpwardPropagation(err, enumErrorCodes.UnresolvedIdentifier)
+				if err != nil {
+					//Sees if this is a fatal error
+					err := errorHandler.CheckErrorContinuesUpwardPropagation(err, enumErrorCodes.Error)
+					if err != nil {
+						return err // ❌❌ CONTINUES Failing!
+					}
+				} else {
+					unresolvedTable.AddUnresolvedSymbol(unresolvedAssignNode)
+				}
 			}
 		} else {
 			return errors.New("Solve multi assignment operandz")

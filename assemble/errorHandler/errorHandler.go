@@ -185,7 +185,7 @@ func NewErrorEntry(code enumErrorCodes.Def, message string, severity enumErrorCo
 	}
 }
 
-// If severity is >= threshold it should stop propagating up
+// If severity is <= threshold it should STOP propagating up
 func CheckErrorContinuesUpwardPropagation(err error, threshold enumErrorCodes.Severity) error {
 	severityValue := err.Error()
 
@@ -253,7 +253,7 @@ func AddNew(errorTableKey enumErrorCodes.Def, args ...interface{}) error {
 
 // A silent error initially...
 func AddUnresolved(symbolName string) error {
-	return errors.New(fmt.Sprintf("%v%d", SEVERITY_PREFIX, enumErrorCodes.Error))
+	return errors.New(fmt.Sprintf("%v%d", SEVERITY_PREFIX, enumErrorCodes.UnresolvedIdentifier))
 }
 
 // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx

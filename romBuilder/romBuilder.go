@@ -1,6 +1,7 @@
 package romBuilder
 
 import (
+	"fmt"
 	"math"
 	"misc/nintasm/assemble/errorHandler"
 	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
@@ -162,6 +163,19 @@ func AddBytesToRom(insertions []uint8) error {
 	}
 
 	return nil
+}
+
+//============================================================
+
+// After the main pass, take an array of uint8s and write to a specific spot
+func OverwriteResolvedBytesInRom(romSegment int, bank int, offset int, insertions []uint8) {
+	xxx := &rom[romSegment][bank].bytes
+	for i, insertion := range insertions {
+		(*xxx)[i] = insertion
+		fmt.Println(insertion)
+	}
+
+	return
 }
 
 //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx

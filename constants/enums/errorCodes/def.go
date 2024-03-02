@@ -128,7 +128,9 @@ type Severity int
 const (
 	// Will just be a warning - stops nothing
 	Warning Severity = iota
-	// Stop operand processing
+	// Will try re-resolving after main pass is done
+	UnresolvedIdentifier
+	// General error. Will not stop build, but will fail after pass is done
 	Error
 	// Stop building entirely
 	Fatal
