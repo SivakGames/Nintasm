@@ -73,6 +73,11 @@ func GetTotalRomSegmentsInRom() int {
 	return len(*getRom())
 }
 
+// How many rom segments are currently defined
+func GetRomSegmentIndex() int {
+	return GetTotalRomSegmentsInRom() - 1
+}
+
 //+++++++++++++++++++++++++++
 
 // The current bank segment (array of uint8 )
@@ -108,6 +113,12 @@ func GetOrg() int {
 	bank := GetCurrentBankSegment()
 	return bank.minOrg + currentInsertionIndex
 }
+
+func GetCurrentInsertionIndex() int {
+	return currentInsertionIndex
+}
+
+// +++++++++++++++++++++++++++++
 
 // TODO: Set ORG upper/lower bounds checks
 func SetOrg(newOrg int) error {

@@ -6,6 +6,7 @@ import (
 	"misc/nintasm/assemble/fileStack"
 	enumParserTypes "misc/nintasm/constants/enums/parserTypes"
 	"misc/nintasm/interpreter"
+	"misc/nintasm/interpreter/environment/unresolvedTable"
 	"misc/nintasm/parser"
 	"misc/nintasm/util"
 )
@@ -27,6 +28,9 @@ func Start(initialInputFile string) error {
 	if err != nil {
 		return err
 	}
+
+	unresolvedTable.ResolvedUnresolved()
+
 	return nil
 }
 

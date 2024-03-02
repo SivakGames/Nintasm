@@ -1,6 +1,7 @@
 package directiveHandler
 
 import (
+	"misc/nintasm/interpreter/environment/unresolvedTable"
 	"misc/nintasm/romBuilder"
 	"misc/nintasm/romBuilder/nodesToBytes"
 )
@@ -31,6 +32,11 @@ func evalDataBytesOperands(directiveName string, operandList *[]Node) error {
 		if err != nil {
 			return err // ❌ Fails
 		}
+
+		if !operand.Resolved {
+			unresolvedTable.AddUnresolvedRomEntry(operand, operandSize)
+		}
+
 		err = romBuilder.AddBytesToRom(asRomData)
 		if err != nil {
 			return err // ❌ Fails

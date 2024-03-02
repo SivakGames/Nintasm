@@ -1,12 +1,12 @@
 package instructionHandler
 
 import (
-	"fmt"
 	"misc/nintasm/assemble/errorHandler"
 	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
 	enumInstructionModes "misc/nintasm/constants/enums/instructionModes"
 	enumTokenTypes "misc/nintasm/constants/enums/tokenTypes"
 	"misc/nintasm/constants/instructionData"
+	"misc/nintasm/interpreter/environment/unresolvedTable"
 	"misc/nintasm/interpreter/operandFactory"
 	"misc/nintasm/romBuilder"
 	"misc/nintasm/romBuilder/nodesToBytes"
@@ -79,21 +79,29 @@ func EvaluateInstruction(instructionName string,
 
 	instructionOpcode := opcodesAndSupportedModes.ModeOpcodes[instructionMode]
 	operandNeedsNBytes := instructionData.InstructionModeOperandRequiredBytes[instructionMode]
-	bytesToInsert := make([]uint8, 0)
-	bytesToInsert = append(bytesToInsert, instructionOpcode)
+	opcodeByteToInsert := make([]uint8, 1)
+	opcodeByteToInsert[0] = instructionOpcode
+	err = romBuilder.AddBytesToRom(opcodeByteToInsert)
+	if err != nil {
+		return err // ❌ Fails
+	}
 
 	if operandNeedsNBytes > 0 {
+		operandBytesToInsert := make([]uint8, operandNeedsNBytes)
 		asRomData, err := nodesToBytes.ConvertNodeValueToUInts(operand, operandNeedsNBytes, false)
 		if err != nil {
 			return err // ❌ Fails
 		}
-		bytesToInsert = append(bytesToInsert, asRomData...)
-		fmt.Println(operand.Resolved)
-	}
 
-	err = romBuilder.AddBytesToRom(bytesToInsert)
-	if err != nil {
-		return err // ❌ Fails
+		if !operand.Resolved {
+			unresolvedTable.AddUnresolvedRomEntry(operand, operandNeedsNBytes)
+		}
+
+		operandBytesToInsert = append(operandBytesToInsert, asRomData...)
+		err = romBuilder.AddBytesToRom(operandBytesToInsert)
+		if err != nil {
+			return err // ❌ Fails
+		}
 	}
 
 	return nil
