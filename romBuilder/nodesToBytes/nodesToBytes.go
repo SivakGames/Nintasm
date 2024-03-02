@@ -25,7 +25,7 @@ func ConvertNodeValueToUInts(node Node, neededBytes int, isBigEndian bool) ([]ui
 		case 2:
 			convertedValue = append(convertedValue, 0, 0)
 		default:
-			panic("Something is very wrong with unresolved byte conversion!")
+			panic("🛑 Something is very wrong with unresolved byte conversion!")
 		}
 		return convertedValue, nil
 	}
@@ -53,7 +53,7 @@ func ConvertNodeValueToUInts(node Node, neededBytes int, isBigEndian bool) ([]ui
 				convertedValue = append(convertedValue, uint8(lowByte))
 			}
 		default:
-			panic("Something is very wrong with numeric byte conversion!")
+			panic("🛑 Something is very wrong with numeric byte conversion!")
 		}
 	case enumNodeTypes.BooleanLiteral:
 		if node.AsBool {
@@ -69,7 +69,7 @@ func ConvertNodeValueToUInts(node Node, neededBytes int, isBigEndian bool) ([]ui
 		case 2:
 			return convertedValue, errorHandler.AddNew(enumErrorCodes.ResolvedValue16BitBool) // ❌ Fails
 		default:
-			panic("Something is very wrong with boolean byte conversion!")
+			panic("🛑 Something is very wrong with boolean byte conversion!")
 		}
 	case enumNodeTypes.StringLiteral:
 		switch neededBytes {
@@ -91,10 +91,10 @@ func ConvertNodeValueToUInts(node Node, neededBytes int, isBigEndian bool) ([]ui
 		case 2:
 			return convertedValue, errorHandler.AddNew(enumErrorCodes.ResolvedValue16BitString) // ❌ Fails
 		default:
-			panic("Something is very wrong with string byte conversion!")
+			panic("🛑 Something is very wrong with string byte conversion!")
 		}
 	default:
-		panic("Something is very wrong with operand conversion!")
+		panic("🛑 Something is very wrong with operand conversion!")
 	}
 
 	return convertedValue, nil

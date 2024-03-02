@@ -124,7 +124,7 @@ func getAdjustedOpcode(mode instModes, baseOpcode uint8, xyMod bool) uint8 {
 	case enumInstructionModes.IND_Y:
 		adjustedOpcode += 0x0c
 	default:
-		panic("Something is terribly wrong with building instruction modes")
+		panic("🛑 Something is terribly wrong with building instruction modes")
 	}
 
 	return adjustedOpcode

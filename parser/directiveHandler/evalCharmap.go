@@ -78,7 +78,7 @@ func evalDefChar(directiveName string, operandList *[]Node) error {
 		}
 
 	default:
-		panic("Something is very wrong with charmap/defchar capturing!!!")
+		panic("🛑 Something is very wrong with charmap/defchar capturing!!!")
 	}
 
 	return nil

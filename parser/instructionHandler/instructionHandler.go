@@ -126,7 +126,7 @@ func checkIfBranchInstruction(instructionName string) bool {
 // Operand wants to use an X/Y index. See if index is used properly and eat it
 func checkModeSupportsXYAndReassign(instructionMode instModeEnum, instructionXYTokenEnum tokenEnum) (instModeEnum, error) {
 	if instructionXYTokenEnum != enumTokenTypes.REGISTER_X && instructionXYTokenEnum != enumTokenTypes.REGISTER_Y {
-		panic("XY index checks didn't yield an X nor a Y!!!")
+		panic("🛑 XY index checks didn't yield an X nor a Y!!!")
 	}
 
 	xyMode, ok := instructionData.InstructionModeEnumToXYModeEnum[instructionMode]

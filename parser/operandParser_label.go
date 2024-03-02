@@ -82,6 +82,6 @@ func (p *LabelOperandParser) Process(operationType tokenEnum, operationValue str
 		return nil
 
 	default:
-		panic("BAD LABEL OPERATION TYPE!!!")
+		panic("🛑 BAD LABEL OPERATION TYPE!!!")
 	}
 }

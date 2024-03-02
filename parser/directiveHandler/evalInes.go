@@ -19,7 +19,7 @@ func evalInesOperands(directiveName string, operandList *[]Node) error {
 	case "INESBAT":
 		return nil
 	default:
-		panic("Something is very wrong with ines directive")
+		panic("🛑 Something is very wrong with ines directive")
 	}
 
 }

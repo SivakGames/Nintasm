@@ -65,7 +65,7 @@ func GetCurrentRomSegment() *romSegmentType {
 	if len(rom) > 0 {
 		return &rom[len(rom)-1]
 	}
-	panic("Attempted to access ROM with no segments!!!")
+	panic("🛑 Attempted to access ROM with no segments!!!")
 }
 
 // How many rom segments are currently defined

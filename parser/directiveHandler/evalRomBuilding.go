@@ -31,7 +31,7 @@ func evalRomBuildingOperands(directiveName string, operandList *[]Node) error {
 		return romSegmentation.ValidateAndSetOrg(orgNode)
 
 	default:
-		panic("Something is VERY wrong with ROM building directive")
+		panic("🛑 Something is VERY wrong with ROM building directive")
 	}
 
 }

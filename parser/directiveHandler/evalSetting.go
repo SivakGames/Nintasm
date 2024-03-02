@@ -71,7 +71,7 @@ func evalSettingChange(directiveName string, operandList *[]Node) error {
 		return nil
 
 	default:
-		panic("Unknown reset setting!")
+		panic("🛑 Unknown setting!")
 	}
 	return nil
 }
@@ -91,7 +91,7 @@ func evalSettingReset(directiveName string) error {
 			return err
 		}
 	default:
-		panic("Unknown reset setting!")
+		panic("🛑 Unknown reset setting!")
 	}
 	return nil
 }

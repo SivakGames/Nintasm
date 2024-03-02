@@ -142,7 +142,7 @@ func GetCurrentOperationLabel() string {
 // If one was previously set then error because it hasn't finished.
 func SetCurrentOperationLabel(label string) error {
 	if currentBlockOperationLabel != "" {
-		panic("Somehow entering another label block operation while first is not done...")
+		panic("🛑 Somehow entering another label block operation while first is not done...")
 	}
 
 	currentBlockOperationLabel = label
@@ -313,7 +313,7 @@ func PopFromStackAndExtendCapturedLines(extendLines []CapturedLine) {
 		StackWillClearFlag = true
 
 	} else {
-		panic("Popping nothing from stack!!!")
+		panic("🛑 Popping nothing from stack!!!")
 	}
 }
 

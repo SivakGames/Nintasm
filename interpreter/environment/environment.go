@@ -97,7 +97,7 @@ func AddOtherIdentifierToMasterTable(symbolName string, symbolEnum enumSymbolTab
 	case enumSymbolTableTypes.Namespace:
 		namespaceTable.AddIdentifierKeyToNamespaceTable(symbolName)
 	default:
-		panic("Bad symbol type being added to environment!")
+		panic("🛑 Bad symbol type being added to environment!")
 	}
 	return nil
 }

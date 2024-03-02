@@ -29,8 +29,14 @@ func Start(initialInputFile string) error {
 		return err
 	}
 
-	unresolvedTable.ResolvedUnresolvedSymbols()
-	unresolvedTable.ResolvedUnresolvedRomEntries()
+	err = unresolvedTable.ResolvedUnresolvedSymbols()
+	if err != nil {
+		return err
+	}
+	err = unresolvedTable.ResolvedUnresolvedRomEntries()
+	if err != nil {
+		return err
+	}
 
 	return nil
 }

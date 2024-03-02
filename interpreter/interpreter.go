@@ -149,7 +149,7 @@ func EvaluateNode(node Node) (Node, error) {
 		case "||":
 			node.AsBool = left.AsBool || right.AsBool
 		default:
-			panic("SOMETHING IS VERY WRONG WITH BINARY EXPRESSION INTERPRETING")
+			panic("🛑 SOMETHING IS VERY WRONG WITH BINARY EXPRESSION INTERPRETING")
 		}
 		switch operation {
 		case "+", "-", "*", "/", "%", "|", "&", "^", "<<", ">>":
@@ -180,7 +180,7 @@ func EvaluateNode(node Node) (Node, error) {
 		case "!":
 			node.AsBool = !right.AsBool
 		default:
-			panic("SOMETHING IS VERY WRONG WITH UNARY EXPRESSION INTERPRETING")
+			panic("🛑 SOMETHING IS VERY WRONG WITH UNARY EXPRESSION INTERPRETING")
 		}
 
 		switch operation {
@@ -200,7 +200,7 @@ func EvaluateNode(node Node) (Node, error) {
 		}
 
 	default:
-		errMsg := fmt.Sprintf("UNKNOWN NODE BEING INTERPRETED!!! %v", node.NodeValue)
+		errMsg := fmt.Sprintf("🛑 UNKNOWN NODE BEING INTERPRETED!!! %v", node.NodeValue)
 		panic(errMsg)
 	}
 

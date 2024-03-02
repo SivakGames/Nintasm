@@ -73,7 +73,7 @@ func ResolvedUnresolvedSymbols() error {
 		}
 		newUnresolvedLength := len(newUnresolvedTable)
 		if originalUnresolvedLength == newUnresolvedLength {
-			panic("DEADLOCK")
+			panic("🛑 DEADLOCK")
 		}
 		unresolvedSymbolTable = newUnresolvedTable
 	}

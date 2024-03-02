@@ -162,7 +162,7 @@ func GenerateSpec(specType string) []specRegexEnum {
 		//case "indirectCapturing":
 		//	return IndirectCapturingSpec
 	}
-	panic("UNKNOWN TOKENIZER SPEC NAME")
+	panic("🛑 UNKNOWN TOKENIZER SPEC NAME")
 }
 
 // ++++++++++++++++++++++++++++++++++++++++++++++++

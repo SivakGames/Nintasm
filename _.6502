@@ -7,17 +7,14 @@
 	.bank 0
 	.org $8000
 
-	LDX #TESTING2 + 5
-	.dw 2 - TESTING + 2
+	.dw TEST, TEST + 2, TEST + 4, TEST + 6
+
+	LDX #5
+	
+TEST:
+	.dw 22
 
 
 	.romSegment "8kb","8kb","CHR"
 	.bank 0
 	.org $0000
-
-	LDY TESTING3 - 7
-
-	;.db toCharmap("💗1")
-
-TESTING2 = 661
-TESTING3 = 556666
