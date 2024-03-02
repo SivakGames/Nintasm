@@ -16,6 +16,7 @@ import (
 type Node = operandFactory.Node
 
 var masterLookupTable = map[string]enumSymbolTableTypes.Def{}
+var unresolvedAddsSilentError = true
 
 // ----------------------------------
 
@@ -57,7 +58,10 @@ func LookupIdentifierInSymbolAsNodeTable(symbolName string) (Node, bool, error) 
 		if otherExists {
 			return node, false, errorHandler.AddNew(enumErrorCodes.InterpreterIdentifierNotValueSymbol, symbolName)
 		}
-		return node, false, errorHandler.AddUnresolved(symbolName)
+		if unresolvedAddsSilentError {
+			return node, false, errorHandler.AddUnresolved(symbolName)
+		}
+		return node, false, errorHandler.AddNew(enumErrorCodes.InterpreterSymbolNotFound, symbolName)
 	}
 	return node, true, nil
 }
@@ -96,4 +100,9 @@ func AddOtherIdentifierToMasterTable(symbolName string, symbolEnum enumSymbolTab
 		panic("Bad symbol type being added to environment!")
 	}
 	return nil
+}
+
+// ++++++++++++++++++++++++++++++
+func ClearUnresolvedSilentErrorFlag() {
+	unresolvedAddsSilentError = false
 }

@@ -5,6 +5,7 @@ import (
 	"misc/nintasm/assemble/fileStack"
 	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
 	"misc/nintasm/interpreter"
+	"misc/nintasm/interpreter/environment"
 	"misc/nintasm/interpreter/operandFactory"
 	"misc/nintasm/romBuilder"
 	"misc/nintasm/romBuilder/nodesToBytes"
@@ -81,17 +82,18 @@ func ResolvedUnresolvedSymbols() error {
 
 // Called at the end of pass 1
 func ResolvedUnresolvedRomEntries() error {
+	environment.ClearUnresolvedSilentErrorFlag()
 	for _, entry := range unresolvedRomTable {
+		errorHandler.OverwriteNoFileDefaults(entry.fileName, uint(entry.lineNumber), entry.lineContent)
 		evaluatedNode, err := interpreter.EvaluateNode(entry.originalNode)
 		if err != nil {
 			err := errorHandler.CheckErrorContinuesUpwardPropagation(err, enumErrorCodes.Error)
 			if err != nil {
 				return err // ❌❌ CONTINUES Failing!
 			}
-		}
-		if !evaluatedNode.Resolved {
 			continue
 		}
+
 		asRomData, err := nodesToBytes.ConvertNodeValueToUInts(evaluatedNode, entry.neededBytes, false)
 		if err != nil {
 			continue
