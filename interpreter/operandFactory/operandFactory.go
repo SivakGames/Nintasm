@@ -109,7 +109,7 @@ func CreateAssignmentNode(left Node, right Node) Node {
 // """Assign a label symbol"""
 func CreateAssignLabelNode(labelName string, org int) Node {
 	node := newNode(enumTokenTypes.ASSIGN_simple, labelName, enumNodeTypes.AssignLabelExpression)
-	left := CreateIdentifierNode(enumTokenTypes.ASSIGN_EQU, labelName)
+	left := CreateIdentifierNode(labelName)
 	right := CreateNumericLiteralNode(org)
 	node.Left = &left
 	node.Right = &right
@@ -119,8 +119,8 @@ func CreateAssignLabelNode(labelName string, org int) Node {
 //===================================================
 //Types of identifiers
 
-func CreateIdentifierNode(nodeType tokenEnum, nodeValue string) Node {
-	node := newNode(nodeType, nodeValue, enumNodeTypes.Identifier)
+func CreateIdentifierNode(nodeValue string) Node {
+	node := newNode(enumTokenTypes.IDENTIFIER, nodeValue, enumNodeTypes.Identifier)
 	return node
 }
 

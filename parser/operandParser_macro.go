@@ -6,6 +6,10 @@ import (
 	"misc/nintasm/interpreter/environment/macroTable"
 )
 
+const MACRO_MIN_OPERANDS = 0
+const MACRO_MAX_OPERANDS = 16
+const MACRO_MANAULLY_EVALS = true
+
 type MacroOperandParser struct {
 	OperandParser
 	capturedLinesToUnpack []blockStack.CapturedLine
@@ -20,13 +24,15 @@ func (mop *MacroOperandParser) Process(macroName string) error {
 	var err error
 
 	macroTable.AppendToReplacementStack()
-
 	mop.capturedLinesToUnpack, err = macroTable.LookupAndGetMacroInEnvironment(macroName, macroTable.Macro)
 	if err != nil {
 		return err
 	}
 
-	operandList, err := mop.GetOperandList(0, 16, true, []string{"macro"})
+	operandList, err := mop.GetOperandList(
+		MACRO_MIN_OPERANDS, MACRO_MAX_OPERANDS, MACRO_MANAULLY_EVALS,
+		[]string{"macro"},
+	)
 	if err != nil {
 		return err // ❌ Fails
 	}

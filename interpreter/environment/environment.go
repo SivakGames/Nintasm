@@ -50,15 +50,16 @@ func AddIdentifierToSymbolAsNodeTable(symbolName string, node Node) error {
 }
 
 // See if identifier has a value in the symbol table
-func LookupIdentifierInSymbolAsNodeTable(symbolName string) (Node, error) {
+func LookupIdentifierInSymbolAsNodeTable(symbolName string) (Node, bool, error) {
 	node, exists := symbolAsNodeTable.GetNodeFromSymbolAsNodeTable(symbolName)
 	if !exists {
 		_, otherExists := masterLookupTable[symbolName]
 		if otherExists {
-			return node, errorHandler.AddNew(enumErrorCodes.InterpreterAlreadyDefined, symbolName, "TODO TYPE DESC")
+			return node, false, errorHandler.AddNew(enumErrorCodes.InterpreterIdentifierNotValueSymbol, symbolName)
 		}
+		return node, false, errorHandler.AddUnresolved(symbolName)
 	}
-	return node, nil
+	return node, true, nil
 }
 
 // -----------------------------------------------------------------------------

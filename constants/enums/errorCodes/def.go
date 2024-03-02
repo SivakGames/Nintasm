@@ -79,6 +79,7 @@ const (
 	DirectiveUnmatchedEndBlock = "DirectiveUnmatchedEndBlock"
 	DirectiveNestedLabelBlock  = "DirectiveNestedLabelBlock"
 
+	MacroNotExist                 = "MacroNotExist"
 	MacroInvokeDoubleCurlyBrace   = "MacroInvokeDoubleCurlyBrace"
 	MacroInvokeUnclosedCurlyBrace = "MacroInvokeUnclosedCurlyBrace"
 
@@ -99,12 +100,15 @@ const (
 	ExprMapDuplicateKey = "ExprMapDuplicateKey"
 	ToExprMapUndefExpr  = "ToExprMapUndefExpr"
 
-	InterpreterNoParentLabel    = "InterpreterNoParentLabel"
-	InterpreterFuncTooFewArgs   = "InterpreterFuncTooFewArgs"
-	InterpreterFuncTooManyArgs  = "InterpreterFuncTooManyArgs"
-	InterpreterFuncArgWrongType = "InterpreterFuncArgWrongType"
-	InterpreterAlreadyDefined   = "InterpreterAlreadyDefined"
-	InterpreterSymbolNotFound   = "InterpreterSymbolNotFound"
+	InterpreterNoParentLabel            = "InterpreterNoParentLabel"
+	InterpreterUnaryNotNumeric          = "InterpreterUnaryNotNumeric"
+	InterpreterBinaryMismatchedTypes    = "InterpreterBinaryMismatchedTypes"
+	InterpreterFuncTooFewArgs           = "InterpreterFuncTooFewArgs"
+	InterpreterFuncTooManyArgs          = "InterpreterFuncTooManyArgs"
+	InterpreterFuncArgWrongType         = "InterpreterFuncArgWrongType"
+	InterpreterAlreadyDefined           = "InterpreterAlreadyDefined"
+	InterpreterSymbolNotFound           = "InterpreterSymbolNotFound"
+	InterpreterIdentifierNotValueSymbol = "InterpreterIdentifierNotValueSymbol"
 
 	BlockIsEmpty                = "BlockIsEmpty"
 	BlockOpUncapturableByParent = "BlockOpUncapturableByParent"

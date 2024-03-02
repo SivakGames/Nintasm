@@ -6,14 +6,15 @@
 	.romSegment "32kb","32kb","PRG"
 	.bank 0
 	.org $8000
-	
-	LDA #7, x
+
+TESTING2 = 555
+
+	.dw 2 - TESTING + 2
 
 TESTING:
 
-	.db 1234
+	.db 12
 
-	lsr aada
 
 
 

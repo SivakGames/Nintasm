@@ -58,6 +58,6 @@ func LookupAndGetMacroInEnvironment(symbolName string, macroEnum LookupMacroEnum
 	if ok {
 		return macro, nil
 	} else {
-		return nil, errorHandler.AddNew(enumErrorCodes.InterpreterSymbolNotFound, symbolName)
+		return nil, errorHandler.AddNew(enumErrorCodes.MacroNotExist, symbolName)
 	}
 }

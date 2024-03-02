@@ -104,6 +104,7 @@ func (p *OperandParser) getOperandAndAppend(operandList *[]Node, captureMasks *[
 			return err // ❌❌ CONTINUES Failing!
 		}
 	}
+
 	if !operandFactory.ValidateNodeIsEmpty(&operand) {
 		*operandList = append(*operandList, operand)
 	}
@@ -488,7 +489,7 @@ func (p *OperandParser) _callExpression(callee string) (Node, error) {
 		if err != nil {
 			return operandFactory.ErrorNode(p.lookaheadValue), err // ❌ Fails
 		}
-		bankArgument := operandFactory.CreateIdentifierNode(p.lookaheadType, p.lookaheadValue)
+		bankArgument := operandFactory.CreateIdentifierNode(p.lookaheadValue)
 		err = p.eatAndAdvance(enumTokenTypes.IDENTIFIER)
 		if err != nil {
 			return operandFactory.ErrorNode(p.lookaheadValue), err // ❌ Fails
@@ -765,12 +766,11 @@ func (p *OperandParser) literal() (Node, error) {
 
 // -----------------
 func (p *OperandParser) identifier() (Node, error) {
-	literalType := p.lookaheadType
 	literalValue := p.lookaheadValue
 	err := p.eatFreelyAndAdvance(enumTokenTypes.IDENTIFIER)
 	if err != nil {
 		return operandFactory.ErrorNode(p.lookaheadValue), err // ❌ Fails
 	}
 
-	return operandFactory.CreateIdentifierNode(literalType, literalValue), nil
+	return operandFactory.CreateIdentifierNode(literalValue), nil
 }

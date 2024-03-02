@@ -106,6 +106,7 @@ var errorTable = map[enumErrorCodes.Def]ErrorTableEntry{
 	enumErrorCodes.DirectiveUnmatchedEndBlock: newErrorTableEntry(enumErrorCodes.Error, "Non-matching closing block with parent operation, %v"),
 	enumErrorCodes.DirectiveNestedLabelBlock:  newErrorTableEntry(enumErrorCodes.Error, "Cannot define a labeled block when in another block statement!"),
 
+	enumErrorCodes.MacroNotExist:                 newErrorTableEntry(enumErrorCodes.Error, "Specified macro %v doesn't exist!"),
 	enumErrorCodes.MacroInvokeDoubleCurlyBrace:   newErrorTableEntry(enumErrorCodes.Error, "Macro invoking error - Must close curly brace before opening another!"),
 	enumErrorCodes.MacroInvokeUnclosedCurlyBrace: newErrorTableEntry(enumErrorCodes.Error, "Macro invoking error - Unclosed curly brace!"),
 
@@ -126,12 +127,15 @@ var errorTable = map[enumErrorCodes.Def]ErrorTableEntry{
 	enumErrorCodes.ExprMapDuplicateKey: newErrorTableEntry(enumErrorCodes.Error, "Expression %v has already been defined in current map"),
 	enumErrorCodes.ToExprMapUndefExpr:  newErrorTableEntry(enumErrorCodes.Error, "Expression `%v` is not defined in currently used exprmap"),
 
-	enumErrorCodes.InterpreterNoParentLabel:    newErrorTableEntry(enumErrorCodes.Error, "Cannot use operation! No parent label!"),
-	enumErrorCodes.InterpreterFuncTooFewArgs:   newErrorTableEntry(enumErrorCodes.Error, "Too few arguments for function!"),
-	enumErrorCodes.InterpreterFuncTooManyArgs:  newErrorTableEntry(enumErrorCodes.Error, "Too many arguments for function!"),
-	enumErrorCodes.InterpreterFuncArgWrongType: newErrorTableEntry(enumErrorCodes.Error, "Argument is wrong type"),
-	enumErrorCodes.InterpreterAlreadyDefined:   newErrorTableEntry(enumErrorCodes.Error, "Symbol %v has been previously defined! (Defined as %v)"),
-	enumErrorCodes.InterpreterSymbolNotFound:   newErrorTableEntry(enumErrorCodes.Error, "Symbol %v was not found!"),
+	enumErrorCodes.InterpreterNoParentLabel:            newErrorTableEntry(enumErrorCodes.Error, "Cannot use operation! No parent label!"),
+	enumErrorCodes.InterpreterBinaryMismatchedTypes:    newErrorTableEntry(enumErrorCodes.Error, "Binary expression types mismatched: %v %v %v"),
+	enumErrorCodes.InterpreterUnaryNotNumeric:          newErrorTableEntry(enumErrorCodes.Error, "Unary expression must be numeric: %v %v"),
+	enumErrorCodes.InterpreterFuncTooFewArgs:           newErrorTableEntry(enumErrorCodes.Error, "Too few arguments for function!"),
+	enumErrorCodes.InterpreterFuncTooManyArgs:          newErrorTableEntry(enumErrorCodes.Error, "Too many arguments for function!"),
+	enumErrorCodes.InterpreterFuncArgWrongType:         newErrorTableEntry(enumErrorCodes.Error, "Argument is wrong type"),
+	enumErrorCodes.InterpreterAlreadyDefined:           newErrorTableEntry(enumErrorCodes.Error, "Symbol %v has been previously defined! (Defined as %v)"),
+	enumErrorCodes.InterpreterSymbolNotFound:           newErrorTableEntry(enumErrorCodes.Error, "Symbol %v was not found and must be resolved!"),
+	enumErrorCodes.InterpreterIdentifierNotValueSymbol: newErrorTableEntry(enumErrorCodes.Error, "Identifier %v is not usable as a numeric value!"),
 
 	enumErrorCodes.BlockIsEmpty:                newErrorTableEntry(enumErrorCodes.Warning, "Block is empty..."),
 	enumErrorCodes.BlockOpUncapturableByParent: newErrorTableEntry(enumErrorCodes.Error, "%v - This operation is uncapturable by block"),
@@ -243,6 +247,13 @@ func AddNew(errorTableKey enumErrorCodes.Def, args ...interface{}) error {
 		return errors.New(fmt.Sprintf("%v%d", SEVERITY_PREFIX, entry.severity))
 	}
 	return errors.New("Non-error-code error???")
+}
+
+// xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+// A silent error initially...
+func AddUnresolved(symbolName string) error {
+	return errors.New(fmt.Sprintf("%v%d", SEVERITY_PREFIX, enumErrorCodes.Error))
 }
 
 // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx

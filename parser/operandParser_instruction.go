@@ -7,6 +7,10 @@ import (
 	"strings"
 )
 
+const INSTRUCTION_MIN_OPERANDS = 0
+const INSTRUCTION_MAX_OPERANDS = 1
+const INSTRUCTION_MANAULLY_EVALS = false
+
 type InstructionOperandParser struct {
 	OperandParser
 }
@@ -18,7 +22,10 @@ func NewInstructionOperandParser() InstructionOperandParser {
 
 func (p *InstructionOperandParser) Process(operationValue string) error {
 	instructionName := strings.ToUpper(operationValue)
-	operandList, err := p.GetOperandList(0, 1, false, []string{"instruction"})
+	operandList, err := p.GetOperandList(
+		INSTRUCTION_MIN_OPERANDS, INSTRUCTION_MAX_OPERANDS, INSTRUCTION_MANAULLY_EVALS,
+		[]string{"instruction"},
+	)
 	if err != nil {
 		return err // ❌ Fails
 	}

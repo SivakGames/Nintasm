@@ -11,6 +11,10 @@ import (
 	"strings"
 )
 
+const ASSIGNMENT_MIN_OPERANDS = 1
+const ASSIGNMENT_MAX_OPERANDS = 64
+const ASSIGNMENT_MANAULLY_EVALS = false
+
 type LabelOperandParser struct {
 	OperandParser
 }
@@ -46,13 +50,16 @@ func (p *LabelOperandParser) Process(operationType tokenEnum, operationValue str
 			return errorHandler.AddNew(enumErrorCodes.AssignmentMissingOperand)
 		}
 
-		operandList, err := p.GetOperandList(1, 64, false, nil)
+		operandList, err := p.GetOperandList(
+			ASSIGNMENT_MIN_OPERANDS, ASSIGNMENT_MAX_OPERANDS, ASSIGNMENT_MANAULLY_EVALS,
+			nil,
+		)
 		if err != nil {
 			return err // ❌ Fails
 		}
 
 		if len(operandList) == 1 {
-			identifierNode := operandFactory.CreateIdentifierNode(operationType, operationLabel)
+			identifierNode := operandFactory.CreateIdentifierNode(operationLabel)
 			assignmentNode := operandFactory.CreateAssignmentNode(identifierNode, operandList[0])
 			_, err := interpreter.EvaluateNode(assignmentNode)
 			if err != nil {

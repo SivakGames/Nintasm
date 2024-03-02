@@ -38,7 +38,11 @@ func EvaluateNode(node Node) (Node, error) {
 
 	case enumNodeTypes.Identifier,
 		enumNodeTypes.MemberExpression:
-		return environment.LookupIdentifierInSymbolAsNodeTable(node.NodeValue)
+		resolvedNode, resolved, err := environment.LookupIdentifierInSymbolAsNodeTable(node.NodeValue)
+		if resolved {
+			return resolvedNode, err
+		}
+		return node, err
 
 	case enumNodeTypes.BacktickStringLiteral:
 		_, err := exprmapTable.GetCurrentExprmap()
@@ -88,18 +92,24 @@ func EvaluateNode(node Node) (Node, error) {
 
 	case enumNodeTypes.BinaryExpression:
 		var err error
+		operation := node.NodeValue
 		left, err := EvaluateNode(*node.Left)
 		if err != nil {
 			return node, err
 		}
+
 		right, err := EvaluateNode(*node.Right)
 		if err != nil {
 			return node, err
 		}
 
-		operation := node.NodeValue
+		if left.NodeType != right.NodeType {
+			return node, errorHandler.AddNew(enumErrorCodes.InterpreterBinaryMismatchedTypes, left.NodeValue, operation, right.NodeValue)
+		}
+
 		node.Left = nil
 		node.Right = nil
+
 		switch operation {
 		case "+":
 			node.AsNumber = left.AsNumber + right.AsNumber
@@ -148,11 +158,16 @@ func EvaluateNode(node Node) (Node, error) {
 		}
 
 	case enumNodeTypes.UnaryExpression:
+		operation := node.NodeValue
 		right, err := EvaluateNode(*node.Right)
 		if err != nil {
 			return node, err
 		}
-		operation := node.NodeValue
+
+		if right.NodeType != enumNodeTypes.NumericLiteral {
+			return node, errorHandler.AddNew(enumErrorCodes.InterpreterUnaryNotNumeric, operation, right.NodeValue)
+		}
+
 		node.Right = nil
 		switch operation {
 		case "+":

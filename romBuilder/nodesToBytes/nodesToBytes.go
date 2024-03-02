@@ -1,6 +1,7 @@
 package nodesToBytes
 
 import (
+	"fmt"
 	"misc/nintasm/assemble/errorHandler"
 	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
 	enumNodeTypes "misc/nintasm/constants/enums/nodeTypes"
@@ -23,6 +24,7 @@ func ConvertNodeValueToUInts(node Node, neededBytes int, isBigEndian bool) ([]ui
 		case 1:
 			convertedValue = append(convertedValue, 0)
 		case 2:
+			fmt.Println("Unrez", node)
 			convertedValue = append(convertedValue, 0, 0)
 		default:
 			panic("Something is very wrong with unresolved byte conversion!")
