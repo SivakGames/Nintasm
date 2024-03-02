@@ -20,15 +20,14 @@ var lastAddedCharmapName = ""
 
 // ----------------------------------
 
-func AddCharmapToEnvironment(symbolName string) error {
+// When first defining a charmap
+func AddIdentifierKeyToCharmapTable(symbolName string) {
 	charmapSymbolTable[symbolName] = CharmapTableType{}
 	lastAddedCharmapName = symbolName
-
 	if defaultCharmapName == "" {
 		defaultCharmapName = lastAddedCharmapName
 		currentCharmapName = defaultCharmapName
 	}
-	return nil
 }
 
 func AddCharToCharmap(newChar rune, charNodes []Node) error {

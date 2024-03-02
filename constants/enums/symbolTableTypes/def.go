@@ -7,6 +7,7 @@ const (
 	Label
 	Macro
 	KVMacro
+	Namespace
 	CharMap
 	ExprMap
 )

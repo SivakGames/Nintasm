@@ -111,7 +111,7 @@ func ReadLines(lines *[]string, lineCounter *uint) error {
 
 			} else {
 				//Either append the operation to the stack's captured lines or evaluate them now
-				if !blockStack.GetCurrentOperationEvaluatesFlag() {
+				if !blockStack.GetCurrentOperationEvaluatesCapturedNodesFlag() {
 					err := blockStack.CheckOperationIsCapturableAndAppend(reformattedLine, &lineOperationParsedValues)
 					if err != nil {
 						return err

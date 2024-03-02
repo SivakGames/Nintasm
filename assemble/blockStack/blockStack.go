@@ -58,7 +58,7 @@ var Stack []StackBlock
 var StackWillClearFlag bool = false
 
 // Will evaluate the node rather than capturing it
-var currentOperationEvaluates bool = false
+var currentOperationEvaluatesCapturedNodesFlag bool = false
 var stackCapturesParentOpOnlyFlag bool = false
 var currentBlockOperationLabel string = ""
 
@@ -151,18 +151,19 @@ func SetCurrentOperationLabel(label string) error {
 
 // -----------------
 
-func ClearCurrentOperationEvaluatesFlag() {
-	currentOperationEvaluates = false
+func ClearCurrentOperationEvaluatesCapturedNodesFlag() {
+	currentOperationEvaluatesCapturedNodesFlag = false
 }
-func GetCurrentOperationEvaluatesFlag() bool {
-	return currentOperationEvaluates
+func GetCurrentOperationEvaluatesCapturedNodesFlag() bool {
+	return currentOperationEvaluatesCapturedNodesFlag
 }
-func SetCurrentOperationEvaluatesFlag() {
-	currentOperationEvaluates = true
+func SetCurrentOperationEvaluatesCapturedNodesFlag() {
+	currentOperationEvaluatesCapturedNodesFlag = true
 }
 
 // --------------------------------
 
+// Will clear the current labeled op's label and the capture parent op flag,
 func GetLabelAndDoEndBlockSetups() string {
 	blockLabel := GetCurrentOperationLabel()
 	ClearCurrentOperationLabel()

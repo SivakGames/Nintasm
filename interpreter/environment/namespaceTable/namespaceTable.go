@@ -2,8 +2,10 @@ package namespaceTable
 
 // ++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+// Mainly just acts a true/false entry as to whether the NS exists.
+// Actual values are stored in the regular symbol table.
 var namespaceSymbolTable = map[string]bool{}
 
-func AddNamespaceToEnvironment(namespaceName string) {
+func AddIdentifierKeyToNamespaceTable(namespaceName string) {
 	namespaceSymbolTable[namespaceName] = true
 }

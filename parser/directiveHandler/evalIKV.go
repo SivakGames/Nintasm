@@ -18,7 +18,7 @@ func evalIkv(directiveName string, operandList *[]Node) error {
 
 	blockStack.PushOntoStack(directiveName, *operandList)
 	blockStack.SetCaptureParentOpOnlyFlag()
-	blockStack.SetCurrentOperationEvaluatesFlag()
+	blockStack.SetCurrentOperationEvaluatesCapturedNodesFlag()
 
 	macroTable.AppendToReplacementStack()
 	return nil
@@ -46,7 +46,7 @@ func evalEndIkv(operandList *[]Node) error {
 	macroTable.PopFromReplacementStack()
 
 	blockStack.ClearCaptureParentOpOnlyFlag()
-	blockStack.ClearCurrentOperationEvaluatesFlag()
+	blockStack.ClearCurrentOperationEvaluatesCapturedNodesFlag()
 	blockStack.PopFromStackAndExtendCapturedLines(modifiedCapturedLines)
 
 	return nil

@@ -22,24 +22,32 @@ const (
 )
 
 // ----------------------------------
+func AddIdentifierKeyToMacroTable(macroName string) {
+	macroSymbolTable[macroName] = MacroTableType{}
+}
+func AddIdentifierKeyToKVMacroTable(macroName string) {
+	kvMacroSymbolTable[macroName] = MacroTableType{}
+}
 
-func AddMacroToEnvironment(symbolName string, macroEnum LookupMacroEnumType, capturedLines MacroTableType) error {
+// ----------------------------------
+
+func AddCapturedLinesToMacro(macroName string, macroEnum LookupMacroEnumType, capturedLines MacroTableType) error {
 	if macroEnum == Macro {
-		macroSymbolTable[symbolName] = capturedLines
+		macroSymbolTable[macroName] = capturedLines
 	} else {
-		kvMacroSymbolTable[symbolName] = capturedLines
+		kvMacroSymbolTable[macroName] = capturedLines
 	}
 	return nil
 }
 
-func LookupMacroInEnvironment(symbolName string, macroEnum LookupMacroEnumType) (MacroTableType, bool) {
+func LookupMacroInEnvironment(macroName string, macroEnum LookupMacroEnumType) (MacroTableType, bool) {
 	var macro MacroTableType
 	var ok bool
 
 	if macroEnum == Macro {
-		macro, ok = macroSymbolTable[symbolName]
+		macro, ok = macroSymbolTable[macroName]
 	} else {
-		macro, ok = kvMacroSymbolTable[symbolName]
+		macro, ok = kvMacroSymbolTable[macroName]
 	}
 	return macro, ok
 

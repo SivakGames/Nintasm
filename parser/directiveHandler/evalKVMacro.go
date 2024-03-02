@@ -4,11 +4,14 @@ import (
 	"misc/nintasm/assemble/blockStack"
 	"misc/nintasm/assemble/errorHandler"
 	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
+	enumSymbolTableTypes "misc/nintasm/constants/enums/symbolTableTypes"
+	"misc/nintasm/interpreter/environment"
 	"misc/nintasm/interpreter/environment/macroTable"
 )
 
 func evalKVMacro(directiveName string, macroLabel string, operandList *[]Node) error {
 	blockStack.PushOntoStack(directiveName, *operandList)
+	environment.AddOtherIdentifierToMasterTable(macroLabel, enumSymbolTableTypes.KVMacro)
 	blockStack.SetCaptureParentOpOnlyFlag()
 	return nil
 }
@@ -17,12 +20,11 @@ func evalKVMacro(directiveName string, macroLabel string, operandList *[]Node) e
 func evalEndKVMacro() error {
 	macroLabel := blockStack.GetLabelAndDoEndBlockSetups()
 	capturedLines := blockStack.GetTopOfStackCapturedLines()
-	macroTable.AddMacroToEnvironment(macroLabel, macroTable.KVMacro, *capturedLines)
-
 	if len(*capturedLines) == 0 {
 		errorHandler.AddNew(enumErrorCodes.BlockIsEmpty) // ⚠️ Warns
 	}
 
+	macroTable.AddCapturedLinesToMacro(macroLabel, macroTable.KVMacro, *capturedLines)
 	blockStack.ClearBottomOfStackCapturedLines()
 	blockStack.PopFromStackAndExtendNoLines()
 	return nil

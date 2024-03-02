@@ -5,20 +5,22 @@ import (
 	"misc/nintasm/assemble/blockStack"
 	"misc/nintasm/assemble/errorHandler"
 	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
+	enumSymbolTableTypes "misc/nintasm/constants/enums/symbolTableTypes"
+	"misc/nintasm/interpreter/environment"
 	"misc/nintasm/interpreter/environment/charmapTable"
 	"misc/nintasm/interpreter/operandFactory"
 )
 
 func evalCharmap(directiveName string, charmapLabel string, operandList *[]Node) error {
 	blockStack.PushOntoStack(directiveName, *operandList)
-	charmapTable.AddCharmapToEnvironment(charmapLabel)
-	blockStack.SetCurrentOperationEvaluatesFlag()
+	environment.AddOtherIdentifierToMasterTable(charmapLabel, enumSymbolTableTypes.CharMap)
+	blockStack.SetCurrentOperationEvaluatesCapturedNodesFlag()
 	return nil
 }
 
 func evalEndCharmap() error {
 	_ = blockStack.GetLabelAndDoEndBlockSetups()
-	blockStack.ClearCurrentOperationEvaluatesFlag()
+	blockStack.ClearCurrentOperationEvaluatesCapturedNodesFlag()
 	blockStack.PopFromStackAndExtendNoLines()
 	return nil
 }

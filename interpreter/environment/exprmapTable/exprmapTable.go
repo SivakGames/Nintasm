@@ -17,7 +17,8 @@ var lastAddedExprmapName = ""
 
 // ----------------------------------
 
-func AddExprmapToEnvironment(symbolName string) error {
+// When first defining a charmap
+func AddIdentifierKeyToExprmapTable(symbolName string) error {
 	exprmapSymbolTable[symbolName] = ExprmapTableType{}
 	lastAddedExprmapName = symbolName
 

@@ -4,20 +4,22 @@ import (
 	"misc/nintasm/assemble/blockStack"
 	"misc/nintasm/assemble/errorHandler"
 	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
+	enumSymbolTableTypes "misc/nintasm/constants/enums/symbolTableTypes"
+	"misc/nintasm/interpreter/environment"
 	"misc/nintasm/interpreter/environment/exprmapTable"
 	"misc/nintasm/interpreter/operandFactory"
 )
 
 func evalExprmap(directiveName string, exprmapLabel string, operandList *[]Node) error {
 	blockStack.PushOntoStack(directiveName, *operandList)
-	exprmapTable.AddExprmapToEnvironment(exprmapLabel)
-	blockStack.SetCurrentOperationEvaluatesFlag()
+	environment.AddOtherIdentifierToMasterTable(exprmapLabel, enumSymbolTableTypes.ExprMap)
+	blockStack.SetCurrentOperationEvaluatesCapturedNodesFlag()
 	return nil
 }
 
 func evalEndExprmap() error {
 	_ = blockStack.GetLabelAndDoEndBlockSetups()
-	blockStack.ClearCurrentOperationEvaluatesFlag()
+	blockStack.ClearCurrentOperationEvaluatesCapturedNodesFlag()
 	blockStack.PopFromStackAndExtendNoLines()
 	return nil
 }
