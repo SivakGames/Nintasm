@@ -106,6 +106,7 @@ const (
 	InterpreterNoParentLabel            = "InterpreterNoParentLabel"
 	InterpreterUnaryNotNumeric          = "InterpreterUnaryNotNumeric"
 	InterpreterBinaryMismatchedTypes    = "InterpreterBinaryMismatchedTypes"
+	InterpreterFuncUndefined            = "InterpreterFuncUndefined"
 	InterpreterFuncTooFewArgs           = "InterpreterFuncTooFewArgs"
 	InterpreterFuncTooManyArgs          = "InterpreterFuncTooManyArgs"
 	InterpreterFuncArgWrongType         = "InterpreterFuncArgWrongType"

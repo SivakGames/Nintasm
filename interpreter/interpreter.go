@@ -9,6 +9,8 @@ import (
 	"misc/nintasm/interpreter/environment"
 	"misc/nintasm/interpreter/environment/charmapTable"
 	"misc/nintasm/interpreter/environment/exprmapTable"
+	"misc/nintasm/interpreter/environment/funcTable"
+	"misc/nintasm/interpreter/environment/symbolAsNodeTable"
 	"misc/nintasm/interpreter/operandFactory"
 	"strings"
 )
@@ -198,6 +200,18 @@ func EvaluateNode(node Node) (Node, error) {
 		if wasAsmFunc {
 			return node, nil
 		}
+		functionNode, err := funcTable.LookupAndGetFunctionInEnvironment(node.NodeValue)
+		if err != nil {
+			return node, err
+		}
+		symbolAsNodeTable.PushToSymbolTableStack()
+		for i, n := range *node.ArgumentList {
+			fmt.Println(i, n)
+		}
+		symbolAsNodeTable.PopFromSymbolTableStack()
+
+		fmt.Println("HIER1", functionNode)
+		fmt.Println("HIER2", node.ArgumentList)
 
 	default:
 		errorHandler.AddNew(enumErrorCodes.Other, "???")

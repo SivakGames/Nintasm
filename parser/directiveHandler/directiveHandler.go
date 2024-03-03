@@ -66,7 +66,7 @@ func EvaluateDirective(operationTokenEnum enumTokenTypes.Def, directiveName stri
 		case "RS":
 			return evalRs(operandList)
 		case "FUNC":
-			return evalFunc(operandList)
+			return evalFunc(operationLabel, operandList)
 		default:
 			panic("🛑 BAD LABELED DIRECTIVE!!!" + directiveName)
 		}

@@ -50,7 +50,6 @@ func LookupMacroInEnvironment(macroName string, macroEnum LookupMacroEnumType) (
 		macro, ok = kvMacroSymbolTable[macroName]
 	}
 	return macro, ok
-
 }
 
 func LookupAndGetMacroInEnvironment(symbolName string, macroEnum LookupMacroEnumType) (MacroTableType, error) {

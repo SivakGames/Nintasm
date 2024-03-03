@@ -6,6 +6,7 @@ import (
 	enumSymbolTableTypes "misc/nintasm/constants/enums/symbolTableTypes"
 	"misc/nintasm/interpreter/environment/charmapTable"
 	"misc/nintasm/interpreter/environment/exprmapTable"
+	"misc/nintasm/interpreter/environment/funcTable"
 	"misc/nintasm/interpreter/environment/macroTable"
 	"misc/nintasm/interpreter/environment/namespaceTable"
 	"misc/nintasm/interpreter/environment/symbolAsNodeTable"
@@ -90,6 +91,8 @@ func AddOtherIdentifierToMasterTable(symbolName string, symbolEnum enumSymbolTab
 		charmapTable.AddIdentifierKeyToCharmapTable(symbolName)
 	case enumSymbolTableTypes.ExprMap:
 		exprmapTable.AddIdentifierKeyToExprmapTable(symbolName)
+	case enumSymbolTableTypes.Function:
+		funcTable.AddIdentifierKeyToFunctionTable(symbolName)
 	case enumSymbolTableTypes.KVMacro:
 		macroTable.AddIdentifierKeyToKVMacroTable(symbolName)
 	case enumSymbolTableTypes.Macro:

@@ -482,16 +482,6 @@ func (p *OperandParser) _callExpression(callee string) (Node, error) {
 
 	callExpr := operandFactory.CreateCallExpressionNode(callee, arguments)
 
-	// ⚠️ TODO: I forgot why this was in the original assembler...
-	/* if p.lookaheadType == tokenizerSpec.DELIMITER_leftParenthesis {
-		newCallee := callExpr.NodeValue
-		newExpr, err := p._callExpression(newCallee)
-		if err != nil {
-			return operandFactory.EmptyNode(), err
-		}
-		callExpr = newExpr
-	} */
-
 	return callExpr, nil
 }
 
@@ -524,25 +514,39 @@ func (p *OperandParser) arguments() ([]Node, error) {
 
 func (p *OperandParser) argumentList() ([]Node, error) {
 	argumentList := []Node{}
-	firstArgument, err := p.statement()
+
+	err := p.getArgumentAndAppend(&argumentList)
 	if err != nil {
 		return argumentList, err // ❌ Fails
 	}
-	argumentList = append(argumentList, firstArgument)
 
 	for p.lookaheadType == enumTokenTypes.DELIMITER_comma {
-		err = p.eatAndAdvance(enumTokenTypes.DELIMITER_comma)
+		err = p.eatFreelyAndAdvance(enumTokenTypes.DELIMITER_comma)
 		if err != nil {
 			return argumentList, err // ❌ Fails
 		}
-		nextArgument, err := p.statement()
+		err := p.getArgumentAndAppend(&argumentList)
 		if err != nil {
 			return argumentList, err // ❌ Fails
 		}
-		argumentList = append(argumentList, nextArgument)
 	}
 
 	return argumentList, nil
+}
+
+//+++++++++++++++++++++++++
+
+func (p *OperandParser) getArgumentAndAppend(argumentList *[]Node) error {
+	argumentNode, err := p.statement()
+	if err != nil {
+		err := errorHandler.CheckErrorContinuesUpwardPropagation(err, enumErrorCodes.Error)
+		if err != nil {
+			return err // ❌❌ CONTINUES Failing!
+		}
+	}
+	*argumentList = append(*argumentList, argumentNode)
+	return nil
+
 }
 
 //--------------------------

@@ -11,7 +11,14 @@ type Node = operandFactory.Node
 
 var labalAsBankTable = map[string]int{}
 
-var symbolTable = map[string]Node{
+// ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+type symbolTableType = map[string]Node
+
+// Used when doing function calls
+var symbolTableStack = []symbolTableType{}
+
+var symbolTable = symbolTableType{
 	"CTRLBTN.right":  generateNumericNodeForEnvironment(0x01),
 	"CTRLBTN.left":   generateNumericNodeForEnvironment(0x02),
 	"CTRLBTN.down":   generateNumericNodeForEnvironment(0x04),
@@ -86,6 +93,21 @@ func AddIdentifierKeyToLabelAsBankTable(symbolName string, bankId int) {
 func GetNodeFromSymbolAsNodeTable(symbolName string) (Node, bool) {
 	node, exists := symbolTable[symbolName]
 	return node, exists
+}
+
+// ------------------------------------------
+
+func PushToSymbolTableStack() {
+	symbolTableStack = append(symbolTableStack, symbolTableType{})
+}
+
+func PopFromSymbolTableStack() {
+	symbolTableStack = symbolTableStack[:len(symbolTableStack)-1]
+}
+
+func AddSymbolToTopTableStack(symbolName string, node Node) {
+	topStack := &symbolTableStack[len(symbolTableStack)-1]
+	(*topStack)[symbolName] = node
 }
 
 // +++++++++++++++++++++++++++++++++++++++++
