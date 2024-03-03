@@ -5,6 +5,9 @@ type Def string
 const (
 	None Def = "None"
 
+	Other      = "Other"
+	OtherFatal = "OtherFatal"
+
 	IncludeFileNotExist = "IncludeFileNotExist"
 	FailOpenFile        = "FailOpenFile"
 	FailScanFile        = "FailScanFile"

@@ -6,6 +6,7 @@ import (
 	enumInstructionModes "misc/nintasm/constants/enums/instructionModes"
 	enumTokenTypes "misc/nintasm/constants/enums/tokenTypes"
 	"misc/nintasm/constants/instructionData"
+	"misc/nintasm/interpreter"
 	"misc/nintasm/interpreter/environment/unresolvedTable"
 	"misc/nintasm/interpreter/operandFactory"
 	"misc/nintasm/romBuilder"
@@ -26,19 +27,30 @@ func EvaluateInstruction(instructionName string,
 	var operand Node
 	var err error
 
+	// Special reassign for branches
+	if instructionMode == enumInstructionModes.ABS && checkIfBranchInstruction(instructionName) {
+		instructionMode = enumInstructionModes.REL
+	}
+
 	if len(*operandList) == 1 {
-		operand = (*operandList)[0]
+		unevaluatedNode := (*operandList)[0]
+		if instructionMode == enumInstructionModes.REL {
+			orgToSubtract := romBuilder.GetOrg() - 2 //The -2 accounts for where things start
+			branchNode := operandFactory.ConvertToBranchBinaryExpressionNode(unevaluatedNode, orgToSubtract)
+			unevaluatedNode = branchNode
+		}
+
+		operand, err = interpreter.EvaluateNode(unevaluatedNode)
+		if err != nil {
+			return err
+		}
+
 	} else {
 		operand = operandFactory.EmptyNode()
 	}
 
 	opcodesAndSupportedModes := instructionData.OpcodesAndSupportedModes[instructionName]
 	useInstructionMode, useInstructionZPMode := enumInstructionModes.None, enumInstructionModes.None
-	isBranch := checkIfBranchInstruction(instructionName)
-
-	if instructionMode == enumInstructionModes.ABS && isBranch {
-		instructionMode = enumInstructionModes.REL
-	}
 
 	//If an index is present, see if it's usable with desired mode and reassign mode to it
 	if instructionXYTokenEnum != enumTokenTypes.None {
@@ -73,12 +85,6 @@ func EvaluateInstruction(instructionName string,
 	//Overwrite mode with ZP version if possible
 	if useInstructionZPMode != enumInstructionModes.None {
 		instructionMode = useInstructionZPMode
-	}
-
-	if isBranch && instructionMode == enumInstructionModes.REL {
-		orgToSubtract := romBuilder.GetOrg()
-		branchNode := operandFactory.ConvertToBranchBinaryExpressionNode(operand, orgToSubtract)
-		operand = branchNode
 	}
 
 	//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

@@ -28,6 +28,9 @@ func coloredNumber(s string) string {
 }
 
 var errorTable = map[enumErrorCodes.Def]ErrorTableEntry{
+	enumErrorCodes.Other:      newErrorTableEntry(enumErrorCodes.Error, "%v"),
+	enumErrorCodes.OtherFatal: newErrorTableEntry(enumErrorCodes.Fatal, "🛑 %v"),
+
 	enumErrorCodes.IncludeFileNotExist: newErrorTableEntry(enumErrorCodes.Fatal, "Source file \x1b[92m%v\x1b[0m does not exist!"),
 	enumErrorCodes.FailOpenFile:        newErrorTableEntry(enumErrorCodes.Fatal, "Failed to open source file: %v"),
 	enumErrorCodes.FailScanFile:        newErrorTableEntry(enumErrorCodes.Fatal, "Failed to scan file!\n%v"),

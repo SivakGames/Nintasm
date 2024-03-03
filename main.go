@@ -34,6 +34,7 @@ func main() {
 	err = assemble.Start(baseInputFileName)
 	if err != nil {
 		fmt.Println("\x1b[31mERRORZ HAPPENED\x1b[0m")
+		fmt.Println(err)
 	}
 
 	romBuilder.GenerateRomBinFile()

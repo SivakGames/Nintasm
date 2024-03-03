@@ -200,6 +200,7 @@ func EvaluateNode(node Node) (Node, error) {
 		}
 
 	default:
+		errorHandler.AddNew(enumErrorCodes.Other, "???")
 		errMsg := fmt.Sprintf("🛑 UNKNOWN NODE BEING INTERPRETED!!! %v", node.NodeValue)
 		panic(errMsg)
 	}

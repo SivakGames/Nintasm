@@ -2,6 +2,7 @@ package fileHandler
 
 import (
 	"bufio"
+	"fmt"
 	"io"
 	"misc/nintasm/assemble/errorHandler"
 	"misc/nintasm/assemble/fileStack"
@@ -19,23 +20,26 @@ var TriggerNewStackCall bool = false
 func GetFirstInputFile(inputFileName string) error {
 	var err error
 
-	_, err = os.Stat(inputFileName)
-	if err != nil {
-		if os.IsNotExist(err) {
-			return errorHandler.AddNew(enumErrorCodes.IncludeFileNotExist, inputFileName) // ❌ Fails
-		} else {
-			return err
-		}
+	// Get the directory part of the input file path
+	dir, base := filepath.Dir(inputFileName), filepath.Base(inputFileName)
+
+	// Check if the directory exists
+	_, err = os.Stat(dir)
+	if os.IsNotExist(err) {
+		return errorHandler.AddNew(enumErrorCodes.IncludeFileNotExist, inputFileName) // ❌ Fails
+	} else if err != nil {
+		return errorHandler.AddNew(enumErrorCodes.OtherFatal, err) // ❌ Fails
+
 	}
 
-	cwd, err := os.Getwd()
+	absPath, err := filepath.Abs(dir)
 	if err != nil {
 		return err
 	}
-	absFilePath := filepath.Join(cwd, inputFileName)
-	relativeFileDirectory = filepath.Dir(absFilePath)
 
-	err = OpenInputFileAndPushLinesToStack(absFilePath)
+	relativeFileDirectory = absPath
+
+	err = OpenInputFileAndPushLinesToStack(relativeFileDirectory + "/" + base)
 	if err != nil {
 		return err
 	}
@@ -55,7 +59,9 @@ func AddRelativePathIncludeFileName(inputFileName string) string {
 func OpenInputFileAndPushLinesToStack(inputFileName string) error {
 	file, err := os.Open(inputFileName)
 	if err != nil {
-		return errorHandler.AddNew(enumErrorCodes.FailOpenFile) // ❌ Fails
+		fmt.Println(os.Stat(inputFileName))
+		fmt.Println(err)
+		return errorHandler.AddNew(enumErrorCodes.FailOpenFile, inputFileName) // ❌ Fails
 	}
 	defer file.Close()
 
