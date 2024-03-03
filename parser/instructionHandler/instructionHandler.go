@@ -87,6 +87,8 @@ func EvaluateInstruction(instructionName string,
 	instructionOpcode := opcodesAndSupportedModes.ModeOpcodes[instructionMode]
 	operandNeedsNBytes := instructionData.InstructionModeOperandRequiredBytes[instructionMode]
 
+	//fmt.Println(instructionName, fmt.Sprintf("%x", instructionOpcode))
+
 	//Add the opcode to ROM
 	opcodeByteToInsert := make([]uint8, 1)
 	opcodeByteToInsert[0] = instructionOpcode

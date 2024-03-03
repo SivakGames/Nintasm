@@ -82,14 +82,15 @@ func assignModesAndOpcodes(modeMap *map[string]instructionOpcodesAndSupportedMod
 		baseOpcode := opcodeModeSet.BaseOpcode
 		for _, mode := range *opcodeModeSet.SupportedModes {
 			xyMod := instructionNameAsKey == "LDX" || instructionNameAsKey == "LDY"
-			adj := getAdjustedOpcode(mode, baseOpcode, xyMod)
+			jmpMod := instructionNameAsKey == "JMP" || instructionNameAsKey == "JSR"
+			adj := getAdjustedOpcode(mode, baseOpcode, xyMod, jmpMod)
 			opcodeModeSet.ModeOpcodes[mode] = adj
 		}
 		OpcodesAndSupportedModes[instructionNameAsKey] = opcodeModeSet
 	}
 }
 
-func getAdjustedOpcode(mode instModes, baseOpcode uint8, xyMod bool) uint8 {
+func getAdjustedOpcode(mode instModes, baseOpcode uint8, xyMod bool, jmpMod bool) uint8 {
 	adjustedOpcode := baseOpcode
 	switch mode {
 	case enumInstructionModes.IMPL,
@@ -108,7 +109,9 @@ func getAdjustedOpcode(mode instModes, baseOpcode uint8, xyMod bool) uint8 {
 	case enumInstructionModes.ZP_X, enumInstructionModes.ZP_Y:
 		adjustedOpcode += 0x10
 	case enumInstructionModes.ABS:
-		adjustedOpcode += 0x08
+		if !jmpMod {
+			adjustedOpcode += 0x08
+		}
 	case enumInstructionModes.ABS_X:
 		adjustedOpcode += 0x18
 	case enumInstructionModes.ABS_Y:
