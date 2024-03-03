@@ -38,6 +38,7 @@ func (p *OperandParser) GetOperandList(
 	operandCount := 0
 	p.manuallyEvalOperands = manuallyEvalOperands
 	p.instructionMode = enumInstructionModes.IMPL
+	p.instructionXYIndex = enumTokenTypes.None
 
 	//See if there are any operands at all
 	if p.lookaheadType != enumTokenTypes.None {
@@ -118,7 +119,7 @@ func (p *OperandParser) getOperandAndAppend(operandList *[]Node, captureMasks *[
 
 func (p *OperandParser) instructionPrefix() (Node, error) {
 	p.instructionMode = enumInstructionModes.ABS
-	p.instructionXYIndex = enumTokenTypes.None
+
 	xyIndex := enumTokenTypes.None
 	checkXYfollowup := false
 	var statement Node

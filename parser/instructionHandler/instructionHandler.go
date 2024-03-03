@@ -34,8 +34,9 @@ func EvaluateInstruction(instructionName string,
 
 	opcodesAndSupportedModes := instructionData.OpcodesAndSupportedModes[instructionName]
 	useInstructionMode, useInstructionZPMode := enumInstructionModes.None, enumInstructionModes.None
+	isBranch := checkIfBranchInstruction(instructionName)
 
-	if instructionMode == enumInstructionModes.ABS && checkIfBranchInstruction(instructionName) {
+	if instructionMode == enumInstructionModes.ABS && isBranch {
 		instructionMode = enumInstructionModes.REL
 	}
 
@@ -72,6 +73,12 @@ func EvaluateInstruction(instructionName string,
 	//Overwrite mode with ZP version if possible
 	if useInstructionZPMode != enumInstructionModes.None {
 		instructionMode = useInstructionZPMode
+	}
+
+	if isBranch && instructionMode == enumInstructionModes.REL {
+		orgToSubtract := romBuilder.GetOrg()
+		branchNode := operandFactory.ConvertToBranchBinaryExpressionNode(operand, orgToSubtract)
+		operand = branchNode
 	}
 
 	//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

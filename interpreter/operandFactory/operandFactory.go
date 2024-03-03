@@ -210,6 +210,15 @@ func ConvertNodeToStringLiteral(node *Node) {
 	return
 }
 
+//-----------------------------------
+//Special node for branch instructions
+
+func ConvertToBranchBinaryExpressionNode(originalNode Node, orgToSubtract int) Node {
+	differenceNode := CreateNumericLiteralNode(orgToSubtract)
+	branchNode := CreateBinaryExpressionNode(enumTokenTypes.OPERATOR_additive, "-", differenceNode, originalNode)
+	return branchNode
+}
+
 //-----------------------------------Primitives
 
 func ValidateNodeIsEmpty(node *Node) bool {

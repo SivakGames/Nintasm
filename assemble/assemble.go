@@ -6,6 +6,7 @@ import (
 	"misc/nintasm/assemble/fileStack"
 	enumParserTypes "misc/nintasm/constants/enums/parserTypes"
 	"misc/nintasm/interpreter"
+	"misc/nintasm/interpreter/environment/predefSymbols"
 	"misc/nintasm/interpreter/environment/unresolvedTable"
 	"misc/nintasm/parser"
 	"misc/nintasm/util"
@@ -19,6 +20,8 @@ var macroOperandParser = parser.NewMacroOperandParser()
 // Main process starts - open input primary input file
 func Start(initialInputFile string) error {
 	var err error
+
+	predefSymbols.AddPregensToMacroTable()
 
 	err = fileHandler.GetFirstInputFile(initialInputFile)
 	if err != nil {

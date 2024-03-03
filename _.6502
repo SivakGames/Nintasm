@@ -20,7 +20,38 @@
 
 ;-----------------------------------------
 RESET:
-	__resetCode__
+	SEI
+	CLD
+	LDX #$ff
+	TXS
+	INX
+	STX $2000
+	STX $2001
+	STX $4010
+	STX $2003
+	LDA #$40
+	STA $4017
+	LDA #$0f
+	STA $4015
+.vbwait1:
+	BIT $2002
+	BPL .vbwait1
+.clearMemory:
+	LDA #$00
+	STA $00, X
+	STA $0100, X
+	STA $0300, X
+	STA $0400, X
+	STA $0500, X
+	STA $0600, X
+	STA $0700, X
+	LDA #$f8
+	STA $0200, X
+	INX
+	BNE .clearMemory
+.vbwait2:
+	BIT $2002
+	BPL .vbwait2
 
 
 RESET_end:
@@ -28,7 +59,12 @@ RESET_end:
 	LDA #(PPUCTRL.enableNMI | PPUCTRL.spritePatternTable)
 	STA PPUCTRL
 
-	__setPPU__ PPUADDR.palBg0
+	LDA #$3F
+	STA $2006
+	LDA #$00
+	STA $2006
+
+;	__setPPU__ PPUADDR.palBg0
 
 	;Let the whole screen be PINK!
 	LDA #$25

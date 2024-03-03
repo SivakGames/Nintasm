@@ -71,7 +71,6 @@ func init() {
 		name := fmt.Sprintf("PPUADDR.palBg%d", i)
 		generateKeys(name, start, end, 0x04)
 	}
-
 }
 
 // -----------------------------------------

@@ -202,3 +202,27 @@ func ClearINES() {
 	INESHeader.hasSetMirroring = false
 	INESHeader.hasSetMapper = false
 }
+
+//=================================================
+
+func GenerateINESHeader() []uint8 {
+	iNESHeader := make([]uint8, 16)
+	iNESHeader[0] = 'N'
+	iNESHeader[1] = 'E'
+	iNESHeader[2] = 'S'
+	iNESHeader[3] = 0x1a
+
+	mirrorFlag := GetInesMirroring()
+	batteryFlag := 0 //TODO
+	mapperHighNibble := GetInesMap() & 0x00f0
+	mapperLowNibble := GetInesMap() & 0x000f
+
+	flags6 := (mapperLowNibble << 4) | mirrorFlag | batteryFlag
+	flags7 := (mapperHighNibble)
+
+	iNESHeader[4] = uint8(GetInesPrgHeaderValue())
+	iNESHeader[5] = uint8(GetInesChrHeaderValue())
+	iNESHeader[6] = uint8(flags6)
+	iNESHeader[7] = uint8(flags7)
+	return iNESHeader
+}
