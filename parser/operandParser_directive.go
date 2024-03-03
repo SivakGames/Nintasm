@@ -37,6 +37,7 @@ var directiveManuallyEvaluatesOperands = map[string]bool{
 	"IKV":        true,
 	"SETCHARMAP": true,
 	"SETEXPRMAP": true,
+	"FUNC":       true,
 }
 
 var directiveEvaluatesLikeMacroOperands = map[string][]string{

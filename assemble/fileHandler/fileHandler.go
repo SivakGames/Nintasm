@@ -26,9 +26,9 @@ func GetFirstInputFile(inputFileName string) error {
 	// Check if the directory exists
 	_, err = os.Stat(dir)
 	if os.IsNotExist(err) {
-		return errorHandler.AddNew(enumErrorCodes.IncludeFileNotExist, inputFileName) // ❌ Fails
+		return errorHandler.AddNew(enumErrorCodes.IncludeFileNotExist, inputFileName) //❌☠️ FATAL ERROR
 	} else if err != nil {
-		return errorHandler.AddNew(enumErrorCodes.OtherFatal, err) // ❌ Fails
+		return errorHandler.AddNew(enumErrorCodes.OtherFatal, err) //❌☠️ FATAL ERROR
 
 	}
 
