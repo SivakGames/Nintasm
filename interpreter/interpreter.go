@@ -52,14 +52,14 @@ func EvaluateNode(node Node) (Node, error) {
 			return node, err
 		}
 
-		exprValue, exists := exprmapTable.CheckIfDefinedInExprmap(node.NodeValue)
-		if !exists {
-			return node, errorHandler.AddNew(enumErrorCodes.ToExprMapUndefExpr, node.NodeValue)
+	case enumNodeTypes.SubstitutionID:
+		fmt.Println("HM? 2")
+		substitutionNode, err := environment.LookupSubstitutionIDfromStack(node.NodeValue)
+		if err != nil {
+			return substitutionNode, err
 		}
-
-		node.AsNumber = exprValue
-		operandFactory.ConvertNodeToNumericLiteral(&node)
-		return node, nil
+		fmt.Println("HM? 1", substitutionNode)
+		return EvaluateNode(substitutionNode)
 
 	case enumNodeTypes.AssignLabelExpression,
 		enumNodeTypes.AssignmentExpression:
@@ -206,12 +206,11 @@ func EvaluateNode(node Node) (Node, error) {
 		}
 		symbolAsNodeTable.PushToSymbolTableStack()
 		for i, n := range *node.ArgumentList {
-			fmt.Println(i, n)
+			symbolAsNodeTable.AddSymbolToTopTableStack(fmt.Sprintf("\\%d", i+1), n)
 		}
+		evaluatedFuncNode, err := EvaluateNode(*functionNode)
 		symbolAsNodeTable.PopFromSymbolTableStack()
-
-		fmt.Println("HIER1", functionNode)
-		fmt.Println("HIER2", node.ArgumentList)
+		return evaluatedFuncNode, err
 
 	default:
 		errorHandler.AddNew(enumErrorCodes.Other, "???")

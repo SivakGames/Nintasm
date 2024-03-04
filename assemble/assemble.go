@@ -1,6 +1,7 @@
 package assemble
 
 import (
+	"fmt"
 	"misc/nintasm/assemble/blockStack"
 	"misc/nintasm/assemble/fileHandler"
 	"misc/nintasm/assemble/fileStack"
@@ -23,6 +24,8 @@ func Start(initialInputFile string) error {
 
 	predefSymbols.AddPregensToMacroTable()
 
+	fmt.Println("=========Pass 1=========")
+
 	err = fileHandler.GetFirstInputFile(initialInputFile)
 	if err != nil {
 		return err
@@ -31,6 +34,8 @@ func Start(initialInputFile string) error {
 	if err != nil {
 		return err
 	}
+
+	fmt.Println("=========Pass 2=========")
 
 	err = unresolvedTable.ResolvedUnresolvedSymbols()
 	if err != nil {

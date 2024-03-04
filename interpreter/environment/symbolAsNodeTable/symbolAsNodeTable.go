@@ -2,6 +2,8 @@ package symbolAsNodeTable
 
 import (
 	"fmt"
+	"misc/nintasm/assemble/errorHandler"
+	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
 	"misc/nintasm/interpreter/operandFactory"
 )
 
@@ -105,9 +107,30 @@ func PopFromSymbolTableStack() {
 	symbolTableStack = symbolTableStack[:len(symbolTableStack)-1]
 }
 
+func CheckTopOfSymbolTableStack() *symbolTableType {
+	if len(symbolTableStack) > 0 {
+		return &symbolTableStack[len(symbolTableStack)-1]
+	}
+	return nil
+}
+
 func AddSymbolToTopTableStack(symbolName string, node Node) {
-	topStack := &symbolTableStack[len(symbolTableStack)-1]
-	(*topStack)[symbolName] = node
+	topStack := CheckTopOfSymbolTableStack()
+	if topStack != nil {
+		(*topStack)[symbolName] = node
+		return
+	}
+	errorHandler.AddNew(enumErrorCodes.Other, "Function stack is empty!")
+	return
+}
+
+func LookupTopOfSymbolTableStack(symbolName string) (Node, bool) {
+	topStack := CheckTopOfSymbolTableStack()
+	if topStack != nil {
+		node, exists := (*topStack)[symbolName]
+		return node, exists
+	}
+	return operandFactory.ErrorNode(symbolName), false
 }
 
 // +++++++++++++++++++++++++++++++++++++++++
