@@ -13,21 +13,21 @@ const LINE_OPERATION_TARGET_TOKENIZER = "startLine"
 // Used to determine the operation at the start of the line
 type OperationParser struct {
 	Parser
-	operationLabel       string
-	operationTokenEnum   tokenEnum
-	operationTokenValue  string
-	parentParserEnum     enumParserTypes.Def
-	operandStartPosition int
+	operationLabel               string
+	operationTokenEnum           tokenEnum
+	operationTokenValue          string
+	parentParserEnum             enumParserTypes.Def
+	operandWillStartFromPosition int
 }
 
 // Create helper
 func NewOperationParser() OperationParser {
 	return OperationParser{
-		operationLabel:       "",
-		operationTokenEnum:   enumTokenTypes.None,
-		operationTokenValue:  "",
-		parentParserEnum:     enumParserTypes.None,
-		operandStartPosition: 0,
+		operationLabel:               "",
+		operationTokenEnum:           enumTokenTypes.None,
+		operationTokenValue:          "",
+		parentParserEnum:             enumParserTypes.None,
+		operandWillStartFromPosition: 0,
 	}
 }
 
@@ -37,7 +37,7 @@ func (p *OperationParser) Process(line string) (err error) {
 	p.operationTokenEnum = enumTokenTypes.None
 	p.operationTokenValue = ""
 	p.parentParserEnum = enumParserTypes.None
-	p.operandStartPosition = 0
+	p.operandWillStartFromPosition = 0
 
 	// Get tokenizer to start
 	err = p.startAndAdvanceToNext(line, LINE_OPERATION_TARGET_TOKENIZER)
@@ -50,7 +50,7 @@ func (p *OperationParser) Process(line string) (err error) {
 	}
 
 	// 🟢 Parsing has succeeded, so get the operand start position too
-	p.operandStartPosition = p.tokenizer.GetCursor()
+	p.operandWillStartFromPosition = p.tokenizer.GetCursor()
 
 	return nil
 }
@@ -59,7 +59,7 @@ func (p *OperationParser) Process(line string) (err error) {
 
 func (p *OperationParser) GetLineOperationValues() util.LineOperationParsedValues {
 	return util.NewLineOperationParsedValues(
-		p.operandStartPosition,
+		p.operandWillStartFromPosition,
 		p.operationLabel,
 		p.operationTokenEnum,
 		p.operationTokenValue,

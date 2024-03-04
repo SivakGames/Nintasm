@@ -15,6 +15,7 @@ type tokenEnum = enumTokenTypes.Def
 type NodeStruct struct {
 	NodeType      nodeEnum
 	Resolved      bool
+	CanReevaluate bool
 	NodeTokenType tokenEnum
 	NodeValue     string
 	AsBool        bool

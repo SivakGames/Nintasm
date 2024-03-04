@@ -38,6 +38,9 @@ func EvaluateNode(node Node) (Node, error) {
 		enumNodeTypes.StringLiteral:
 		return node, nil
 
+	case enumNodeTypes.Error:
+		return node, nil
+
 	case enumNodeTypes.Identifier,
 		enumNodeTypes.MemberExpression:
 		resolvedNode, resolved, err := environment.LookupIdentifierInSymbolAsNodeTable(node.NodeValue)
@@ -53,12 +56,10 @@ func EvaluateNode(node Node) (Node, error) {
 		}
 
 	case enumNodeTypes.SubstitutionID:
-		fmt.Println("HM? 2")
 		substitutionNode, err := environment.LookupSubstitutionIDfromStack(node.NodeValue)
 		if err != nil {
 			return substitutionNode, err
 		}
-		fmt.Println("HM? 1", substitutionNode)
 		return EvaluateNode(substitutionNode)
 
 	case enumNodeTypes.AssignLabelExpression,
@@ -107,7 +108,10 @@ func EvaluateNode(node Node) (Node, error) {
 		}
 
 		if left.NodeType != right.NodeType {
-			return node, errorHandler.AddNew(enumErrorCodes.InterpreterBinaryMismatchedTypes, left.NodeValue, operation, right.NodeValue)
+			badLeftValue := node.Left.NodeValue
+			badRightValue := node.Right.NodeValue
+			operandFactory.ConvertNodeToNumericLiteral(&node)
+			return node, errorHandler.AddNew(enumErrorCodes.InterpreterBinaryMismatchedTypes, badLeftValue, operation, badRightValue)
 		}
 
 		node.Left = nil
@@ -200,6 +204,8 @@ func EvaluateNode(node Node) (Node, error) {
 		if wasAsmFunc {
 			return node, nil
 		}
+
+		// Not ASM function, look for user-def function
 		functionNode, err := funcTable.LookupAndGetFunctionInEnvironment(node.NodeValue)
 		if err != nil {
 			return node, err
@@ -210,6 +216,9 @@ func EvaluateNode(node Node) (Node, error) {
 		}
 		evaluatedFuncNode, err := EvaluateNode(*functionNode)
 		symbolAsNodeTable.PopFromSymbolTableStack()
+		if err != nil {
+			return node, err
+		}
 		return evaluatedFuncNode, err
 
 	default:

@@ -42,6 +42,7 @@ var errorTable = map[enumErrorCodes.Def]ErrorTableEntry{
 	enumErrorCodes.TokenizerUnknownIllegalToken: newErrorTableEntry(enumErrorCodes.Error, "Unknown/Illegal token: %v"),
 
 	enumErrorCodes.ParserEndOfInput:      newErrorTableEntry(enumErrorCodes.Error, "Parsing error - Unexpected end of input!"),
+	enumErrorCodes.OperandStatementEmpty: newErrorTableEntry(enumErrorCodes.Error, "Parsing error - Operand is missing!"),
 	enumErrorCodes.ParserUnexpectedToken: newErrorTableEntry(enumErrorCodes.Error, fmt.Sprintf("Parsing error - Unexpected token: %v", coloredSymbol("%v"))),
 
 	enumErrorCodes.OperationUNKNOWN:                 newErrorTableEntry(enumErrorCodes.Error, "UNKNOWN OPERATION"),

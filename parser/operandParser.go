@@ -16,7 +16,8 @@ type Node = operandFactory.Node
 // General type for other operand parsers to borrow from
 type OperandParser struct {
 	operandListStringStartPosition int
-	operandStartPosition           int
+	currentOperandStartPosition    int
+	currentOperandEndPosition      int
 	instructionMode                instModeEnum
 	instructionXYIndex             tokenEnum
 	manuallyEvalOperands           bool
@@ -33,6 +34,9 @@ type OperandParser struct {
 func (p *OperandParser) GetOperandList(
 	minOperands int, maxOperands int,
 	manuallyEvalOperands bool, captureMasks []string) ([]Node, error) {
+
+	p.currentOperandStartPosition = p.operandListStringStartPosition
+	p.currentOperandEndPosition = p.operandListStringStartPosition
 
 	operandList := []Node{}
 	operandCount := 0
@@ -106,10 +110,26 @@ func (p *OperandParser) getOperandAndAppend(operandList *[]Node, captureMasks *[
 		}
 	}
 
-	if !operandFactory.ValidateNodeIsEmpty(&operand) {
-		*operandList = append(*operandList, operand)
+	if p.lookaheadType == enumTokenTypes.DELIMITER_comma ||
+		p.lookaheadType == enumTokenTypes.None {
+		if !operandFactory.ValidateNodeIsEmpty(&operand) {
+			*operandList = append(*operandList, operand)
+		}
+		return nil
 	}
 
+	for p.lookaheadType != enumTokenTypes.DELIMITER_comma && p.lookaheadType != enumTokenTypes.None {
+		_, err := p.statement()
+		if err != nil {
+			err = p.eatFreelyAndAdvance(p.lookaheadType)
+			if err != nil {
+				*operandList = append(*operandList, operandFactory.EmptyNode())
+				return nil
+			}
+		}
+	}
+
+	*operandList = append(*operandList, operandFactory.EmptyNode())
 	return nil
 }
 
@@ -134,7 +154,7 @@ func (p *OperandParser) instructionPrefix() (Node, error) {
 		p.instructionMode = enumInstructionModes.IND
 		err = p.eatFreelyAndAdvance(enumTokenTypes.DELIMITER_leftSquareBracket)
 		if err != nil {
-			return operandFactory.ErrorNode(p.lookaheadValue), err // ❌ Fails
+			return p.badEat(err) // ❌ Fails
 		}
 		statement, err = p.statement()
 		if err != nil {
@@ -176,7 +196,7 @@ func (p *OperandParser) instructionPrefix() (Node, error) {
 		p.instructionMode = enumInstructionModes.IMM
 		err = p.eatFreelyAndAdvance(enumTokenTypes.DELIMITER_hash)
 		if err != nil {
-			return operandFactory.ErrorNode(p.lookaheadValue), err // ❌ Fails
+			return p.badEat(err) // ❌ Fails
 		}
 		statement, err = p.statement()
 		if err != nil {
@@ -192,7 +212,7 @@ func (p *OperandParser) instructionPrefix() (Node, error) {
 			p.instructionMode = enumInstructionModes.ZP
 			err = p.eatFreelyAndAdvance(enumTokenTypes.OPERATOR_relational)
 			if err != nil {
-				return operandFactory.ErrorNode(p.lookaheadValue), err // ❌ Fails
+				return p.badEat(err) // ❌ Fails
 			}
 		}
 		statement, err = p.statement()
@@ -208,7 +228,7 @@ func (p *OperandParser) instructionPrefix() (Node, error) {
 		p.instructionMode = enumInstructionModes.A
 		err = p.eatFreelyAndAdvance(enumTokenTypes.REGISTER_A)
 		if err != nil {
-			return operandFactory.ErrorNode(p.lookaheadValue), err // ❌ Fails
+			return p.badEat(err) // ❌ Fails
 		}
 		if p.lookaheadType != enumTokenTypes.None {
 			return operandFactory.ErrorNode(p.lookaheadValue),
@@ -286,7 +306,7 @@ func (p *OperandParser) macroReplaceStatement() (Node, error) {
 			if len(closingTokenEnum) > 0 {
 				err := p.eatFreelyAndAdvance(topOfStackEnum)
 				if err != nil {
-					return operandFactory.ErrorNode(p.lookaheadValue), err // ❌ Fails
+					return p.badEat(err) // ❌ Fails
 				}
 			}
 
@@ -297,7 +317,7 @@ func (p *OperandParser) macroReplaceStatement() (Node, error) {
 			}
 			err := p.eatFreelyAndAdvance(enumTokenTypes.DELIMITER_leftCurlyBrace)
 			if err != nil {
-				return operandFactory.ErrorNode(p.lookaheadValue), err // ❌ Fails
+				return p.badEat(err) // ❌ Fails
 			}
 			closingTokenEnum = append(closingTokenEnum, enumTokenTypes.DELIMITER_rightCurlyBrace)
 
@@ -305,7 +325,7 @@ func (p *OperandParser) macroReplaceStatement() (Node, error) {
 			replacement += p.lookaheadValue
 			err := p.eatFreelyAndAdvance(p.lookaheadType)
 			if err != nil {
-				return operandFactory.ErrorNode(p.lookaheadValue), err // ❌ Fails
+				return p.badEat(err) // ❌ Fails
 			}
 		}
 	}
@@ -321,8 +341,17 @@ func (p *OperandParser) macroReplaceStatement() (Node, error) {
 
 func (p *OperandParser) statement() (Node, error) {
 	if p.lookaheadType == enumTokenTypes.None {
-		return operandFactory.EmptyNode(), nil
+		p.addErrorHighlighterWithOffset(1)
+		return operandFactory.EmptyNode(), errorHandler.AddNew(enumErrorCodes.OperandStatementEmpty)
+	} else if p.lookaheadType == enumTokenTypes.DELIMITER_comma {
+		p.addErrorHighlighterWithOffset(-1)
+		err := p.eatFreelyAndAdvance(enumTokenTypes.DELIMITER_comma)
+		if err != nil {
+			return p.badEat(err) // ❌ Fails
+		}
+		return operandFactory.EmptyNode(), errorHandler.AddNew(enumErrorCodes.OperandStatementEmpty)
 	}
+
 	statement, err := p.bitwiseOrExpression()
 	if err != nil {
 		return statement, err
@@ -412,7 +441,7 @@ func (p *OperandParser) unaryExpression() (Node, error) {
 			unaryValue := p.lookaheadValue
 			err := p.eatFreelyAndAdvance(p.lookaheadType)
 			if err != nil {
-				return operandFactory.ErrorNode(p.lookaheadValue), err // ❌ Fails
+				return p.badEat(err) // ❌ Fails
 			}
 			argument, err := p.unaryExpression()
 			if err != nil {
@@ -460,18 +489,17 @@ func (p *OperandParser) _callExpression(callee string) (Node, error) {
 	if callee == "bank" {
 		err = p.eatFreelyAndAdvance(enumTokenTypes.DELIMITER_leftParenthesis)
 		if err != nil {
-			return operandFactory.ErrorNode(p.lookaheadValue), err // ❌ Fails
+			return p.badEat(err) // ❌ Fails
 		}
 		bankArgument := operandFactory.CreateIdentifierNode(p.lookaheadValue)
 		err = p.eatAndAdvance(enumTokenTypes.IDENTIFIER)
 		if err != nil {
-			return operandFactory.ErrorNode(p.lookaheadValue), err // ❌ Fails
+			return p.badEat(err) // ❌ Fails
 		}
 		err = p.eatAndAdvance(enumTokenTypes.DELIMITER_rightParenthesis)
 		if err != nil {
-			return operandFactory.ErrorNode(p.lookaheadValue), err // ❌ Fails
+			return p.badEat(err) // ❌ Fails
 		}
-
 		return operandFactory.CreateCallExpressionNode(callee, []Node{bankArgument}), nil
 	}
 
@@ -558,7 +586,7 @@ func (p *OperandParser) memberExpression() (Node, error) {
 
 	result, err := p.primaryExpression()
 	if err != nil {
-		return operandFactory.ErrorNode(p.lookaheadValue), err // ❌ Fails
+		return result, err // ❌ Fails
 	}
 
 	//If nothing else, just exit
@@ -567,11 +595,13 @@ func (p *OperandParser) memberExpression() (Node, error) {
 	}
 
 	if p._isLiteral(p.lookaheadType) {
+		p.addErrorHighlighter()
 		return operandFactory.ErrorNode(p.lookaheadValue),
 			errorHandler.AddNew(enumErrorCodes.OperandMisplacedLiteral, p.lookaheadValue) // ❌ Fails
 	}
 
 	if p.lookaheadType == enumTokenTypes.IDENTIFIER {
+		p.addErrorHighlighter()
 		return operandFactory.ErrorNode(p.lookaheadValue),
 			errorHandler.AddNew(enumErrorCodes.OperandMisplacedIdentifier, p.lookaheadValue) // ❌ Fails
 	}
@@ -580,7 +610,7 @@ func (p *OperandParser) memberExpression() (Node, error) {
 	if p.lookaheadType == enumTokenTypes.DELIMITER_period {
 		err = p.eatFreelyAndAdvance(enumTokenTypes.DELIMITER_period)
 		if err != nil {
-			return operandFactory.ErrorNode(p.lookaheadValue), err // ❌ Fails
+			return p.badEat(err) // ❌ Fails
 		}
 		if p.lookaheadType != enumTokenTypes.IDENTIFIER {
 			if p.tokenizer.IsTokenIdentifierLike(p.lookaheadValue) {
@@ -623,7 +653,7 @@ func (p *OperandParser) primaryExpression() (Node, error) {
 		}
 		err = p.eatFreelyAndAdvance(enumTokenTypes.DELIMITER_period)
 		if err != nil {
-			return operandFactory.ErrorNode(p.lookaheadValue), err // ❌ Fails
+			return p.badEat(err) // ❌ Fails
 		}
 		if p.lookaheadType == enumTokenTypes.IDENTIFIER {
 			p.lookaheadValue = parentLabel + "." + p.lookaheadValue
@@ -657,7 +687,7 @@ func (p *OperandParser) _logicalExpression(builderName func() (Node, error), ope
 		logicalExpressionValue := p.lookaheadValue
 		err = p.eatFreelyAndAdvance(operatorToken)
 		if err != nil {
-			return operandFactory.ErrorNode(p.lookaheadValue), err // ❌ Fails
+			return p.badEat(err) // ❌ Fails
 		}
 		right, err = builderName()
 		if err != nil {
@@ -690,7 +720,7 @@ func (p *OperandParser) _isLiteral(tokenType tokenEnum) bool {
 func (p *OperandParser) parenthesizedExpression() (Node, error) {
 	err := p.eatFreelyAndAdvance(enumTokenTypes.DELIMITER_leftParenthesis)
 	if err != nil {
-		return operandFactory.ErrorNode(p.lookaheadValue), err // ❌ Fails
+		return p.badEat(err) // ❌ Fails
 	}
 
 	expression, err := p.statement()
@@ -700,7 +730,7 @@ func (p *OperandParser) parenthesizedExpression() (Node, error) {
 
 	err = p.eatAndAdvance(enumTokenTypes.DELIMITER_rightParenthesis)
 	if err != nil {
-		return operandFactory.ErrorNode(p.lookaheadValue), err // ❌ Fails
+		return p.badEat(err) // ❌ Fails
 	}
 
 	return expression, nil
@@ -713,7 +743,7 @@ func (p *OperandParser) literal() (Node, error) {
 
 	err := p.eatFreelyAndAdvance(p.lookaheadType)
 	if err != nil {
-		return operandFactory.EmptyNode(), err
+		return p.badEat(err) // ❌ Fails
 	}
 
 	switch literalType {
@@ -746,8 +776,24 @@ func (p *OperandParser) identifier() (Node, error) {
 	literalValue := p.lookaheadValue
 	err := p.eatFreelyAndAdvance(enumTokenTypes.IDENTIFIER)
 	if err != nil {
-		return operandFactory.ErrorNode(p.lookaheadValue), err // ❌ Fails
+		return p.badEat(err) // ❌ Fails
 	}
 
 	return operandFactory.CreateIdentifierNode(literalValue), nil
+}
+
+// xxxxxxxxxxxxxxxxxxx
+
+func (p *OperandParser) addErrorHighlighter() {
+	p.addErrorHighlighterWithOffset(0)
+}
+
+func (p *OperandParser) addErrorHighlighterWithOffset(offset int) {
+	errorHandler.AddHighlights(p.tokenizer.GetPrevCursor()+offset, p.tokenizer.GetCursor()+offset)
+}
+
+// xxxxxxxxxxxxxxxxxxx
+
+func (p *OperandParser) badEat(err error) (Node, error) {
+	return operandFactory.ErrorNode(p.lookaheadValue), err
 }

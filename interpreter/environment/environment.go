@@ -1,7 +1,6 @@
 package environment
 
 import (
-	"fmt"
 	"misc/nintasm/assemble/errorHandler"
 	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
 	enumSymbolTableTypes "misc/nintasm/constants/enums/symbolTableTypes"
@@ -73,10 +72,8 @@ func LookupIdentifierInSymbolAsNodeTable(symbolName string) (Node, bool, error) 
 func LookupSubstitutionIDfromStack(symbolName string) (Node, error) {
 	node, exists := symbolAsNodeTable.LookupTopOfSymbolTableStack(symbolName)
 	if !exists {
-		fmt.Println("HM?")
 		return node, errorHandler.AddNew(enumErrorCodes.InterpreterSymbolNotFound, symbolName)
 	}
-	fmt.Println("HM!!")
 	return node, nil
 }
 

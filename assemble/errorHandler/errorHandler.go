@@ -12,6 +12,10 @@ import (
 
 // ++++++++++++++++++++++++++++++++++++++++
 
+const ERROR_CAPTION_MIN_WIDTH = 7
+
+// ++++++++++++++++++++++++++++++++++++++++
+
 type ErrorEntry struct {
 	code        enumErrorCodes.Def
 	lineNumber  uint
@@ -33,6 +37,8 @@ var noFileDefaults = resolveSymbolData{
 	lineNumber:  0,
 	lineContent: "",
 }
+var highlightStart int = -1
+var highlightEnd int = -1
 
 func NewErrorEntry(code enumErrorCodes.Def, message string, severity enumErrorCodes.Severity) ErrorEntry {
 	fileData := fileStack.GetTopOfFileStack()
@@ -57,6 +63,8 @@ func NewErrorEntry(code enumErrorCodes.Def, message string, severity enumErrorCo
 	}
 }
 
+// ------------------------------------------------
+
 // If severity is <= threshold it should STOP propagating up
 func CheckErrorContinuesUpwardPropagation(err error, threshold enumErrorCodes.Severity) error {
 	severityValue := err.Error()
@@ -74,33 +82,43 @@ func CheckErrorContinuesUpwardPropagation(err error, threshold enumErrorCodes.Se
 	return err
 }
 
-/*
+// xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
-░ >> D:\Emulate\NES\Disassemblies\Lolo 3\prg\fixed.6502
-▓   2711   .include "prg/music-engine/dpcm-samples.6502a"
-▓  FATAL ERROR  Source  .INCLUDE  file prg/music-engine/dpcm-samples.6502a does not exist!!!
+func AddHighlights(start int, end int) {
+	highlightStart = start
+	highlightEnd = end
+}
 
- >>> Assembly WILL NOT continue due to fatal errors! <<<
-Assembly could not be completed due to errors!
-Total Error Count: 1 / Total Warning Count: 0
-
-*/
+func Resetighlights() {
+	highlightEnd = -1
+}
 
 // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
 func AddNew(errorTableKey enumErrorCodes.Def, args ...interface{}) error {
+	defer Resetighlights()
+
 	errData, tableKeyExists := errorTable[errorTableKey]
 	if tableKeyExists {
 		errMsg := fmt.Sprintf(errData.description, args...)
 		entry := NewErrorEntry(errorTableKey, errMsg, errData.severity)
 
+		//File name (if any)
 		colorizedFileName := util.Colorize(fmt.Sprintf(" >> %v ", entry.fileName), "red", true)
 		fmt.Println("░", colorizedFileName)
 
 		//Line number and content
-		colorizedLineNumber := util.Colorize(util.PadStringLeft(fmt.Sprintf(" %d ", entry.lineNumber), 7, ' '), "blue", true)
+		colorizedLineNumber := util.Colorize(util.PadStringLeft(fmt.Sprintf(" %d ", entry.lineNumber), ERROR_CAPTION_MIN_WIDTH, ' '), "blue", true)
 		fmt.Println("▓", colorizedLineNumber, entry.lineContent)
 
+		if highlightEnd > highlightStart {
+			marginSpacer := util.Colorize(util.PadStringLeft("", ERROR_CAPTION_MIN_WIDTH+2, '░'), "cyan", false)
+			leadingSpace := util.PadStringLeft("", highlightStart, ' ')
+			arrows := util.Colorize(util.PadStringLeft("", highlightEnd-highlightStart, '~'), "lightred", false)
+			fmt.Println(marginSpacer, fmt.Sprintf("%v%v", leadingSpace, arrows))
+		}
+
+		//Severity and description
 		severityDescription, severityColor := "", ""
 
 		switch entry.severity {

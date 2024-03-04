@@ -71,13 +71,12 @@ func (t *Tokenizer) GetNextToken() (hasMore bool, tokenType tokenEnum, tokenValu
 
 }
 
-func (t *Tokenizer) GoBackToPrev() {
-	t.cursor = t.prevCursor
-	t.prevCursor = -1
-}
-
 func (t *Tokenizer) GetCursor() int {
 	return t.cursor
+}
+
+func (t *Tokenizer) GetPrevCursor() int {
+	return t.prevCursor
 }
 
 // Used for local labels. If a token is LIKE an identifier

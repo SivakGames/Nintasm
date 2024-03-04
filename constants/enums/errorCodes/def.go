@@ -19,6 +19,7 @@ const (
 	TokenizerUnknownIllegalToken = "TokenizerUnknownIllegalToken"
 
 	ParserEndOfInput      = "ParserEndOfInput"
+	OperandStatementEmpty = "OperandStatementEmpty"
 	ParserUnexpectedToken = "ParserUnexpectedToken"
 
 	OperationBadTokenAfter           = "OperationBadTokenAfter"
@@ -134,7 +135,7 @@ const (
 	Warning Severity = iota
 	// Will try re-resolving after main pass is done
 	UnresolvedIdentifier
-	// General error. Will not stop build, but will fail after pass is done
+	// General error. Will not stop build, but will fail and not be re-evaluated
 	Error
 	// Stop building entirely
 	Fatal
