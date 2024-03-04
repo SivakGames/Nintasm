@@ -54,6 +54,13 @@ func EvaluateNode(node Node) (Node, error) {
 		if err != nil {
 			return node, err
 		}
+		exprAsNum, exprExists := exprmapTable.CheckIfDefinedInExprmap(node.NodeValue)
+		if !exprExists {
+			return node, errorHandler.AddNew(enumErrorCodes.Other, "BABSB")
+		}
+		node.AsNumber = exprAsNum
+		operandFactory.ConvertNodeToNumericLiteral(&node)
+		return node, nil
 
 	case enumNodeTypes.SubstitutionID:
 		substitutionNode, err := environment.LookupSubstitutionIDfromStack(node.NodeValue)
@@ -243,7 +250,12 @@ func ProcessAssemblerFunction(node *Node) (bool, error) {
 		}
 
 		for i, a := range *node.ArgumentList {
-			if a.NodeType != functionData.argMustResolveTo[i] {
+			evaluatedFuncNode, err := EvaluateNode(a)
+			if err != nil {
+				return isAsmFunc, err
+			}
+
+			if evaluatedFuncNode.NodeType != functionData.argMustResolveTo[i] {
 				return isAsmFunc, errorHandler.AddNew(enumErrorCodes.InterpreterFuncArgWrongType)
 			}
 		}

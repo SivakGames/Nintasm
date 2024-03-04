@@ -82,14 +82,14 @@ func MapStringToCharmap(stringToConvert string) (string, error) {
 // ----------------------------------
 
 func checkIfDefinedInCharmap(lookupChar rune) ([]Node, bool) {
-	target, exists := charmapSymbolTable[currentCharmapName][lookupChar]
+	target, exists := charmapSymbolTable[lastAddedCharmapName][lookupChar]
 	return target, exists
 }
 
 func CheckIfCharAlreadyExistsInCharmap(lookupChar rune) ([]Node, error) {
 	target, exists := checkIfDefinedInCharmap(lookupChar)
 	if exists {
-		return target, errorHandler.AddNew(enumErrorCodes.CharMapDuplicateKey, lookupChar) // ❌ Fails
+		return target, errorHandler.AddNew(enumErrorCodes.CharMapDuplicateKey, lookupChar, lastAddedCharmapName) // ❌ Fails
 	}
 	return target, nil
 }

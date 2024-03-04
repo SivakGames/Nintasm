@@ -36,11 +36,18 @@ func TestCharmaps(t *testing.T) {
 		moduleLines = append(moduleLines, "testCharmap .endcharmap")
 
 		moduleLines = append(moduleLines, "testCharmap2 .charmap")
+		moduleLines = append(moduleLines, " .defchar \"A\", $10")
 		moduleLines = append(moduleLines, " .defchar \"D\", $10")
 		moduleLines = append(moduleLines, " .defchar \"E\", $11")
 		moduleLines = append(moduleLines, " .defchar \"F\", $12")
 		moduleLines = append(moduleLines, " .defchar \"G\", $13")
 		moduleLines = append(moduleLines, "testCharmap2 .endcharmap")
+
+		moduleLines = append(moduleLines, "testCharmap3 .charmap")
+		moduleLines = append(moduleLines, " .defchar \"A\", $41")
+		moduleLines = append(moduleLines, " .defchar \"B\", $42")
+		moduleLines = append(moduleLines, " .defchar \"C\", $43")
+		moduleLines = append(moduleLines, "testCharmap3 .endcharmap")
 
 		moduleLines = append(moduleLines, " .db toCharmap(\"ABCÄÔ┏┓┗┛あいガギ邪鬼王💚🧊➡\")")
 

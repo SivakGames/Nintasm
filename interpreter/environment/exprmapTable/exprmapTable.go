@@ -63,7 +63,7 @@ func CheckIfDefinedInExprmap(lookupExpr string) (int, bool) {
 }
 
 func CheckIfAlreadyExistsInExprmap(lookupExpr string) (int, error) {
-	target, exists := CheckIfDefinedInExprmap(lookupExpr)
+	target, exists := exprmapSymbolTable[lastAddedExprmapName][lookupExpr]
 	if exists {
 		return target, errorHandler.AddNew(enumErrorCodes.ExprMapDuplicateKey, lookupExpr) // ❌ Fails
 	}

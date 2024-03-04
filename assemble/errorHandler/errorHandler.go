@@ -39,6 +39,7 @@ var noFileDefaults = resolveSymbolData{
 }
 var highlightStart int = -1
 var highlightEnd int = -1
+var TotalErrors uint = 0
 
 func NewErrorEntry(code enumErrorCodes.Def, message string, severity enumErrorCodes.Severity) ErrorEntry {
 	fileData := fileStack.GetTopOfFileStack()
@@ -97,6 +98,8 @@ func Resetighlights() {
 
 func AddNew(errorTableKey enumErrorCodes.Def, args ...interface{}) error {
 	defer Resetighlights()
+
+	TotalErrors++
 
 	errData, tableKeyExists := errorTable[errorTableKey]
 	if tableKeyExists {

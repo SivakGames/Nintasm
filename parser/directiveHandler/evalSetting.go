@@ -23,6 +23,7 @@ func evalSettingChange(directiveName string, operandList *[]Node) error {
 		if err != nil {
 			return err
 		}
+
 	case "SETEXPRMAP":
 		changeToExprmapNode := (*operandList)[0]
 		if !operandFactory.ValidateNodeIsIdentifier(&changeToExprmapNode) {

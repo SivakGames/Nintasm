@@ -117,7 +117,7 @@ var errorTable = map[enumErrorCodes.Def]ErrorTableEntry{
 
 	enumErrorCodes.CharMapNoneDefined:     newErrorTableEntry(enumErrorCodes.Error, "No character maps have been defined!"),
 	enumErrorCodes.CharMapNotExist:        newErrorTableEntry(enumErrorCodes.Error, "Specified charmap doesn't exist!"),
-	enumErrorCodes.CharMapDuplicateKey:    newErrorTableEntry(enumErrorCodes.Error, "Character %c has already been defined in current map"),
+	enumErrorCodes.CharMapDuplicateKey:    newErrorTableEntry(enumErrorCodes.Error, "Character %c has already been defined in current map %v"),
 	enumErrorCodes.ToCharMapUndefChar:     newErrorTableEntry(enumErrorCodes.Error, "Character `%c` is not defined in currently used charmap %v"),
 	enumErrorCodes.DefCharTooLong:         newErrorTableEntry(enumErrorCodes.Error, "Can't map %v - Character definition must be 1 character long!"),
 	enumErrorCodes.DefCharRangeEndSmaller: newErrorTableEntry(enumErrorCodes.Error, "End value of defined character range value must be greater than start value"),
