@@ -487,20 +487,7 @@ func (p *OperandParser) _callExpression(callee string) (Node, error) {
 	var err error = nil
 
 	if callee == "bank" {
-		err = p.eatFreelyAndAdvance(enumTokenTypes.DELIMITER_leftParenthesis)
-		if err != nil {
-			return p.badEat(err) // ❌ Fails
-		}
-		bankArgument := operandFactory.CreateIdentifierNode(p.lookaheadValue)
-		err = p.eatAndAdvance(enumTokenTypes.IDENTIFIER)
-		if err != nil {
-			return p.badEat(err) // ❌ Fails
-		}
-		err = p.eatAndAdvance(enumTokenTypes.DELIMITER_rightParenthesis)
-		if err != nil {
-			return p.badEat(err) // ❌ Fails
-		}
-		return operandFactory.CreateCallExpressionNode(callee, []Node{bankArgument}), nil
+		return p.specialAsmFunctionArguments(callee)
 	}
 
 	arguments, err := p.arguments()
@@ -511,6 +498,34 @@ func (p *OperandParser) _callExpression(callee string) (Node, error) {
 	callExpr := operandFactory.CreateCallExpressionNode(callee, arguments)
 
 	return callExpr, nil
+}
+
+//--------------------
+
+func (p *OperandParser) specialAsmFunctionArguments(callee string) (Node, error) {
+	var err error = nil
+	var asmFuncArguments []Node
+
+	err = p.eatFreelyAndAdvance(enumTokenTypes.DELIMITER_leftParenthesis)
+	if err != nil {
+		return p.badEat(err) // ❌ Fails
+	}
+
+	switch callee {
+	case "bank":
+		bankArgument := operandFactory.CreateIdentifierNode(p.lookaheadValue)
+		err = p.eatAndAdvance(enumTokenTypes.IDENTIFIER)
+		if err != nil {
+			return p.badEat(err) // ❌ Fails
+		}
+		asmFuncArguments = append(asmFuncArguments, bankArgument)
+	}
+
+	err = p.eatAndAdvance(enumTokenTypes.DELIMITER_rightParenthesis)
+	if err != nil {
+		return p.badEat(err) // ❌ Fails
+	}
+	return operandFactory.CreateCallExpressionNode(callee, asmFuncArguments), nil
 }
 
 //--------------------

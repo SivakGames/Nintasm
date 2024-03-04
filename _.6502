@@ -20,7 +20,44 @@
 
 ;-----------------------------------------
 
-	.db low(RESET)
+VmCreateObject .kvmacro
+
+	.d_bw 1,2
+;Parent VM ID
+    .db \parentVmId
+;X (optional)
+	.if !defined(\xOffset)
+		.db $00
+	.else
+		.db \xOffset
+	.endif
+;Y (optional)
+	.if !defined(\yOffset)
+		.db $00
+	.else
+		.db \yOffset
+	.endif
+;Sub VM ID
+	.db \subVmId
+;Init argument
+	.if !defined(\initArg)
+		.db $00
+	.else
+		.db \initArg
+	.endif
+
+VmCreateObject .endkvm
+
+
+
+	.ikv VmCreateObject
+
+	.kv \parentVmId, 1
+	.kv \yOffset, 2
+	.kv \subVmId, 3
+	.kv \initArg, 4
+
+	.endikv
 
 RESET:
 	SEI

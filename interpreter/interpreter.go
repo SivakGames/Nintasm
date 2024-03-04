@@ -24,6 +24,7 @@ type assemblerFunction struct {
 }
 
 var assemblerBuiltInFunctions = map[string]assemblerFunction{
+	"defined":   {1, 1, []enumNodeTypes.Def{enumNodeTypes.Empty}},
 	"high":      {1, 1, []enumNodeTypes.Def{enumNodeTypes.NumericLiteral}},
 	"low":       {1, 1, []enumNodeTypes.Def{enumNodeTypes.NumericLiteral}},
 	"bank":      {1, 1, []enumNodeTypes.Def{enumNodeTypes.Identifier}},
@@ -177,9 +178,15 @@ func EvaluateNode(node Node) (Node, error) {
 		if err != nil {
 			return node, err
 		}
-
-		if right.NodeType != enumNodeTypes.NumericLiteral {
-			return node, errorHandler.AddNew(enumErrorCodes.InterpreterUnaryNotNumeric, operation, right.NodeValue)
+		switch operation {
+		case "+", "-", "~":
+			if right.NodeType != enumNodeTypes.NumericLiteral {
+				return node, errorHandler.AddNew(enumErrorCodes.InterpreterUnaryNotNumeric, operation, right.NodeValue)
+			}
+		case "!":
+			if right.NodeType != enumNodeTypes.BooleanLiteral {
+				return node, errorHandler.AddNew(enumErrorCodes.InterpreterUnaryNotBoolean, operation, right.NodeValue)
+			}
 		}
 
 		node.Right = nil
@@ -255,12 +262,22 @@ func ProcessAssemblerFunction(node *Node) (bool, error) {
 				return isAsmFunc, err
 			}
 
+			if functionData.argMustResolveTo[i] == enumNodeTypes.Empty {
+				continue
+			}
+
 			if evaluatedFuncNode.NodeType != functionData.argMustResolveTo[i] {
 				return isAsmFunc, errorHandler.AddNew(enumErrorCodes.InterpreterFuncArgWrongType)
 			}
 		}
 
 		switch funcName {
+		case "defined":
+			definedCheckNode := (*node.ArgumentList)[0]
+			if definedCheckNode.Resolved {
+				node.AsBool = true
+				operandFactory.ConvertNodeToBooleanLiteral(node)
+			}
 		case "high":
 			node.AsNumber = ((*node.ArgumentList)[0].AsNumber & 0x0ff00) >> 8
 		case "low":

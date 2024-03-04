@@ -105,6 +105,7 @@ const (
 	ToExprMapUndefExpr  = "ToExprMapUndefExpr"
 
 	InterpreterNoParentLabel            = "InterpreterNoParentLabel"
+	InterpreterUnaryNotBoolean          = "InterpreterUnaryNotBoolean"
 	InterpreterUnaryNotNumeric          = "InterpreterUnaryNotNumeric"
 	InterpreterBinaryMismatchedTypes    = "InterpreterBinaryMismatchedTypes"
 	InterpreterFuncUndefined            = "InterpreterFuncUndefined"
