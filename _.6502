@@ -29,6 +29,7 @@ VmCreateObject .kvmacro
 	.if !defined(\xOffset)
 		.db $00
 	.else
+		.db "🧊"
 		.db \xOffset
 	.endif
 ;Y (optional)
@@ -48,8 +49,6 @@ VmCreateObject .kvmacro
 	.endif
 
 VmCreateObject .endkvm
-
-
 
 	.ikv VmCreateObject
 
