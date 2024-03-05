@@ -5,6 +5,7 @@ import (
 	"misc/nintasm/assemble/errorHandler"
 	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
 	"misc/nintasm/interpreter/environment/macroTable"
+	"misc/nintasm/interpreter/environment/symbolAsNodeTable"
 	"misc/nintasm/interpreter/operandFactory"
 )
 
@@ -21,9 +22,24 @@ func evalIkv(directiveName string, operandList *[]Node) error {
 	blockStack.SetCurrentOperationEvaluatesCapturedNodesFlag()
 
 	macroTable.AppendToReplacementStack()
+	symbolAsNodeTable.PushToSymbolTableStack()
+
 	return nil
 }
 
+// Middle operation - adding a key to IKV
+func evalKv(operandList *[]Node) error {
+	macroKeyNode := &(*operandList)[0]
+	if !operandFactory.ValidateNodeIsSubstitutionID(macroKeyNode) {
+		return errorHandler.AddNew(enumErrorCodes.NodeTypeNotSubstitutionID) // ❌ Fails
+	}
+	macroValueNode := &(*operandList)[1]
+	macroTable.AddToReplacementListOnTopOfStack(macroKeyNode.NodeValue, macroValueNode.NodeValue)
+	symbolAsNodeTable.AddSymbolToTopTableStack(macroKeyNode.NodeValue, operandFactory.CreateBooleanLiteralNode(true))
+	return nil
+}
+
+// Final operation
 func evalEndIkv(operandList *[]Node) error {
 	currentStackOperation := blockStack.GetTopOfStackOperation()
 	currentStackOperationOperandList := &currentStackOperation.OperandList
@@ -35,6 +51,8 @@ func evalEndIkv(operandList *[]Node) error {
 
 	replacementList := macroTable.GetReplacementListOnTopOfStack()
 	var modifiedCapturedLines []blockStack.CapturedLine
+
+	//Replace with substitutions
 
 	for _, md := range macroData {
 		for _, replacementListItem := range *replacementList {
@@ -49,15 +67,5 @@ func evalEndIkv(operandList *[]Node) error {
 	blockStack.ClearCurrentOperationEvaluatesCapturedNodesFlag()
 	blockStack.PopFromStackAndExtendCapturedLines(modifiedCapturedLines)
 
-	return nil
-}
-
-func evalKv(operandList *[]Node) error {
-	macroKeyNode := &(*operandList)[0]
-	if !operandFactory.ValidateNodeIsSubstitutionID(macroKeyNode) {
-		return errorHandler.AddNew(enumErrorCodes.NodeTypeNotSubstitutionID) // ❌ Fails
-	}
-	macroValueNode := &(*operandList)[1]
-	macroTable.AddToReplacementListOnTopOfStack(macroKeyNode.NodeValue, macroValueNode.NodeValue)
 	return nil
 }

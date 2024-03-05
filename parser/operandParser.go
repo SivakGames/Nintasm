@@ -775,12 +775,11 @@ func (p *OperandParser) literal() (Node, error) {
 		return operandFactory.CreateStringLiteralNode(literalValue), nil
 	case enumTokenTypes.BACKTICK_STRING:
 		return operandFactory.CreateBacktickStringLiteralNode(literalValue), nil
-	case enumTokenTypes.SUBSTITUTION_numericID:
+	case enumTokenTypes.SUBSTITUTION_numericID,
+		enumTokenTypes.SUBSTITUTION_stringID,
+		enumTokenTypes.SUBSTITUTION_numMacroArgs:
 		return operandFactory.CreateSubstitutionIdNode(literalType, literalValue), nil
-	case enumTokenTypes.SUBSTITUTION_stringID:
-		return operandFactory.CreateSubstitutionIdNode(literalType, literalValue), nil
-	case enumTokenTypes.SUBSTITUTION_numMacroArgs:
-		return operandFactory.CreateSubstitutionIdNode(literalType, literalValue), nil
+
 	}
 	// ❌ Fails
 	panic("Something is greatly wrong with literal type")

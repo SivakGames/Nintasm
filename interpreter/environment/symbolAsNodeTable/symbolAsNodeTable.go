@@ -107,7 +107,11 @@ func PopFromSymbolTableStack() {
 	symbolTableStack = symbolTableStack[:len(symbolTableStack)-1]
 }
 
-func CheckTopOfSymbolTableStack() *symbolTableType {
+func CheckTopOfSymbolTableStackHasLength() bool {
+	return len(symbolTableStack) > 0
+}
+
+func GetTopOfSymbolTableStack() *symbolTableType {
 	if len(symbolTableStack) > 0 {
 		return &symbolTableStack[len(symbolTableStack)-1]
 	}
@@ -115,7 +119,7 @@ func CheckTopOfSymbolTableStack() *symbolTableType {
 }
 
 func AddSymbolToTopTableStack(symbolName string, node Node) {
-	topStack := CheckTopOfSymbolTableStack()
+	topStack := GetTopOfSymbolTableStack()
 	if topStack != nil {
 		(*topStack)[symbolName] = node
 		return
@@ -124,8 +128,9 @@ func AddSymbolToTopTableStack(symbolName string, node Node) {
 	return
 }
 
-func LookupTopOfSymbolTableStack(symbolName string) (Node, bool) {
-	topStack := CheckTopOfSymbolTableStack()
+// Checks if there is anything on top of the stack and if the symbol exists.
+func LookupSymbolInTopOfSymbolTableStack(symbolName string) (Node, bool) {
+	topStack := GetTopOfSymbolTableStack()
 	if topStack != nil {
 		node, exists := (*topStack)[symbolName]
 		return node, exists

@@ -52,6 +52,7 @@ func AddIdentifierToSymbolAsNodeTable(symbolName string, node Node) error {
 }
 
 // See if identifier has a value in the symbol table
+// Returns node, resolved, err
 func LookupIdentifierInSymbolAsNodeTable(symbolName string) (Node, bool, error) {
 	node, exists := symbolAsNodeTable.GetNodeFromSymbolAsNodeTable(symbolName)
 	if !exists {
@@ -69,12 +70,17 @@ func LookupIdentifierInSymbolAsNodeTable(symbolName string) (Node, bool, error) 
 
 // -----------------------------------------------------------------------------
 
-func LookupSubstitutionIDfromStack(symbolName string) (Node, error) {
-	node, exists := symbolAsNodeTable.LookupTopOfSymbolTableStack(symbolName)
+// Will check the topmost stack for a substitution ID and get the node if there is one
+func LookupSubstitutionID(symbolName string) (Node, error) {
+	substitutionNode, exists := symbolAsNodeTable.LookupSymbolInTopOfSymbolTableStack(symbolName)
 	if !exists {
-		return node, errorHandler.AddNew(enumErrorCodes.InterpreterSymbolNotFound, symbolName)
+		if unresolvedAddsSilentError {
+			return operandFactory.CreateUndefinedNode(symbolName), errorHandler.AddUnresolved(symbolName)
+		}
+		return substitutionNode, errorHandler.AddNew(enumErrorCodes.InterpreterSymbolNotFound, symbolName)
 	}
-	return node, nil
+	return substitutionNode, nil
+
 }
 
 // -----------------------------------------------------------------------------

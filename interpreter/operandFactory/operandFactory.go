@@ -14,9 +14,8 @@ type tokenEnum = enumTokenTypes.Def
 
 type NodeStruct struct {
 	NodeType      nodeEnum
+	NodeTokenEnum tokenEnum
 	Resolved      bool
-	CanReevaluate bool
-	NodeTokenType tokenEnum
 	NodeValue     string
 	AsBool        bool
 	AsNumber      int
@@ -25,13 +24,15 @@ type NodeStruct struct {
 	ArgumentList  *[]Node
 }
 
-func newNode(nodeType tokenEnum, nodeValue string, nType nodeEnum) NodeStruct {
+func newNode(nodeTokenEnum tokenEnum, nodeValue string, nType nodeEnum) NodeStruct {
 	return NodeStruct{
-		NodeTokenType: nodeType,
+		NodeTokenEnum: nodeTokenEnum,
 		NodeValue:     nodeValue,
 		NodeType:      nType,
 	}
 }
+
+//----------------------------------------
 
 func EmptyNode() Node {
 	node := newNode(enumTokenTypes.None, "", enumNodeTypes.Empty)
@@ -44,17 +45,7 @@ func ErrorNode(nodeValue string) Node {
 	return node
 }
 
-/*
-// """Operand for .func expressions"""
-func FunctionOperand(numArgs int, operands []string) (int, []string) {
-	return numArgs, operands
-}
-
-// """Any instruction that takes an operand"""
-func InterpretedInstructionBytes(opcode []string, value []string) []string {
-	//return opcode, ...value
-	return opcode
-} */
+//----------------------------------------
 
 // """Calling a function"""
 func CreateCallExpressionNode(callee string, arguments []Node) Node {
@@ -98,6 +89,8 @@ func CreateUnaryExpressionNode(nodeType tokenEnum, nodeValue string, right Node)
 	node.Right = &right
 	return node
 }
+
+//====================================================
 
 // """Assign a symbol"""
 func CreateAssignmentNode(left Node, right Node) Node {
@@ -179,100 +172,8 @@ func CreateBacktickStringLiteralNode(nodeValue string) Node {
 	return node
 }
 
-//->->->->->->->->->->->->->->->->->->->->->->->->->->
-// Conversions
-
-func ConvertNodeToNumericLiteral(node *Node) {
-	node.NodeType = enumNodeTypes.NumericLiteral
-	node.NodeTokenType = enumTokenTypes.NUMBER_decimal
-	node.NodeValue = fmt.Sprintf("%d", node.AsNumber)
-	node.Resolved = true
-	return
-}
-
-func ConvertNodeToBooleanLiteral(node *Node) {
-	node.NodeType = enumNodeTypes.BooleanLiteral
-	node.NodeTokenType = enumTokenTypes.None
-	if node.AsBool {
-		node.NodeValue = "1"
-		node.AsNumber = 1
-	} else {
-		node.NodeValue = "0"
-		node.AsNumber = 0
-	}
-	node.Resolved = true
-	return
-}
-
-func ConvertNodeToStringLiteral(node *Node) {
-	node.NodeType = enumNodeTypes.StringLiteral
-	node.NodeTokenType = enumTokenTypes.STRING
-	node.Resolved = true
-	return
-}
-
-//-----------------------------------
-//Special node for branch instructions
-
-func ConvertToBranchBinaryExpressionNode(originalNode Node, orgToSubtract int) Node {
-	orgToSubtractNode := CreateNumericLiteralNode(orgToSubtract)
-	branchNode := CreateBinaryExpressionNode(enumTokenTypes.OPERATOR_additive, "-", originalNode, orgToSubtractNode)
-	return branchNode
-}
-
-//-----------------------------------Primitives
-
-func ValidateNodeIsEmpty(node *Node) bool {
-	return node.NodeType == enumNodeTypes.Empty
-}
-
-//-----------------------------------Primitives
-
-func ValidateNodeIsBoolean(node *Node) bool {
-	return node.NodeType == enumNodeTypes.BooleanLiteral
-}
-func ValidateNodeIsString(node *Node) bool {
-	return node.NodeType == enumNodeTypes.StringLiteral
-}
-
-//-----------------------------------Identifiers/IDs
-
-func ValidateNodeIsIdentifier(node *Node) bool {
-	return node.NodeType == enumNodeTypes.Identifier
-}
-func ValidateNodeIsSubstitutionID(node *Node) bool {
-	return node.NodeType == enumNodeTypes.SubstitutionID
-}
-
-//-----------------------------------1234567890
-
-func ValidateNodeIsNumeric(node *Node) bool {
-	return node.NodeType == enumNodeTypes.NumericLiteral
-}
-func ValidateNumericNodeIsGTValue(node *Node, minValue int) bool {
-	return node.AsNumber > minValue
-}
-func ValidateNumericNodeIsGTEValue(node *Node, minValue int) bool {
-	return node.AsNumber >= minValue
-}
-func ValidateNumericNodeIsLTValue(node *Node, maxValue int) bool {
-	return node.AsNumber < maxValue
-}
-func ValidateNumericNodeIsLTEValue(node *Node, maxValue int) bool {
-	return node.AsNumber <= maxValue
-}
-func ValidateNumericNodeIsGTEandLTEValues(node *Node, minValue int, maxValue int) bool {
-	return node.AsNumber >= minValue && node.AsNumber <= maxValue
-}
-func ValidateNumericNodeIsPositive(node *Node) bool {
-	return node.AsNumber >= 0
-}
-func ValidateNumericNodeIsGTZero(node *Node) bool {
-	return node.AsNumber > 0
-}
-func ValidateNumericNodeIs8BitValue(node *Node) bool {
-	return node.AsNumber > -0x00100 && node.AsNumber < 0x00100
-}
-func ValidateNumericNodeIs16BitValue(node *Node) bool {
-	return node.AsNumber > -0x10000 && node.AsNumber < 0x10000
+// A _ or can also be made when invoking a macro with arguments missing
+func CreateUndefinedNode(nodeValue string) Node {
+	node := newNode(enumTokenTypes.None, nodeValue, enumNodeTypes.Undefined)
+	return node
 }

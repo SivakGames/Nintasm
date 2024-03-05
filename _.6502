@@ -37,6 +37,7 @@ VmCreateObject .kvmacro
 	.else
 		.db \yOffset
 	.endif
+
 ;Sub VM ID
 	.db \subVmId
 ;Init argument

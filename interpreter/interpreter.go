@@ -24,10 +24,10 @@ type assemblerFunction struct {
 }
 
 var assemblerBuiltInFunctions = map[string]assemblerFunction{
-	"defined":   {1, 1, []enumNodeTypes.Def{enumNodeTypes.Empty}},
+	"bank":      {1, 1, []enumNodeTypes.Def{enumNodeTypes.Identifier}},
+	"defined":   {1, 1, []enumNodeTypes.Def{enumNodeTypes.Identifier}},
 	"high":      {1, 1, []enumNodeTypes.Def{enumNodeTypes.NumericLiteral}},
 	"low":       {1, 1, []enumNodeTypes.Def{enumNodeTypes.NumericLiteral}},
-	"bank":      {1, 1, []enumNodeTypes.Def{enumNodeTypes.Identifier}},
 	"toCharmap": {1, 1, []enumNodeTypes.Def{enumNodeTypes.StringLiteral}},
 }
 
@@ -37,9 +37,6 @@ func EvaluateNode(node Node) (Node, error) {
 		enumNodeTypes.BooleanLiteral,
 		enumNodeTypes.NumericLiteral,
 		enumNodeTypes.StringLiteral:
-		return node, nil
-
-	case enumNodeTypes.Error:
 		return node, nil
 
 	case enumNodeTypes.Identifier,
@@ -64,11 +61,11 @@ func EvaluateNode(node Node) (Node, error) {
 		return node, nil
 
 	case enumNodeTypes.SubstitutionID:
-		substitutionNode, err := environment.LookupSubstitutionIDfromStack(node.NodeValue)
+		substitutionNode, err := environment.LookupSubstitutionID(node.NodeValue)
 		if err != nil {
 			return substitutionNode, err
 		}
-		return EvaluateNode(substitutionNode)
+		return substitutionNode, nil
 
 	case enumNodeTypes.AssignLabelExpression,
 		enumNodeTypes.AssignmentExpression:
@@ -256,26 +253,30 @@ func ProcessAssemblerFunction(node *Node) (bool, error) {
 			return isAsmFunc, errorHandler.AddNew(enumErrorCodes.InterpreterFuncTooManyArgs)
 		}
 
-		for i, a := range *node.ArgumentList {
-			evaluatedFuncNode, err := EvaluateNode(a)
-			if err != nil {
-				return isAsmFunc, err
-			}
-
-			if functionData.argMustResolveTo[i] == enumNodeTypes.Empty {
-				continue
-			}
-
-			if evaluatedFuncNode.NodeType != functionData.argMustResolveTo[i] {
-				return isAsmFunc, errorHandler.AddNew(enumErrorCodes.InterpreterFuncArgWrongType)
+		//Depending on the function, may do standard evaluation or not...
+		switch funcName {
+		case "high", "low", "toCharmap":
+			for i, a := range *node.ArgumentList {
+				evaluatedFuncNode, err := EvaluateNode(a)
+				if err != nil {
+					return isAsmFunc, err
+				}
+				if evaluatedFuncNode.NodeType != functionData.argMustResolveTo[i] {
+					return isAsmFunc, errorHandler.AddNew(enumErrorCodes.InterpreterFuncArgWrongType)
+				}
 			}
 		}
 
+		//Actually process the function...
 		switch funcName {
 		case "defined":
-			definedCheckNode := (*node.ArgumentList)[0]
-			if definedCheckNode.Resolved {
+			baseNode := (*node.ArgumentList)[0]
+
+			if baseNode.Resolved {
 				node.AsBool = true
+				operandFactory.ConvertNodeToBooleanLiteral(node)
+			} else if baseNode.NodeType == enumNodeTypes.Undefined {
+				node.AsBool = false
 				operandFactory.ConvertNodeToBooleanLiteral(node)
 			}
 		case "high":

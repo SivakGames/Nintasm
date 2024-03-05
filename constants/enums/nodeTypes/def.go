@@ -6,6 +6,7 @@ const (
 	Empty Def = iota + 0
 	Error
 	AssemblerReservedWord
+	Undefined
 
 	AssignmentExpression
 	AssignLabelExpression
