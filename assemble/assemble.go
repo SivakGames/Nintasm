@@ -6,7 +6,6 @@ import (
 	"misc/nintasm/assemble/fileHandler"
 	"misc/nintasm/assemble/fileStack"
 	enumParserTypes "misc/nintasm/constants/enums/parserTypes"
-	"misc/nintasm/interpreter"
 	"misc/nintasm/interpreter/environment/predefSymbols"
 	"misc/nintasm/interpreter/environment/unresolvedTable"
 	"misc/nintasm/parser"
@@ -88,65 +87,18 @@ func ReadLines(lines *[]string, lineCounter *uint) error {
 
 		lineOperationParsedValues := lineOperationParser.GetLineOperationValues()
 
-		//Intermediate - determine if in stack capturing
-		if len(blockStack.Stack) > 0 {
-			var blockStackErr error
-			isStartEndOp := blockStack.CheckIfNewStartEndOperation(&lineOperationParsedValues)
+		//Intermediate - determine if capturing things in a block stack
 
-			//See if the incoming operation is for starting/ending a block
-			if isStartEndOp {
-				blockStackErr = parseOperandStringAndProcess(
-					reformattedLine,
-					&lineOperationParsedValues,
-				)
-				if blockStackErr != nil {
-					return blockStackErr
-				}
-
-				//If ending, iterate bottom of stack and parse all captured operations (if any)
-				if blockStack.CheckIfEndOperationAndClearStack(&lineOperationParsedValues) {
-					for _, b := range blockStack.Stack[0].CapturedLines {
-						processOperandArguments := util.NewLineOperationParsedValues(b.OperandStartPosition,
-							b.OperationLabel,
-							b.OperationTokenEnum,
-							b.OperationTokenValue,
-							b.ParentParserEnum,
-						)
-						blockStackErr = parseOperandStringAndProcess(
-							b.OriginalLine,
-							&processOperandArguments,
-						)
-						if blockStackErr != nil {
-							return blockStackErr
-						}
-					}
-					//Mainly set by namespaces - will clear the overriding parent label
-					if interpreter.PopParentLabelWhenBlockOpDone {
-						interpreter.PopParentLabel()
-						interpreter.PopParentLabelWhenBlockOpDone = false
-					}
-					blockStack.ClearStack()
-				}
-
-			} else {
-				//Either append the operation to the stack's captured lines or evaluate them now
-				if !blockStack.GetCurrentOperationEvaluatesCapturedNodesFlag() {
-					err := blockStack.CheckOperationIsCapturableAndAppend(reformattedLine, &lineOperationParsedValues)
-					if err != nil {
-						return err
-					}
-				} else {
-					blockStackErr = parseOperandStringAndProcess(
-						reformattedLine,
-						&lineOperationParsedValues,
-					)
-					if blockStackErr != nil {
-						return blockStackErr
-					}
-				}
+		currentBlockStack := blockStack.GetCurrentStack()
+		if len(*currentBlockStack) > 0 {
+			err := handleBlockStack(reformattedLine, &lineOperationParsedValues)
+			if err != nil {
+				return err
 			}
 			continue
 		}
+
+		//Do regular operand parsing/processing
 
 		err := parseOperandStringAndProcess(
 			reformattedLine,
@@ -156,9 +108,13 @@ func ReadLines(lines *[]string, lineCounter *uint) error {
 			return err
 		}
 	}
+
 	return nil
 }
 
+//==========================================================
+
+// Main operand parsing...
 func parseOperandStringAndProcess(
 	reformattedLine string,
 	lineOperationParsedValues *util.LineOperationParsedValues,

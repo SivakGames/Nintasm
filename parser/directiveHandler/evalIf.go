@@ -61,10 +61,11 @@ func evalEndIf(operandList *[]Node) error {
 
 	blockStack.PopFromStackAndExtendCapturedLines(*trueStatementCapturedLines)
 
+	currentStack := blockStack.GetCurrentStack()
 	if blockStack.StackWillClearFlag {
 		if currentStackOperation != nil {
-			blockStack.Stack[0] = *currentStackOperation
-			blockStack.Stack[0].AlternateStackBlock = nil
+			(*currentStack)[0] = *currentStackOperation
+			(*currentStack)[0].AlternateStackBlock = nil
 		} else {
 			blockStack.SetBottomOfStackToEmptyBlock()
 		}

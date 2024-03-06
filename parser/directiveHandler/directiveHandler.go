@@ -16,7 +16,8 @@ func EvaluateDirective(operationTokenEnum enumTokenTypes.Def, directiveName stri
 
 	if operationTokenEnum == enumTokenTypes.DIRECTIVE_blockEnd ||
 		operationTokenEnum == enumTokenTypes.DIRECTIVE_labeledBlockEnd {
-		if len(blockStack.Stack) == 0 {
+		currentStack := blockStack.GetCurrentStack()
+		if len(*currentStack) == 0 {
 			return errorHandler.AddNew(enumErrorCodes.DirectiveUnopenedEndBlock, directiveName)
 		}
 
@@ -151,7 +152,8 @@ func EvaluateDirective(operationTokenEnum enumTokenTypes.Def, directiveName stri
 func ProcessOpenLabelBlock(openBlockLabel string) error {
 	var err error
 
-	if len(blockStack.Stack) > 0 {
+	currentStack := blockStack.GetCurrentStack()
+	if len(*currentStack) > 0 {
 		return errorHandler.AddNew(enumErrorCodes.DirectiveNestedLabelBlock) // ❌ Fails
 	}
 	err = environment.CheckIfAlreadyDefinedInMasterTable(openBlockLabel)

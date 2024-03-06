@@ -22,41 +22,20 @@
 
 VmCreateObject .kvmacro
 
-	.d_bw 1,2
-;Parent VM ID
-    .db \parentVmId
-;X (optional)
-	.if !defined(\xOffset)
-		.db $00
-	.else
-		.db "🧊"
-		.db \xOffset
-	.endif
-;Y (optional)
-	.if !defined(\yOffset)
-		.db $00
-	.else
-		.db \yOffset
+	.if defined(\x1)
+		.db 661
 	.endif
 
-;Sub VM ID
-	.db \subVmId
-;Init argument
-	.if !defined(\initArg)
-		.db $00
-	.else
-		.db \initArg
-	.endif
+	.repeat 2
+		.repeat 4
+			.db 5
+		.endRepeat
+	.endRepeat
 
 VmCreateObject .endkvm
 
 	.ikv VmCreateObject
-
-	.kv \parentVmId, 1
-	.kv \yOffset, 2
-	.kv \subVmId, 3
-	.kv \initArg, 4
-
+	.kv \xa1, 5
 	.endikv
 
 RESET:

@@ -13,6 +13,8 @@ import (
 
 type Node = operandFactory.Node
 
+// ++++++++++++++++++++++++++++++++++++
+
 type CapturedLine struct {
 	OriginalLine         string
 	OperationLabel       string
@@ -39,21 +41,25 @@ func newCapturedLine(originalLine string,
 	}
 }
 
-type StackBlock struct {
+// ++++++++++++++++++++++++++++++++++++
+
+type BlockOperationStack struct {
 	BlockOperationName  string
 	OperandList         []Node
 	CapturedLines       []CapturedLine
-	AlternateStackBlock *StackBlock
+	AlternateStackBlock *BlockOperationStack
 }
 
-func newStackBlock(operationName string, operandList []Node) StackBlock {
-	return StackBlock{
+func newBlockOperationStack(operationName string, operandList []Node) BlockOperationStack {
+	return BlockOperationStack{
 		BlockOperationName: operationName,
 		OperandList:        operandList,
 	}
 }
 
-var Stack []StackBlock
+// ++++++++++++++++++++++++++++++++++++
+
+var blockOperationMainStack [][]BlockOperationStack
 
 var StackWillClearFlag bool = false
 
@@ -65,36 +71,69 @@ var currentBlockOperationLabel string = ""
 // Mainly used with namespace. Will temporarily act as the parent label for such operations
 var temporaryOverwritingParentLabel string = ""
 
-// -----------------------------
+// ````````````````````````````````````````````````````
+func init() {
+	//Ensure there's one entry on the bottom
+	PushOntoMainStack()
+}
+
+// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+func PushOntoMainStack() {
+	blockOperationMainStack = append(blockOperationMainStack, []BlockOperationStack{})
+}
+func PopFromMainStack() {
+	blockOperationMainStack = (blockOperationMainStack)[:len(blockOperationMainStack)-1]
+}
+
+// -----------------------------------------------------
+
+func GetCurrentStack() *[]BlockOperationStack {
+	return &blockOperationMainStack[len(blockOperationMainStack)-1]
+}
+
+// Get the stack that's on top of the main stack
+func getTopOfCurrentStack() *BlockOperationStack {
+	currentStack := GetCurrentStack()
+	return &(*currentStack)[len(*currentStack)-1]
+}
+
+// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 func PushOntoStack(op string, operandList []Node) {
-	Stack = append(Stack, newStackBlock(op, operandList))
+	currentStack := GetCurrentStack()
+	*currentStack = append(*currentStack, newBlockOperationStack(op, operandList))
 	return
 }
 
 func popFromStack() {
-	Stack = Stack[:len(Stack)-1]
+	currentStack := GetCurrentStack()
+	*currentStack = (*currentStack)[:len(*currentStack)-1]
 }
 
 func ClearStack() {
-	Stack = Stack[:0]
+	currentStack := GetCurrentStack()
+	*currentStack = (*currentStack)[:0]
 }
 
 // -----------------
 
 func AppendToTopOfStackAlternateBlock(op string, operandList []Node) {
 	currentStackOp := GetTopOfStackLastAlternateOperation()
-	altBlock := newStackBlock(op, operandList)
+	altBlock := newBlockOperationStack(op, operandList)
 	currentStackOp.AlternateStackBlock = &altBlock
 	return
 }
 
 // Get whatever's on top (and thus current)
-func GetTopOfStackOperation() *StackBlock {
-	return &Stack[len(Stack)-1]
+func GetTopOfStackOperation() *BlockOperationStack {
+	currentStack := GetCurrentStack()
+	return &(*currentStack)[len(*currentStack)-1]
 }
 
-func GetTopOfStackLastAlternateOperation() *StackBlock {
+func GetTopOfStackLastAlternateOperation() *BlockOperationStack {
 	currentStackOp := GetTopOfStackOperation()
 	for currentStackOp.AlternateStackBlock != nil {
 		currentStackOp = currentStackOp.AlternateStackBlock
@@ -111,11 +150,13 @@ func GetTopOfStackCapturedLines() *[]CapturedLine {
 // -----------------
 
 func SetBottomOfStackToEmptyBlock() {
-	Stack[0] = newStackBlock("nil", nil)
+	currentStack := GetCurrentStack()
+	(*currentStack)[0] = newBlockOperationStack("nil", nil)
 }
 
 func ClearBottomOfStackCapturedLines() {
-	Stack[0].CapturedLines = Stack[0].CapturedLines[:0]
+	currentStack := GetCurrentStack()
+	(*currentStack)[0].CapturedLines = (*currentStack)[0].CapturedLines[:0]
 }
 
 // -----------------
@@ -300,14 +341,15 @@ func CheckOperationIsCapturableAndAppend(
 
 // Take top of the stack and append all of it to the next unit down and pop the top
 func PopFromStackAndExtendCapturedLines(extendLines []CapturedLine) {
-	if len(Stack) > 1 {
+	currentStack := GetCurrentStack()
+	if len(*currentStack) > 1 {
 		popFromStack()
 		newCurrentStackOperation := GetTopOfStackLastAlternateOperation()
 		for _, line := range extendLines {
 			newCurrentStackOperation.CapturedLines = append(newCurrentStackOperation.CapturedLines, line)
 		}
 
-	} else if len(Stack) == 1 {
+	} else if len(*currentStack) == 1 {
 		newCurrentStackOperation := GetTopOfStackLastAlternateOperation()
 		newCurrentStackOperation.CapturedLines = extendLines
 		StackWillClearFlag = true

@@ -66,6 +66,5 @@ func evalEndIkv(operandList *[]Node) error {
 	blockStack.ClearCaptureParentOpOnlyFlag()
 	blockStack.ClearCurrentOperationEvaluatesCapturedNodesFlag()
 	blockStack.PopFromStackAndExtendCapturedLines(modifiedCapturedLines)
-
 	return nil
 }
