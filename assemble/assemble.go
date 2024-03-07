@@ -91,7 +91,7 @@ func ReadLines(lines *[]string, lineCounter *uint) error {
 
 		currentBlockStack := blockStack.GetCurrentStack()
 		if len(*currentBlockStack) > 0 {
-			err := handleBlockStack(reformattedLine, &lineOperationParsedValues)
+			err := handleBlockStack(reformattedLine, &lineOperationParsedValues, true)
 			if err != nil {
 				return err
 			}

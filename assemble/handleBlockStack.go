@@ -13,6 +13,7 @@ import (
 func handleBlockStack(
 	reformattedLine string,
 	lineOperationParsedValues *util.LineOperationParsedValues,
+	fromMainLoop bool,
 ) error {
 	var blockStackErr error
 
@@ -30,7 +31,7 @@ func handleBlockStack(
 
 		//If ending, iterate bottom of stack and parse all captured operations (if any)
 		if blockStack.CheckIfEndOperationAndClearStack(lineOperationParsedValues) {
-			blockStackErr = processCapturedLines()
+			blockStackErr = processCapturedLines(fromMainLoop)
 			if blockStackErr != nil {
 				return blockStackErr // ❌ Fails
 			}
@@ -39,7 +40,6 @@ func handleBlockStack(
 				interpreter.PopParentLabel()
 				interpreter.PopParentLabelWhenBlockOpDone = false
 			}
-			blockStack.ClearStack()
 		}
 
 	} else {
@@ -64,7 +64,7 @@ func handleBlockStack(
 	return nil
 }
 
-func processCapturedLines() error {
+func processCapturedLines(fromMainLoop bool) error {
 	var processCapturedErr error
 
 	//Make a pointer to the current stack
@@ -76,9 +76,6 @@ func processCapturedLines() error {
 	//Make a pointer to what was jus pushed onto the main stack
 	newlyEvaluatedBlockStack := blockStack.GetCurrentStack()
 
-	//Ensure the stack shrinks
-	defer blockStack.PopFromMainStack()
-
 	//Iterate over captured lines
 	for _, b := range (*processingBlockStack)[0].CapturedLines {
 		if len(*newlyEvaluatedBlockStack) > 0 {
@@ -89,7 +86,7 @@ func processCapturedLines() error {
 				OperationTokenValue:  b.OperationTokenValue,
 				ParentParserEnum:     b.ParentParserEnum,
 			}
-			processCapturedErr = handleBlockStack(b.OriginalLine, &newlyEvaluatedParsedValues)
+			processCapturedErr = handleBlockStack(b.OriginalLine, &newlyEvaluatedParsedValues, false)
 			if processCapturedErr != nil {
 				return processCapturedErr // ❌ Fails
 			}
@@ -111,6 +108,10 @@ func processCapturedLines() error {
 		if processCapturedErr != nil {
 			return processCapturedErr // ❌ Fails
 		}
+	}
+	blockStack.PopFromMainStack()
+	if fromMainLoop {
+		blockStack.PopFromStack()
 	}
 
 	return nil

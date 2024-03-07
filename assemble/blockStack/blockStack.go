@@ -108,7 +108,7 @@ func PushOntoStack(op string, operandList []Node) {
 	return
 }
 
-func popFromStack() {
+func PopFromStack() {
 	currentStack := GetCurrentStack()
 	*currentStack = (*currentStack)[:len(*currentStack)-1]
 }
@@ -343,7 +343,7 @@ func CheckOperationIsCapturableAndAppend(
 func PopFromStackAndExtendCapturedLines(extendLines []CapturedLine) {
 	currentStack := GetCurrentStack()
 	if len(*currentStack) > 1 {
-		popFromStack()
+		PopFromStack()
 		newCurrentStackOperation := GetTopOfStackLastAlternateOperation()
 		for _, line := range extendLines {
 			newCurrentStackOperation.CapturedLines = append(newCurrentStackOperation.CapturedLines, line)

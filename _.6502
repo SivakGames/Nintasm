@@ -20,22 +20,45 @@
 
 ;-----------------------------------------
 
-VmCreateObject .kvmacro
-
-	.if defined(\x1)
-		.db 661
+	.if 5 > 1
+		.db 11
+		.db 11
+		.db 11
+		.db 11
 	.endif
 
-	.repeat 2
-		.repeat 4
-			.db 5
-		.endRepeat
-	.endRepeat
+VmCreateObject .kvmacro
+
+	.db 6
+	.if defined(\x1)
+		.db 11 + \x1
+		.db 12 + \x1
+		.db 13 + \x1
+		.db 14 + \x1
+		.if defined(\y1)
+			.db 31 + \y1
+			.db 32 + \y1
+			.db 33 + \y1
+			.db 34 + \y1
+		.endif
+	.else
+		.db 22
+		.db 22
+		.db 22
+		.db 22
+	.endif
+
+	.if defined(\x1)
+	.db 6
+	.db 6
+	.db 6
+	.endif
 
 VmCreateObject .endkvm
 
 	.ikv VmCreateObject
-	.kv \xa1, 5
+	.kv \x11, 5
+	.kv \y1, 15
 	.endikv
 
 RESET:

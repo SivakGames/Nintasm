@@ -38,12 +38,12 @@ func ConvertNodeValueToUInts(node Node, neededBytes int, isBigEndian bool) ([]ui
 		switch neededBytes {
 		case 1:
 			if node.AsNumber < -0x000ff || node.AsNumber > 0x000ff {
-				return nil, errorHandler.AddNew(enumErrorCodes.ResolvedValueNot8Bit) // ❌ Fails
+				return nil, errorHandler.AddNew(enumErrorCodes.ResolvedValueNot8Bit, node.AsNumber) // ❌ Fails
 			}
 			convertedValue = append(convertedValue, uint8(lowByte))
 		case 2:
 			if node.AsNumber < -0x0ffff || node.AsNumber > 0x0ffff {
-				return nil, errorHandler.AddNew(enumErrorCodes.ResolvedValueNot16Bit) // ❌ Fails
+				return nil, errorHandler.AddNew(enumErrorCodes.ResolvedValueNot16Bit, node.AsNumber) // ❌ Fails
 			}
 			if !isBigEndian {
 				convertedValue = append(convertedValue, uint8(lowByte))
