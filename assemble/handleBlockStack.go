@@ -20,6 +20,13 @@ func handleBlockStack(
 	//See if the incoming operation is for starting/ending a block
 	isStartOrEndOperation := blockStack.CheckIfNewStartEndOperation(lineOperationParsedValues)
 
+	var flag bool
+	if fromMainLoop {
+		flag = blockStack.GetCurrentOperationEvaluatesCapturedNodesFlag()
+	} else {
+		flag = true
+	}
+
 	if isStartOrEndOperation {
 		blockStackErr = parseOperandStringAndProcess(
 			reformattedLine,
@@ -47,7 +54,7 @@ func handleBlockStack(
 
 	} else {
 		//Either append the operation to the stack's captured lines or evaluate them now
-		if !blockStack.GetCurrentOperationEvaluatesCapturedNodesFlag() {
+		if !flag {
 			err := blockStack.CheckOperationIsCapturableAndAppend(reformattedLine, lineOperationParsedValues)
 			if err != nil {
 				return err

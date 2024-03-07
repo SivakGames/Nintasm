@@ -59,7 +59,25 @@ func newBlockOperationStack(operationName string, operandList []Node) BlockOpera
 
 // ++++++++++++++++++++++++++++++++++++
 
-var blockOperationMainStack [][]BlockOperationStack
+type mainStack struct {
+	Flag1               bool
+	flag2               bool
+	flag3               bool
+	blockOperationStack []BlockOperationStack
+}
+
+func newMainStack() mainStack {
+	return mainStack{
+		Flag1:               false,
+		flag2:               false,
+		flag3:               false,
+		blockOperationStack: []BlockOperationStack{},
+	}
+}
+
+// ++++++++++++++++++++++++++++++++++++
+
+var blockOperationMainStack []mainStack
 
 var StackWillClearFlag bool = false
 
@@ -67,9 +85,6 @@ var StackWillClearFlag bool = false
 var currentOperationEvaluatesCapturedNodesFlag bool = false
 var stackCapturesParentOpOnlyFlag bool = false
 var currentBlockOperationLabel string = ""
-
-// Mainly used with namespace. Will temporarily act as the parent label for such operations
-var temporaryOverwritingParentLabel string = ""
 
 // ````````````````````````````````````````````````````
 func init() {
@@ -81,16 +96,19 @@ func init() {
 // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 func PushOntoMainStack() {
-	blockOperationMainStack = append(blockOperationMainStack, []BlockOperationStack{})
+	blockOperationMainStack = append(blockOperationMainStack, newMainStack())
 }
 func PopFromMainStack() {
 	blockOperationMainStack = (blockOperationMainStack)[:len(blockOperationMainStack)-1]
+}
+func GetCurrentMainStack() *mainStack {
+	return &(blockOperationMainStack)[len(blockOperationMainStack)-1]
 }
 
 // -----------------------------------------------------
 
 func GetCurrentStack() *[]BlockOperationStack {
-	return &blockOperationMainStack[len(blockOperationMainStack)-1]
+	return &blockOperationMainStack[len(blockOperationMainStack)-1].blockOperationStack
 }
 
 // Get the stack that's on top of the main stack
@@ -162,12 +180,20 @@ func ClearBottomOfStackCapturedLines() {
 // -----------------
 
 func ClearCaptureParentOpOnlyFlag() {
-	stackCapturesParentOpOnlyFlag = false
+	currentMainStack := GetCurrentMainStack()
+	*&currentMainStack.flag2 = false
+	//stackCapturesParentOpOnlyFlag = false
+}
+func GetCaptureParentOpOnlyFlag() bool {
+	currentMainStack := GetCurrentMainStack()
+	return currentMainStack.flag2
 }
 
 // Stack will only handle the parent op. No nested ops.
 func SetCaptureParentOpOnlyFlag() {
-	stackCapturesParentOpOnlyFlag = true
+	currentMainStack := GetCurrentMainStack()
+	*&currentMainStack.flag2 = true
+	//stackCapturesParentOpOnlyFlag = true
 }
 
 // -----------------
@@ -193,13 +219,19 @@ func SetCurrentOperationLabel(label string) error {
 // -----------------
 
 func ClearCurrentOperationEvaluatesCapturedNodesFlag() {
-	currentOperationEvaluatesCapturedNodesFlag = false
+	currentMainStack := GetCurrentMainStack()
+	*&currentMainStack.Flag1 = false
+	//currentOperationEvaluatesCapturedNodesFlag = false
 }
 func GetCurrentOperationEvaluatesCapturedNodesFlag() bool {
-	return currentOperationEvaluatesCapturedNodesFlag
+	currentMainStack := GetCurrentMainStack()
+	return *&currentMainStack.Flag1
+	//return currentOperationEvaluatesCapturedNodesFlag
 }
 func SetCurrentOperationEvaluatesCapturedNodesFlag() {
-	currentOperationEvaluatesCapturedNodesFlag = true
+	currentMainStack := GetCurrentMainStack()
+	*&currentMainStack.Flag1 = true
+	//currentOperationEvaluatesCapturedNodesFlag = true
 }
 
 // --------------------------------
@@ -227,7 +259,7 @@ func CheckIfNewStartEndOperation(lineOperationParsedValues *util.LineOperationPa
 
 	//If capturing for only the parent op, only a valid closing block for the parent can end it
 
-	if stackCapturesParentOpOnlyFlag &&
+	if GetCaptureParentOpOnlyFlag() &&
 		!CheckIfEndOpMatchesOpeningOp(lineOperationParsedValues.OperationTokenValue) {
 		return false
 	}
