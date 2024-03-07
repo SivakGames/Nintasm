@@ -3,6 +3,7 @@ package interpreter
 import (
 	"fmt"
 	"log"
+	"math"
 	"misc/nintasm/assemble/errorHandler"
 	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
 	enumNodeTypes "misc/nintasm/constants/enums/nodeTypes"
@@ -26,6 +27,7 @@ type assemblerFunction struct {
 var assemblerBuiltInFunctions = map[string]assemblerFunction{
 	"bank":      {1, 1, []enumNodeTypes.Def{enumNodeTypes.Identifier}},
 	"defined":   {1, 1, []enumNodeTypes.Def{enumNodeTypes.Identifier}},
+	"floor":     {1, 1, []enumNodeTypes.Def{enumNodeTypes.NumericLiteral}},
 	"high":      {1, 1, []enumNodeTypes.Def{enumNodeTypes.NumericLiteral}},
 	"low":       {1, 1, []enumNodeTypes.Def{enumNodeTypes.NumericLiteral}},
 	"toCharmap": {1, 1, []enumNodeTypes.Def{enumNodeTypes.StringLiteral}},
@@ -255,7 +257,7 @@ func ProcessAssemblerFunction(node *Node) (bool, error) {
 
 		//Depending on the function, may do standard evaluation or not...
 		switch funcName {
-		case "high", "low", "toCharmap":
+		case "floor", "high", "low", "toCharmap":
 			for i, a := range *node.ArgumentList {
 				evaluatedFuncNode, err := EvaluateNode(a)
 				if err != nil {
@@ -282,6 +284,8 @@ func ProcessAssemblerFunction(node *Node) (bool, error) {
 				node.AsBool = false
 				operandFactory.ConvertNodeToBooleanLiteral(node)
 			}
+		case "floor":
+			node.AsNumber = int(math.Floor(float64((*node.ArgumentList)[0].AsNumber)))
 		case "high":
 			node.AsNumber = ((*node.ArgumentList)[0].AsNumber & 0x0ff00) >> 8
 		case "low":
@@ -299,7 +303,7 @@ func ProcessAssemblerFunction(node *Node) (bool, error) {
 		}
 
 		switch funcName {
-		case "high", "low":
+		case "floor", "high", "low":
 			operandFactory.ConvertNodeToNumericLiteral(node)
 		case "toCharmap":
 			operandFactory.ConvertNodeToStringLiteral(node)
