@@ -6,6 +6,7 @@ import (
 	"misc/nintasm/interpreter/environment"
 	"misc/nintasm/interpreter/environment/macroTable"
 	"misc/nintasm/parser"
+	"misc/nintasm/util"
 )
 
 var builtInMacro_ResetCode = []string{
@@ -53,12 +54,14 @@ func init() {
 		lineOperationParser.Process(bim)
 		lineOperationParsedValues := lineOperationParser.GetLineOperationValues()
 		generatedMacro[i] = blockStack.CapturedLine{
-			OriginalLine:         bim,
-			OperationLabel:       lineOperationParsedValues.OperationLabel,
-			OperationTokenEnum:   lineOperationParsedValues.OperationTokenEnum,
-			OperationTokenValue:  lineOperationParsedValues.OperationTokenValue,
-			OperandStartPosition: lineOperationParsedValues.OperandStartPosition,
-			ParentParserEnum:     lineOperationParsedValues.ParentParserEnum,
+			OriginalLine: bim,
+			LineOperationParsedValues: util.LineOperationParsedValues{
+				OperationLabel:       lineOperationParsedValues.OperationLabel,
+				OperationTokenEnum:   lineOperationParsedValues.OperationTokenEnum,
+				OperationTokenValue:  lineOperationParsedValues.OperationTokenValue,
+				OperandStartPosition: lineOperationParsedValues.OperandStartPosition,
+				ParentParserEnum:     lineOperationParsedValues.ParentParserEnum,
+			},
 		}
 	}
 	preGenMacros["__resetCode__"] = generatedMacro

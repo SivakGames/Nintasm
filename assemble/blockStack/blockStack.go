@@ -16,12 +16,8 @@ type Node = operandFactory.Node
 // ++++++++++++++++++++++++++++++++++++
 
 type CapturedLine struct {
-	OriginalLine         string
-	OperationLabel       string
-	OperationTokenEnum   enumTokenTypes.Def
-	OperationTokenValue  string
-	OperandStartPosition int
-	ParentParserEnum     enumParserTypes.Def
+	OriginalLine string
+	util.LineOperationParsedValues
 }
 
 func newCapturedLine(originalLine string,
@@ -32,12 +28,14 @@ func newCapturedLine(originalLine string,
 	parentParserEnum enumParserTypes.Def,
 ) CapturedLine {
 	return CapturedLine{
-		OriginalLine:         originalLine,
-		OperationLabel:       operationLabel,
-		OperationTokenEnum:   operationTokenEnum,
-		OperationTokenValue:  operationTokenValue,
-		OperandStartPosition: operandStartPosition,
-		ParentParserEnum:     parentParserEnum,
+		OriginalLine: originalLine,
+		LineOperationParsedValues: util.LineOperationParsedValues{
+			OperationLabel:       operationLabel,
+			OperationTokenEnum:   operationTokenEnum,
+			OperationTokenValue:  operationTokenValue,
+			OperandStartPosition: operandStartPosition,
+			ParentParserEnum:     parentParserEnum,
+		},
 	}
 }
 
