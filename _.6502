@@ -20,16 +20,28 @@
 
 ;-----------------------------------------
 
-AddrDiff .func (\2 - \1)
+YYY .kvmacro
+	.db 1
+	.repeat 2
+	.db 2
+	.endRepeat
+	.db 3
+YYY .endkvm
 
-GENVALUE_LiquidPaletteIndex .func AddrDiff(DATA_RoomLiquidAnimatePalettes, \1) >> 2
 
-DATA_RoomLiquidAnimatePalettes:
-.water1:
-	.db $0f,$11,$21,$11
+	.ikv YYY
+	.endikv
 
-	.db GENVALUE_LiquidPaletteIndex($8000)	;0
-	.db GENVALUE_LiquidPaletteIndex(DATA_RoomLiquidAnimatePalettes.water1)	;0
+;AddrDiff .func (\2 - \1)
+;
+;GENVALUE_LiquidPaletteIndex .func AddrDiff(DATA_RoomLiquidAnimatePalettes, \1) >> 2
+;
+;DATA_RoomLiquidAnimatePalettes:
+;.water1:
+;	.db $0f,$11,$21,$11
+;
+;	.db GENVALUE_LiquidPaletteIndex($8000)	;0
+;	.db GENVALUE_LiquidPaletteIndex(DATA_RoomLiquidAnimatePalettes.water1)	;0
 
 RESET:
 	SEI

@@ -62,7 +62,6 @@ func newBlockOperationStack(operationName string, operandList []Node) BlockOpera
 type mainStack struct {
 	Flag1               bool
 	flag2               bool
-	flag3               bool
 	blockOperationStack []BlockOperationStack
 }
 
@@ -70,7 +69,6 @@ func newMainStack() mainStack {
 	return mainStack{
 		Flag1:               false,
 		flag2:               false,
-		flag3:               false,
 		blockOperationStack: []BlockOperationStack{},
 	}
 }

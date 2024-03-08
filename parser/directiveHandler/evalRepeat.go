@@ -16,6 +16,8 @@ func evalRepeat(directiveName string, operandList *[]Node) error {
 		return err
 	}
 
+	blockStack.SetCurrentOperationEvaluatesCapturedNodesFlag()
+
 	if !operandFactory.ValidateNodeIsNumeric(&numRepeatsNode) {
 		return errorHandler.AddNew(enumErrorCodes.NodeTypeNotNumeric) // ❌ Fails
 	} else if !operandFactory.ValidateNumericNodeIsGTEValue(&numRepeatsNode, 1) {

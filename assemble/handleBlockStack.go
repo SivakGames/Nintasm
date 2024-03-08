@@ -1,6 +1,7 @@
 package assemble
 
 import (
+	"fmt"
 	"misc/nintasm/assemble/blockStack"
 	"misc/nintasm/interpreter"
 	"misc/nintasm/util"
@@ -27,6 +28,8 @@ func handleBlockStack(
 		flag = true
 	}
 
+	fmt.Println(flag)
+
 	if isStartOrEndOperation {
 		blockStackErr = parseOperandStringAndProcess(
 			reformattedLine,
@@ -38,7 +41,7 @@ func handleBlockStack(
 
 		//If ending, iterate bottom of stack and parse all captured operations (if any)
 		if blockStack.CheckIfEndOperationAndClearStack(lineOperationParsedValues) {
-			blockStackErr = processCapturedLines()
+			blockStackErr = reassignPointers()
 			if blockStackErr != nil {
 				return blockStackErr // ❌ Fails
 			}
@@ -74,21 +77,33 @@ func handleBlockStack(
 	return nil
 }
 
-func processCapturedLines() error {
-	var processCapturedErr error
-
+func reassignPointers() error {
 	//Make a pointer to the current stack
 	processingBlockStack := blockStack.GetCurrentStack()
 
 	//Push new entry one onto main stack in case a new stack will need to be evaluated
 	blockStack.PushOntoMainStack()
+	defer blockStack.PopFromMainStack()
 
 	//Make a pointer to what was jus pushed onto the main stack
 	newlyEvaluatedBlockStack := blockStack.GetCurrentStack()
 
+	err := processCapturedLines(processingBlockStack, newlyEvaluatedBlockStack)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func processCapturedLines(
+	currentLevel *[]blockStack.BlockOperationStack,
+	upperLevel *[]blockStack.BlockOperationStack) error {
+	var processCapturedErr error
+
 	//Iterate over captured lines
-	for _, b := range (*processingBlockStack)[0].CapturedLines {
-		if len(*newlyEvaluatedBlockStack) > 0 {
+	for _, b := range (*currentLevel)[0].CapturedLines {
+		if len(*upperLevel) > 0 {
 			newlyEvaluatedParsedValues := util.LineOperationParsedValues{
 				OperandStartPosition: b.OperandStartPosition,
 				OperationLabel:       b.OperationLabel,
@@ -119,7 +134,6 @@ func processCapturedLines() error {
 			return processCapturedErr // ❌ Fails
 		}
 	}
-	blockStack.PopFromMainStack()
 
 	return nil
 }
