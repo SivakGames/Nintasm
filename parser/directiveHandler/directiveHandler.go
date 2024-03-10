@@ -3,6 +3,7 @@ package directiveHandler
 import (
 	"fmt"
 	"misc/nintasm/assemble/blockStack"
+	"misc/nintasm/assemble/blockStack2"
 	"misc/nintasm/assemble/errorHandler"
 	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
 	enumTokenTypes "misc/nintasm/constants/enums/tokenTypes"
@@ -14,14 +15,17 @@ type Node = operandFactory.Node
 
 func EvaluateDirective(operationTokenEnum enumTokenTypes.Def, directiveName string, operationLabel string, operandList *[]Node) error {
 
+	// Check if end block and if it's actually closing something
 	if operationTokenEnum == enumTokenTypes.DIRECTIVE_blockEnd ||
 		operationTokenEnum == enumTokenTypes.DIRECTIVE_labeledBlockEnd {
-		currentStack := blockStack.GetCurrentStack()
-		if len(*currentStack) == 0 {
+		//currentStack := blockStack.GetCurrentStack()
+		currentBlockEntries := blockStack2.GetCurrentBlockEntries()
+		//if len(*currentStack) == 0 {
+		if len(*currentBlockEntries) == 0 {
 			return errorHandler.AddNew(enumErrorCodes.DirectiveUnopenedEndBlock, directiveName)
 		}
 
-		if !blockStack.CheckIfEndOpMatchesOpeningOp(directiveName) {
+		if !blockStack2.CheckIfEndOpMatchesOpeningOp(directiveName) {
 			return errorHandler.AddNew(enumErrorCodes.DirectiveUnopenedEndBlock, directiveName)
 		}
 	}
@@ -95,7 +99,7 @@ func EvaluateDirective(operationTokenEnum enumTokenTypes.Def, directiveName stri
 		case "ENDIKV":
 			return evalEndIkv(operandList)
 		case "ENDREPEAT":
-			return evalEndRepeat(operandList)
+			return evalEndRepeat()
 		default:
 			panic("🛑 BAD BLOCK END DIRECTIVE!!!" + directiveName)
 		}

@@ -2,7 +2,7 @@ package parser
 
 import (
 	"fmt"
-	"misc/nintasm/assemble/blockStack"
+	"misc/nintasm/assemble/blockStack2"
 	"misc/nintasm/interpreter/environment/macroTable"
 )
 
@@ -12,7 +12,7 @@ const MACRO_MANAULLY_EVALS = true
 
 type MacroOperandParser struct {
 	OperandParser
-	capturedLinesToUnpack []blockStack.CapturedLine
+	capturedLinesToUnpack []blockStack2.CapturedLine
 }
 
 func NewMacroOperandParser() MacroOperandParser {
@@ -44,11 +44,11 @@ func (mop *MacroOperandParser) Process(macroName string) error {
 	return nil
 }
 
-func (mop *MacroOperandParser) GetUnpackLinesRef() *[]blockStack.CapturedLine {
+func (mop *MacroOperandParser) GetUnpackLinesRef() *[]blockStack2.CapturedLine {
 	return &mop.capturedLinesToUnpack
 }
 
-func (mop *MacroOperandParser) ApplyReplacementsToCapturedLine(capturedLineIndex int) blockStack.CapturedLine {
+func (mop *MacroOperandParser) ApplyReplacementsToCapturedLine(capturedLineIndex int) blockStack2.CapturedLine {
 	replacedCapturedLine := mop.capturedLinesToUnpack[capturedLineIndex]
 	replacementList := macroTable.GetReplacementListOnTopOfStack()
 

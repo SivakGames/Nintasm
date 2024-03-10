@@ -9,6 +9,8 @@ import (
 
 func evalIf(directiveName string, operandList *[]Node) error {
 	blockStack.PushOntoStack(directiveName, *operandList)
+	blockStack.ClearCaptureParentOpOnlyFlag()
+	blockStack.ClearCurrentOperationEvaluatesCapturedNodesFlag()
 	return nil
 }
 

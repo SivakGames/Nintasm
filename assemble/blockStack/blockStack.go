@@ -29,12 +29,17 @@ func init() {
 // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
+// Deprecated
 func PushOntoMainStack() {
 	blockOperationMainStack = append(blockOperationMainStack, newMainStack())
 }
+
+// Deprecated
 func PopFromMainStack() {
 	blockOperationMainStack = (blockOperationMainStack)[:len(blockOperationMainStack)-1]
 }
+
+// Deprecated
 func GetCurrentMainStack() *mainStack {
 	return &(blockOperationMainStack)[len(blockOperationMainStack)-1]
 }
@@ -54,6 +59,7 @@ func getTopOfCurrentStack() *BlockOperationStack {
 // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
+// Deprecated
 func PushOntoStack(op string, operandList []Node) {
 	currentStack := GetCurrentStack()
 	*currentStack = append(*currentStack, newBlockOperationStack(op, operandList))
@@ -62,6 +68,9 @@ func PushOntoStack(op string, operandList []Node) {
 
 func PopFromStack() {
 	currentStack := GetCurrentStack()
+	if len(*currentStack) == 0 {
+		return
+	}
 	*currentStack = (*currentStack)[:len(*currentStack)-1]
 }
 

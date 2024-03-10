@@ -18,93 +18,47 @@
 	.bank 0
 	.org $8000
 
-;-----------------------------------------
-
-YYY .kvmacro
+TTT .kvMacro
 	.db 1
+
 	.repeat 2
 	.db 2
-	.endRepeat
-	.db 3
-YYY .endkvm
+	.endrepeat
+
+	.db \xx
+
+	.repeat \rr
+	.db 5
+		.repeat 3
+		.db 6
+		.endrepeat
+	.endrepeat
+TTT .endkvm
+
+;-----------------------------------------
+RESET:
 
 
-	.ikv YYY
+NMI:
+
+	.repeat 2, \i
+	.db 6+\i
+	.endrepeat
+
+	.ikv TTT
+	.kv \xx, 160
+	.kv \rr, 16
 	.endikv
 
-;AddrDiff .func (\2 - \1)
-;
-;GENVALUE_LiquidPaletteIndex .func AddrDiff(DATA_RoomLiquidAnimatePalettes, \1) >> 2
-;
-;DATA_RoomLiquidAnimatePalettes:
-;.water1:
-;	.db $0f,$11,$21,$11
-;
-;	.db GENVALUE_LiquidPaletteIndex($8000)	;0
-;	.db GENVALUE_LiquidPaletteIndex(DATA_RoomLiquidAnimatePalettes.water1)	;0
+	.db 1,2,3,4
+	.db 1,2,3,4
+	.db 1,2,3,4
+	.db 1,2,3,4
 
-RESET:
-	SEI
-	CLD
-	LDX #$ff
-	TXS
-	INX
-	STX $2000
-	STX $2001
-	STX $4010
-	STX $2003
-	LDA #$40
-	STA $4017
-	LDA #$0f
-	STA $4015
-.vbwait1:
-	BIT $2002
-	BPL .vbwait1
-.clearMemory:
-	LDA #$00
-	STA $00, X
-	STA $0100, X
-	STA $0300, X
-	STA $0400, X
-	STA $0500, X
-	STA $0600, X
-	STA $0700, X
-	LDA #$f8
-	STA $0200, X
-	INX
-	BNE .clearMemory
-.vbwait2:
-	BIT $2002
-	BPL .vbwait2
-
-
-RESET_end:
-	;Enable NMI
-	LDA #(PPUCTRL.enableNMI | PPUCTRL.spritePatternTable)
-	STA PPUCTRL
-
-	LDA #$3F
-	STA $2006
-	LDA #$00
-	STA $2006
-
-;	__setPPU__ PPUADDR.palBg0
-
-	;Let the whole screen be PINK!
-	LDA #$25
-	STA $2007
-
-Forever:
-	JMP Forever
-
-;-----------------------------------------
-NMI:
-	LDA #0 
-	STA $2006 
-	STA $2006
-	RTI
-
-;-----------------------------------------
+	.ikv TTT
+	.kv \xx, 255
+	.kv \rr, 12
+	.endikv
 
 	.org $fffa
 	.dw NMI, RESET, 0

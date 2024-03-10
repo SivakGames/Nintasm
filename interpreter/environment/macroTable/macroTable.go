@@ -1,14 +1,16 @@
 package macroTable
 
 import (
-	"misc/nintasm/assemble/blockStack"
+	"misc/nintasm/assemble/blockStack2"
 	"misc/nintasm/assemble/errorHandler"
 	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
 )
 
 // ++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-type MacroTableType = []blockStack.CapturedLine
+type MacroTableType = []blockStack2.CapturedLine
+
+//type MacroTableType = []blockStack.CapturedLine
 
 var macroSymbolTable = map[string]MacroTableType{}
 var kvMacroSymbolTable = map[string]MacroTableType{}

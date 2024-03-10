@@ -2,7 +2,7 @@ package assemble
 
 import (
 	"fmt"
-	"misc/nintasm/assemble/blockStack"
+	"misc/nintasm/assemble/blockStack2"
 	"misc/nintasm/assemble/fileHandler"
 	"misc/nintasm/assemble/fileStack"
 	enumParserTypes "misc/nintasm/constants/enums/parserTypes"
@@ -89,9 +89,10 @@ func ReadLines(lines *[]string, lineCounter *uint) error {
 
 		//Intermediate - determine if capturing things in a block stack
 
-		currentBlockStack := blockStack.GetCurrentStack()
+		currentBlockStack := blockStack2.GetCurrentBlockEntries()
 		if len(*currentBlockStack) > 0 {
-			err := handleBlockStack(reformattedLine, &lineOperationParsedValues, true)
+			//err := handleBlockStack(reformattedLine, &lineOperationParsedValues, true)
+			err := handleBlockStack(reformattedLine, &lineOperationParsedValues)
 			if err != nil {
 				return err
 			}

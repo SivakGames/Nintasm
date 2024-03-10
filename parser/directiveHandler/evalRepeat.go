@@ -1,7 +1,7 @@
 package directiveHandler
 
 import (
-	"misc/nintasm/assemble/blockStack"
+	"misc/nintasm/assemble/blockStack2"
 	"misc/nintasm/assemble/errorHandler"
 	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
 	"misc/nintasm/interpreter"
@@ -11,13 +11,12 @@ import (
 )
 
 func evalRepeat(directiveName string, operandList *[]Node) error {
+
+	// Check and validate repeat amount
 	numRepeatsNode, err := interpreter.EvaluateNode((*operandList)[0])
 	if err != nil {
 		return err
 	}
-
-	blockStack.SetCurrentOperationEvaluatesCapturedNodesFlag()
-
 	if !operandFactory.ValidateNodeIsNumeric(&numRepeatsNode) {
 		return errorHandler.AddNew(enumErrorCodes.NodeTypeNotNumeric) // ❌ Fails
 	} else if !operandFactory.ValidateNumericNodeIsGTEValue(&numRepeatsNode, 1) {
@@ -26,6 +25,7 @@ func evalRepeat(directiveName string, operandList *[]Node) error {
 
 	evaluatedNodes := []Node{numRepeatsNode}
 
+	// Check if iterator node was set
 	if len(*operandList) > 1 {
 		iterNameNode := (*operandList)[1]
 		if !operandFactory.ValidateNodeIsSubstitutionID(&iterNameNode) {
@@ -34,28 +34,37 @@ func evalRepeat(directiveName string, operandList *[]Node) error {
 		evaluatedNodes = append(evaluatedNodes, (*operandList)[1])
 	}
 
-	blockStack.PushOntoStack(directiveName, evaluatedNodes)
+	//See if this is the bottom entry (i.e. creating a new stack)
+	// Set the eval instead of capture to false
+
+	//blockStack.PushOntoStack(directiveName, evaluatedNodes)
+	//blockStack.ClearCaptureParentOpOnlyFlag()
+	//blockStack.ClearCurrentOperationEvaluatesCapturedNodesFlag()
+	blockStack2.PushOntoTopEntry(directiveName, evaluatedNodes)
 
 	return nil
 }
 
-func evalEndRepeat(operandList *[]Node) error {
-	currentStackOperation := blockStack.GetTopOfStackOperation()
-	currentStackOperationOperandList := &currentStackOperation.OperandList
-	currentStackOperationCapturedLines := &currentStackOperation.CapturedLines
+func evalEndRepeat() error {
+	capturedLines, operandList := blockStack2.GetTopBlockEntryData()
+	//currentStackOperation := blockStack.GetTopOfStackOperation()
+	//operandList := &currentStackOperation.OperandList
+	//capturedLines := &currentStackOperation.CapturedLines
 
-	repeatAmount := (*currentStackOperationOperandList)[0].AsNumber
+	//Extract repeatAmount
+	repeatAmount := (*operandList)[0].AsNumber
 	iteratorName := ""
-	if len(*currentStackOperationOperandList) > 1 {
-		iteratorName = (*currentStackOperationOperandList)[1].NodeValue
+
+	if len(*operandList) > 1 {
+		iteratorName = (*operandList)[1].NodeValue
 	}
 
-	replacedLines := make([]blockStack.CapturedLine, len(*currentStackOperationCapturedLines)*repeatAmount)
+	replacedLines := make([]blockStack2.CapturedLine, len(*capturedLines)*repeatAmount)
 	replacedIndex := 0
 
 	if iteratorName == "" {
 		for i := 0; i < repeatAmount; i++ {
-			for _, j := range *currentStackOperationCapturedLines {
+			for _, j := range *capturedLines {
 				replacedLines[replacedIndex] = j
 				replacedIndex++
 			}
@@ -64,7 +73,7 @@ func evalEndRepeat(operandList *[]Node) error {
 		iterNameAsRegex := regexp.MustCompile(`\` + iteratorName + `\b`)
 		for i := 0; i < repeatAmount; i++ {
 			replaceNum := strconv.Itoa(i)
-			for _, j := range *currentStackOperationCapturedLines {
+			for _, j := range *capturedLines {
 				replaced := iterNameAsRegex.ReplaceAllString(j.OriginalLine, replaceNum)
 				j.OriginalLine = replaced
 				replacedLines[replacedIndex] = j
@@ -72,7 +81,11 @@ func evalEndRepeat(operandList *[]Node) error {
 			}
 		}
 	}
+	if len(replacedLines) == 0 {
+		errorHandler.AddNew(enumErrorCodes.BlockIsEmpty) // ⚠️ Warns
+	}
 
-	blockStack.PopFromStackAndExtendCapturedLines(replacedLines)
+	//blockStack.PopFromStackAndExtendCapturedLines(replacedLines)
+	blockStack2.PopTopEntryThenExtendCapturedLines(replacedLines)
 	return nil
 }
