@@ -1,7 +1,6 @@
 package directiveHandler
 
 import (
-	"fmt"
 	"misc/nintasm/assemble/blockStack2"
 	"misc/nintasm/assemble/errorHandler"
 	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
@@ -79,7 +78,6 @@ func evalEndIkv(operandList *[]Node) error {
 	//Clearing this flag was a reset from the old method.
 	//New method should just leave the flag alone at the end op and all opening ops
 	// should set/clear it instead
-	fmt.Println(modifiedCapturedLines)
 
 	//blockStack.ClearCurrentOperationEvaluatesCapturedNodesFlag()
 	blockStack2.ClearCurrentInvokeOperationEvalFlag()

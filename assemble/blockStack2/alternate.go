@@ -1,7 +1,6 @@
 package blockStack2
 
 import (
-	"fmt"
 	enumTokenTypes "misc/nintasm/constants/enums/tokenTypes"
 	"misc/nintasm/util"
 	"strings"
@@ -130,20 +129,13 @@ func AddNewInvokeOperationCollection() {
 
 func DestroyTempCollection(ptr *InvokeOperation) {
 	var invokeOp *InvokeOperation = &invokeOperations
-	var exited bool = false
 
 	for invokeOp.nextCollection != nil {
 		if invokeOp.nextCollection == ptr {
 			invokeOp.nextCollection = nil
-			exited = true
 			break
 		}
 		invokeOp = invokeOperations.nextCollection
-	}
-	if exited {
-		fmt.Println("Exited legit")
-	} else {
-		fmt.Println("Exited not legit")
 	}
 }
 

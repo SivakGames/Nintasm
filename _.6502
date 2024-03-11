@@ -3,6 +3,39 @@
 ; Will display a pink screen
 ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+MMM .macro
+	.repeat 2
+		.db $fe,$ff
+	.endrepeat
+MMM .endm
+
+TTT .kvMacro
+	.db 1
+	.db "HEYHEY1"
+
+	.if defined(\rr)
+		.repeat 32
+			.db 6
+		.endrepeat
+		.db "HEYHEY2"
+
+	.endif
+
+	.db \xx
+
+	.db "HEYHEY3"
+TTT .endkvm
+
+
+CCC .charmap
+	.defchar "A", $11
+	.defchar "B", $22
+CCC .endcharmap
+
+EEE .exprmap
+	.defexpr "A 1", $33
+EEE .endexprmap
+
 ;==========================================
 ; iNES header
 ;==========================================
@@ -18,24 +51,14 @@
 	.bank 0
 	.org $8000
 
-TTT .kvMacro
-	.db 1
-
-
-	.if defined(\rr)
-		.repeat 32
-			.db 6
-		.endrepeat
-
-	.endif
-
-	.db \xx
-
-
-TTT .endkvm
-
 ;-----------------------------------------
 RESET:
+
+	MMM 
+
+
+	.db toCharmap("AB")
+	.db `A 1`,`A 1`
 
 	.if 2 > 11
 		.db 9,9,9,9
@@ -68,7 +91,7 @@ NMI:
 
 	.ikv TTT
 	.kv \xx, 255
-	.kv \rr, 16
+	;.kv \rr, 16
 	;.kv \rr, 12
 	.endikv
 

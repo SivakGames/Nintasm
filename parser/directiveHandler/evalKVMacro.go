@@ -1,7 +1,6 @@
 package directiveHandler
 
 import (
-	"fmt"
 	"misc/nintasm/assemble/blockStack"
 	"misc/nintasm/assemble/blockStack2"
 	"misc/nintasm/assemble/errorHandler"
@@ -26,7 +25,6 @@ func evalEndKVMacro() error {
 	}
 
 	macroTable.AddCapturedLinesToMacro(macroLabel, macroTable.KVMacro, *capturedLines)
-	fmt.Println(macroTable.LookupMacroInEnvironment(macroLabel, macroTable.KVMacro))
 	//blockStack.ClearBottomOfStackCapturedLines()
 	//blockStack.PopFromStackAndExtendNoLines()
 	blockStack2.ForcePopTopEntry()
