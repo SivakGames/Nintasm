@@ -21,18 +21,17 @@
 TTT .kvMacro
 	.db 1
 
-	.repeat 2
-	.db 2
-	.endrepeat
+
+	.if defined(\rr)
+		.repeat 32
+			.db 6
+		.endrepeat
+
+	.endif
 
 	.db \xx
 
-	.repeat \rr
-	.db 5
-		.repeat 3
-		.db 6
-		.endrepeat
-	.endrepeat
+
 TTT .endkvm
 
 ;-----------------------------------------
@@ -40,6 +39,15 @@ RESET:
 
 	.if 2 > 11
 		.db 9,9,9,9
+	.endif
+
+	.if defined(twtwtwt)
+		.repeat 2
+		.db 9
+			.repeat 3
+			.db 8
+			.endrepeat
+		.endrepeat
 	.endif
 
 NMI:
@@ -60,7 +68,8 @@ NMI:
 
 	.ikv TTT
 	.kv \xx, 255
-	.kv \rr, 12
+	.kv \rr, 16
+	;.kv \rr, 12
 	.endikv
 
 	.org $fffa
