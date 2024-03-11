@@ -10,18 +10,18 @@ import (
 // ++++++++++++++++++++++++++++++++++++
 
 type blockEntry struct {
-	blockOperationName  string
-	capturedLines       []CapturedLine
-	operandList         []Node
-	alternateStackBlock *blockEntry
+	BlockOperationName  string
+	CapturedLines       []CapturedLine
+	OperandList         []Node
+	AlternateStackBlock *blockEntry
 }
 
 func newBlockEntry(blockOperationName string, operandList []Node) blockEntry {
 	return blockEntry{
-		blockOperationName:  blockOperationName,
-		capturedLines:       []CapturedLine{},
-		operandList:         operandList,
-		alternateStackBlock: nil,
+		BlockOperationName:  blockOperationName,
+		CapturedLines:       []CapturedLine{},
+		OperandList:         operandList,
+		AlternateStackBlock: nil,
 	}
 }
 
@@ -72,8 +72,8 @@ func getCurrentInvokeOperationTopBlockEntry() *blockEntry {
 
 func getCurrentInvokeOperationTopBlockEntryFurthestAlternate() *blockEntry {
 	blockEntry := getCurrentInvokeOperationTopBlockEntry()
-	for blockEntry.alternateStackBlock != nil {
-		blockEntry = blockEntry.alternateStackBlock
+	for blockEntry.AlternateStackBlock != nil {
+		blockEntry = blockEntry.AlternateStackBlock
 	}
 	return blockEntry
 }
@@ -153,11 +153,16 @@ func PushOntoTopEntry(blockOperationName string, operandList []Node) {
 	currentOp := getCurrentInvokeOperation()
 	currentOp.evalutesInsteadOfCapturing = flags.ForcedEval
 	currentOp.forcedCapturing = flags.ForcedCapture
-
 }
 
 func ForcePopTopEntry() {
 	popFromCurrentInvokeOperationEntries()
+}
+
+func CreateNewAlternateForTopEntry(blockOperationName string, operandList []Node) {
+	curr := getCurrentInvokeOperationTopBlockEntryFurthestAlternate()
+	altBlock := newBlockEntry(blockOperationName, operandList)
+	curr.AlternateStackBlock = &altBlock
 }
 
 func PopTopEntryThenExtendCapturedLines(extendedLines []CapturedLine) {
@@ -168,13 +173,13 @@ func PopTopEntryThenExtendCapturedLines(extendedLines []CapturedLine) {
 		popFromCurrentInvokeOperationEntries()
 		blockEntry := getCurrentInvokeOperationTopBlockEntryFurthestAlternate()
 		for _, line := range extendedLines {
-			blockEntry.capturedLines = append(blockEntry.capturedLines, line)
+			blockEntry.CapturedLines = append(blockEntry.CapturedLines, line)
 		}
 
 	} else if len(*blockEntries) == 1 {
 		//Set eval operands to true
 		blockEntry := getCurrentInvokeOperationTopBlockEntryFurthestAlternate()
-		blockEntry.capturedLines = extendedLines
+		blockEntry.CapturedLines = extendedLines
 		GoToProcessingFlag = true
 	} else {
 		panic("🛑 Popping nothing/extending nothing!!!")
@@ -185,36 +190,44 @@ func GetCurrentBlockEntries() *[]blockEntry {
 	return getCurrentInvokeOperationBlockEntries()
 }
 
+func GetCurrentBlockEntry() *blockEntry {
+	currentStackOp := getCurrentInvokeOperationTopBlockEntry()
+	return currentStackOp
+}
+
+func GetCurrentBlockEntryOperationName() string {
+	curr := getCurrentInvokeOperationTopBlockEntryFurthestAlternate()
+	return curr.BlockOperationName
+}
+
 func GetCurrentBlockEntryCapturedLines() *[]CapturedLine {
 	curr := getCurrentInvokeOperationTopBlockEntryFurthestAlternate()
-	return &curr.capturedLines
+	return &curr.CapturedLines
 }
 
 func CheckIfEndOpMatchesOpeningOp(desiredEndOpName string) bool {
 	currentStackOp := getCurrentInvokeOperationTopBlockEntry()
-	endOpName, _ := correspondingEndBlockOperations[currentStackOp.blockOperationName]
+	endOpName, _ := correspondingEndBlockOperations[currentStackOp.BlockOperationName]
 	return endOpName == strings.ToUpper(desiredEndOpName)
 }
 
-func GetCurrentOpPtr() *InvokeOperation {
-	return getCurrentInvokeOperation()
+func GetTopBlockEntryData() (*[]CapturedLine, *[]Node) {
+	topEntry := getCurrentInvokeOperationTopBlockEntry()
+	return &topEntry.CapturedLines, &topEntry.OperandList
 }
 
 // ***************************************************
-
+func GetCurrentOpPtr() *InvokeOperation {
+	return getCurrentInvokeOperation()
+}
 func GetLinesWithPtr(pointer *InvokeOperation) *[]CapturedLine {
-	return &pointer.blockEntries[0].capturedLines
+	return &pointer.blockEntries[0].CapturedLines
 }
 func GetBlockEntriesWithPtr(pointer *InvokeOperation) *[]blockEntry {
 	return &pointer.blockEntries
 }
 func ClearBlockEntriesWithPtr(pointer *InvokeOperation) {
 	pointer.blockEntries = (*pointer).blockEntries[:0]
-}
-
-func GetTopBlockEntryData() (*[]CapturedLine, *[]Node) {
-	topEntry := getCurrentInvokeOperationTopBlockEntry()
-	return &topEntry.capturedLines, &topEntry.operandList
 }
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -251,7 +264,7 @@ func CheckOperationIsCapturableAndAppend(
 		return err
 	}
 	currentStackOp := getCurrentInvokeOperationTopBlockEntryFurthestAlternate()
-	currentStackOp.capturedLines = append(currentStackOp.capturedLines, newCapturedLine(
+	currentStackOp.CapturedLines = append(currentStackOp.CapturedLines, newCapturedLine(
 		originalLine,
 		lineOperationParsedValues.OperationLabel,
 		lineOperationParsedValues.OperationTokenEnum,

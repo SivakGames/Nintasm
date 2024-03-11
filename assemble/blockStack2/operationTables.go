@@ -103,7 +103,7 @@ var allowedOperationsForParentOps = map[string]captureableOpMap{
 
 func getAllowedOperationsForCurrentBlockOperation() captureableOpMap {
 	blockEntry := getCurrentInvokeOperationTopBlockEntryFurthestAlternate()
-	blockOperationName := blockEntry.blockOperationName
+	blockOperationName := blockEntry.BlockOperationName
 	allowedOperations, ok := allowedOperationsForParentOps[blockOperationName]
 	if !ok {
 		errMsg := fmt.Sprintf("Very bad stack op! Got: %v", blockOperationName)
