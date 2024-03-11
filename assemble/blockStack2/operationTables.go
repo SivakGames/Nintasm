@@ -29,6 +29,7 @@ var startBlockOperationFlags = map[string]startOpFlags{
 	"EXPRMAP":   newStartOpFlags(true, false),
 	"IF":        newStartOpFlags(false, false),
 	"IKV":       newStartOpFlags(true, false),
+	"IM":        newStartOpFlags(true, false),
 	"KVMACRO":   newStartOpFlags(false, true),
 	"MACRO":     newStartOpFlags(false, true),
 	"NAMESPACE": newStartOpFlags(true, false),
@@ -38,7 +39,7 @@ var startBlockOperationFlags = map[string]startOpFlags{
 func getStartOperationFlags(directiveName string) startOpFlags {
 	flags, ok := startBlockOperationFlags[directiveName]
 	if !ok {
-		panic("Bad/undefined start op flag name")
+		panic(fmt.Sprintf("Bad/undefined start op flag name: %v", directiveName))
 	}
 
 	return flags
@@ -52,6 +53,7 @@ var correspondingEndBlockOperations = map[string]string{
 	"EXPRMAP":   "ENDEXPRMAP",
 	"IF":        "ENDIF",
 	"IKV":       "ENDIKV",
+	"IM":        "ENDIM",
 	"KVMACRO":   "ENDKVM",
 	"MACRO":     "ENDM",
 	"NAMESPACE": "ENDNAMESPACE",
@@ -93,6 +95,7 @@ var allowedOperationsForParentOps = map[string]captureableOpMap{
 	"IKV": {
 		enumTokenTypes.DIRECTIVE_invokeKeyVal: true,
 	},
+	"IM":      {},
 	"KVMACRO": sharedCapturableMacroOps,
 	"MACRO":   sharedCapturableMacroOps,
 	"NAMESPACE": {

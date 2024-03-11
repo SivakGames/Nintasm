@@ -22,6 +22,7 @@ func NewMacroOperandParser() MacroOperandParser {
 // Main macro invoke parser
 func (mop *MacroOperandParser) Process(macroName string) error {
 	var err error
+	var capturedLinesToProcess []blockStack2.CapturedLine
 
 	macroTable.AppendToReplacementStack()
 	mop.capturedLinesToUnpack, err = macroTable.LookupAndGetMacroInEnvironment(macroName, macroTable.Macro)
@@ -37,16 +38,33 @@ func (mop *MacroOperandParser) Process(macroName string) error {
 		return err // ❌ Fails
 	}
 
+	// Put numeric replacements on stack
 	for i, operand := range operandList {
 		macroTable.AddToReplacementListOnTopOfStack(fmt.Sprintf("\\%d", i+1), operand.NodeValue)
 	}
 
+	//Iterate over macro lines and apply replacements
+	for i := range mop.capturedLinesToUnpack {
+		capturedLinesToProcess = append(capturedLinesToProcess, mop.ApplyReplacementsToCapturedLine(i))
+	}
+
+	blockStack2.PushOntoTopEntry("IM", operandList)
+
+	currentStackOp := blockStack2.GetCurrentBlockEntry()
+	currentStackOp.CapturedLines = capturedLinesToProcess
+
 	return nil
 }
 
+/*
+func (mop *MacroOperandParser) GenerateDummyEndBlock() util.LineOperationParsedValues {
+	return util.NewLineOperationParsedValues(6, "", enumTokenTypes.DIRECTIVE_labeledBlockEnd, " ENDIM", enumParserTypes.Directive)
+}*/
+
+/*
 func (mop *MacroOperandParser) GetUnpackLinesRef() *[]blockStack2.CapturedLine {
 	return &mop.capturedLinesToUnpack
-}
+}*/
 
 func (mop *MacroOperandParser) ApplyReplacementsToCapturedLine(capturedLineIndex int) blockStack2.CapturedLine {
 	replacedCapturedLine := mop.capturedLinesToUnpack[capturedLineIndex]

@@ -4,11 +4,14 @@
 ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 MMM .macro
-	.db 1
+	.if defined(\1)
+	.db 77
+	.endif
+	.db \1
 	.repeat 32
 			.db 6
 		.endrepeat
-	.db "HEYHEY1"
+	.db "JEYJEY1"
 MMM .endm
 
 TTT .kvMacro

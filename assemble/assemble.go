@@ -186,7 +186,13 @@ func parseOperandStringAndProcess(
 		if operandParserErr != nil {
 			return operandParserErr
 		}
-		linesToUnpack := macroOperandParser.GetUnpackLinesRef()
+
+		preProcessBlockStack()
+
+		//endBlock := macroOperandParser.GenerateDummyEndBlock()
+		//handleBlockStack(" ENDIM", &endBlock)
+
+		/*linesToUnpack := macroOperandParser.GetUnpackLinesRef()
 		for i := range *linesToUnpack {
 			replacedCapturedLine := macroOperandParser.ApplyReplacementsToCapturedLine(i)
 			temp := util.NewLineOperationParsedValues(replacedCapturedLine.OperandStartPosition,
@@ -199,7 +205,7 @@ func parseOperandStringAndProcess(
 			if err != nil {
 				return err
 			}
-		}
+		}*/
 		macroOperandParser.PopFromStack()
 
 	default:

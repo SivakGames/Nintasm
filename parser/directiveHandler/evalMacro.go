@@ -1,7 +1,6 @@
 package directiveHandler
 
 import (
-	"fmt"
 	"misc/nintasm/assemble/blockStack"
 	"misc/nintasm/assemble/blockStack2"
 	"misc/nintasm/assemble/errorHandler"
@@ -27,8 +26,6 @@ func evalEndMacro() error {
 	if len(*capturedLines) == 0 {
 		errorHandler.AddNew(enumErrorCodes.BlockIsEmpty) // ⚠️ Warns
 	}
-
-	fmt.Println(*capturedLines)
 
 	macroTable.AddCapturedLinesToMacro(macroLabel, macroTable.Macro, *capturedLines)
 	//blockStack.ClearBottomOfStackCapturedLines()
