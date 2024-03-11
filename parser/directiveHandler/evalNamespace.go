@@ -1,7 +1,6 @@
 package directiveHandler
 
 import (
-	"misc/nintasm/assemble/blockStack"
 	"misc/nintasm/assemble/blockStack2"
 	enumSymbolTableTypes "misc/nintasm/constants/enums/symbolTableTypes"
 	"misc/nintasm/interpreter"
@@ -21,7 +20,7 @@ func evalNamespace(directiveName string, namespaceLabel string, operandList *[]N
 
 // End the Namespace definition and add to environment
 func evalEndNamespace() error {
-	blockStack.ClearCurrentOperationLabel() //TODO - Change to new implementation
+	blockStack2.ClearCurrentOperationLabel() //TODO - Change to new implementation
 	blockStack2.ForcePopTopEntry()
 	//_ = blockStack.GetLabelAndDoEndBlockSetups()
 	//blockStack.ClearCurrentOperationEvaluatesCapturedNodesFlag()

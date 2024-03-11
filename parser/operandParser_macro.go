@@ -77,6 +77,6 @@ func (mop *MacroOperandParser) ApplyReplacementsToCapturedLine(capturedLineIndex
 	return replacedCapturedLine
 }
 
-func (mop *MacroOperandParser) PopFromStack() {
+func (mop *MacroOperandParser) EndInvokeMacro() {
 	macroTable.PopFromReplacementStack()
 }

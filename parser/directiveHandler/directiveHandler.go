@@ -2,7 +2,6 @@ package directiveHandler
 
 import (
 	"fmt"
-	"misc/nintasm/assemble/blockStack"
 	"misc/nintasm/assemble/blockStack2"
 	"misc/nintasm/assemble/errorHandler"
 	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
@@ -156,7 +155,8 @@ func EvaluateDirective(operationTokenEnum enumTokenTypes.Def, directiveName stri
 func ProcessOpenLabelBlock(openBlockLabel string) error {
 	var err error
 
-	currentStack := blockStack.GetCurrentStack()
+	//currentStack := blockStack.GetCurrentStack()
+	currentStack := blockStack2.GetCurrentBlockEntries()
 	if len(*currentStack) > 0 {
 		return errorHandler.AddNew(enumErrorCodes.DirectiveNestedLabelBlock) // ❌ Fails
 	}
@@ -164,7 +164,7 @@ func ProcessOpenLabelBlock(openBlockLabel string) error {
 	if err != nil {
 		return err // ❌ Fails
 	}
-	err = blockStack.SetCurrentOperationLabel(openBlockLabel)
+	err = blockStack2.SetCurrentOperationLabel(openBlockLabel)
 	if err != nil {
 		return err // ❌ Fails
 	}

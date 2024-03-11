@@ -62,7 +62,6 @@ EEE .endexprmap
 
 ;-----------------------------------------
 RESET:
-	MMM 2
 
 
 	.db toCharmap("Aは")
@@ -81,6 +80,7 @@ RESET:
 		.endrepeat
 	.endif
 
+	MMM 2
 NMI:
 
 	.repeat 2, \i

@@ -1,6 +1,7 @@
 package blockStack2
 
 import (
+	"fmt"
 	enumTokenTypes "misc/nintasm/constants/enums/tokenTypes"
 	"misc/nintasm/util"
 	"strings"
@@ -46,6 +47,7 @@ func newInvokeOperation() InvokeOperation {
 
 // +++++++++++++++++++++++++++++++++++++++++++++
 
+var currentBlockOperationLabel string = ""
 var invokeOperations InvokeOperation = newInvokeOperation()
 var GoToProcessingFlag bool = false
 
@@ -90,6 +92,22 @@ func popFromCurrentInvokeOperationEntries() {
 }
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++
+func ClearCurrentOperationLabel() {
+	currentBlockOperationLabel = ""
+}
+
+// Will set the label of the labeled operation that will be captured.
+// If one was previously set then error because it hasn't finished.
+func SetCurrentOperationLabel(label string) error {
+	if currentBlockOperationLabel != "" {
+		panic(fmt.Sprintf("🛑 Somehow entering another label block operation while first (%v) is not done...", currentBlockOperationLabel))
+	}
+
+	currentBlockOperationLabel = label
+	return nil
+}
+
+// +++++++++++++++++++++++++++++++++++++++++++++++++++
 func ClearCurrentInvokeOperationEvalFlag() {
 	currentInvokeOp := getCurrentInvokeOperation()
 	currentInvokeOp.evalutesInsteadOfCapturing = false
@@ -103,6 +121,7 @@ func SetCurrentInvokeOperationEvalFlag() {
 	currentInvokeOp.evalutesInsteadOfCapturing = true
 }
 
+// +++++++++++++++++++++++++++++++++++++++++++++++++++
 func ClearCurrentInvokeOperationForcedCapturingFlag() {
 	currentInvokeOp := getCurrentInvokeOperation()
 	currentInvokeOp.forcedCapturing = false

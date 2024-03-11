@@ -2,7 +2,6 @@ package directiveHandler
 
 import (
 	"fmt"
-	"misc/nintasm/assemble/blockStack"
 	"misc/nintasm/assemble/blockStack2"
 	"misc/nintasm/assemble/errorHandler"
 	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
@@ -24,7 +23,7 @@ func evalEndCharmap() error {
 	//_ = blockStack.GetLabelAndDoEndBlockSetups()
 	//blockStack.ClearCurrentOperationEvaluatesCapturedNodesFlag()
 	//blockStack.PopFromStackAndExtendNoLines()
-	blockStack.ClearCurrentOperationLabel() //TODO - Change to new implementation
+	blockStack2.ClearCurrentOperationLabel()
 	blockStack2.ForcePopTopEntry()
 	return nil
 }

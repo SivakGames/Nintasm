@@ -27,6 +27,7 @@ func evalEndKVMacro() error {
 	macroTable.AddCapturedLinesToMacro(macroLabel, macroTable.KVMacro, *capturedLines)
 	//blockStack.ClearBottomOfStackCapturedLines()
 	//blockStack.PopFromStackAndExtendNoLines()
+	blockStack2.ClearCurrentOperationLabel()
 	blockStack2.ForcePopTopEntry()
 	return nil
 }

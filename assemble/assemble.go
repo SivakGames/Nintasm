@@ -206,7 +206,7 @@ func parseOperandStringAndProcess(
 				return err
 			}
 		}*/
-		macroOperandParser.PopFromStack()
+		macroOperandParser.EndInvokeMacro()
 
 	default:
 		panic("🛑 Parent parsing operation could not be determined!")
