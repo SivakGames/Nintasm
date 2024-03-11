@@ -4,9 +4,11 @@
 ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 MMM .macro
-	.repeat 2
-		.db $fe,$ff
-	.endrepeat
+	.db 1
+	.repeat 32
+			.db 6
+		.endrepeat
+	.db "HEYHEY1"
 MMM .endm
 
 TTT .kvMacro
@@ -26,10 +28,14 @@ TTT .kvMacro
 	.db "HEYHEY3"
 TTT .endkvm
 
+NNN .namespace
+.x1 = 1
+.x2 = .x1 + 12
+NNN .endnamespace
 
 CCC .charmap
 	.defchar "A", $11
-	.defchar "B", $22
+	.defchar "は", $22
 CCC .endcharmap
 
 EEE .exprmap
@@ -53,11 +59,10 @@ EEE .endexprmap
 
 ;-----------------------------------------
 RESET:
+	MMM 2
 
-	MMM 
 
-
-	.db toCharmap("AB")
+	.db toCharmap("Aは")
 	.db `A 1`,`A 1`
 
 	.if 2 > 11
