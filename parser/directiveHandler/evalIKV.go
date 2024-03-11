@@ -18,10 +18,6 @@ func evalIkv(directiveName string, operandList *[]Node) error {
 	}
 
 	blockStack2.PushOntoTopEntry(directiveName, *operandList)
-	//blockStack.PushOntoStack(directiveName, *operandList)
-	//blockStack.SetCaptureParentOpOnlyFlag()
-	//blockStack.SetCurrentOperationEvaluatesCapturedNodesFlag()
-
 	macroTable.AppendToReplacementStack()
 	symbolAsNodeTable.PushToSymbolTableStack()
 
@@ -43,10 +39,6 @@ func evalKv(operandList *[]Node) error {
 
 // Final operation
 func evalEndIkv(operandList *[]Node) error {
-	//currentStackOperation := blockStack.GetTopOfStackOperation()
-	//currentStackOperationOperandList := &currentStackOperation.OperandList
-	//macroNameNode := &(*currentStackOperationOperandList)[0]
-
 	// Get invoking macro name
 	_, originalOperandList := blockStack2.GetTopBlockEntryData()
 	macroNameNode := &(*originalOperandList)[0]
@@ -56,8 +48,6 @@ func evalEndIkv(operandList *[]Node) error {
 	if err != nil {
 		return err
 	}
-
-	//var modifiedCapturedLines []blockStack.CapturedLine
 
 	var modifiedCapturedLines []blockStack2.CapturedLine
 	replacementList := macroTable.GetReplacementListOnTopOfStack()
@@ -71,17 +61,7 @@ func evalEndIkv(operandList *[]Node) error {
 	}
 
 	macroTable.PopFromReplacementStack()
-
-	//blockStack.ClearCaptureParentOpOnlyFlag()
-
-	//Clearing this flag was a reset from the old method.
-	//New method should just leave the flag alone at the end op and all opening ops
-	// should set/clear it instead
-
-	//blockStack.ClearCurrentOperationEvaluatesCapturedNodesFlag()
 	blockStack2.ClearCurrentInvokeOperationEvalFlag()
-	//blockStack.PopFromStackAndExtendCapturedLines(modifiedCapturedLines)
 	blockStack2.PopTopEntryThenExtendCapturedLines(modifiedCapturedLines)
-
 	return nil
 }

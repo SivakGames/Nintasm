@@ -12,16 +12,11 @@ import (
 
 func evalExprmap(directiveName string, exprmapLabel string, operandList *[]Node) error {
 	blockStack2.PushOntoTopEntry(directiveName, *operandList)
-	//blockStack.PushOntoStack(directiveName, *operandList)
 	environment.AddOtherIdentifierToMasterTable(exprmapLabel, enumSymbolTableTypes.ExprMap)
-	//blockStack.SetCurrentOperationEvaluatesCapturedNodesFlag()
 	return nil
 }
 
 func evalEndExprmap() error {
-	//_ = blockStack.GetLabelAndDoEndBlockSetups()
-	//blockStack.ClearCurrentOperationEvaluatesCapturedNodesFlag()
-	//blockStack.PopFromStackAndExtendNoLines()
 	blockStack2.ClearCurrentOperationLabel() //TODO - Change to new implementation
 	blockStack2.ForcePopTopEntry()
 	return nil

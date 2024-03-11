@@ -10,8 +10,6 @@ import (
 
 type MacroTableType = []blockStack2.CapturedLine
 
-//type MacroTableType = []blockStack.CapturedLine
-
 var macroSymbolTable = map[string]MacroTableType{}
 var kvMacroSymbolTable = map[string]MacroTableType{}
 

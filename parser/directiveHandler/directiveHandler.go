@@ -17,9 +17,7 @@ func EvaluateDirective(operationTokenEnum enumTokenTypes.Def, directiveName stri
 	// Check if end block and if it's actually closing something
 	if operationTokenEnum == enumTokenTypes.DIRECTIVE_blockEnd ||
 		operationTokenEnum == enumTokenTypes.DIRECTIVE_labeledBlockEnd {
-		//currentStack := blockStack.GetCurrentStack()
 		currentBlockEntries := blockStack2.GetCurrentBlockEntries()
-		//if len(*currentStack) == 0 {
 		if len(*currentBlockEntries) == 0 {
 			return errorHandler.AddNew(enumErrorCodes.DirectiveUnopenedEndBlock, directiveName)
 		}
@@ -102,7 +100,6 @@ func EvaluateDirective(operationTokenEnum enumTokenTypes.Def, directiveName stri
 		default:
 			panic("🛑 BAD BLOCK END DIRECTIVE!!!" + directiveName)
 		}
-		//return evalRomBuildingOperands(directiveName, operandList)
 
 	case enumTokenTypes.DIRECTIVE_labeledBlockStart:
 		err := ProcessOpenLabelBlock(operationLabel)
@@ -155,7 +152,6 @@ func EvaluateDirective(operationTokenEnum enumTokenTypes.Def, directiveName stri
 func ProcessOpenLabelBlock(openBlockLabel string) error {
 	var err error
 
-	//currentStack := blockStack.GetCurrentStack()
 	currentStack := blockStack2.GetCurrentBlockEntries()
 	if len(*currentStack) > 0 {
 		return errorHandler.AddNew(enumErrorCodes.DirectiveNestedLabelBlock) // ❌ Fails

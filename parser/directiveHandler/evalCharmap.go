@@ -12,17 +12,12 @@ import (
 )
 
 func evalCharmap(directiveName string, charmapLabel string, operandList *[]Node) error {
-	//blockStack.PushOntoStack(directiveName, *operandList)
 	blockStack2.PushOntoTopEntry(directiveName, *operandList)
 	environment.AddOtherIdentifierToMasterTable(charmapLabel, enumSymbolTableTypes.CharMap)
-	//blockStack.SetCurrentOperationEvaluatesCapturedNodesFlag()
 	return nil
 }
 
 func evalEndCharmap() error {
-	//_ = blockStack.GetLabelAndDoEndBlockSetups()
-	//blockStack.ClearCurrentOperationEvaluatesCapturedNodesFlag()
-	//blockStack.PopFromStackAndExtendNoLines()
 	blockStack2.ClearCurrentOperationLabel()
 	blockStack2.ForcePopTopEntry()
 	return nil

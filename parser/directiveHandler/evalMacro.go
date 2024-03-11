@@ -10,10 +10,8 @@ import (
 )
 
 func evalMacro(directiveName string, macroLabel string, operandList *[]Node) error {
-	//blockStack.PushOntoStack(directiveName, *operandList)
 	blockStack2.PushOntoTopEntry(directiveName, *operandList)
 	environment.AddOtherIdentifierToMasterTable(macroLabel, enumSymbolTableTypes.Macro)
-	//blockStack.SetCaptureParentOpOnlyFlag()
 	return nil
 }
 
@@ -21,14 +19,11 @@ func evalMacro(directiveName string, macroLabel string, operandList *[]Node) err
 func evalEndMacro() error {
 	macroLabel := blockStack2.GetCurrentOperationLabel()
 	capturedLines := blockStack2.GetCurrentBlockEntryCapturedLines()
-	//capturedLines := blockStack.GetTopOfStackCapturedLines()
 	if len(*capturedLines) == 0 {
 		errorHandler.AddNew(enumErrorCodes.BlockIsEmpty) // ⚠️ Warns
 	}
 
 	macroTable.AddCapturedLinesToMacro(macroLabel, macroTable.Macro, *capturedLines)
-	//blockStack.ClearBottomOfStackCapturedLines()
-	//blockStack.PopFromStackAndExtendNoLines()
 	blockStack2.ClearCurrentOperationLabel()
 	blockStack2.ForcePopTopEntry()
 	return nil

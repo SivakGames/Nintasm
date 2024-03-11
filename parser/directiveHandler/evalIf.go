@@ -8,27 +8,21 @@ import (
 )
 
 func evalIf(directiveName string, operandList *[]Node) error {
-	//blockStack.PushOntoStack(directiveName, *operandList)
-	//blockStack.ClearCaptureParentOpOnlyFlag()
-	//blockStack.ClearCurrentOperationEvaluatesCapturedNodesFlag()
 	blockStack2.PushOntoTopEntry(directiveName, *operandList)
 	return nil
 }
 
 func evalElseIf(directiveName string, operandList *[]Node) error {
-	//lastOp := blockStack.GetTopOfStackLastAlternateOperation()
 	lastOpName := blockStack2.GetCurrentBlockEntryOperationName()
 	//See if else has been declared - can't do else if afterwards
 	if lastOpName == "ELSE" {
 		return errorHandler.AddNew(enumErrorCodes.IfStatementElseIfAfterElse)
 	}
-	//blockStack.AppendToTopOfStackAlternateBlock(directiveName, *operandList)
 	blockStack2.CreateNewAlternateForTopEntry(directiveName, *operandList)
 	return nil
 }
 
 func evalElse(directiveName string, operandList *[]Node) error {
-	//lastOp := blockStack.GetTopOfStackLastAlternateOperation()
 	lastOpName := blockStack2.GetCurrentBlockEntryOperationName()
 	//See if else has been declared - can't do duplicate elses
 	if lastOpName == "ELSE" {
@@ -36,13 +30,11 @@ func evalElse(directiveName string, operandList *[]Node) error {
 	}
 
 	*operandList = append(*operandList, operandFactory.CreateBooleanLiteralNode(true))
-	//blockStack.AppendToTopOfStackAlternateBlock(directiveName, *operandList)
 	blockStack2.CreateNewAlternateForTopEntry(directiveName, *operandList)
 	return nil
 }
 
 func evalEndIf(operandList *[]Node) error {
-	//currentStackOperation := blockStack.GetTopOfStackOperation()
 	currentStackOperation := blockStack2.GetCurrentBlockEntry()
 	var trueStatementCapturedLines *[]blockStack2.CapturedLine
 
@@ -69,7 +61,6 @@ func evalEndIf(operandList *[]Node) error {
 		trueStatementCapturedLines = &emptyCapturedLines
 	}
 
-	//blockStack.PopFromStackAndExtendCapturedLines(*trueStatementCapturedLines)
 	blockStack2.PopTopEntryThenExtendCapturedLines(*trueStatementCapturedLines)
 
 	//currentStack := blockStack.GetCurrentStack()

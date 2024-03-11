@@ -11,7 +11,6 @@ import (
 )
 
 func evalRepeat(directiveName string, operandList *[]Node) error {
-
 	// Check and validate repeat amount
 	numRepeatsNode, err := interpreter.EvaluateNode((*operandList)[0])
 	if err != nil {
@@ -34,12 +33,6 @@ func evalRepeat(directiveName string, operandList *[]Node) error {
 		evaluatedNodes = append(evaluatedNodes, (*operandList)[1])
 	}
 
-	//See if this is the bottom entry (i.e. creating a new stack)
-	// Set the eval instead of capture to false
-
-	//blockStack.PushOntoStack(directiveName, evaluatedNodes)
-	//blockStack.ClearCaptureParentOpOnlyFlag()
-	//blockStack.ClearCurrentOperationEvaluatesCapturedNodesFlag()
 	blockStack2.PushOntoTopEntry(directiveName, evaluatedNodes)
 
 	return nil
@@ -47,14 +40,12 @@ func evalRepeat(directiveName string, operandList *[]Node) error {
 
 func evalEndRepeat() error {
 	capturedLines, operandList := blockStack2.GetTopBlockEntryData()
-	//currentStackOperation := blockStack.GetTopOfStackOperation()
-	//operandList := &currentStackOperation.OperandList
-	//capturedLines := &currentStackOperation.CapturedLines
 
 	//Extract repeatAmount
 	repeatAmount := (*operandList)[0].AsNumber
-	iteratorName := ""
 
+	//Extract iterator name (if any)
+	iteratorName := ""
 	if len(*operandList) > 1 {
 		iteratorName = (*operandList)[1].NodeValue
 	}
@@ -85,7 +76,6 @@ func evalEndRepeat() error {
 		errorHandler.AddNew(enumErrorCodes.BlockIsEmpty) // ⚠️ Warns
 	}
 
-	//blockStack.PopFromStackAndExtendCapturedLines(replacedLines)
 	blockStack2.PopTopEntryThenExtendCapturedLines(replacedLines)
 	return nil
 }
