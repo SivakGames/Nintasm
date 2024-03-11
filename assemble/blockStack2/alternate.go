@@ -95,6 +95,9 @@ func popFromCurrentInvokeOperationEntries() {
 func ClearCurrentOperationLabel() {
 	currentBlockOperationLabel = ""
 }
+func GetCurrentOperationLabel() string {
+	return currentBlockOperationLabel
+}
 
 // Will set the label of the labeled operation that will be captured.
 // If one was previously set then error because it hasn't finished.

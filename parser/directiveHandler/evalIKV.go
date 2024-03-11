@@ -18,10 +18,9 @@ func evalIkv(directiveName string, operandList *[]Node) error {
 	}
 
 	blockStack2.PushOntoTopEntry(directiveName, *operandList)
-
 	//blockStack.PushOntoStack(directiveName, *operandList)
-	//	blockStack.SetCaptureParentOpOnlyFlag()
-	//	blockStack.SetCurrentOperationEvaluatesCapturedNodesFlag()
+	//blockStack.SetCaptureParentOpOnlyFlag()
+	//blockStack.SetCurrentOperationEvaluatesCapturedNodesFlag()
 
 	macroTable.AppendToReplacementStack()
 	symbolAsNodeTable.PushToSymbolTableStack()

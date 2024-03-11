@@ -1,7 +1,6 @@
 package directiveHandler
 
 import (
-	"misc/nintasm/assemble/blockStack"
 	"misc/nintasm/assemble/blockStack2"
 	"misc/nintasm/assemble/errorHandler"
 	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
@@ -18,7 +17,7 @@ func evalKVMacro(directiveName string, macroLabel string, operandList *[]Node) e
 
 // End the macro definition and add to environment
 func evalEndKVMacro() error {
-	macroLabel := blockStack.GetLabelAndDoEndBlockSetups()
+	macroLabel := blockStack2.GetCurrentOperationLabel()
 	capturedLines := blockStack2.GetCurrentBlockEntryCapturedLines()
 	if len(*capturedLines) == 0 {
 		errorHandler.AddNew(enumErrorCodes.BlockIsEmpty) // ⚠️ Warns

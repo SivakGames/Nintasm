@@ -1,7 +1,6 @@
 package directiveHandler
 
 import (
-	"misc/nintasm/assemble/blockStack"
 	"misc/nintasm/assemble/blockStack2"
 	"misc/nintasm/assemble/errorHandler"
 	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
@@ -20,7 +19,7 @@ func evalMacro(directiveName string, macroLabel string, operandList *[]Node) err
 
 // End the macro definition and add to environment
 func evalEndMacro() error {
-	macroLabel := blockStack.GetLabelAndDoEndBlockSetups()
+	macroLabel := blockStack2.GetCurrentOperationLabel()
 	capturedLines := blockStack2.GetCurrentBlockEntryCapturedLines()
 	//capturedLines := blockStack.GetTopOfStackCapturedLines()
 	if len(*capturedLines) == 0 {

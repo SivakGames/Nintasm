@@ -1,7 +1,6 @@
 package directiveHandler
 
 import (
-	"misc/nintasm/assemble/blockStack"
 	"misc/nintasm/assemble/blockStack2"
 	"misc/nintasm/assemble/errorHandler"
 	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
@@ -74,15 +73,16 @@ func evalEndIf(operandList *[]Node) error {
 	blockStack2.PopTopEntryThenExtendCapturedLines(*trueStatementCapturedLines)
 
 	//currentStack := blockStack.GetCurrentStack()
-	currentStack := blockStack2.GetCurrentBlockEntries()
-	if blockStack.StackWillClearFlag {
-		if currentStackOperation != nil {
-			(*currentStack)[0] = *currentStackOperation
-			(*currentStack)[0].AlternateStackBlock = nil
-		} else {
-			blockStack.SetBottomOfStackToEmptyBlock()
-		}
-	}
+	/*
+		currentStack := blockStack2.GetCurrentBlockEntries()
+		if blockStack.StackWillClearFlag {
+			if currentStackOperation != nil {
+				(*currentStack)[0] = *currentStackOperation
+				(*currentStack)[0].AlternateStackBlock = nil
+			} else {
+				blockStack.SetBottomOfStackToEmptyBlock()
+			}
+		} */
 
 	return nil
 }
