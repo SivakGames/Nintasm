@@ -2,7 +2,7 @@ package directiveHandler
 
 import (
 	"fmt"
-	"misc/nintasm/assemble/blockStack2"
+	"misc/nintasm/assemble/blockStack"
 	"misc/nintasm/assemble/errorHandler"
 	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
 	enumTokenTypes "misc/nintasm/constants/enums/tokenTypes"
@@ -17,12 +17,12 @@ func EvaluateDirective(operationTokenEnum enumTokenTypes.Def, directiveName stri
 	// Check if end block and if it's actually closing something
 	if operationTokenEnum == enumTokenTypes.DIRECTIVE_blockEnd ||
 		operationTokenEnum == enumTokenTypes.DIRECTIVE_labeledBlockEnd {
-		currentBlockEntries := blockStack2.GetCurrentBlockEntries()
+		currentBlockEntries := blockStack.GetCurrentBlockEntries()
 		if len(*currentBlockEntries) == 0 {
 			return errorHandler.AddNew(enumErrorCodes.DirectiveUnopenedEndBlock, directiveName)
 		}
 
-		if !blockStack2.CheckIfEndOpMatchesOpeningOp(directiveName) {
+		if !blockStack.CheckIfEndOpMatchesOpeningOp(directiveName) {
 			return errorHandler.AddNew(enumErrorCodes.DirectiveUnopenedEndBlock, directiveName)
 		}
 	}
@@ -152,7 +152,7 @@ func EvaluateDirective(operationTokenEnum enumTokenTypes.Def, directiveName stri
 func ProcessOpenLabelBlock(openBlockLabel string) error {
 	var err error
 
-	currentStack := blockStack2.GetCurrentBlockEntries()
+	currentStack := blockStack.GetCurrentBlockEntries()
 	if len(*currentStack) > 0 {
 		return errorHandler.AddNew(enumErrorCodes.DirectiveNestedLabelBlock) // ❌ Fails
 	}
@@ -160,7 +160,7 @@ func ProcessOpenLabelBlock(openBlockLabel string) error {
 	if err != nil {
 		return err // ❌ Fails
 	}
-	err = blockStack2.SetCurrentOperationLabel(openBlockLabel)
+	err = blockStack.SetCurrentOperationLabel(openBlockLabel)
 	if err != nil {
 		return err // ❌ Fails
 	}

@@ -2,7 +2,7 @@ package directiveHandler
 
 import (
 	"fmt"
-	"misc/nintasm/assemble/blockStack2"
+	"misc/nintasm/assemble/blockStack"
 	"misc/nintasm/assemble/errorHandler"
 	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
 	enumSymbolTableTypes "misc/nintasm/constants/enums/symbolTableTypes"
@@ -12,14 +12,13 @@ import (
 )
 
 func evalCharmap(directiveName string, charmapLabel string, operandList *[]Node) error {
-	blockStack2.PushOntoTopEntry(directiveName, *operandList)
+	blockStack.PushOntoTopEntry(directiveName, *operandList)
 	environment.AddOtherIdentifierToMasterTable(charmapLabel, enumSymbolTableTypes.CharMap)
 	return nil
 }
 
 func evalEndCharmap() error {
-	blockStack2.ClearCurrentOperationLabel()
-	blockStack2.ForcePopTopEntry()
+	blockStack.EndLabeledDirective()
 	return nil
 }
 

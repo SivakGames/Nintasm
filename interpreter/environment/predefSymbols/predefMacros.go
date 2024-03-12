@@ -1,7 +1,7 @@
 package predefSymbols
 
 import (
-	"misc/nintasm/assemble/blockStack2"
+	"misc/nintasm/assemble/blockStack"
 	enumSymbolTableTypes "misc/nintasm/constants/enums/symbolTableTypes"
 	"misc/nintasm/interpreter/environment"
 	"misc/nintasm/interpreter/environment/macroTable"
@@ -53,7 +53,7 @@ func init() {
 	for i, bim := range builtInMacro_ResetCode {
 		lineOperationParser.Process(bim)
 		lineOperationParsedValues := lineOperationParser.GetLineOperationValues()
-		generatedMacro[i] = blockStack2.CapturedLine{
+		generatedMacro[i] = blockStack.CapturedLine{
 			OriginalLine: bim,
 			LineOperationParsedValues: util.LineOperationParsedValues{
 				OperationLabel:       lineOperationParsedValues.OperationLabel,

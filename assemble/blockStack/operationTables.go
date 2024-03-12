@@ -1,4 +1,4 @@
-package blockStack2
+package blockStack
 
 import (
 	"fmt"

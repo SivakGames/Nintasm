@@ -1,7 +1,7 @@
 package directiveHandler
 
 import (
-	"misc/nintasm/assemble/blockStack2"
+	"misc/nintasm/assemble/blockStack"
 	"misc/nintasm/assemble/errorHandler"
 	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
 	"misc/nintasm/interpreter"
@@ -33,13 +33,13 @@ func evalRepeat(directiveName string, operandList *[]Node) error {
 		evaluatedNodes = append(evaluatedNodes, (*operandList)[1])
 	}
 
-	blockStack2.PushOntoTopEntry(directiveName, evaluatedNodes)
+	blockStack.PushOntoTopEntry(directiveName, evaluatedNodes)
 
 	return nil
 }
 
 func evalEndRepeat() error {
-	capturedLines, operandList := blockStack2.GetTopBlockEntryData()
+	capturedLines, operandList := blockStack.GetTopBlockEntryData()
 
 	//Extract repeatAmount
 	repeatAmount := (*operandList)[0].AsNumber
@@ -50,7 +50,7 @@ func evalEndRepeat() error {
 		iteratorName = (*operandList)[1].NodeValue
 	}
 
-	replacedLines := make([]blockStack2.CapturedLine, len(*capturedLines)*repeatAmount)
+	replacedLines := make([]blockStack.CapturedLine, len(*capturedLines)*repeatAmount)
 	replacedIndex := 0
 
 	if iteratorName == "" {
@@ -76,6 +76,6 @@ func evalEndRepeat() error {
 		errorHandler.AddNew(enumErrorCodes.BlockIsEmpty) // ⚠️ Warns
 	}
 
-	blockStack2.PopTopEntryThenExtendCapturedLines(replacedLines)
+	blockStack.PopTopEntryThenExtendCapturedLines(replacedLines)
 	return nil
 }

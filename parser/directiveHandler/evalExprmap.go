@@ -1,7 +1,7 @@
 package directiveHandler
 
 import (
-	"misc/nintasm/assemble/blockStack2"
+	"misc/nintasm/assemble/blockStack"
 	"misc/nintasm/assemble/errorHandler"
 	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
 	enumSymbolTableTypes "misc/nintasm/constants/enums/symbolTableTypes"
@@ -11,14 +11,13 @@ import (
 )
 
 func evalExprmap(directiveName string, exprmapLabel string, operandList *[]Node) error {
-	blockStack2.PushOntoTopEntry(directiveName, *operandList)
+	blockStack.PushOntoTopEntry(directiveName, *operandList)
 	environment.AddOtherIdentifierToMasterTable(exprmapLabel, enumSymbolTableTypes.ExprMap)
 	return nil
 }
 
 func evalEndExprmap() error {
-	blockStack2.ClearCurrentOperationLabel() //TODO - Change to new implementation
-	blockStack2.ForcePopTopEntry()
+	blockStack.EndLabeledDirective()
 	return nil
 }
 

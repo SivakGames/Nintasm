@@ -1,4 +1,4 @@
-package blockStack2
+package blockStack
 
 import (
 	enumParserTypes "misc/nintasm/constants/enums/parserTypes"
@@ -37,32 +37,38 @@ func newCapturedLine(originalLine string,
 
 // ++++++++++++++++++++++++++++++++++++
 
-type BlockOperationStack struct {
+type blockEntry struct {
 	BlockOperationName  string
-	OperandList         []Node
 	CapturedLines       []CapturedLine
-	AlternateStackBlock *BlockOperationStack
+	OperandList         []Node
+	AlternateStackBlock *blockEntry
 }
 
-func newBlockOperationStack(operationName string, operandList []Node) BlockOperationStack {
-	return BlockOperationStack{
-		BlockOperationName: operationName,
-		OperandList:        operandList,
+func newBlockEntry(blockOperationName string, operandList []Node) blockEntry {
+	return blockEntry{
+		BlockOperationName:  blockOperationName,
+		CapturedLines:       []CapturedLine{},
+		OperandList:         operandList,
+		AlternateStackBlock: nil,
 	}
 }
 
 // ++++++++++++++++++++++++++++++++++++
 
-type mainStack struct {
-	Flag1               bool
-	flag2               bool
-	blockOperationStack []BlockOperationStack
+type InvokeOperation struct {
+	blockEntries []blockEntry
+	//Setting where the operation evaluates things while capturing
+	evalutesInsteadOfCapturing bool
+	//Mainly for macros - Will always capture nodes except for a corresponding ending block
+	forcedCapturing bool
+	nextCollection  *InvokeOperation
 }
 
-func newMainStack() mainStack {
-	return mainStack{
-		Flag1:               false,
-		flag2:               false,
-		blockOperationStack: []BlockOperationStack{},
+func newInvokeOperation() InvokeOperation {
+	return InvokeOperation{
+		blockEntries:               []blockEntry{},
+		evalutesInsteadOfCapturing: false,
+		forcedCapturing:            false,
+		nextCollection:             nil,
 	}
 }

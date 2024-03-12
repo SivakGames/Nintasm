@@ -1,7 +1,7 @@
 package directiveHandler
 
 import (
-	"misc/nintasm/assemble/blockStack2"
+	"misc/nintasm/assemble/blockStack"
 	"misc/nintasm/assemble/errorHandler"
 	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
 	"misc/nintasm/interpreter/environment/macroTable"
@@ -17,7 +17,7 @@ func evalIkv(directiveName string, operandList *[]Node) error {
 		return errorHandler.AddNew(enumErrorCodes.NodeTypeNotIdentifier) // ❌ Fails
 	}
 
-	blockStack2.PushOntoTopEntry(directiveName, *operandList)
+	blockStack.PushOntoTopEntry(directiveName, *operandList)
 	macroTable.AppendToReplacementStack()
 	symbolAsNodeTable.PushToSymbolTableStack()
 
@@ -40,7 +40,7 @@ func evalKv(operandList *[]Node) error {
 // Final operation
 func evalEndIkv(operandList *[]Node) error {
 	// Get invoking macro name
-	_, originalOperandList := blockStack2.GetTopBlockEntryData()
+	_, originalOperandList := blockStack.GetTopBlockEntryData()
 	macroNameNode := &(*originalOperandList)[0]
 
 	// Get macro's data
@@ -49,7 +49,7 @@ func evalEndIkv(operandList *[]Node) error {
 		return err
 	}
 
-	var modifiedCapturedLines []blockStack2.CapturedLine
+	var modifiedCapturedLines []blockStack.CapturedLine
 	replacementList := macroTable.GetReplacementListOnTopOfStack()
 
 	//Replace with substitutions
@@ -61,7 +61,7 @@ func evalEndIkv(operandList *[]Node) error {
 	}
 
 	macroTable.PopFromReplacementStack()
-	blockStack2.ClearCurrentInvokeOperationEvalFlag()
-	blockStack2.PopTopEntryThenExtendCapturedLines(modifiedCapturedLines)
+	blockStack.ClearCurrentInvokeOperationEvalFlag()
+	blockStack.PopTopEntryThenExtendCapturedLines(modifiedCapturedLines)
 	return nil
 }

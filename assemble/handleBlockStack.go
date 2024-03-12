@@ -1,7 +1,7 @@
 package assemble
 
 import (
-	"misc/nintasm/assemble/blockStack2"
+	"misc/nintasm/assemble/blockStack"
 	"misc/nintasm/interpreter"
 	"misc/nintasm/util"
 )
@@ -10,7 +10,7 @@ func handleBlockStack(
 	reformattedLine string,
 	lineOperationParsedValues *util.LineOperationParsedValues,
 ) error {
-	isStartOrEndOperation := blockStack2.CheckIfNewStartEndOperation(lineOperationParsedValues)
+	isStartOrEndOperation := blockStack.CheckIfNewStartEndOperation(lineOperationParsedValues)
 
 	if isStartOrEndOperation {
 		// Operation will always process
@@ -23,7 +23,7 @@ func handleBlockStack(
 		}
 
 		//If ending, iterate bottom of stack and parse all captured operations (if any)
-		if blockStack2.CheckIfEndOperationAndGoesToProcessing(lineOperationParsedValues) {
+		if blockStack.CheckIfEndOperationAndGoesToProcessing(lineOperationParsedValues) {
 			err := preProcessBlockStack()
 			if err != nil {
 				return err // ❌ Fails
@@ -37,7 +37,7 @@ func handleBlockStack(
 
 	} else {
 		//If in forced eval mode, evaluate the node right here
-		if blockStack2.GetCurrentInvokeOperationEvalFlag() {
+		if blockStack.GetCurrentInvokeOperationEvalFlag() {
 			err := parseOperandStringAndProcess(
 				reformattedLine,
 				lineOperationParsedValues,
@@ -47,7 +47,7 @@ func handleBlockStack(
 				return err // ❌ Fails
 			}
 		} else {
-			err := blockStack2.CheckOperationIsCapturableAndAppend(reformattedLine, lineOperationParsedValues)
+			err := blockStack.CheckOperationIsCapturableAndAppend(reformattedLine, lineOperationParsedValues)
 			if err != nil {
 				return err
 			}
@@ -58,25 +58,25 @@ func handleBlockStack(
 }
 
 func preProcessBlockStack() error {
-	currentOp := blockStack2.GetCurrentOpPtr()
-	blockStack2.AddNewInvokeOperationCollection() //Create new temp stack
-	tempNewOp := blockStack2.GetCurrentOpPtr()
+	currentOp := blockStack.GetCurrentOpPtr()
+	blockStack.AddNewInvokeOperationCollection() //Create new temp stack
+	tempNewOp := blockStack.GetCurrentOpPtr()
 	err := readCapturedLines(currentOp, tempNewOp)
 	if err != nil {
 		return err
 	}
-	blockStack2.DestroyTempCollection(tempNewOp) //Remove upper level buffer stack
-	blockStack2.ClearBlockEntriesWithPtr(currentOp)
+	blockStack.DestroyTempCollection(tempNewOp) //Remove upper level buffer stack
+	blockStack.ClearBlockEntriesWithPtr(currentOp)
 	return nil
 }
 
 func readCapturedLines(
-	currentOp *blockStack2.InvokeOperation,
-	tempNewOp *blockStack2.InvokeOperation) error {
+	currentOp *blockStack.InvokeOperation,
+	tempNewOp *blockStack.InvokeOperation) error {
 	var processCapturedErr error
 
-	lines := blockStack2.GetLinesWithPtr(currentOp)
-	monitorStack := blockStack2.GetBlockEntriesWithPtr(tempNewOp)
+	lines := blockStack.GetLinesWithPtr(currentOp)
+	monitorStack := blockStack.GetBlockEntriesWithPtr(tempNewOp)
 
 	//Iterate over captured lines
 	for _, b := range *lines {

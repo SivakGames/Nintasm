@@ -2,7 +2,7 @@ package assemble
 
 import (
 	"fmt"
-	"misc/nintasm/assemble/blockStack2"
+	"misc/nintasm/assemble/blockStack"
 	"misc/nintasm/assemble/fileHandler"
 	"misc/nintasm/assemble/fileStack"
 	enumParserTypes "misc/nintasm/constants/enums/parserTypes"
@@ -84,14 +84,11 @@ func ReadLines(lines *[]string, lineCounter *uint) error {
 		if lineOperationErr != nil {
 			return lineOperationErr
 		}
-
 		lineOperationParsedValues := lineOperationParser.GetLineOperationValues()
 
 		//Intermediate - determine if capturing things in a block stack
-
-		currentBlockStack := blockStack2.GetCurrentBlockEntries()
+		currentBlockStack := blockStack.GetCurrentBlockEntries()
 		if len(*currentBlockStack) > 0 {
-			//err := handleBlockStack(reformattedLine, &lineOperationParsedValues, true)
 			err := handleBlockStack(reformattedLine, &lineOperationParsedValues)
 			if err != nil {
 				return err
@@ -100,7 +97,6 @@ func ReadLines(lines *[]string, lineCounter *uint) error {
 		}
 
 		//Do regular operand parsing/processing
-
 		err := parseOperandStringAndProcess(
 			reformattedLine,
 			&lineOperationParsedValues,
@@ -188,29 +184,12 @@ func parseOperandStringAndProcess(
 		}
 
 		preProcessBlockStack()
-
-		//endBlock := macroOperandParser.GenerateDummyEndBlock()
-		//handleBlockStack(" ENDIM", &endBlock)
-
-		/*linesToUnpack := macroOperandParser.GetUnpackLinesRef()
-		for i := range *linesToUnpack {
-			replacedCapturedLine := macroOperandParser.ApplyReplacementsToCapturedLine(i)
-			temp := util.NewLineOperationParsedValues(replacedCapturedLine.OperandStartPosition,
-				replacedCapturedLine.OperationLabel,
-				replacedCapturedLine.OperationTokenEnum,
-				replacedCapturedLine.OperationTokenValue,
-				replacedCapturedLine.ParentParserEnum,
-			)
-			err := parseOperandStringAndProcess(replacedCapturedLine.OriginalLine, &temp)
-			if err != nil {
-				return err
-			}
-		}*/
 		macroOperandParser.EndInvokeMacro()
 
 	default:
 		panic("🛑 Parent parsing operation could not be determined!")
 	}
+
 	if fileHandler.TriggerNewStackCall {
 		fileHandler.TriggerNewStackCall = false
 		err := startReadingLinesTopFileStack()

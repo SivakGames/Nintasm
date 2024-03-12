@@ -1,4 +1,4 @@
-package blockStack2
+package blockStack
 
 import (
 	"fmt"
@@ -6,44 +6,6 @@ import (
 	"misc/nintasm/util"
 	"strings"
 )
-
-// ++++++++++++++++++++++++++++++++++++
-
-type blockEntry struct {
-	BlockOperationName  string
-	CapturedLines       []CapturedLine
-	OperandList         []Node
-	AlternateStackBlock *blockEntry
-}
-
-func newBlockEntry(blockOperationName string, operandList []Node) blockEntry {
-	return blockEntry{
-		BlockOperationName:  blockOperationName,
-		CapturedLines:       []CapturedLine{},
-		OperandList:         operandList,
-		AlternateStackBlock: nil,
-	}
-}
-
-// ++++++++++++++++++++++++++++++++++++
-
-type InvokeOperation struct {
-	blockEntries []blockEntry
-	//Setting where the operation evaluates things while capturing
-	evalutesInsteadOfCapturing bool
-	//Mainly for macros - Will always capture nodes except for a corresponding ending block
-	forcedCapturing bool
-	nextCollection  *InvokeOperation
-}
-
-func newInvokeOperation() InvokeOperation {
-	return InvokeOperation{
-		blockEntries:               []blockEntry{},
-		evalutesInsteadOfCapturing: false,
-		forcedCapturing:            false,
-		nextCollection:             nil,
-	}
-}
 
 // +++++++++++++++++++++++++++++++++++++++++++++
 
@@ -105,7 +67,6 @@ func SetCurrentOperationLabel(label string) error {
 	if currentBlockOperationLabel != "" {
 		panic(fmt.Sprintf("🛑 Somehow entering another label block operation while first (%v) is not done...", currentBlockOperationLabel))
 	}
-
 	currentBlockOperationLabel = label
 	return nil
 }
@@ -136,6 +97,11 @@ func GetCurrentInvokeOperationForcedCapturingFlag() bool {
 func SetCurrentInvokeOperationForcedCapturingFlag() {
 	currentInvokeOp := getCurrentInvokeOperation()
 	currentInvokeOp.forcedCapturing = true
+}
+
+func EndLabeledDirective() {
+	ClearCurrentOperationLabel()
+	ForcePopTopEntry()
 }
 
 // ====================================================
