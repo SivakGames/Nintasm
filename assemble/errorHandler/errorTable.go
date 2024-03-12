@@ -130,7 +130,7 @@ var errorTable = map[enumErrorCodes.Def]ErrorTableEntry{
 	enumErrorCodes.InterpreterNoParentLabel:            newErrorTableEntry(enumErrorCodes.Error, "Cannot use operation! No parent label!"),
 	enumErrorCodes.InterpreterUnaryNotBoolean:          newErrorTableEntry(enumErrorCodes.Error, "Unary expression must be boolean: %v %v"),
 	enumErrorCodes.InterpreterUnaryNotNumeric:          newErrorTableEntry(enumErrorCodes.Error, "Unary expression must be numeric: %v %v"),
-	enumErrorCodes.InterpreterBinaryMismatchedTypes:    newErrorTableEntry(enumErrorCodes.Error, "Binary expression types mismatched: %v %v %v"),
+	enumErrorCodes.InterpreterBinaryMismatchedTypes:    newErrorTableEntry(enumErrorCodes.Error, fmt.Sprintf("Binary expression types mismatched: %v %v %v", "%v", coloredSymbol("%v"), "%v")),
 	enumErrorCodes.InterpreterFuncUndefined:            newErrorTableEntry(enumErrorCodes.Error, "Function %v is undefined!"),
 	enumErrorCodes.InterpreterFuncTooFewArgs:           newErrorTableEntry(enumErrorCodes.Error, "Too few arguments for function!"),
 	enumErrorCodes.InterpreterFuncTooManyArgs:          newErrorTableEntry(enumErrorCodes.Error, "Too many arguments for function!"),

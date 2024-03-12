@@ -2,48 +2,8 @@
 ; Sample NES Program
 ; Will display a pink screen
 ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-MMM .macro
-	.if defined(\1)
-	.db 77
-	.endif
-	.db \1
-	.repeat 32
-			.db 6
-		.endrepeat
-	.db "JEYJEY1"
-MMM .endm
-
-TTT .kvMacro
-	.db 1
-	.db "HEYHEY1"
-
-	.if defined(\rr)
-		.repeat 32
-			.db 6
-		.endrepeat
-		.db "HEYHEY2"
-
-	.endif
-
-	.db \xx
-
-	.db "HEYHEY3"
-TTT .endkvm
-
-NNN .namespace
-.x1 = 1
-.x2 = .x1 + 12
-NNN .endnamespace
-
-CCC .charmap
-	.defchar "A", $11
-	.defchar "は", $22
-CCC .endcharmap
-
-EEE .exprmap
-	.defexpr "A 1", $33
-EEE .endexprmap
+AddrDiff .func (\2 - \1)
+GENVALUE .func AddrDiff(2, \1)
 
 ;==========================================
 ; iNES header
@@ -61,47 +21,23 @@ EEE .endexprmap
 	.org $8000
 
 ;-----------------------------------------
+
 RESET:
+	.db GENVALUE(55)
 
-
-	.db toCharmap("Aは")
-	.db `A 1`,`A 1`
-
-	.if 2 > 11
-		.db 9,9,9,9
-	.endif
-
-	.if defined(twtwtwt)
-		.repeat 2
-		.db 9
-			.repeat 3
-			.db 8
-			.endrepeat
-		.endrepeat
-	.endif
-
-	MMM 2
 NMI:
 
-	.repeat 2, \i
-	.db 6+\i
-	.endrepeat
+DATA_RoomLiquidAnimatePalettes:
+	.db 24
+	.db 25
+	.db 25
+	.db 25
+.water4:
+	.db 2
+	.db 4
+	.db 4
+	.db 4
 
-	.ikv TTT
-	.kv \xx, 160
-	.kv \rr, 16
-	.endikv
-
-	.db 1,2,3,4
-	.db 1,2,3,4
-	.db 1,2,3,4
-	.db 1,2,3,4
-
-	.ikv TTT
-	.kv \xx, 255
-	;.kv \rr, 16
-	;.kv \rr, 12
-	.endikv
 
 	.org $fffa
 	.dw NMI, RESET, 0

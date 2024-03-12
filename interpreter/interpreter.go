@@ -49,6 +49,13 @@ func EvaluateNode(node Node) (Node, error) {
 		}
 		return node, err
 
+	case enumNodeTypes.SubstitutionID:
+		substitutionNode, err := environment.LookupSubstitutionID(node.NodeValue)
+		if err != nil {
+			return node, err
+		}
+		return substitutionNode, nil
+
 	case enumNodeTypes.BacktickStringLiteral:
 		_, err := exprmapTable.GetCurrentExprmap()
 		if err != nil {
@@ -61,13 +68,6 @@ func EvaluateNode(node Node) (Node, error) {
 		node.AsNumber = exprAsNum
 		operandFactory.ConvertNodeToNumericLiteral(&node)
 		return node, nil
-
-	case enumNodeTypes.SubstitutionID:
-		substitutionNode, err := environment.LookupSubstitutionID(node.NodeValue)
-		if err != nil {
-			return substitutionNode, err
-		}
-		return substitutionNode, nil
 
 	case enumNodeTypes.AssignLabelExpression,
 		enumNodeTypes.AssignmentExpression:
@@ -118,7 +118,10 @@ func EvaluateNode(node Node) (Node, error) {
 			badLeftValue := node.Left.NodeValue
 			badRightValue := node.Right.NodeValue
 			operandFactory.ConvertNodeToNumericLiteral(&node)
-			return node, errorHandler.AddNew(enumErrorCodes.InterpreterBinaryMismatchedTypes, badLeftValue, operation, badRightValue)
+			return node, errorHandler.AddNew(
+				enumErrorCodes.InterpreterBinaryMismatchedTypes,
+				badLeftValue, operation, badRightValue,
+			)
 		}
 
 		node.Left = nil
@@ -218,17 +221,35 @@ func EvaluateNode(node Node) (Node, error) {
 			return node, nil
 		}
 
+		// ---------------------------------------------
 		// Not ASM function, look for user-def function
-		functionNode, err := funcTable.LookupAndGetFunctionInEnvironment(node.NodeValue)
+		functionPtr, err := funcTable.LookupAndGetFunctionInEnvironment(node.NodeValue)
 		if err != nil {
 			return node, err
 		}
+		functionNode := *functionPtr
+
+		//Add arguments to stack
 		symbolAsNodeTable.PushToSymbolTableStack()
+		defer symbolAsNodeTable.PopFromSymbolTableStack()
+
 		for i, n := range *node.ArgumentList {
 			symbolAsNodeTable.AddSymbolToTopTableStack(fmt.Sprintf("\\%d", i+1), n)
 		}
-		evaluatedFuncNode, err := EvaluateNode(*functionNode)
-		symbolAsNodeTable.PopFromSymbolTableStack()
+
+		if functionNode.ArgumentList == nil {
+			return EvaluateNode(functionNode)
+		}
+
+		for i, n := range *functionNode.ArgumentList {
+			evalN, err := EvaluateNode(n)
+			if err != nil {
+				return node, err
+			}
+			(*functionNode.ArgumentList)[i] = evalN
+		}
+
+		evaluatedFuncNode, err := EvaluateNode(functionNode)
 		if err != nil {
 			return node, err
 		}

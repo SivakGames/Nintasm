@@ -56,8 +56,9 @@ func AddIdentifierToSymbolAsNodeTable(symbolName string, node Node) error {
 func LookupIdentifierInSymbolAsNodeTable(symbolName string) (Node, bool, error) {
 	node, exists := symbolAsNodeTable.GetNodeFromSymbolAsNodeTable(symbolName)
 	if !exists {
-		_, otherExists := masterLookupTable[symbolName]
-		if otherExists {
+		//Sees if the label exists but doesn't correspond to an actual value
+		_, nonValueLabelExists := masterLookupTable[symbolName]
+		if nonValueLabelExists {
 			return node, false, errorHandler.AddNew(enumErrorCodes.InterpreterIdentifierNotValueSymbol, symbolName)
 		}
 		if unresolvedAddsSilentError {
