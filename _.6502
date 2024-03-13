@@ -2,8 +2,20 @@
 ; Sample NES Program
 ; Will display a pink screen
 ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-AddrDiff .func (\2 - \1)
-GENVALUE_LiquidPaletteIndex .func AddrDiff(DATA_RoomLiquidAnimatePalettes, \1) >> 2
+
+VmCreateObject .kvmacro
+;Parent VM ID
+    .db \parentVmId
+;X (optional)
+	.if !defined(\xOffset)
+		.db $00
+	.else
+		.db \xOffset
+	.endif
+
+VmCreateObject .endkvm
+
+
 
 ;==========================================
 ; iNES header
@@ -24,21 +36,10 @@ GENVALUE_LiquidPaletteIndex .func AddrDiff(DATA_RoomLiquidAnimatePalettes, \1) >
 
 RESET:
 
-DATA_RoomLiquidAnimatePalettes:
-.water1:
-	.db $0f,$11,$21,$11
-.water2:
-	.db $0f,$21,$21,$11
-.water3:
-	.db $0f,$21,$11,$11
-.water4:
-	.db $0f,$31,$11,$11
-.water5:
-	.db $0f,$31,$21,$11
-
-	.db "ABCD"
-
-	.db GENVALUE_LiquidPaletteIndex(DATA_RoomLiquidAnimatePalettes.water3)
+	.ikv VmCreateObject
+		.kv \parentVmId, 7
+		.kv \subVmId, 5
+	.endikv
 
 
 NMI:

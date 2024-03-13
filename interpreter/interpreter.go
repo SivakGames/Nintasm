@@ -289,11 +289,11 @@ func ProcessAssemblerFunction(node *Node) (bool, error) {
 		switch funcName {
 		case "defined":
 			baseNode := (*node.ArgumentList)[0]
-
 			if baseNode.Resolved {
 				node.AsBool = true
 				operandFactory.ConvertNodeToBooleanLiteral(node)
-			} else if operandFactory.ValidateNodeIsIdentifier(&baseNode) {
+			} else if operandFactory.ValidateNodeIsIdentifier(&baseNode) ||
+				operandFactory.ValidateNodeIsSubstitutionID(&baseNode) {
 				node.AsBool = false
 				operandFactory.ConvertNodeToBooleanLiteral(node)
 			} else if baseNode.NodeType == enumNodeTypes.Undefined {
