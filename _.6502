@@ -27,6 +27,8 @@ appa = 2
 RESET:
 
 	.db Testing
+	.db strlen("TS1231aT")
+	.db 7,7,7
 
 
 NMI:

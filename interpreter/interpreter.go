@@ -27,6 +27,7 @@ type assemblerFunction struct {
 var assemblerBuiltInFunctions = map[string]assemblerFunction{
 	"bank":      {1, 1, []enumNodeTypes.Def{enumNodeTypes.Identifier}},
 	"defined":   {1, 1, []enumNodeTypes.Def{enumNodeTypes.Identifier}},
+	"strlen":    {1, 1, []enumNodeTypes.Def{enumNodeTypes.StringLiteral}},
 	"floor":     {1, 1, []enumNodeTypes.Def{enumNodeTypes.NumericLiteral}},
 	"high":      {1, 1, []enumNodeTypes.Def{enumNodeTypes.NumericLiteral}},
 	"low":       {1, 1, []enumNodeTypes.Def{enumNodeTypes.NumericLiteral}},
@@ -274,7 +275,7 @@ func ProcessAssemblerFunction(node *Node) (bool, error) {
 
 		//Depending on the function, may do standard evaluation or not...
 		switch funcName {
-		case "floor", "high", "low", "toCharmap":
+		case "floor", "high", "low", "strlen", "toCharmap":
 			for i, a := range *node.ArgumentList {
 				evaluatedFuncNode, err := EvaluateNode(a)
 				if err != nil {
@@ -303,6 +304,8 @@ func ProcessAssemblerFunction(node *Node) (bool, error) {
 			}
 		case "floor":
 			node.AsNumber = int(math.Floor(float64((*node.ArgumentList)[0].AsNumber)))
+		case "strlen":
+			node.AsNumber = len((*node.ArgumentList)[0].NodeValue)
 		case "high":
 			node.AsNumber = ((*node.ArgumentList)[0].AsNumber & 0x0ff00) >> 8
 		case "low":
@@ -320,7 +323,7 @@ func ProcessAssemblerFunction(node *Node) (bool, error) {
 		}
 
 		switch funcName {
-		case "floor", "high", "low":
+		case "floor", "high", "low", "strlen":
 			operandFactory.ConvertNodeToNumericLiteral(node)
 		case "toCharmap":
 			operandFactory.ConvertNodeToStringLiteral(node)
