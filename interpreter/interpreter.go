@@ -25,13 +25,22 @@ type assemblerFunction struct {
 }
 
 var assemblerBuiltInFunctions = map[string]assemblerFunction{
-	"bank":      {1, 1, []enumNodeTypes.Def{enumNodeTypes.Identifier}},
-	"defined":   {1, 1, []enumNodeTypes.Def{enumNodeTypes.Identifier}},
-	"strlen":    {1, 1, []enumNodeTypes.Def{enumNodeTypes.StringLiteral}},
+	"ceil":      {1, 1, []enumNodeTypes.Def{enumNodeTypes.NumericLiteral}},
 	"floor":     {1, 1, []enumNodeTypes.Def{enumNodeTypes.NumericLiteral}},
+	"round":     {1, 1, []enumNodeTypes.Def{enumNodeTypes.NumericLiteral}},
 	"high":      {1, 1, []enumNodeTypes.Def{enumNodeTypes.NumericLiteral}},
 	"low":       {1, 1, []enumNodeTypes.Def{enumNodeTypes.NumericLiteral}},
+	"sin":       {1, 1, []enumNodeTypes.Def{enumNodeTypes.NumericLiteral}},
+	"sindeg":    {1, 1, []enumNodeTypes.Def{enumNodeTypes.NumericLiteral}},
+	"cos":       {1, 1, []enumNodeTypes.Def{enumNodeTypes.NumericLiteral}},
+	"cosdeg":    {1, 1, []enumNodeTypes.Def{enumNodeTypes.NumericLiteral}},
+	"modfDeci":  {1, 1, []enumNodeTypes.Def{enumNodeTypes.NumericLiteral}},
+	"modfInt":   {1, 1, []enumNodeTypes.Def{enumNodeTypes.NumericLiteral}},
+	"strlen":    {1, 1, []enumNodeTypes.Def{enumNodeTypes.StringLiteral}},
+	"substr":    {1, 1, []enumNodeTypes.Def{enumNodeTypes.StringLiteral}},
 	"toCharmap": {1, 1, []enumNodeTypes.Def{enumNodeTypes.StringLiteral}},
+	"defined":   {1, 1, []enumNodeTypes.Def{enumNodeTypes.Identifier}},
+	"bank":      {1, 1, []enumNodeTypes.Def{enumNodeTypes.Identifier}},
 }
 
 func EvaluateNode(node Node) (Node, error) {
@@ -275,7 +284,12 @@ func ProcessAssemblerFunction(node *Node) (bool, error) {
 
 		//Depending on the function, may do standard evaluation or not...
 		switch funcName {
-		case "floor", "high", "low", "strlen", "toCharmap":
+		case "ceil", "floor", "round",
+			"high", "low",
+			"sin", "sindeg", "cos", "cosdeg",
+			"modfDeci", "modfInt",
+			"strlen", "substr",
+			"toCharmap":
 			for i, a := range *node.ArgumentList {
 				evaluatedFuncNode, err := EvaluateNode(a)
 				if err != nil {
@@ -289,6 +303,36 @@ func ProcessAssemblerFunction(node *Node) (bool, error) {
 
 		//Actually process the function...
 		switch funcName {
+		case "ceil":
+			node.AsNumber = int(math.Ceil(float64((*node.ArgumentList)[0].AsNumber)))
+		case "floor":
+			node.AsNumber = int(math.Floor(float64((*node.ArgumentList)[0].AsNumber)))
+		case "round":
+			node.AsNumber = int(math.Round(float64((*node.ArgumentList)[0].AsNumber)))
+		case "high":
+			node.AsNumber = ((*node.ArgumentList)[0].AsNumber & 0x0ff00) >> 8
+		case "low":
+			node.AsNumber = ((*node.ArgumentList)[0].AsNumber & 0x000ff)
+		case "sin":
+			node.AsNumber = int(math.Sin(float64((*node.ArgumentList)[0].AsNumber)))
+		case "cos":
+			node.AsNumber = int(math.Cos(float64((*node.ArgumentList)[0].AsNumber)))
+		case "sindeg":
+			node.AsNumber = int(math.Sin(float64((*node.ArgumentList)[0].AsNumber) * (180 / math.Pi)))
+		case "cosdeg":
+			node.AsNumber = int(math.Cos(float64((*node.ArgumentList)[0].AsNumber) * (180 / math.Pi)))
+		case "strlen":
+			node.AsNumber = len((*node.ArgumentList)[0].NodeValue)
+		case "toCharmap":
+			nodeString := ((*node.ArgumentList)[0].NodeValue)
+			replacedString, err := charmapTable.MapStringToCharmap(nodeString)
+			if err != nil {
+				return isAsmFunc, err
+			}
+			node.NodeValue = replacedString
+		case "bank":
+			log.Println((*node.ArgumentList)[0])
+			//node.AsNumber = ((*node.ArgumentList)[0].AsNumber & 0x000ff)
 		case "defined":
 			baseNode := (*node.ArgumentList)[0]
 			if baseNode.Resolved {
@@ -302,28 +346,14 @@ func ProcessAssemblerFunction(node *Node) (bool, error) {
 				node.AsBool = false
 				operandFactory.ConvertNodeToBooleanLiteral(node)
 			}
-		case "floor":
-			node.AsNumber = int(math.Floor(float64((*node.ArgumentList)[0].AsNumber)))
-		case "strlen":
-			node.AsNumber = len((*node.ArgumentList)[0].NodeValue)
-		case "high":
-			node.AsNumber = ((*node.ArgumentList)[0].AsNumber & 0x0ff00) >> 8
-		case "low":
-			node.AsNumber = ((*node.ArgumentList)[0].AsNumber & 0x000ff)
-		case "toCharmap":
-			nodeString := ((*node.ArgumentList)[0].NodeValue)
-			replacedString, err := charmapTable.MapStringToCharmap(nodeString)
-			if err != nil {
-				return isAsmFunc, err
-			}
-			node.NodeValue = replacedString
-		case "bank":
-			log.Println((*node.ArgumentList)[0])
-			//node.AsNumber = ((*node.ArgumentList)[0].AsNumber & 0x000ff)
 		}
 
 		switch funcName {
-		case "floor", "high", "low", "strlen":
+		case "ceil", "floor", "round",
+			"high", "low",
+			"sin", "sindeg", "cos", "cosdeg",
+			"modfDeci", "modfInt",
+			"strlen":
 			operandFactory.ConvertNodeToNumericLiteral(node)
 		case "toCharmap":
 			operandFactory.ConvertNodeToStringLiteral(node)
