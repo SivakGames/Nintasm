@@ -38,6 +38,7 @@ func EvaluateNode(node Node) (Node, error) {
 	case enumNodeTypes.Empty,
 		enumNodeTypes.BooleanLiteral,
 		enumNodeTypes.NumericLiteral,
+		enumNodeTypes.MultiByte,
 		enumNodeTypes.StringLiteral:
 		return node, nil
 

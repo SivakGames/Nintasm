@@ -81,7 +81,6 @@ func LookupSubstitutionID(symbolName string) (Node, error) {
 		return substitutionNode, errorHandler.AddNew(enumErrorCodes.InterpreterSymbolNotFound, symbolName)
 	}
 	return substitutionNode, nil
-
 }
 
 // -----------------------------------------------------------------------------

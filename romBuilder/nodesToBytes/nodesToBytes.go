@@ -93,6 +93,16 @@ func ConvertNodeValueToUInts(node Node, neededBytes int, isBigEndian bool) ([]ui
 		default:
 			panic("🛑 Something is very wrong with string byte conversion!")
 		}
+
+	case enumNodeTypes.MultiByte:
+		for _, n := range *node.ArgumentList {
+			subValue, err := ConvertNodeValueToUInts(n, neededBytes, isBigEndian)
+			if err != nil {
+				return nil, err
+			}
+			convertedValue = append(convertedValue, subValue...)
+		}
+
 	default:
 		panic("🛑 Something is very wrong with operand conversion!")
 	}

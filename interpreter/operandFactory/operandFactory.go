@@ -128,6 +128,15 @@ func CreateMacroReplacementNode(nodeValue string) Node {
 	return node
 }
 
+// ===================================================
+// Multi node
+func CreateMultiByteNode(nodes []Node) Node {
+	node := newNode("multiNode", enumNodeTypes.MultiByte)
+	node.ArgumentList = &nodes
+	node.Resolved = true
+	return node
+}
+
 //===================================================
 //Literals
 

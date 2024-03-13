@@ -23,5 +23,6 @@ const (
 	StringLiteral
 	SubstitutionID
 
+	MultiByte
 	MacroReplacementString
 )

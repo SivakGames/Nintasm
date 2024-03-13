@@ -1,7 +1,6 @@
 package parser
 
 import (
-	"fmt"
 	"misc/nintasm/assemble/errorHandler"
 	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
 	enumTokenTypes "misc/nintasm/constants/enums/tokenTypes"
@@ -60,29 +59,49 @@ func (p *LabelOperandParser) Process(operationType tokenEnum, operationValue str
 		}
 
 		if len(operandList) == 1 {
-			identifierNode := operandFactory.CreateIdentifierNode(operationLabel)
-			assignmentNode := operandFactory.CreateAssignmentNode(identifierNode, operandList[0])
-			unresolvedAssignNode, err := interpreter.EvaluateNode(assignmentNode)
+			err := doAssignment(operationLabel, &operandList[0])
 			if err != nil {
-				//Sees if this is unresolvable only...
-				err := errorHandler.CheckErrorContinuesUpwardPropagation(err, enumErrorCodes.UnresolvedIdentifier)
-				if err != nil {
-					//Sees if this is a fatal error
-					err := errorHandler.CheckErrorContinuesUpwardPropagation(err, enumErrorCodes.Error)
-					if err != nil {
-						return err // ❌❌ CONTINUES Failing!
-					}
-				} else {
-					unresolvedTable.AddUnresolvedSymbol(unresolvedAssignNode)
-				}
+				return err
 			}
+
 		} else {
-			fmt.Println(operandList)
-			return errorHandler.AddNew(enumErrorCodes.OtherFatal, "Solve multi assignment operandz")
+			for i, o := range operandList {
+				evalNode, err := interpreter.EvaluateNode(o)
+				if err != nil {
+					return err
+				}
+				operandList[i] = evalNode
+			}
+			multiByteNode := operandFactory.CreateMultiByteNode(operandList)
+			err := doAssignment(operationLabel, &multiByteNode)
+			if err != nil {
+				return err
+			}
+
 		}
 		return nil
 
 	default:
 		panic("🛑 BAD LABEL OPERATION TYPE!!!")
 	}
+}
+
+func doAssignment(operationLabel string, operand *Node) error {
+	identifierNode := operandFactory.CreateIdentifierNode(operationLabel)
+	assignmentNode := operandFactory.CreateAssignmentNode(identifierNode, *operand)
+	unresolvedAssignNode, err := interpreter.EvaluateNode(assignmentNode)
+	if err != nil {
+		//Sees if this is unresolvable only...
+		err := errorHandler.CheckErrorContinuesUpwardPropagation(err, enumErrorCodes.UnresolvedIdentifier)
+		if err != nil {
+			//Sees if this is a fatal error
+			err := errorHandler.CheckErrorContinuesUpwardPropagation(err, enumErrorCodes.Error)
+			if err != nil {
+				return err // ❌❌ CONTINUES Failing!
+			}
+		} else {
+			unresolvedTable.AddUnresolvedSymbol(unresolvedAssignNode)
+		}
+	}
+	return nil
 }

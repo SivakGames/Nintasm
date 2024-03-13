@@ -3,19 +3,9 @@
 ; Will display a pink screen
 ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-VmCreateObject .kvmacro
-;Parent VM ID
-    .db \parentVmId
-;X (optional)
-	.if !defined(\xOffset)
-		.db $00
-	.else
-		.db \xOffset
-	.endif
+Testing = 1,2,3,14,"appa"
 
-VmCreateObject .endkvm
-
-
+appa = 2
 
 ;==========================================
 ; iNES header
@@ -36,10 +26,7 @@ VmCreateObject .endkvm
 
 RESET:
 
-	.ikv VmCreateObject
-		.kv \parentVmId, 7
-		.kv \subVmId, 5
-	.endikv
+	.db Testing
 
 
 NMI:
