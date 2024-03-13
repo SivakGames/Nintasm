@@ -437,7 +437,6 @@ func (p *OperandParser) unaryExpression() (Node, error) {
 		case enumTokenTypes.OPERATOR_additive,
 			enumTokenTypes.OPERATOR_logicalNot,
 			enumTokenTypes.OPERATOR_negate:
-			unaryType := p.lookaheadType
 			unaryValue := p.lookaheadValue
 			err := p.eatFreelyAndAdvance(p.lookaheadType)
 			if err != nil {
@@ -447,7 +446,7 @@ func (p *OperandParser) unaryExpression() (Node, error) {
 			if err != nil {
 				return operandFactory.ErrorNode(p.lookaheadValue), err // ❌ Fails
 			}
-			return operandFactory.CreateUnaryExpressionNode(unaryType, unaryValue, argument), nil
+			return operandFactory.CreateUnaryExpressionNode(unaryValue, argument), nil
 		}
 	}
 	return p.callMemberExpression()
@@ -698,7 +697,6 @@ func (p *OperandParser) _logicalExpression(builderName func() (Node, error), ope
 	}
 
 	for p.lookaheadType != enumTokenTypes.None && p.lookaheadType == operatorToken {
-		logicalExpressionType := p.lookaheadType
 		logicalExpressionValue := p.lookaheadValue
 		err = p.eatFreelyAndAdvance(operatorToken)
 		if err != nil {
@@ -708,7 +706,7 @@ func (p *OperandParser) _logicalExpression(builderName func() (Node, error), ope
 		if err != nil {
 			return operandFactory.ErrorNode(p.lookaheadValue), err // ❌ Fails
 		}
-		left = operandFactory.CreateBinaryExpressionNode(logicalExpressionType, logicalExpressionValue, left, right)
+		left = operandFactory.CreateBinaryExpressionNode(logicalExpressionValue, left, right)
 	}
 
 	return left, nil
@@ -778,7 +776,7 @@ func (p *OperandParser) literal() (Node, error) {
 	case enumTokenTypes.SUBSTITUTION_numericID,
 		enumTokenTypes.SUBSTITUTION_stringID,
 		enumTokenTypes.SUBSTITUTION_numMacroArgs:
-		return operandFactory.CreateSubstitutionIdNode(literalType, literalValue), nil
+		return operandFactory.CreateSubstitutionIdNode(literalValue), nil
 
 	}
 	// ❌ Fails

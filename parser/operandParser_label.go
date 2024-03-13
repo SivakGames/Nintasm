@@ -1,7 +1,6 @@
 package parser
 
 import (
-	"errors"
 	"fmt"
 	"misc/nintasm/assemble/errorHandler"
 	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
@@ -79,7 +78,7 @@ func (p *LabelOperandParser) Process(operationType tokenEnum, operationValue str
 			}
 		} else {
 			fmt.Println(operandList)
-			return errors.New("Solve multi assignment operandz")
+			return errorHandler.AddNew(enumErrorCodes.OtherFatal, "Solve multi assignment operandz")
 		}
 		return nil
 
