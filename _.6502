@@ -3,7 +3,7 @@
 ; Will display a pink screen
 ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 AddrDiff .func (\2 - \1)
-GENVALUE .func AddrDiff(2, \1)
+GENVALUE_LiquidPaletteIndex .func AddrDiff(DATA_RoomLiquidAnimatePalettes, \1) >> 2
 
 ;==========================================
 ; iNES header
@@ -23,21 +23,25 @@ GENVALUE .func AddrDiff(2, \1)
 ;-----------------------------------------
 
 RESET:
-	.db GENVALUE(55)
-
-NMI:
 
 DATA_RoomLiquidAnimatePalettes:
-	.db 24
-	.db 25
-	.db 25
-	.db 25
+.water1:
+	.db $0f,$11,$21,$11
+.water2:
+	.db $0f,$21,$21,$11
+.water3:
+	.db $0f,$21,$11,$11
 .water4:
-	.db 2
-	.db 4
-	.db 4
-	.db 4
+	.db $0f,$31,$11,$11
+.water5:
+	.db $0f,$31,$21,$11
 
+	.db "ABCD"
+
+	.db GENVALUE_LiquidPaletteIndex(DATA_RoomLiquidAnimatePalettes.water3)
+
+
+NMI:
 
 	.org $fffa
 	.dw NMI, RESET, 0

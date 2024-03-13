@@ -229,24 +229,19 @@ func EvaluateNode(node Node) (Node, error) {
 		}
 		functionNode := *functionPtr
 
-		//Add arguments to stack
-		symbolAsNodeTable.PushToSymbolTableStack()
-		defer symbolAsNodeTable.PopFromSymbolTableStack()
-
 		for i, n := range *node.ArgumentList {
-			symbolAsNodeTable.AddSymbolToTopTableStack(fmt.Sprintf("\\%d", i+1), n)
-		}
-
-		if functionNode.ArgumentList == nil {
-			return EvaluateNode(functionNode)
-		}
-
-		for i, n := range *functionNode.ArgumentList {
 			evalN, err := EvaluateNode(n)
 			if err != nil {
 				return node, err
 			}
-			(*functionNode.ArgumentList)[i] = evalN
+			(*node.ArgumentList)[i] = evalN
+		}
+
+		//Add newly evaluated arguments to stack
+		symbolAsNodeTable.PushToSymbolTableStack()
+		defer symbolAsNodeTable.PopFromSymbolTableStack()
+		for i, n := range *node.ArgumentList {
+			symbolAsNodeTable.AddSymbolToTopTableStack(fmt.Sprintf("\\%d", i+1), n)
 		}
 
 		evaluatedFuncNode, err := EvaluateNode(functionNode)
