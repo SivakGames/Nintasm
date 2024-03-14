@@ -56,22 +56,12 @@ func (mop *MacroOperandParser) Process(macroName string) error {
 	return nil
 }
 
-/*
-func (mop *MacroOperandParser) GenerateDummyEndBlock() util.LineOperationParsedValues {
-	return util.NewLineOperationParsedValues(6, "", enumTokenTypes.DIRECTIVE_labeledBlockEnd, " ENDIM", enumParserTypes.Directive)
-}*/
-
-/*
-func (mop *MacroOperandParser) GetUnpackLinesRef() *[]blockStack2.CapturedLine {
-	return &mop.capturedLinesToUnpack
-}*/
-
 func (mop *MacroOperandParser) ApplyReplacementsToCapturedLine(capturedLineIndex int) blockStack.CapturedLine {
 	replacedCapturedLine := mop.capturedLinesToUnpack[capturedLineIndex]
 	replacementList := macroTable.GetReplacementListOnTopOfStack()
 
 	for _, replacementListItem := range *replacementList {
-		replacedCapturedLine.OriginalLine = replacementListItem.ReplaceRegex.ReplaceAllString(replacedCapturedLine.OriginalLine, replacementListItem.ReplaceString)
+		replacedCapturedLine.OriginalLine = replacementListItem.ReplaceRegex.ReplaceAllLiteralString(replacedCapturedLine.OriginalLine, replacementListItem.ReplaceString)
 	}
 
 	return replacedCapturedLine

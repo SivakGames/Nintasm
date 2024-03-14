@@ -69,6 +69,7 @@ var sharedCapturableOps = captureableOpMap{
 	enumTokenTypes.DIRECTIVE_dataBytes:  true,
 	enumTokenTypes.DIRECTIVE_dataSeries: true,
 	enumTokenTypes.DIRECTIVE_mixedData:  true,
+	enumTokenTypes.DIRECTIVE_throw:      true,
 }
 
 var sharedCapturableMacroOps = captureableOpMap{
@@ -78,6 +79,7 @@ var sharedCapturableMacroOps = captureableOpMap{
 	enumTokenTypes.DIRECTIVE_mixedData:  true,
 	enumTokenTypes.DIRECTIVE_blockStart: true,
 	enumTokenTypes.DIRECTIVE_blockEnd:   true,
+	enumTokenTypes.DIRECTIVE_throw:      true,
 }
 
 // Dictates which operations can be captured by the parent

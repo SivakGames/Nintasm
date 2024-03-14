@@ -28,7 +28,7 @@ var assemblerBuiltInFunctions = map[string]assemblerFunction{
 	"sindeg":               {1, 1, []enumNodeTypes.Def{enumNodeTypes.NumericLiteral}},
 	"cos":                  {1, 1, []enumNodeTypes.Def{enumNodeTypes.NumericLiteral}},
 	"cosdeg":               {1, 1, []enumNodeTypes.Def{enumNodeTypes.NumericLiteral}},
-	"strlen":               {1, 1, []enumNodeTypes.Def{enumNodeTypes.StringLiteral}},
+	"strlen":               {1, 1, []enumNodeTypes.Def{enumNodeTypes.MultiByte}},
 	"substr":               {2, 3, []enumNodeTypes.Def{enumNodeTypes.StringLiteral, enumNodeTypes.NumericLiteral, enumNodeTypes.NumericLiteral}},
 	"toCharmap":            {1, 1, []enumNodeTypes.Def{enumNodeTypes.StringLiteral}},
 	"reverseStr":           {1, 1, []enumNodeTypes.Def{enumNodeTypes.StringLiteral}},
