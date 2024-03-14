@@ -57,26 +57,26 @@ func GetSpecifiedCharmap(specifiedCharmapName string) (CharmapTableType, error) 
 
 // ----------------------------------
 
-func MapStringToCharmap(stringToConvert string) (string, error) {
-	replacedString := ""
+func MapStringToCharmap(stringToConvert string) ([]int, error) {
 	stringAsRuneArray := []rune(stringToConvert)
+	replacedStringAsBytes := []int{}
 
 	currCharmap, err := GetCurrentCharmap()
 	if err != nil {
-		return replacedString, err
+		return replacedStringAsBytes, err
 	}
 
 	for _, r := range stringAsRuneArray {
 		nodes, exists := currCharmap[r]
 		if !exists {
-			return replacedString, errorHandler.AddNew(enumErrorCodes.ToCharMapUndefChar, r, currentCharmapName) // ❌ Fails
+			return replacedStringAsBytes, errorHandler.AddNew(enumErrorCodes.ToCharMapUndefChar, r, currentCharmapName) // ❌ Fails
 		}
 		for _, v := range nodes {
-			replacedString += string(rune(v.AsNumber))
+			replacedStringAsBytes = append(replacedStringAsBytes, v.AsNumber)
 		}
 	}
 
-	return replacedString, nil
+	return replacedStringAsBytes, nil
 }
 
 // ----------------------------------

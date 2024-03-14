@@ -96,6 +96,10 @@ func GetNodeFromSymbolAsNodeTable(symbolName string) (Node, bool) {
 	node, exists := symbolTable[symbolName]
 	return node, exists
 }
+func GetValueFromLabelAsBankTable(symbolName string) (int, bool) {
+	bankValue, exists := labalAsBankTable[symbolName]
+	return bankValue, exists
+}
 
 // ------------------------------------------
 

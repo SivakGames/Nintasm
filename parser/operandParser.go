@@ -485,7 +485,7 @@ func _checkValidAssignmentTarget(assignmentType tokenEnum) bool {
 func (p *OperandParser) _callExpression(callee string) (Node, error) {
 	var err error = nil
 
-	if callee == "bank" {
+	if callee == "bank" || callee == "namespaceValuesToStr" {
 		return p.specialAsmFunctionArguments(callee)
 	}
 
@@ -511,13 +511,14 @@ func (p *OperandParser) specialAsmFunctionArguments(callee string) (Node, error)
 	}
 
 	switch callee {
-	case "bank":
+	case "bank", "namespaceValuesToStr":
 		bankArgument := operandFactory.CreateIdentifierNode(p.lookaheadValue)
 		err = p.eatAndAdvance(enumTokenTypes.IDENTIFIER)
 		if err != nil {
 			return p.badEat(err) // ❌ Fails
 		}
 		asmFuncArguments = append(asmFuncArguments, bankArgument)
+
 	}
 
 	err = p.eatAndAdvance(enumTokenTypes.DELIMITER_rightParenthesis)

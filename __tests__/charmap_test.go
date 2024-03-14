@@ -41,6 +41,7 @@ func TestCharmaps(t *testing.T) {
 		moduleLines = append(moduleLines, " .defchar \"E\", $11")
 		moduleLines = append(moduleLines, " .defchar \"F\", $12")
 		moduleLines = append(moduleLines, " .defchar \"G\", $13")
+		moduleLines = append(moduleLines, " .defchar \"Z\", $f3")
 		moduleLines = append(moduleLines, "testCharmap2 .endcharmap")
 
 		moduleLines = append(moduleLines, "testCharmap3 .charmap")
@@ -52,7 +53,7 @@ func TestCharmaps(t *testing.T) {
 		moduleLines = append(moduleLines, " .db toCharmap(\"ABCÄÔ┏┓┗┛あいガギ邪鬼王💚🧊➡\")")
 
 		moduleLines = append(moduleLines, " .setCharmap testCharmap2")
-		moduleLines = append(moduleLines, " .db toCharmap(\"GFED\")")
+		moduleLines = append(moduleLines, " .db toCharmap(\"GFEZ\")")
 
 		moduleLines = append(moduleLines, " .resetCharmap")
 		moduleLines = append(moduleLines, " .db toCharmap(\"💚💚💚💚\")")
@@ -63,7 +64,9 @@ func TestCharmaps(t *testing.T) {
 			uint8(0x18), uint8(0x19), uint8(0x1a), uint8(0x1b),
 			uint8(0x1c), uint8(0x1d), uint8(0x1e), uint8(0x1f),
 			uint8(0x20), uint8(0x21), uint8(0x22), uint8(0x23),
-			uint8(0x13), uint8(0x12), uint8(0x11), uint8(0x10),
+
+			uint8(0x13), uint8(0x12), uint8(0x11), uint8(0xf3),
+
 			uint8(0x20), uint8(0x20), uint8(0x20), uint8(0x20),
 		}
 

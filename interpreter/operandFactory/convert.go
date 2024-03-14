@@ -12,6 +12,7 @@ func ConvertNodeToNumericLiteral(node *Node) {
 	node.NodeType = enumNodeTypes.NumericLiteral
 	node.NodeValue = fmt.Sprintf("%d", node.AsNumber)
 	node.Resolved = true
+	node.ArgumentList = nil
 	return
 }
 
@@ -31,6 +32,13 @@ func ConvertNodeToBooleanLiteral(node *Node) {
 func ConvertNodeToStringLiteral(node *Node) {
 	node.NodeType = enumNodeTypes.StringLiteral
 	node.Resolved = true
+	return
+}
+
+func ConvertNodeToMultiBytes(node *Node, mutliBytes []Node) {
+	node.NodeType = enumNodeTypes.MultiByte
+	node.Resolved = true
+	node.ArgumentList = &mutliBytes
 	return
 }
 

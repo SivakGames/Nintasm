@@ -2,13 +2,10 @@ package interpreter
 
 import (
 	"fmt"
-	"log"
-	"math"
 	"misc/nintasm/assemble/errorHandler"
 	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
 	enumNodeTypes "misc/nintasm/constants/enums/nodeTypes"
 	"misc/nintasm/interpreter/environment"
-	"misc/nintasm/interpreter/environment/charmapTable"
 	"misc/nintasm/interpreter/environment/exprmapTable"
 	"misc/nintasm/interpreter/environment/funcTable"
 	"misc/nintasm/interpreter/environment/symbolAsNodeTable"
@@ -17,31 +14,6 @@ import (
 )
 
 type Node = operandFactory.Node
-
-type assemblerFunction struct {
-	minArgs          int
-	maxArgs          int
-	argMustResolveTo []enumNodeTypes.Def
-}
-
-var assemblerBuiltInFunctions = map[string]assemblerFunction{
-	"ceil":      {1, 1, []enumNodeTypes.Def{enumNodeTypes.NumericLiteral}},
-	"floor":     {1, 1, []enumNodeTypes.Def{enumNodeTypes.NumericLiteral}},
-	"round":     {1, 1, []enumNodeTypes.Def{enumNodeTypes.NumericLiteral}},
-	"high":      {1, 1, []enumNodeTypes.Def{enumNodeTypes.NumericLiteral}},
-	"low":       {1, 1, []enumNodeTypes.Def{enumNodeTypes.NumericLiteral}},
-	"sin":       {1, 1, []enumNodeTypes.Def{enumNodeTypes.NumericLiteral}},
-	"sindeg":    {1, 1, []enumNodeTypes.Def{enumNodeTypes.NumericLiteral}},
-	"cos":       {1, 1, []enumNodeTypes.Def{enumNodeTypes.NumericLiteral}},
-	"cosdeg":    {1, 1, []enumNodeTypes.Def{enumNodeTypes.NumericLiteral}},
-	"modfDeci":  {1, 1, []enumNodeTypes.Def{enumNodeTypes.NumericLiteral}},
-	"modfInt":   {1, 1, []enumNodeTypes.Def{enumNodeTypes.NumericLiteral}},
-	"strlen":    {1, 1, []enumNodeTypes.Def{enumNodeTypes.StringLiteral}},
-	"substr":    {1, 1, []enumNodeTypes.Def{enumNodeTypes.StringLiteral}},
-	"toCharmap": {1, 1, []enumNodeTypes.Def{enumNodeTypes.StringLiteral}},
-	"defined":   {1, 1, []enumNodeTypes.Def{enumNodeTypes.Identifier}},
-	"bank":      {1, 1, []enumNodeTypes.Def{enumNodeTypes.Identifier}},
-}
 
 func EvaluateNode(node Node) (Node, error) {
 	switch node.NodeType {
@@ -224,7 +196,7 @@ func EvaluateNode(node Node) (Node, error) {
 		}
 
 	case enumNodeTypes.CallExpression:
-		wasAsmFunc, err := ProcessAssemblerFunction(&node)
+		wasAsmFunc, err := processAssemblerFunction(&node)
 		if err != nil {
 			return node, err
 		}
@@ -268,96 +240,4 @@ func EvaluateNode(node Node) (Node, error) {
 	}
 
 	return node, nil
-}
-
-func ProcessAssemblerFunction(node *Node) (bool, error) {
-	funcName := node.NodeValue
-	functionData, isAsmFunc := assemblerBuiltInFunctions[funcName]
-	if isAsmFunc {
-		numArgs := len(*node.ArgumentList)
-		if numArgs < functionData.minArgs {
-			return isAsmFunc, errorHandler.AddNew(enumErrorCodes.InterpreterFuncTooFewArgs)
-		}
-		if numArgs > functionData.maxArgs {
-			return isAsmFunc, errorHandler.AddNew(enumErrorCodes.InterpreterFuncTooManyArgs)
-		}
-
-		//Depending on the function, may do standard evaluation or not...
-		switch funcName {
-		case "ceil", "floor", "round",
-			"high", "low",
-			"sin", "sindeg", "cos", "cosdeg",
-			"modfDeci", "modfInt",
-			"strlen", "substr",
-			"toCharmap":
-			for i, a := range *node.ArgumentList {
-				evaluatedFuncNode, err := EvaluateNode(a)
-				if err != nil {
-					return isAsmFunc, err
-				}
-				if evaluatedFuncNode.NodeType != functionData.argMustResolveTo[i] {
-					return isAsmFunc, errorHandler.AddNew(enumErrorCodes.InterpreterFuncArgWrongType)
-				}
-			}
-		}
-
-		//Actually process the function...
-		switch funcName {
-		case "ceil":
-			node.AsNumber = int(math.Ceil(float64((*node.ArgumentList)[0].AsNumber)))
-		case "floor":
-			node.AsNumber = int(math.Floor(float64((*node.ArgumentList)[0].AsNumber)))
-		case "round":
-			node.AsNumber = int(math.Round(float64((*node.ArgumentList)[0].AsNumber)))
-		case "high":
-			node.AsNumber = ((*node.ArgumentList)[0].AsNumber & 0x0ff00) >> 8
-		case "low":
-			node.AsNumber = ((*node.ArgumentList)[0].AsNumber & 0x000ff)
-		case "sin":
-			node.AsNumber = int(math.Sin(float64((*node.ArgumentList)[0].AsNumber)))
-		case "cos":
-			node.AsNumber = int(math.Cos(float64((*node.ArgumentList)[0].AsNumber)))
-		case "sindeg":
-			node.AsNumber = int(math.Sin(float64((*node.ArgumentList)[0].AsNumber) * (180 / math.Pi)))
-		case "cosdeg":
-			node.AsNumber = int(math.Cos(float64((*node.ArgumentList)[0].AsNumber) * (180 / math.Pi)))
-		case "strlen":
-			node.AsNumber = len((*node.ArgumentList)[0].NodeValue)
-		case "toCharmap":
-			nodeString := ((*node.ArgumentList)[0].NodeValue)
-			replacedString, err := charmapTable.MapStringToCharmap(nodeString)
-			if err != nil {
-				return isAsmFunc, err
-			}
-			node.NodeValue = replacedString
-		case "bank":
-			log.Println((*node.ArgumentList)[0])
-			//node.AsNumber = ((*node.ArgumentList)[0].AsNumber & 0x000ff)
-		case "defined":
-			baseNode := (*node.ArgumentList)[0]
-			if baseNode.Resolved {
-				node.AsBool = true
-				operandFactory.ConvertNodeToBooleanLiteral(node)
-			} else if operandFactory.ValidateNodeIsIdentifier(&baseNode) ||
-				operandFactory.ValidateNodeIsSubstitutionID(&baseNode) {
-				node.AsBool = false
-				operandFactory.ConvertNodeToBooleanLiteral(node)
-			} else if baseNode.NodeType == enumNodeTypes.Undefined {
-				node.AsBool = false
-				operandFactory.ConvertNodeToBooleanLiteral(node)
-			}
-		}
-
-		switch funcName {
-		case "ceil", "floor", "round",
-			"high", "low",
-			"sin", "sindeg", "cos", "cosdeg",
-			"modfDeci", "modfInt",
-			"strlen":
-			operandFactory.ConvertNodeToNumericLiteral(node)
-		case "toCharmap":
-			operandFactory.ConvertNodeToStringLiteral(node)
-		}
-	}
-	return isAsmFunc, nil
 }

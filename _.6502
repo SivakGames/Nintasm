@@ -18,19 +18,24 @@ appa = 2
 ;==========================================
 ; PRG start
 ;==========================================
-	.romSegment "32kb", "32kb", "PRG"
+	.romSegment "32kb", "16kb", "PRG"
 	.bank 0
 	.org $8000
 
 ;-----------------------------------------
 
 RESET:
+;	.db Testing
+	.db 5,6
 
-	.db Testing
-	.db strlen("TS1231aT")
 	.db 7,7,7
+	.db bank(NMI)
 
 
+
+
+	.bank 1
+	.org $c000
 NMI:
 
 	.org $fffa

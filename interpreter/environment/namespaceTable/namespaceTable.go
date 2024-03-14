@@ -9,3 +9,7 @@ var namespaceSymbolTable = map[string]bool{}
 func AddIdentifierKeyToNamespaceTable(namespaceName string) {
 	namespaceSymbolTable[namespaceName] = true
 }
+
+func LookupInNamespaceTable(namespaceName string) {
+
+}

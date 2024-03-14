@@ -170,7 +170,7 @@ func AddBytesToRom(insertions []uint8) error {
 func OverwriteResolvedBytesInRom(romSegment int, bank int, offset int, insertions []uint8) {
 	byteTarget := &rom[romSegment][bank].bytes
 	for i, insertion := range insertions {
-		(*byteTarget)[i] = insertion
+		(*byteTarget)[i+offset] = insertion
 	}
 }
 
