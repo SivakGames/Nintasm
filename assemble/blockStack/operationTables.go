@@ -34,6 +34,7 @@ var startBlockOperationFlags = map[string]startOpFlags{
 	"MACRO":     newStartOpFlags(false, true),
 	"NAMESPACE": newStartOpFlags(true, false),
 	"REPEAT":    newStartOpFlags(false, false),
+	"SWITCH":    newStartOpFlags(false, false),
 }
 
 func getStartOperationFlags(directiveName string) startOpFlags {
@@ -58,6 +59,7 @@ var correspondingEndBlockOperations = map[string]string{
 	"MACRO":     "ENDM",
 	"NAMESPACE": "ENDNAMESPACE",
 	"REPEAT":    "ENDREPEAT",
+	"SWITCH":    "ENDSWITCH",
 }
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -104,6 +106,7 @@ var allowedOperationsForParentOps = map[string]captureableOpMap{
 		enumTokenTypes.ASSIGN_simple: true,
 	},
 	"REPEAT": sharedCapturableOps,
+	"SWITCH": sharedCapturableOps,
 }
 
 func getAllowedOperationsForCurrentBlockOperation() captureableOpMap {

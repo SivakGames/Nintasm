@@ -52,6 +52,8 @@ func EvaluateDirective(operationTokenEnum enumTokenTypes.Def, directiveName stri
 		return evalSettingChange(directiveName, operandList)
 	case enumTokenTypes.DIRECTIVE_settingReset:
 		return evalSettingReset(directiveName)
+	case enumTokenTypes.DIRECTIVE_throw:
+		return evalThrow(operandList)
 
 	case enumTokenTypes.DIRECTIVE_include:
 		switch directiveName {
@@ -81,6 +83,13 @@ func EvaluateDirective(operationTokenEnum enumTokenTypes.Def, directiveName stri
 			return evalElseIf(directiveName, operandList)
 		case "ELSE":
 			return evalElse(directiveName, operandList)
+		case "SWITCH":
+			return evalSwitch(directiveName, operandList)
+		case "CASE":
+			return nil
+		case "DEFAULT":
+			return nil
+			//return evalIf(directiveName, operandList)
 		case "IKV":
 			return evalIkv(directiveName, operandList)
 		case "REPEAT":
@@ -97,6 +106,8 @@ func EvaluateDirective(operationTokenEnum enumTokenTypes.Def, directiveName stri
 			return evalEndIkv(operandList)
 		case "ENDREPEAT":
 			return evalEndRepeat()
+		case "ENDSWITCH":
+			return evalEndSwitch()
 		default:
 			panic("🛑 BAD BLOCK END DIRECTIVE!!!" + directiveName)
 		}

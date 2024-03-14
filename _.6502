@@ -32,6 +32,15 @@ RESET:
 	.db bank(NMI)
 
 
+	.switch 7
+
+	.case 7
+		.db 2
+	.case 2
+		.db 4
+
+	.endSwitch
+
 
 
 	.bank 1
