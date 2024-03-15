@@ -25,21 +25,17 @@ TTT .endm
 ;-----------------------------------------
 
 RESET:
-;	.db Testing
-	TTT $01
-
-	.db 7,7,7
-	.db bank(NMI)
-
+	
+	.default
 
 	.switch 7
-
-	.case 7
-		.db 2
-	.case 2
-		.db 4
+		.case 7
+			.db 2
+		.case 2
+			.db 4
 
 	.endSwitch
+
 
 
 

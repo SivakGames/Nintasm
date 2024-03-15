@@ -112,8 +112,13 @@ var errorTable = map[enumErrorCodes.Def]ErrorTableEntry{
 
 	enumErrorCodes.AssignmentMissingOperand: newErrorTableEntry(enumErrorCodes.Error, "Missing operand for assignment!"),
 
-	enumErrorCodes.IfStatementElseIfAfterElse: newErrorTableEntry(enumErrorCodes.Error, "Cannot have elseif after else"),
-	enumErrorCodes.IfStatementDuplicateElse:   newErrorTableEntry(enumErrorCodes.Error, "Cannot only have 1 else in this block"),
+	enumErrorCodes.IfStatementElseIfAfterElse:        newErrorTableEntry(enumErrorCodes.Error, "Cannot have elseif after else"),
+	enumErrorCodes.IfStatementDuplicateElse:          newErrorTableEntry(enumErrorCodes.Error, "Cannot only have 1 else in this block"),
+	enumErrorCodes.SwitchStatementCaseAfterDefault:   newErrorTableEntry(enumErrorCodes.Error, "Cannot have case after default"),
+	enumErrorCodes.SwitchStatementMismatchedCaseType: newErrorTableEntry(enumErrorCodes.Error, "Case's type mismatched from original switch's type"),
+	enumErrorCodes.SwitchStatementDuplicateDefault:   newErrorTableEntry(enumErrorCodes.Error, "Cannot only have 1 default in this block"),
+	enumErrorCodes.CaseNoSwitch:                      newErrorTableEntry(enumErrorCodes.Error, "Cannot have case outside a switch"),
+	enumErrorCodes.DefaultNoSwitch:                   newErrorTableEntry(enumErrorCodes.Error, "Cannot have default outside a switch"),
 
 	enumErrorCodes.CharMapNoneDefined:     newErrorTableEntry(enumErrorCodes.Error, "No character maps have been defined!"),
 	enumErrorCodes.CharMapNotExist:        newErrorTableEntry(enumErrorCodes.Error, "Specified charmap doesn't exist!"),

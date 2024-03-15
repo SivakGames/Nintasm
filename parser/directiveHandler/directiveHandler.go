@@ -86,9 +86,9 @@ func EvaluateDirective(operationTokenEnum enumTokenTypes.Def, directiveName stri
 		case "SWITCH":
 			return evalSwitch(directiveName, operandList)
 		case "CASE":
-			return nil
+			return evalCase(directiveName, operandList)
 		case "DEFAULT":
-			return nil
+			return evalDefault(directiveName, operandList)
 			//return evalIf(directiveName, operandList)
 		case "IKV":
 			return evalIkv(directiveName, operandList)

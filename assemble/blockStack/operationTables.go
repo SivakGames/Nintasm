@@ -106,7 +106,11 @@ var allowedOperationsForParentOps = map[string]captureableOpMap{
 		enumTokenTypes.ASSIGN_simple: true,
 	},
 	"REPEAT": sharedCapturableOps,
-	"SWITCH": sharedCapturableOps,
+	"SWITCH": {
+		enumTokenTypes.DIRECTIVE_blockStart: true,
+	},
+	"CASE":    sharedCapturableOps,
+	"DEFAULT": sharedCapturableOps,
 }
 
 func getAllowedOperationsForCurrentBlockOperation() captureableOpMap {

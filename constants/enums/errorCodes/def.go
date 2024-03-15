@@ -89,8 +89,13 @@ const (
 
 	AssignmentMissingOperand = "AssignmentMissingOperand"
 
-	IfStatementElseIfAfterElse = "IfStatementElseIfAfterElse"
-	IfStatementDuplicateElse   = "IfStatementDuplicateElse"
+	IfStatementElseIfAfterElse        = "IfStatementElseIfAfterElse"
+	IfStatementDuplicateElse          = "IfStatementDuplicateElse"
+	SwitchStatementCaseAfterDefault   = "SwitchStatementCaseAfterDefault"
+	SwitchStatementMismatchedCaseType = "SwitchStatementMismatchedCaseType"
+	SwitchStatementDuplicateDefault   = "SwitchStatementDuplicateDefault"
+	CaseNoSwitch                      = "CaseNoSwitch"
+	DefaultNoSwitch                   = "DefaultNoSwitch"
 
 	CharMapNoneDefined     = "CharMapNoneDefined"
 	CharMapNotExist        = "CharMapNotExist"
