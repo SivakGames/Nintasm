@@ -4,9 +4,16 @@ import (
 	"misc/nintasm/assemble/blockStack"
 	"misc/nintasm/assemble/errorHandler"
 	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
+	"misc/nintasm/interpreter/operandFactory"
 )
 
 func evalSwitch(directiveName string, operandList *[]Node) error {
+	switchOperand := &(*operandList)[0]
+	if !operandFactory.ValidateNodeIsNumeric(switchOperand) &&
+		!operandFactory.ValidateNodeIsString(switchOperand) {
+		return errorHandler.AddNew(enumErrorCodes.SwitchStatementBadOperand)
+	}
+
 	blockStack.PushOntoTopEntry(directiveName, *operandList)
 	return nil
 }
@@ -17,8 +24,7 @@ func evalCase(directiveName string, operandList *[]Node) error {
 		return err
 	}
 
-	topBlockOp := blockStack.GetCurrentBlockEntry()
-	switchOperand := topBlockOp.OperandList[0]
+	switchOperand := getOriginalSwitchOperand()
 	caseOperand := &(*operandList)[0]
 
 	if switchOperand.NodeType != caseOperand.NodeType {
@@ -41,6 +47,8 @@ func evalDefault(directiveName string, operandList *[]Node) error {
 func evalEndSwitch() error {
 	//currentStackOperation := blockStack.GetCurrentBlockEntry()
 	//var trueStatementCapturedLines *[]blockStack.CapturedLine
+
+	//switchOperand := getOriginalSwitchOperand()
 
 	return nil
 }
@@ -77,4 +85,9 @@ func checkProperCaseDefaultNesting(childOp string) error {
 	}
 
 	return nil
+}
+
+func getOriginalSwitchOperand() Node {
+	switchBlockOp := blockStack.GetCurrentBlockEntry()
+	return switchBlockOp.OperandList[0]
 }

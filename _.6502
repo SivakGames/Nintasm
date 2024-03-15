@@ -25,10 +25,8 @@ TTT .endm
 ;-----------------------------------------
 
 RESET:
-	
-	.default
 
-	.switch 7
+	.switch 7 + 1
 		.case 7
 			.db 2
 		.case 2

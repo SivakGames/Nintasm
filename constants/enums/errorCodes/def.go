@@ -91,6 +91,7 @@ const (
 
 	IfStatementElseIfAfterElse        = "IfStatementElseIfAfterElse"
 	IfStatementDuplicateElse          = "IfStatementDuplicateElse"
+	SwitchStatementBadOperand         = "SwitchStatementBadOperand"
 	SwitchStatementCaseAfterDefault   = "SwitchStatementCaseAfterDefault"
 	SwitchStatementMismatchedCaseType = "SwitchStatementMismatchedCaseType"
 	SwitchStatementDuplicateDefault   = "SwitchStatementDuplicateDefault"
