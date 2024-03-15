@@ -114,6 +114,12 @@ func AddNew(errorTableKey enumErrorCodes.Def, args ...interface{}) error {
 		colorizedLineNumber := util.Colorize(util.PadStringLeft(fmt.Sprintf(" %d ", entry.lineNumber), ERROR_CAPTION_MIN_WIDTH, ' '), "blue", true)
 		fmt.Println("▓", colorizedLineNumber, entry.lineContent)
 
+		subOp := fileStack.GetSubOp()
+		if subOp != nil {
+			colorizedLineNumber := util.Colorize(util.PadStringLeft(fmt.Sprintf(" %d ", subOp.SubOpLineNumber), ERROR_CAPTION_MIN_WIDTH-2, ' '), "blue", true)
+			fmt.Println("▓▓▓", colorizedLineNumber, subOp.LineContent)
+		}
+
 		if highlightEnd > highlightStart {
 			marginSpacer := util.Colorize(util.PadStringLeft("", ERROR_CAPTION_MIN_WIDTH+2, '░'), "cyan", false)
 			leadingSpace := util.PadStringLeft("", highlightStart, ' ')

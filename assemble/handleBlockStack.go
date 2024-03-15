@@ -2,6 +2,7 @@ package assemble
 
 import (
 	"misc/nintasm/assemble/blockStack"
+	"misc/nintasm/assemble/fileStack"
 	"misc/nintasm/interpreter"
 	"misc/nintasm/util"
 )
@@ -79,7 +80,7 @@ func readCapturedLines(
 	monitorStack := blockStack.GetBlockEntriesWithPtr(tempNewOp)
 
 	//Iterate over captured lines
-	for _, b := range *lines {
+	for i, b := range *lines {
 		if len(*monitorStack) > 0 {
 			newlyEvaluatedParsedValues := util.LineOperationParsedValues{
 				OperandStartPosition: b.OperandStartPosition,
@@ -95,7 +96,7 @@ func readCapturedLines(
 			continue
 		}
 
-		// Ordinarily things will come here
+		fileStack.AddSubOp(uint(i+1), b.OriginalLine)
 
 		processOperandArguments := util.NewLineOperationParsedValues(b.OperandStartPosition,
 			b.OperationLabel,

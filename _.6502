@@ -25,26 +25,12 @@ TTT .endm
 ;-----------------------------------------
 
 RESET:
-	.if 3 > 4
+	.if 3 > 4 && 2 == 2
 		.db 3
 	.elseif 15 > 14
 		.db 5
 
 	.endif
-
-	.db 1,2,3,4
-
-	.switch 7
-		.case 7
-			.db 2,4,6
-		.case 2
-			.db 4,6,8
-		.default
-			.db 14,16,18
-
-	.endSwitch
-
-
 
 
 	.bank 1
