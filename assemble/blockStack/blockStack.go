@@ -104,6 +104,11 @@ func EndLabeledDirective() {
 	ForcePopTopEntry()
 }
 
+func SetBottomOfStackToEmptyBlock() {
+	currentStack := getCurrentInvokeOperationBlockEntries()
+	(*currentStack)[0] = newBlockEntry("nil", nil)
+}
+
 // ====================================================
 // ====================================================
 
@@ -161,6 +166,7 @@ func PopTopEntryThenExtendCapturedLines(extendedLines []CapturedLine) {
 		blockEntry := getCurrentInvokeOperationTopBlockEntryFurthestAlternate()
 		blockEntry.CapturedLines = extendedLines
 		GoToProcessingFlag = true
+
 	} else {
 		panic("🛑 Popping nothing/extending nothing!!!")
 	}

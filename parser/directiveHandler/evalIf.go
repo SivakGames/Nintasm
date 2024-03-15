@@ -63,17 +63,15 @@ func evalEndIf(operandList *[]Node) error {
 
 	blockStack.PopTopEntryThenExtendCapturedLines(*trueStatementCapturedLines)
 
-	//currentStack := blockStack.GetCurrentStack()
-	/*
-		currentStack := blockStack2.GetCurrentBlockEntries()
-		if blockStack.StackWillClearFlag {
-			if currentStackOperation != nil {
-				(*currentStack)[0] = *currentStackOperation
-				(*currentStack)[0].AlternateStackBlock = nil
-			} else {
-				blockStack.SetBottomOfStackToEmptyBlock()
-			}
-		} */
+	currentStack := blockStack.GetCurrentBlockEntries()
+	if blockStack.GoToProcessingFlag {
+		if currentStackOperation != nil {
+			(*currentStack)[0] = *currentStackOperation
+			(*currentStack)[0].AlternateStackBlock = nil
+		} else {
+			blockStack.SetBottomOfStackToEmptyBlock()
+		}
+	}
 
 	return nil
 }

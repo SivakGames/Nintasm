@@ -1,9 +1,11 @@
 package directiveHandler
 
 import (
+	"fmt"
 	"misc/nintasm/assemble/blockStack"
 	"misc/nintasm/assemble/errorHandler"
 	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
+	enumNodeTypes "misc/nintasm/constants/enums/nodeTypes"
 	"misc/nintasm/interpreter/operandFactory"
 )
 
@@ -40,15 +42,55 @@ func evalDefault(directiveName string, operandList *[]Node) error {
 		return err
 	}
 
+	baseSwitchEntry := blockStack.GetCurrentBlockEntry()
+	baseSwitchNode := (*baseSwitchEntry).OperandList[0]
+	fmt.Println(baseSwitchNode)
+
+	*operandList = append(*operandList, baseSwitchNode)
 	blockStack.CreateNewAlternateForTopEntry(directiveName, *operandList)
 	return nil
 }
 
 func evalEndSwitch() error {
-	//currentStackOperation := blockStack.GetCurrentBlockEntry()
-	//var trueStatementCapturedLines *[]blockStack.CapturedLine
+	baseSwitchEntry := blockStack.GetCurrentBlockEntry()
+	baseSwitchNode := (*baseSwitchEntry).OperandList[0]
+	targetNodeType := baseSwitchNode.NodeType
 
-	//switchOperand := getOriginalSwitchOperand()
+	currentStackOperation := baseSwitchEntry.AlternateStackBlock
+	var trueStatementCapturedLines *[]blockStack.CapturedLine
+
+	for currentStackOperation != nil {
+		caseData := &currentStackOperation.OperandList[0]
+		if targetNodeType == enumNodeTypes.NumericLiteral {
+			if caseData.AsNumber == baseSwitchNode.AsNumber {
+				break
+			}
+		} else {
+			if caseData.NodeValue == baseSwitchNode.NodeValue {
+				break
+			}
+		}
+		currentStackOperation = currentStackOperation.AlternateStackBlock
+	}
+
+	if currentStackOperation != nil {
+		trueStatementCapturedLines = &currentStackOperation.CapturedLines
+	} else {
+		emptyCapturedLines := make([]blockStack.CapturedLine, 0)
+		trueStatementCapturedLines = &emptyCapturedLines
+	}
+
+	blockStack.PopTopEntryThenExtendCapturedLines(*trueStatementCapturedLines)
+
+	currentStack := blockStack.GetCurrentBlockEntries()
+	if blockStack.GoToProcessingFlag {
+		if currentStackOperation != nil {
+			(*currentStack)[0] = *currentStackOperation
+			(*currentStack)[0].AlternateStackBlock = nil
+		} else {
+			blockStack.SetBottomOfStackToEmptyBlock()
+		}
+	}
 
 	return nil
 }
