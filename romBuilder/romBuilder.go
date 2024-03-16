@@ -137,8 +137,8 @@ func SetOrg(newOrg int) error {
 			return errorHandler.AddNew(enumErrorCodes.OrgTooSmall, newOrg, bank.minOrg)
 		} else if newOrg > bank.maxOrg {
 			return errorHandler.AddNew(enumErrorCodes.OrgTooBig, newOrg, bank.maxOrg)
-		} else if newOrg <= currentOrg {
-			return errorHandler.AddNew(enumErrorCodes.OrgLTEProgramCounter, newOrg, currentOrg)
+		} else if newOrg < currentOrg {
+			return errorHandler.AddNew(enumErrorCodes.OrgLTProgramCounter, newOrg, currentOrg)
 		}
 	}
 	currentInsertionIndex = newOrg % bankSize

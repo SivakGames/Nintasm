@@ -86,13 +86,13 @@ var errorTable = map[enumErrorCodes.Def]ErrorTableEntry{
 
 	enumErrorCodes.INESValueAlreadySet: newErrorTableEntry(enumErrorCodes.Error, "%v value has already been set!!!"),
 
-	enumErrorCodes.BankSizeUneven:       newErrorTableEntry(enumErrorCodes.Fatal, "Bank size is not evenly distributable"),
-	enumErrorCodes.BankOverflow:         newErrorTableEntry(enumErrorCodes.Fatal, "Bank will overflow by: %d byte(s) here"),
-	enumErrorCodes.BankNotSequential:    newErrorTableEntry(enumErrorCodes.Fatal, "Bank declarations must be sequentially incrementing"),
-	enumErrorCodes.BankNumberTooHigh:    newErrorTableEntry(enumErrorCodes.Fatal, "Too high of a bank number!"),
-	enumErrorCodes.OrgTooSmall:          newErrorTableEntry(enumErrorCodes.Error, "ORG is too small! Attempted: %d / Minimum Allowed: %d"),
-	enumErrorCodes.OrgTooBig:            newErrorTableEntry(enumErrorCodes.Error, "ORG is too big! Attempted: %d / Max Allowed: %d"),
-	enumErrorCodes.OrgLTEProgramCounter: newErrorTableEntry(enumErrorCodes.Error, "Cannot set ORG to a value less than where the program counter currently is!\nThis would overwrite data!\n Attempted: %d / Currently at: %d"),
+	enumErrorCodes.BankSizeUneven:      newErrorTableEntry(enumErrorCodes.Fatal, "Bank size is not evenly distributable"),
+	enumErrorCodes.BankOverflow:        newErrorTableEntry(enumErrorCodes.Fatal, "Bank will overflow by: %d byte(s) here"),
+	enumErrorCodes.BankNotSequential:   newErrorTableEntry(enumErrorCodes.Fatal, "Bank declarations must be sequentially incrementing"),
+	enumErrorCodes.BankNumberTooHigh:   newErrorTableEntry(enumErrorCodes.Fatal, "Too high of a bank number!"),
+	enumErrorCodes.OrgTooSmall:         newErrorTableEntry(enumErrorCodes.Error, "ORG is too small! Attempted: %d / Minimum Allowed: %d"),
+	enumErrorCodes.OrgTooBig:           newErrorTableEntry(enumErrorCodes.Error, "ORG is too big! Attempted: %d / Max Allowed: %d"),
+	enumErrorCodes.OrgLTProgramCounter: newErrorTableEntry(enumErrorCodes.Error, "Cannot set ORG to a value less than where the program counter currently is!\nThis would overwrite data!\n Attempted: %d / Currently at: %d"),
 
 	enumErrorCodes.InstUnsupportedMode:      newErrorTableEntry(enumErrorCodes.Error, "Mode is not supported by instruction!"),
 	enumErrorCodes.InstTokenAfterOperand:    newErrorTableEntry(enumErrorCodes.Error, "No more tokens can follow this instruction's operands! %v"),

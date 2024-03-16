@@ -19,8 +19,23 @@
 	.org $8000
 
 ;-----------------------------------------
-	.db 5 > 1 && 6 > 2
-	
+
+O1RoomTiles .namespace
+jjj = 234
+.i_ef = $88,$98,$89,$99,3
+O1RoomTiles .endnamespace
+
+;O1RoomTilesValues = namespaceValuesToStr(O1RoomTiles)
+;O1RoomTilesRepeatValue = floor(strlen(O1RoomTilesValues) / 5)
+;
+;O1RoomGenerateTiles .macro
+;	.repeat O1RoomTilesRepeatValue, \i
+;	.db substr(O1RoomTilesValues, \i*5+\1, \i*5+\1+1)
+;	.endrepeat
+;O1RoomGenerateTiles .endm
+;
+;TILEDEF_TL_Overworld1Rooms:
+;	O1RoomGenerateTiles 0
 
 RESET:
 NMI:

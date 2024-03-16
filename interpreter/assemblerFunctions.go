@@ -107,6 +107,7 @@ func processAssemblerFunction(node *Node) (bool, error) {
 		node.AsNumber = len((*node.ArgumentList)[0].NodeValue)
 	case "namespaceValuesToStr":
 		(*node.ArgumentList)[0].NodeValue = "tatata"
+		operandFactory.ConvertNodeToMultiBytes(node, *node.ArgumentList)
 
 	case "toCharmap":
 		nodeString := ((*node.ArgumentList)[0].NodeValue)
@@ -153,8 +154,7 @@ func processAssemblerFunction(node *Node) (bool, error) {
 		"bank",
 		"strlen":
 		operandFactory.ConvertNodeToNumericLiteral(node)
-	case "namespaceValuesToStr":
-		operandFactory.ConvertNodeToStringLiteral(node)
+
 	}
 
 	return isAsmFunc, nil

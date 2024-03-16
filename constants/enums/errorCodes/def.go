@@ -63,13 +63,13 @@ const (
 
 	INESValueAlreadySet = "INESValueAlreadySet"
 
-	BankSizeUneven       = "BankSizeUneven"
-	BankNotSequential    = "BankNotSequential"
-	BankNumberTooHigh    = "BankNumberTooHigh"
-	BankOverflow         = "BankOverflow"
-	OrgTooSmall          = "OrgTooSmall"
-	OrgTooBig            = "OrgTooBig"
-	OrgLTEProgramCounter = "OrgLTEProgramCounter"
+	BankSizeUneven      = "BankSizeUneven"
+	BankNotSequential   = "BankNotSequential"
+	BankNumberTooHigh   = "BankNumberTooHigh"
+	BankOverflow        = "BankOverflow"
+	OrgTooSmall         = "OrgTooSmall"
+	OrgTooBig           = "OrgTooBig"
+	OrgLTProgramCounter = "OrgLTProgramCounter"
 
 	InstUnsupportedMode      = "InstUnsupportedMode"
 	InstTokenAfterOperand    = "InstTokenAfterOperand"
