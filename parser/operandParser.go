@@ -352,7 +352,7 @@ func (p *OperandParser) statement() (Node, error) {
 		return operandFactory.EmptyNode(), errorHandler.AddNew(enumErrorCodes.OperandStatementEmpty)
 	}
 
-	statement, err := p.bitwiseOrExpression()
+	statement, err := p.logicalOrExpression()
 	if err != nil {
 		return statement, err
 	}
@@ -380,52 +380,52 @@ func (p *OperandParser) statement() (Node, error) {
 
 // || expression
 func (p *OperandParser) logicalOrExpression() (Node, error) {
-	return p._logicalExpression(p.logicalAndExpression, enumTokenTypes.OPERATOR_logicalOr)
+	return p._binaryExpression(p.logicalAndExpression, enumTokenTypes.OPERATOR_logicalOr)
 }
 
 // && expression
 func (p *OperandParser) logicalAndExpression() (Node, error) {
-	return p._logicalExpression(p.bitwiseOrExpression, enumTokenTypes.OPERATOR_logicalAnd)
+	return p._binaryExpression(p.bitwiseOrExpression, enumTokenTypes.OPERATOR_logicalAnd)
 }
 
 // | expression
 func (p *OperandParser) bitwiseOrExpression() (Node, error) {
-	return p._logicalExpression(p.bitwiseXorExpression, enumTokenTypes.OPERATOR_bitwiseOr)
+	return p._binaryExpression(p.bitwiseXorExpression, enumTokenTypes.OPERATOR_bitwiseOr)
 }
 
 // ^ expression
 func (p *OperandParser) bitwiseXorExpression() (Node, error) {
-	return p._logicalExpression(p.bitwiseAndExpression, enumTokenTypes.OPERATOR_bitwiseXor)
+	return p._binaryExpression(p.bitwiseAndExpression, enumTokenTypes.OPERATOR_bitwiseXor)
 }
 
 // & expression
 func (p *OperandParser) bitwiseAndExpression() (Node, error) {
-	return p._logicalExpression(p.equalityExpression, enumTokenTypes.OPERATOR_bitwiseAnd)
+	return p._binaryExpression(p.equalityExpression, enumTokenTypes.OPERATOR_bitwiseAnd)
 }
 
 // ==, != expression
 func (p *OperandParser) equalityExpression() (Node, error) {
-	return p._logicalExpression(p.shiftExpression, enumTokenTypes.OPERATOR_equality)
+	return p._binaryExpression(p.shiftExpression, enumTokenTypes.OPERATOR_equality)
 }
 
 // <<, >> expression
 func (p *OperandParser) shiftExpression() (Node, error) {
-	return p._logicalExpression(p.relationalExpression, enumTokenTypes.OPERATOR_shift)
+	return p._binaryExpression(p.relationalExpression, enumTokenTypes.OPERATOR_shift)
 }
 
 // <,<=,>=,> expression
 func (p *OperandParser) relationalExpression() (Node, error) {
-	return p._logicalExpression(p.additiveExpression, enumTokenTypes.OPERATOR_relational)
+	return p._binaryExpression(p.additiveExpression, enumTokenTypes.OPERATOR_relational)
 }
 
 // +,- expression
 func (p *OperandParser) additiveExpression() (Node, error) {
-	return p._logicalExpression(p.multiplicativeExpression, enumTokenTypes.OPERATOR_additive)
+	return p._binaryExpression(p.multiplicativeExpression, enumTokenTypes.OPERATOR_additive)
 }
 
 // *,/,% expression
 func (p *OperandParser) multiplicativeExpression() (Node, error) {
-	return p._logicalExpression(p.unaryExpression, enumTokenTypes.OPERATOR_multiplicative)
+	return p._binaryExpression(p.unaryExpression, enumTokenTypes.OPERATOR_multiplicative)
 }
 
 //---------------------
@@ -688,10 +688,11 @@ func (p *OperandParser) primaryExpression() (Node, error) {
 
 // ++++++++++++++++++++++++++++
 // Helper for logical expressions
-func (p *OperandParser) _logicalExpression(builderName func() (Node, error), operatorToken tokenEnum) (Node, error) {
+func (p *OperandParser) _binaryExpression(builderName func() (Node, error), operatorToken tokenEnum) (Node, error) {
 	var left Node
 	var right Node
 	var err error = nil
+
 	left, err = builderName()
 	if err != nil {
 		return operandFactory.ErrorNode(p.lookaheadValue), err // ❌ Fails
