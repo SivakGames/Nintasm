@@ -37,6 +37,7 @@ var startBlockOperationFlags = map[string]startOpFlags{
 	"SWITCH":    newStartOpFlags(false, false),
 }
 
+// The default values for flags when a new operation is pushed
 func getStartOperationFlags(directiveName string) startOpFlags {
 	flags, ok := startBlockOperationFlags[directiveName]
 	if !ok {
@@ -114,7 +115,7 @@ var allowedOperationsForParentOps = map[string]captureableOpMap{
 }
 
 func getAllowedOperationsForCurrentBlockOperation() captureableOpMap {
-	blockEntry := getCurrentInvokeOperationTopBlockEntryFurthestAlternate()
+	blockEntry := getCurrentCaptureBlockListCaptureBlockStackTopFurthestAlternate()
 	blockOperationName := blockEntry.BlockOperationName
 	allowedOperations, ok := allowedOperationsForParentOps[blockOperationName]
 	if !ok {

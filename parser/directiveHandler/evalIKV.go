@@ -17,7 +17,7 @@ func evalIkv(directiveName string, operandList *[]Node) error {
 		return errorHandler.AddNew(enumErrorCodes.NodeTypeNotIdentifier) // ❌ Fails
 	}
 
-	blockStack.PushOntoTopEntry(directiveName, *operandList)
+	blockStack.PushCaptureBlock(directiveName, *operandList)
 	macroTable.AppendToReplacementStack()
 	symbolAsNodeTable.PushToSymbolTableStack()
 
@@ -40,7 +40,7 @@ func evalKv(operandList *[]Node) error {
 // Final operation
 func evalEndIkv(operandList *[]Node) error {
 	// Get invoking macro name
-	_, originalOperandList := blockStack.GetTopBlockEntryData()
+	_, originalOperandList := blockStack.GetCurrentCaptureBlockCapturedLinesAndOperandList()
 	macroNameNode := &(*originalOperandList)[0]
 
 	// Get macro's data
@@ -61,7 +61,7 @@ func evalEndIkv(operandList *[]Node) error {
 	}
 
 	macroTable.PopFromReplacementStack()
-	blockStack.ClearCurrentInvokeOperationEvalFlag()
-	blockStack.PopTopEntryThenExtendCapturedLines(modifiedCapturedLines)
+	blockStack.ClearCaptureBlockListEvalFlag()
+	blockStack.PopCaptureBlockThenExtendCapturedLines(modifiedCapturedLines)
 	return nil
 }

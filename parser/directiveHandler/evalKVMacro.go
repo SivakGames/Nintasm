@@ -10,7 +10,7 @@ import (
 )
 
 func evalKVMacro(directiveName string, macroLabel string, operandList *[]Node) error {
-	blockStack.PushOntoTopEntry(directiveName, *operandList)
+	blockStack.PushCaptureBlock(directiveName, *operandList)
 	environment.AddOtherIdentifierToMasterTable(macroLabel, enumSymbolTableTypes.KVMacro)
 	return nil
 }
@@ -18,12 +18,12 @@ func evalKVMacro(directiveName string, macroLabel string, operandList *[]Node) e
 // End the macro definition and add to environment
 func evalEndKVMacro() error {
 	macroLabel := blockStack.GetCurrentOperationLabel()
-	capturedLines := blockStack.GetCurrentBlockEntryCapturedLines()
+	capturedLines := blockStack.GetCurrentCaptureBlockCapturedLines()
 	if len(*capturedLines) == 0 {
 		errorHandler.AddNew(enumErrorCodes.BlockIsEmpty) // ⚠️ Warns
 	}
 
 	macroTable.AddCapturedLinesToMacro(macroLabel, macroTable.KVMacro, *capturedLines)
-	blockStack.EndLabeledDirective()
+	blockStack.ProcessEndLabeledDirective()
 	return nil
 }

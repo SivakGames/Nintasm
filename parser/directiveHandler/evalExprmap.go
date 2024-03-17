@@ -11,13 +11,13 @@ import (
 )
 
 func evalExprmap(directiveName string, exprmapLabel string, operandList *[]Node) error {
-	blockStack.PushOntoTopEntry(directiveName, *operandList)
+	blockStack.PushCaptureBlock(directiveName, *operandList)
 	environment.AddOtherIdentifierToMasterTable(exprmapLabel, enumSymbolTableTypes.ExprMap)
 	return nil
 }
 
 func evalEndExprmap() error {
-	blockStack.EndLabeledDirective()
+	blockStack.ProcessEndLabeledDirective()
 	return nil
 }
 

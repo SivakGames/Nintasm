@@ -12,13 +12,13 @@ import (
 )
 
 func evalCharmap(directiveName string, charmapLabel string, operandList *[]Node) error {
-	blockStack.PushOntoTopEntry(directiveName, *operandList)
+	blockStack.PushCaptureBlock(directiveName, *operandList)
 	environment.AddOtherIdentifierToMasterTable(charmapLabel, enumSymbolTableTypes.CharMap)
 	return nil
 }
 
 func evalEndCharmap() error {
-	blockStack.EndLabeledDirective()
+	blockStack.ProcessEndLabeledDirective()
 	return nil
 }
 

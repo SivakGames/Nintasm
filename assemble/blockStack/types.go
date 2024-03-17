@@ -37,38 +37,38 @@ func newCapturedLine(originalLine string,
 
 // ++++++++++++++++++++++++++++++++++++
 
-type blockEntry struct {
-	BlockOperationName  string
-	CapturedLines       []CapturedLine
-	OperandList         []Node
-	AlternateStackBlock *blockEntry
+type captureBlock struct {
+	BlockOperationName    string
+	CapturedLines         []CapturedLine
+	OperandList           []Node
+	AlternateCaptureBlock *captureBlock
 }
 
-func newBlockEntry(blockOperationName string, operandList []Node) blockEntry {
-	return blockEntry{
-		BlockOperationName:  blockOperationName,
-		CapturedLines:       []CapturedLine{},
-		OperandList:         operandList,
-		AlternateStackBlock: nil,
+func newCaptureBlock(blockOperationName string, operandList []Node) captureBlock {
+	return captureBlock{
+		BlockOperationName:    blockOperationName,
+		CapturedLines:         []CapturedLine{},
+		OperandList:           operandList,
+		AlternateCaptureBlock: nil,
 	}
 }
 
 // ++++++++++++++++++++++++++++++++++++
 
-type InvokeOperation struct {
-	blockEntries []blockEntry
+type CaptureBlockList struct {
+	captureBlockStack []captureBlock
 	//Setting where the operation evaluates things while capturing
 	evalutesInsteadOfCapturing bool
 	//Mainly for macros - Will always capture nodes except for a corresponding ending block
 	forcedCapturing bool
-	nextCollection  *InvokeOperation
+	nextList        *CaptureBlockList
 }
 
-func newInvokeOperation() InvokeOperation {
-	return InvokeOperation{
-		blockEntries:               []blockEntry{},
+func newCaptureBlockList() CaptureBlockList {
+	return CaptureBlockList{
+		captureBlockStack:          []captureBlock{},
 		evalutesInsteadOfCapturing: false,
 		forcedCapturing:            false,
-		nextCollection:             nil,
+		nextList:                   nil,
 	}
 }

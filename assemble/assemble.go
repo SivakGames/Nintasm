@@ -87,7 +87,7 @@ func ReadLines(lines *[]string, lineCounter *uint) error {
 		lineOperationParsedValues := lineOperationParser.GetLineOperationValues()
 
 		//Intermediate - determine if capturing things in a block stack
-		currentBlockStack := blockStack.GetCurrentBlockEntries()
+		currentBlockStack := blockStack.GetCurrentCaptureBlockStack()
 		if len(*currentBlockStack) > 0 {
 			err := handleBlockStack(reformattedLine, &lineOperationParsedValues)
 			if err != nil {

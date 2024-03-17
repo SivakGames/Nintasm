@@ -1,170 +1,77 @@
 package blockStack
 
-import (
-	"fmt"
-	enumTokenTypes "misc/nintasm/constants/enums/tokenTypes"
-	"misc/nintasm/util"
-	"strings"
-)
+// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+// Dealing with capture list itself
+// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
-// +++++++++++++++++++++++++++++++++++++++++++++
-
-var currentBlockOperationLabel string = ""
-var invokeOperations InvokeOperation = newInvokeOperation()
-var GoToProcessingFlag bool = false
-
-// +++++++++++++++++++++++++++++++++++++++++++++
-
-func getCurrentInvokeOperation() *InvokeOperation {
-	var invokeOp *InvokeOperation = &invokeOperations
-	for invokeOp.nextCollection != nil {
-		invokeOp = invokeOp.nextCollection
-	}
-	return invokeOp
+// When processing block ops (macros in particular), add another capture list
+func AddNewCaptureBlockList() {
+	createAndAppendNewCaptureBlockList()
 }
 
-func getCurrentInvokeOperationBlockEntries() *[]blockEntry {
-	currentInvokeOp := getCurrentInvokeOperation()
-	return &currentInvokeOp.blockEntries
-}
-
-func getCurrentInvokeOperationTopBlockEntry() *blockEntry {
-	blockEntries := getCurrentInvokeOperationBlockEntries()
-	return &(*blockEntries)[len(*blockEntries)-1]
-}
-
-func getCurrentInvokeOperationTopBlockEntryFurthestAlternate() *blockEntry {
-	blockEntry := getCurrentInvokeOperationTopBlockEntry()
-	for blockEntry.AlternateStackBlock != nil {
-		blockEntry = blockEntry.AlternateStackBlock
-	}
-	return blockEntry
-}
-
-// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-
-func pushOntoCurrentInvokeOperationEntries(blockOperationName string, operandList []Node) {
-	blockEntries := getCurrentInvokeOperationBlockEntries()
-	*blockEntries = append(*blockEntries, newBlockEntry(blockOperationName, operandList))
-}
-func popFromCurrentInvokeOperationEntries() {
-	blockEntries := getCurrentInvokeOperationBlockEntries()
-	*blockEntries = (*blockEntries)[:len(*blockEntries)-1]
+func DestroyCaptureBlockListWithPointer(ptr *CaptureBlockList) {
+	destroyCaptureBlockListAtPointer(ptr)
 }
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++
-func ClearCurrentOperationLabel() {
-	currentBlockOperationLabel = ""
+func ClearCaptureBlockListEvalFlag() {
+	blockList := getCurrentCaptureBlockList()
+	blockList.evalutesInsteadOfCapturing = false
 }
-func GetCurrentOperationLabel() string {
-	return currentBlockOperationLabel
+func GetCaptureBlockListEvalFlag() bool {
+	blockList := getCurrentCaptureBlockList()
+	return blockList.evalutesInsteadOfCapturing
 }
-
-// Will set the label of the labeled operation that will be captured.
-// If one was previously set then error because it hasn't finished.
-func SetCurrentOperationLabel(label string) error {
-	if currentBlockOperationLabel != "" {
-		panic(fmt.Sprintf("🛑 Somehow entering another label block operation while first (%v) is not done...", currentBlockOperationLabel))
-	}
-	currentBlockOperationLabel = label
-	return nil
+func SetCaptureBlockListEvalFlag() {
+	blockList := getCurrentCaptureBlockList()
+	blockList.evalutesInsteadOfCapturing = true
 }
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++
-func ClearCurrentInvokeOperationEvalFlag() {
-	currentInvokeOp := getCurrentInvokeOperation()
-	currentInvokeOp.evalutesInsteadOfCapturing = false
+func ClearCaptureBlockListForcedCapturingFlag() {
+	blockList := getCurrentCaptureBlockList()
+	blockList.forcedCapturing = false
 }
-func GetCurrentInvokeOperationEvalFlag() bool {
-	currentInvokeOp := getCurrentInvokeOperation()
-	return currentInvokeOp.evalutesInsteadOfCapturing
+func GetCaptureBlockListForcedCapturingFlag() bool {
+	blockList := getCurrentCaptureBlockList()
+	return blockList.forcedCapturing
 }
-func SetCurrentInvokeOperationEvalFlag() {
-	currentInvokeOp := getCurrentInvokeOperation()
-	currentInvokeOp.evalutesInsteadOfCapturing = true
-}
-
-// +++++++++++++++++++++++++++++++++++++++++++++++++++
-func ClearCurrentInvokeOperationForcedCapturingFlag() {
-	currentInvokeOp := getCurrentInvokeOperation()
-	currentInvokeOp.forcedCapturing = false
-}
-func GetCurrentInvokeOperationForcedCapturingFlag() bool {
-	currentInvokeOp := getCurrentInvokeOperation()
-	return currentInvokeOp.forcedCapturing
-}
-func SetCurrentInvokeOperationForcedCapturingFlag() {
-	currentInvokeOp := getCurrentInvokeOperation()
-	currentInvokeOp.forcedCapturing = true
+func SetCaptureBlockListForcedCapturingFlag() {
+	blockList := getCurrentCaptureBlockList()
+	blockList.forcedCapturing = true
 }
 
-func EndLabeledDirective() {
-	ClearCurrentOperationLabel()
-	ForcePopTopEntry()
+// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+// Dealing with capture blocks in the current list
+// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+func PushCaptureBlock(blockOperationName string, operandList []Node) {
+	pushOntoCurrentCaptureBlockListCaptureBlockStack(blockOperationName, operandList)
+	defaultFlags := getStartOperationFlags(blockOperationName)
+	blockList := getCurrentCaptureBlockList()
+	blockList.evalutesInsteadOfCapturing = defaultFlags.ForcedEval
+	blockList.forcedCapturing = defaultFlags.ForcedCapture
 }
 
-func SetBottomOfStackToEmptyBlock() {
-	currentStack := getCurrentInvokeOperationBlockEntries()
-	(*currentStack)[0] = newBlockEntry("nil", nil)
+func ForcePopCaptureBlock() {
+	popFromCurrentCaptureBlockListCaptureBlockStack()
 }
 
-// ====================================================
-// ====================================================
-
-// When processing, will add another potentially usable collection
-// in case an operation would make a new stack
-func AddNewInvokeOperationCollection() {
-	highestOp := getCurrentInvokeOperation()
-	newOp := newInvokeOperation()
-	(*highestOp).nextCollection = &newOp
-}
-
-func DestroyTempCollection(ptr *InvokeOperation) {
-	var invokeOp *InvokeOperation = &invokeOperations
-
-	for invokeOp.nextCollection != nil {
-		if invokeOp.nextCollection == ptr {
-			invokeOp.nextCollection = nil
-			break
-		}
-		invokeOp = invokeOperations.nextCollection
-	}
-}
-
-func PushOntoTopEntry(blockOperationName string, operandList []Node) {
-	pushOntoCurrentInvokeOperationEntries(blockOperationName, operandList)
-	flags := getStartOperationFlags(blockOperationName)
-	currentOp := getCurrentInvokeOperation()
-	currentOp.evalutesInsteadOfCapturing = flags.ForcedEval
-	currentOp.forcedCapturing = flags.ForcedCapture
-}
-
-func ForcePopTopEntry() {
-	popFromCurrentInvokeOperationEntries()
-}
-
-func CreateNewAlternateForTopEntry(blockOperationName string, operandList []Node) {
-	curr := getCurrentInvokeOperationTopBlockEntryFurthestAlternate()
-	altBlock := newBlockEntry(blockOperationName, operandList)
-	curr.AlternateStackBlock = &altBlock
-}
-
-func PopTopEntryThenExtendCapturedLines(extendedLines []CapturedLine) {
-	blockEntries := getCurrentInvokeOperationBlockEntries()
+func PopCaptureBlockThenExtendCapturedLines(extendedLines []CapturedLine) {
+	blockStack := getCurrentCaptureBlockListCaptureBlockStack()
 
 	// More than 1 will
-	if len(*blockEntries) > 1 {
-		popFromCurrentInvokeOperationEntries()
-		blockEntry := getCurrentInvokeOperationTopBlockEntryFurthestAlternate()
+	if len(*blockStack) > 1 {
+		popFromCurrentCaptureBlockListCaptureBlockStack()
+		captureBlock := getCurrentCaptureBlockListCaptureBlockStackTopFurthestAlternate()
 		for _, line := range extendedLines {
-			blockEntry.CapturedLines = append(blockEntry.CapturedLines, line)
+			captureBlock.CapturedLines = append(captureBlock.CapturedLines, line)
 		}
 
-	} else if len(*blockEntries) == 1 {
+	} else if len(*blockStack) == 1 {
 		//Set eval operands to true
-		blockEntry := getCurrentInvokeOperationTopBlockEntryFurthestAlternate()
-		blockEntry.CapturedLines = extendedLines
+		captureBlock := getCurrentCaptureBlockListCaptureBlockStackTopFurthestAlternate()
+		captureBlock.CapturedLines = extendedLines
 		GoToProcessingFlag = true
 
 	} else {
@@ -172,103 +79,53 @@ func PopTopEntryThenExtendCapturedLines(extendedLines []CapturedLine) {
 	}
 }
 
-func GetCurrentBlockEntries() *[]blockEntry {
-	return getCurrentInvokeOperationBlockEntries()
+func CreateNewAlternateForCaptureBlock(blockOperationName string, operandList []Node) {
+	captureBlock := getCurrentCaptureBlockListCaptureBlockStackTopFurthestAlternate()
+	altCaptureBlock := newCaptureBlock(blockOperationName, operandList)
+	captureBlock.AlternateCaptureBlock = &altCaptureBlock
 }
 
-func GetCurrentBlockEntry() *blockEntry {
-	currentStackOp := getCurrentInvokeOperationTopBlockEntry()
-	return currentStackOp
+//================================================
+
+func GetCurrentCaptureBlockStack() *[]captureBlock {
+	return getCurrentCaptureBlockListCaptureBlockStack()
 }
 
-func GetCurrentBlockEntryOperationName() string {
-	curr := getCurrentInvokeOperationTopBlockEntryFurthestAlternate()
-	return curr.BlockOperationName
+func GetCurrentCaptureBlock() *captureBlock {
+	captureBlock := getCurrentCaptureBlockListCaptureBlockStackTop()
+	return captureBlock
 }
 
-func GetCurrentBlockEntryCapturedLines() *[]CapturedLine {
-	curr := getCurrentInvokeOperationTopBlockEntryFurthestAlternate()
-	return &curr.CapturedLines
+func GetCurrentCaptureBlockCapturedLines() *[]CapturedLine {
+	captureBlock := getCurrentCaptureBlockListCaptureBlockStackTopFurthestAlternate()
+	return &captureBlock.CapturedLines
 }
 
-func CheckIfEndOpMatchesOpeningOp(desiredEndOpName string) bool {
-	currentStackOp := getCurrentInvokeOperationTopBlockEntry()
-	endOpName, _ := correspondingEndBlockOperations[currentStackOp.BlockOperationName]
-	return endOpName == strings.ToUpper(desiredEndOpName)
+func GetCurrentCaptureBlockCapturedLinesAndOperandList() (*[]CapturedLine, *[]Node) {
+	captureBlock := getCurrentCaptureBlockListCaptureBlockStackTop()
+	return &captureBlock.CapturedLines, &captureBlock.OperandList
 }
 
-func GetTopBlockEntryData() (*[]CapturedLine, *[]Node) {
-	topEntry := getCurrentInvokeOperationTopBlockEntry()
-	return &topEntry.CapturedLines, &topEntry.OperandList
+func GetCurrentCaptureBlockOperationName() string {
+	captureBlock := getCurrentCaptureBlockListCaptureBlockStackTopFurthestAlternate()
+	return captureBlock.BlockOperationName
+}
+
+func SetBottomOfStackToEmptyBlock() {
+	blockStack := getCurrentCaptureBlockListCaptureBlockStack()
+	(*blockStack)[0] = newCaptureBlock("nil", nil)
 }
 
 // ***************************************************
-func GetCurrentOpPtr() *InvokeOperation {
-	return getCurrentInvokeOperation()
+func GetCurrentOpPtr() *CaptureBlockList {
+	return getCurrentCaptureBlockList()
 }
-func GetLinesWithPtr(pointer *InvokeOperation) *[]CapturedLine {
-	return &pointer.blockEntries[0].CapturedLines
+func GetLinesWithPtr(pointer *CaptureBlockList) *[]CapturedLine {
+	return &pointer.captureBlockStack[0].CapturedLines
 }
-func GetBlockEntriesWithPtr(pointer *InvokeOperation) *[]blockEntry {
-	return &pointer.blockEntries
+func GetBlockEntriesWithPtr(pointer *CaptureBlockList) *[]captureBlock {
+	return &pointer.captureBlockStack
 }
-func ClearBlockEntriesWithPtr(pointer *InvokeOperation) {
-	pointer.blockEntries = (*pointer).blockEntries[:0]
-}
-
-// +++++++++++++++++++++++++++++++++++++++++++++++++++
-
-func CheckIfNewStartEndOperation(lineOperationParsedValues *util.LineOperationParsedValues) bool {
-	isStartEndEnum := (lineOperationParsedValues.OperationTokenEnum == enumTokenTypes.DIRECTIVE_blockStart ||
-		lineOperationParsedValues.OperationTokenEnum == enumTokenTypes.DIRECTIVE_labeledBlockStart ||
-		lineOperationParsedValues.OperationTokenEnum == enumTokenTypes.DIRECTIVE_blockEnd ||
-		lineOperationParsedValues.OperationTokenEnum == enumTokenTypes.DIRECTIVE_labeledBlockEnd)
-
-	// If op isn't start/end enum no need to proceed...
-	if !isStartEndEnum {
-		return false
-	}
-
-	//If in forced evaluate mode, see if there is a pair to force-close it
-
-	if GetCurrentInvokeOperationForcedCapturingFlag() &&
-		!CheckIfEndOpMatchesOpeningOp(lineOperationParsedValues.OperationTokenValue) {
-		return false
-	}
-
-	return true
-}
-
-//-----------------------------------------------------
-
-func CheckOperationIsCapturableAndAppend(
-	originalLine string,
-	lineOperationParsedValues *util.LineOperationParsedValues,
-) error {
-	err := checkOperationIsCapturableByCurrentBlockOperation(lineOperationParsedValues)
-	if err != nil {
-		return err
-	}
-	currentStackOp := getCurrentInvokeOperationTopBlockEntryFurthestAlternate()
-	currentStackOp.CapturedLines = append(currentStackOp.CapturedLines, newCapturedLine(
-		originalLine,
-		lineOperationParsedValues.OperationLabel,
-		lineOperationParsedValues.OperationTokenEnum,
-		lineOperationParsedValues.OperationTokenValue,
-		lineOperationParsedValues.OperandStartPosition,
-		lineOperationParsedValues.ParentParserEnum,
-	))
-	return nil
-}
-
-//--------------------------------
-
-func CheckIfEndOperationAndGoesToProcessing(lineOperationParsedValues *util.LineOperationParsedValues) bool {
-	if (lineOperationParsedValues.OperationTokenEnum == enumTokenTypes.DIRECTIVE_blockEnd ||
-		lineOperationParsedValues.OperationTokenEnum == enumTokenTypes.DIRECTIVE_labeledBlockEnd) &&
-		GoToProcessingFlag {
-		GoToProcessingFlag = false
-		return true
-	}
-	return false
+func ClearBlockEntriesWithPtr(pointer *CaptureBlockList) {
+	pointer.captureBlockStack = (*pointer).captureBlockStack[:0]
 }

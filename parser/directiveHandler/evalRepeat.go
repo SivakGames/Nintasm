@@ -33,13 +33,13 @@ func evalRepeat(directiveName string, operandList *[]Node) error {
 		evaluatedNodes = append(evaluatedNodes, (*operandList)[1])
 	}
 
-	blockStack.PushOntoTopEntry(directiveName, evaluatedNodes)
+	blockStack.PushCaptureBlock(directiveName, evaluatedNodes)
 
 	return nil
 }
 
 func evalEndRepeat() error {
-	capturedLines, operandList := blockStack.GetTopBlockEntryData()
+	capturedLines, operandList := blockStack.GetCurrentCaptureBlockCapturedLinesAndOperandList()
 
 	//Extract repeatAmount
 	repeatAmount := (*operandList)[0].AsNumber
@@ -76,6 +76,6 @@ func evalEndRepeat() error {
 		errorHandler.AddNew(enumErrorCodes.BlockIsEmpty) // ⚠️ Warns
 	}
 
-	blockStack.PopTopEntryThenExtendCapturedLines(replacedLines)
+	blockStack.PopCaptureBlockThenExtendCapturedLines(replacedLines)
 	return nil
 }

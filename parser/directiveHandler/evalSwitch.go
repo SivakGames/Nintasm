@@ -16,7 +16,7 @@ func evalSwitch(directiveName string, operandList *[]Node) error {
 		return errorHandler.AddNew(enumErrorCodes.SwitchStatementBadOperand)
 	}
 
-	blockStack.PushOntoTopEntry(directiveName, *operandList)
+	blockStack.PushCaptureBlock(directiveName, *operandList)
 	return nil
 }
 
@@ -32,7 +32,7 @@ func evalCase(directiveName string, operandList *[]Node) error {
 	if switchOperand.NodeType != caseOperand.NodeType {
 		return errorHandler.AddNew(enumErrorCodes.SwitchStatementMismatchedCaseType)
 	}
-	blockStack.CreateNewAlternateForTopEntry(directiveName, *operandList)
+	blockStack.CreateNewAlternateForCaptureBlock(directiveName, *operandList)
 	return nil
 }
 
@@ -42,21 +42,21 @@ func evalDefault(directiveName string, operandList *[]Node) error {
 		return err
 	}
 
-	baseSwitchEntry := blockStack.GetCurrentBlockEntry()
+	baseSwitchEntry := blockStack.GetCurrentCaptureBlock()
 	baseSwitchNode := (*baseSwitchEntry).OperandList[0]
 	fmt.Println(baseSwitchNode)
 
 	*operandList = append(*operandList, baseSwitchNode)
-	blockStack.CreateNewAlternateForTopEntry(directiveName, *operandList)
+	blockStack.CreateNewAlternateForCaptureBlock(directiveName, *operandList)
 	return nil
 }
 
 func evalEndSwitch() error {
-	baseSwitchEntry := blockStack.GetCurrentBlockEntry()
+	baseSwitchEntry := blockStack.GetCurrentCaptureBlock()
 	baseSwitchNode := (*baseSwitchEntry).OperandList[0]
 	targetNodeType := baseSwitchNode.NodeType
 
-	currentStackOperation := baseSwitchEntry.AlternateStackBlock
+	currentStackOperation := baseSwitchEntry.AlternateCaptureBlock
 	var trueStatementCapturedLines *[]blockStack.CapturedLine
 
 	for currentStackOperation != nil {
@@ -70,7 +70,7 @@ func evalEndSwitch() error {
 				break
 			}
 		}
-		currentStackOperation = currentStackOperation.AlternateStackBlock
+		currentStackOperation = currentStackOperation.AlternateCaptureBlock
 	}
 
 	if currentStackOperation != nil {
@@ -80,13 +80,13 @@ func evalEndSwitch() error {
 		trueStatementCapturedLines = &emptyCapturedLines
 	}
 
-	blockStack.PopTopEntryThenExtendCapturedLines(*trueStatementCapturedLines)
+	blockStack.PopCaptureBlockThenExtendCapturedLines(*trueStatementCapturedLines)
 
-	currentStack := blockStack.GetCurrentBlockEntries()
+	currentStack := blockStack.GetCurrentCaptureBlockStack()
 	if blockStack.GoToProcessingFlag {
 		if currentStackOperation != nil {
 			(*currentStack)[0] = *currentStackOperation
-			(*currentStack)[0].AlternateStackBlock = nil
+			(*currentStack)[0].AlternateCaptureBlock = nil
 		} else {
 			blockStack.SetBottomOfStackToEmptyBlock()
 		}
@@ -99,7 +99,7 @@ func evalEndSwitch() error {
 // are deemed valid
 func checkProperCaseDefaultNesting(childOp string) error {
 	//Must actually be in a block
-	entries := blockStack.GetCurrentBlockEntries()
+	entries := blockStack.GetCurrentCaptureBlockStack()
 	if len(*entries) == 0 {
 		if childOp == "CASE" {
 			return errorHandler.AddNew(enumErrorCodes.CaseNoSwitch)
@@ -108,7 +108,7 @@ func checkProperCaseDefaultNesting(childOp string) error {
 	}
 
 	//Block must actually be a switch block
-	topBlockOp := blockStack.GetCurrentBlockEntry()
+	topBlockOp := blockStack.GetCurrentCaptureBlock()
 	switchOpName := topBlockOp.BlockOperationName
 	if switchOpName != "SWITCH" {
 		if childOp == "CASE" {
@@ -118,7 +118,7 @@ func checkProperCaseDefaultNesting(childOp string) error {
 	}
 
 	// Default after default also not allowed
-	lastOpName := blockStack.GetCurrentBlockEntryOperationName()
+	lastOpName := blockStack.GetCurrentCaptureBlockOperationName()
 	if lastOpName == "DEFAULT" {
 		if childOp == "CASE" {
 			return errorHandler.AddNew(enumErrorCodes.SwitchStatementCaseAfterDefault)
@@ -130,6 +130,6 @@ func checkProperCaseDefaultNesting(childOp string) error {
 }
 
 func getOriginalSwitchOperand() Node {
-	switchBlockOp := blockStack.GetCurrentBlockEntry()
+	switchBlockOp := blockStack.GetCurrentCaptureBlock()
 	return switchBlockOp.OperandList[0]
 }

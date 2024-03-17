@@ -8,7 +8,7 @@ import (
 )
 
 func evalNamespace(directiveName string, namespaceLabel string, operandList *[]Node) error {
-	blockStack.PushOntoTopEntry(directiveName, *operandList)
+	blockStack.PushCaptureBlock(directiveName, *operandList)
 	environment.AddOtherIdentifierToMasterTable(namespaceLabel, enumSymbolTableTypes.Namespace)
 	interpreter.AppendParentLabel(namespaceLabel)
 	return nil
@@ -16,7 +16,7 @@ func evalNamespace(directiveName string, namespaceLabel string, operandList *[]N
 
 // End the Namespace definition and add to environment
 func evalEndNamespace() error {
-	blockStack.EndLabeledDirective()
+	blockStack.ProcessEndLabeledDirective()
 	interpreter.PopParentLabel()
 	return nil
 }

@@ -10,7 +10,7 @@ import (
 )
 
 func evalMacro(directiveName string, macroLabel string, operandList *[]Node) error {
-	blockStack.PushOntoTopEntry(directiveName, *operandList)
+	blockStack.PushCaptureBlock(directiveName, *operandList)
 	environment.AddOtherIdentifierToMasterTable(macroLabel, enumSymbolTableTypes.Macro)
 	return nil
 }
@@ -18,12 +18,12 @@ func evalMacro(directiveName string, macroLabel string, operandList *[]Node) err
 // End the macro definition and add to environment
 func evalEndMacro() error {
 	macroLabel := blockStack.GetCurrentOperationLabel()
-	capturedLines := blockStack.GetCurrentBlockEntryCapturedLines()
+	capturedLines := blockStack.GetCurrentCaptureBlockCapturedLines()
 	if len(*capturedLines) == 0 {
 		errorHandler.AddNew(enumErrorCodes.BlockIsEmpty) // ⚠️ Warns
 	}
 
 	macroTable.AddCapturedLinesToMacro(macroLabel, macroTable.Macro, *capturedLines)
-	blockStack.EndLabeledDirective()
+	blockStack.ProcessEndLabeledDirective()
 	return nil
 }

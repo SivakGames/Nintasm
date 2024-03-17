@@ -8,34 +8,34 @@ import (
 )
 
 func evalIf(directiveName string, operandList *[]Node) error {
-	blockStack.PushOntoTopEntry(directiveName, *operandList)
+	blockStack.PushCaptureBlock(directiveName, *operandList)
 	return nil
 }
 
 func evalElseIf(directiveName string, operandList *[]Node) error {
-	lastOpName := blockStack.GetCurrentBlockEntryOperationName()
+	lastOpName := blockStack.GetCurrentCaptureBlockOperationName()
 	//See if else has been declared - can't do else if afterwards
 	if lastOpName == "ELSE" {
 		return errorHandler.AddNew(enumErrorCodes.IfStatementElseIfAfterElse)
 	}
-	blockStack.CreateNewAlternateForTopEntry(directiveName, *operandList)
+	blockStack.CreateNewAlternateForCaptureBlock(directiveName, *operandList)
 	return nil
 }
 
 func evalElse(directiveName string, operandList *[]Node) error {
-	lastOpName := blockStack.GetCurrentBlockEntryOperationName()
+	lastOpName := blockStack.GetCurrentCaptureBlockOperationName()
 	//See if else has been declared - can't do duplicate elses
 	if lastOpName == "ELSE" {
 		return errorHandler.AddNew(enumErrorCodes.IfStatementDuplicateElse)
 	}
 
 	*operandList = append(*operandList, operandFactory.CreateBooleanLiteralNode(true))
-	blockStack.CreateNewAlternateForTopEntry(directiveName, *operandList)
+	blockStack.CreateNewAlternateForCaptureBlock(directiveName, *operandList)
 	return nil
 }
 
 func evalEndIf(operandList *[]Node) error {
-	currentStackOperation := blockStack.GetCurrentBlockEntry()
+	currentStackOperation := blockStack.GetCurrentCaptureBlock()
 	var trueStatementCapturedLines *[]blockStack.CapturedLine
 
 	// Cycle through until finding a true block or a nil one (nothing is true)
@@ -49,7 +49,7 @@ func evalEndIf(operandList *[]Node) error {
 		if ifData.AsBool {
 			break
 		}
-		currentStackOperation = currentStackOperation.AlternateStackBlock
+		currentStackOperation = currentStackOperation.AlternateCaptureBlock
 	}
 
 	// Nil signifies no if/elseif/else are true so nothing will be
@@ -61,13 +61,13 @@ func evalEndIf(operandList *[]Node) error {
 		trueStatementCapturedLines = &emptyCapturedLines
 	}
 
-	blockStack.PopTopEntryThenExtendCapturedLines(*trueStatementCapturedLines)
+	blockStack.PopCaptureBlockThenExtendCapturedLines(*trueStatementCapturedLines)
 
-	currentStack := blockStack.GetCurrentBlockEntries()
+	currentStack := blockStack.GetCurrentCaptureBlockStack()
 	if blockStack.GoToProcessingFlag {
 		if currentStackOperation != nil {
 			(*currentStack)[0] = *currentStackOperation
-			(*currentStack)[0].AlternateStackBlock = nil
+			(*currentStack)[0].AlternateCaptureBlock = nil
 		} else {
 			blockStack.SetBottomOfStackToEmptyBlock()
 		}

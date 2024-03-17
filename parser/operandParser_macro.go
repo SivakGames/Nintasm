@@ -48,9 +48,9 @@ func (mop *MacroOperandParser) Process(macroName string) error {
 		capturedLinesToProcess = append(capturedLinesToProcess, mop.ApplyReplacementsToCapturedLine(i))
 	}
 
-	blockStack.PushOntoTopEntry("IM", operandList)
+	blockStack.PushCaptureBlock("IM", operandList)
 
-	currentStackOp := blockStack.GetCurrentBlockEntry()
+	currentStackOp := blockStack.GetCurrentCaptureBlock()
 	currentStackOp.CapturedLines = capturedLinesToProcess
 
 	return nil

@@ -38,15 +38,15 @@ func handleBlockStack(
 
 	} else {
 		//If in forced eval mode, evaluate the node right here
-		if blockStack.GetCurrentInvokeOperationEvalFlag() {
+		if blockStack.GetCaptureBlockListEvalFlag() {
 			err := parseOperandStringAndProcess(
 				reformattedLine,
 				lineOperationParsedValues,
 			)
-
 			if err != nil {
 				return err // ❌ Fails
 			}
+
 		} else {
 			err := blockStack.CheckOperationIsCapturableAndAppend(reformattedLine, lineOperationParsedValues)
 			if err != nil {
@@ -60,20 +60,20 @@ func handleBlockStack(
 
 func preProcessBlockStack() error {
 	currentOp := blockStack.GetCurrentOpPtr()
-	blockStack.AddNewInvokeOperationCollection() //Create new temp stack
+	blockStack.AddNewCaptureBlockList() //Create new temp stack
 	tempNewOp := blockStack.GetCurrentOpPtr()
 	err := readCapturedLines(currentOp, tempNewOp)
 	if err != nil {
 		return err
 	}
-	blockStack.DestroyTempCollection(tempNewOp) //Remove upper level buffer stack
+	blockStack.DestroyCaptureBlockListWithPointer(tempNewOp) //Remove upper level buffer stack
 	blockStack.ClearBlockEntriesWithPtr(currentOp)
 	return nil
 }
 
 func readCapturedLines(
-	currentOp *blockStack.InvokeOperation,
-	tempNewOp *blockStack.InvokeOperation) error {
+	currentOp *blockStack.CaptureBlockList,
+	tempNewOp *blockStack.CaptureBlockList) error {
 	var processCapturedErr error
 
 	lines := blockStack.GetLinesWithPtr(currentOp)
