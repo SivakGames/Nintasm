@@ -8,6 +8,7 @@ import (
 	"misc/nintasm/interpreter/environment"
 	"misc/nintasm/interpreter/environment/exprmapTable"
 	"misc/nintasm/interpreter/environment/funcTable"
+	"misc/nintasm/interpreter/environment/namespaceTable"
 	"misc/nintasm/interpreter/environment/symbolAsNodeTable"
 	"misc/nintasm/interpreter/operandFactory"
 	"strings"
@@ -46,7 +47,7 @@ func EvaluateNode(node Node) (Node, error) {
 		}
 		exprAsNum, exprExists := exprmapTable.CheckIfDefinedInExprmap(node.NodeValue)
 		if !exprExists {
-			return node, errorHandler.AddNew(enumErrorCodes.Other, "BABSB")
+			return node, errorHandler.AddNew(enumErrorCodes.ExprMapUndefExpr, node.NodeValue)
 		}
 		node.AsNumber = exprAsNum
 		operandFactory.ConvertNodeToNumericLiteral(&node)
@@ -54,15 +55,13 @@ func EvaluateNode(node Node) (Node, error) {
 
 	case enumNodeTypes.AssignLabelExpression,
 		enumNodeTypes.AssignmentExpression:
-		var err error
-		left := *node.Left
-		right, err := EvaluateNode(*node.Right)
-		if err != nil {
-			return node, err
-		}
-		symbolName := left.NodeValue
-		node.Left = nil
-		node.Right = nil
+
+		assignmentTypeIsLabel := node.NodeType == enumNodeTypes.AssignLabelExpression
+		nodeHasResolved := false
+
+		//Left node is the label itself
+		symbolName := (*node.Left).NodeValue
+		originalSymbolName := symbolName
 		isLocal := strings.HasPrefix(symbolName, ".")
 		if isLocal {
 			parentLabel, err := GetParentLabel()
@@ -70,18 +69,30 @@ func EvaluateNode(node Node) (Node, error) {
 				return node, err
 			}
 			symbolName = parentLabel + symbolName
+			if namespaceTable.IsDefiningNamespace {
+				defer func() {
+					namespaceTable.AddKeyToCurrentNamespace(parentLabel, originalSymbolName, nodeHasResolved)
+				}()
+			}
 		}
-		node.Resolved = true
 
-		isLabel := node.NodeType == enumNodeTypes.AssignLabelExpression
-		err = environment.AddIdentifierToSymbolAsNodeTable(symbolName, right)
+		// Right node is the expression to set the label to
+		evaluatedLabelNode, err := EvaluateNode(*node.Right)
 		if err != nil {
 			return node, err
 		}
-		if isLabel {
+
+		err = environment.AddIdentifierToSymbolAsNodeTable(symbolName, evaluatedLabelNode)
+		if err != nil {
+			return node, err
+		}
+		if assignmentTypeIsLabel {
 			environment.AddToLabelAsBankTable(symbolName)
 		}
 
+		nodeHasResolved = true
+		node.Left = nil
+		node.Right = nil
 		return node, nil
 
 	case enumNodeTypes.BinaryExpression:

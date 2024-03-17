@@ -20,16 +20,6 @@ func GetParentLabel() (string, error) {
 	return parentLabel, nil
 }
 
-func AppendParentLabel(newLabel string) {
-	parentLabelStack = append(parentLabelStack, newLabel)
-	return
-}
-
-func PopParentLabel() {
-	parentLabelStack = parentLabelStack[:len(parentLabelStack)-1]
-	return
-}
-
 // Will overwrite at current position or add if none
 func OverwriteParentLabel(newLabel string) {
 	if len(parentLabelStack) == 0 {
@@ -37,5 +27,17 @@ func OverwriteParentLabel(newLabel string) {
 		return
 	}
 	parentLabelStack[len(parentLabelStack)-1] = newLabel
+	return
+}
+
+// ------------------------------------------------------------------
+
+func AppendParentLabel(newLabel string) {
+	parentLabelStack = append(parentLabelStack, newLabel)
+	return
+}
+
+func PopParentLabel() {
+	parentLabelStack = parentLabelStack[:len(parentLabelStack)-1]
 	return
 }

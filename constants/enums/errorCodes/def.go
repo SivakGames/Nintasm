@@ -87,7 +87,9 @@ const (
 	MacroInvokeDoubleCurlyBrace   = "MacroInvokeDoubleCurlyBrace"
 	MacroInvokeUnclosedCurlyBrace = "MacroInvokeUnclosedCurlyBrace"
 
-	AssignmentMissingOperand = "AssignmentMissingOperand"
+	AssignmentMissingOperand      = "AssignmentMissingOperand"
+	AssignmentLocalNotInNamespace = "AssignmentLocalNotInNamespace"
+	AssignmentNamespaceNotLocal   = "AssignmentNamespaceNotLocal"
 
 	IfStatementElseIfAfterElse        = "IfStatementElseIfAfterElse"
 	IfStatementDuplicateElse          = "IfStatementDuplicateElse"
@@ -97,6 +99,9 @@ const (
 	SwitchStatementDuplicateDefault   = "SwitchStatementDuplicateDefault"
 	CaseNoSwitch                      = "CaseNoSwitch"
 	DefaultNoSwitch                   = "DefaultNoSwitch"
+
+	NamespaceNotExist            = "NamespaceNotExist"
+	NamespaceToValuesNotResolved = "NamespaceToValuesNotResolved"
 
 	CharMapNoneDefined     = "CharMapNoneDefined"
 	CharMapNotExist        = "CharMapNotExist"
@@ -108,6 +113,7 @@ const (
 	ExprMapNoneDefined  = "ExprMapNoneDefined"
 	ExprMapNotExist     = "ExprMapNotExist"
 	ExprMapDuplicateKey = "ExprMapDuplicateKey"
+	ExprMapUndefExpr    = "ExprMapUndefExpr"
 	ToExprMapUndefExpr  = "ToExprMapUndefExpr"
 
 	InterpreterNoParentLabel            = "InterpreterNoParentLabel"

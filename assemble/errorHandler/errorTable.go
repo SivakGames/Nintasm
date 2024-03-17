@@ -110,7 +110,9 @@ var errorTable = map[enumErrorCodes.Def]ErrorTableEntry{
 	enumErrorCodes.MacroInvokeDoubleCurlyBrace:   newErrorTableEntry(enumErrorCodes.Error, "Macro invoking error - Must close curly brace before opening another!"),
 	enumErrorCodes.MacroInvokeUnclosedCurlyBrace: newErrorTableEntry(enumErrorCodes.Error, "Macro invoking error - Unclosed curly brace!"),
 
-	enumErrorCodes.AssignmentMissingOperand: newErrorTableEntry(enumErrorCodes.Error, "Missing operand for assignment!"),
+	enumErrorCodes.AssignmentMissingOperand:      newErrorTableEntry(enumErrorCodes.Error, "Missing operand for assignment!"),
+	enumErrorCodes.AssignmentLocalNotInNamespace: newErrorTableEntry(enumErrorCodes.Error, "Cannot use local assignment outside of namespace"),
+	enumErrorCodes.AssignmentNamespaceNotLocal:   newErrorTableEntry(enumErrorCodes.Error, "Must use local assignment within namespace"),
 
 	enumErrorCodes.IfStatementElseIfAfterElse:        newErrorTableEntry(enumErrorCodes.Error, "Cannot have elseif after else"),
 	enumErrorCodes.IfStatementDuplicateElse:          newErrorTableEntry(enumErrorCodes.Error, "Cannot only have 1 else in this block"),
@@ -120,6 +122,9 @@ var errorTable = map[enumErrorCodes.Def]ErrorTableEntry{
 	enumErrorCodes.SwitchStatementDuplicateDefault:   newErrorTableEntry(enumErrorCodes.Error, "Cannot only have 1 default in this block"),
 	enumErrorCodes.CaseNoSwitch:                      newErrorTableEntry(enumErrorCodes.Error, "Cannot have case outside a switch"),
 	enumErrorCodes.DefaultNoSwitch:                   newErrorTableEntry(enumErrorCodes.Error, "Cannot have default outside a switch"),
+
+	enumErrorCodes.NamespaceNotExist:            newErrorTableEntry(enumErrorCodes.Error, "Namespace %v does not exist!"),
+	enumErrorCodes.NamespaceToValuesNotResolved: newErrorTableEntry(enumErrorCodes.Error, "Namespace value %v is not resolved and cannot be converted to a value"),
 
 	enumErrorCodes.CharMapNoneDefined:     newErrorTableEntry(enumErrorCodes.Error, "No character maps have been defined!"),
 	enumErrorCodes.CharMapNotExist:        newErrorTableEntry(enumErrorCodes.Error, "Specified charmap doesn't exist!"),
@@ -131,6 +136,7 @@ var errorTable = map[enumErrorCodes.Def]ErrorTableEntry{
 	enumErrorCodes.ExprMapNoneDefined:  newErrorTableEntry(enumErrorCodes.Error, "No expression maps have been defined!"),
 	enumErrorCodes.ExprMapNotExist:     newErrorTableEntry(enumErrorCodes.Error, "Specified exprmap doesn't exist!"),
 	enumErrorCodes.ExprMapDuplicateKey: newErrorTableEntry(enumErrorCodes.Error, "Expression %v has already been defined in current map"),
+	enumErrorCodes.ExprMapUndefExpr:    newErrorTableEntry(enumErrorCodes.Error, "Expression `%v` is not defined in currently used exprmap %v"),
 	enumErrorCodes.ToExprMapUndefExpr:  newErrorTableEntry(enumErrorCodes.Error, "Expression `%v` is not defined in currently used exprmap"),
 
 	enumErrorCodes.InterpreterNoParentLabel:            newErrorTableEntry(enumErrorCodes.Error, "Cannot use operation! No parent label!"),

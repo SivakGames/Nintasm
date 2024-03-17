@@ -5,7 +5,9 @@ import (
 	"misc/nintasm/assemble/errorHandler"
 	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
 	enumNodeTypes "misc/nintasm/constants/enums/nodeTypes"
+	"misc/nintasm/interpreter/environment"
 	"misc/nintasm/interpreter/environment/charmapTable"
+	"misc/nintasm/interpreter/environment/namespaceTable"
 	"misc/nintasm/interpreter/environment/symbolAsNodeTable"
 	"misc/nintasm/interpreter/operandFactory"
 )
@@ -29,7 +31,7 @@ var assemblerBuiltInFunctions = map[string]assemblerFunction{
 	"cos":                  {1, 1, []enumNodeTypes.Def{enumNodeTypes.NumericLiteral}},
 	"cosdeg":               {1, 1, []enumNodeTypes.Def{enumNodeTypes.NumericLiteral}},
 	"strlen":               {1, 1, []enumNodeTypes.Def{enumNodeTypes.MultiByte}},
-	"substr":               {2, 3, []enumNodeTypes.Def{enumNodeTypes.StringLiteral, enumNodeTypes.NumericLiteral, enumNodeTypes.NumericLiteral}},
+	"substr":               {2, 3, []enumNodeTypes.Def{enumNodeTypes.MultiByte, enumNodeTypes.NumericLiteral, enumNodeTypes.NumericLiteral}},
 	"toCharmap":            {1, 1, []enumNodeTypes.Def{enumNodeTypes.StringLiteral}},
 	"reverseStr":           {1, 1, []enumNodeTypes.Def{enumNodeTypes.StringLiteral}},
 	"defined":              {1, 1, []enumNodeTypes.Def{enumNodeTypes.Identifier}},
@@ -104,10 +106,52 @@ func processAssemblerFunction(node *Node) (bool, error) {
 	case "cosdeg":
 		node.AsNumber = int(math.Cos(float64((*node.ArgumentList)[0].AsNumber) * (180 / math.Pi)))
 	case "strlen":
-		node.AsNumber = len((*node.ArgumentList)[0].NodeValue)
+		identifierName := (*node.ArgumentList)[0]
+		node.AsNumber = len(*identifierName.ArgumentList)
+	case "substr":
+		var limit Node
+		var slicedNodes []Node
+
+		target := (*node.ArgumentList)[0]
+		offset := (*node.ArgumentList)[1]
+		if len(*node.ArgumentList) > 2 {
+			limit = (*node.ArgumentList)[2]
+			slicedNodes = (*target.ArgumentList)[offset.AsNumber:limit.AsNumber]
+		} else {
+			slicedNodes = (*target.ArgumentList)[offset.AsNumber:]
+		}
+		operandFactory.ConvertNodeToMultiBytes(node, slicedNodes)
+
 	case "namespaceValuesToStr":
-		(*node.ArgumentList)[0].NodeValue = "tatata"
-		operandFactory.ConvertNodeToMultiBytes(node, *node.ArgumentList)
+		namespaceLabel := (*node.ArgumentList)[0].NodeValue
+		nsValues, err := namespaceTable.GetNamespaceValues(namespaceLabel)
+		if err != nil {
+			return isAsmFunc, err
+		}
+		nsValuesAsNode := []Node{}
+		for _, nsv := range *nsValues {
+			fullName := namespaceLabel + nsv.Key
+			if !nsv.Resolved {
+				return isAsmFunc, errorHandler.AddNew(enumErrorCodes.NamespaceToValuesNotResolved, nsv.Key)
+			}
+			lookedUpNode, _, err := environment.LookupIdentifierInSymbolAsNodeTable(fullName)
+			if err != nil {
+				return isAsmFunc, err
+			}
+			switch lookedUpNode.NodeType {
+			case enumNodeTypes.NumericLiteral, enumNodeTypes.StringLiteral:
+				nsValuesAsNode = append(nsValuesAsNode, lookedUpNode)
+			case enumNodeTypes.MultiByte:
+				for _, arg := range *lookedUpNode.ArgumentList {
+					nsValuesAsNode = append(nsValuesAsNode, arg)
+				}
+			default:
+				panic("Can't unpack for namespace values to str")
+			}
+		}
+
+		node.NodeValue = namespaceLabel
+		operandFactory.ConvertNodeToMultiBytes(node, nsValuesAsNode)
 
 	case "toCharmap":
 		nodeString := ((*node.ArgumentList)[0].NodeValue)

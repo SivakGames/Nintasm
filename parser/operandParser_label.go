@@ -5,6 +5,7 @@ import (
 	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
 	enumTokenTypes "misc/nintasm/constants/enums/tokenTypes"
 	"misc/nintasm/interpreter"
+	"misc/nintasm/interpreter/environment/namespaceTable"
 	"misc/nintasm/interpreter/environment/unresolvedTable"
 	"misc/nintasm/interpreter/operandFactory"
 	"misc/nintasm/romBuilder"
@@ -50,6 +51,12 @@ func (p *LabelOperandParser) Process(operationType tokenEnum, operationValue str
 			return errorHandler.AddNew(enumErrorCodes.AssignmentMissingOperand)
 		}
 
+		if namespaceTable.IsDefiningNamespace && !isLocal {
+			return errorHandler.AddNew(enumErrorCodes.AssignmentNamespaceNotLocal)
+		} else if !namespaceTable.IsDefiningNamespace && isLocal {
+			return errorHandler.AddNew(enumErrorCodes.AssignmentLocalNotInNamespace)
+		}
+
 		operandList, err := p.GetOperandList(
 			ASSIGNMENT_MIN_OPERANDS, ASSIGNMENT_MAX_OPERANDS, ASSIGNMENT_MANAULLY_EVALS,
 			nil,
@@ -77,7 +84,6 @@ func (p *LabelOperandParser) Process(operationType tokenEnum, operationValue str
 			if err != nil {
 				return err
 			}
-
 		}
 		return nil
 
@@ -103,5 +109,6 @@ func doAssignment(operationLabel string, operand *Node) error {
 			unresolvedTable.AddUnresolvedSymbol(unresolvedAssignNode)
 		}
 	}
+
 	return nil
 }
