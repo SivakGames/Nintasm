@@ -18,12 +18,21 @@
 	.bank 0
 	.org $8000
 
+	.rsset $0000
+temp .rs 16
+gen .rs 5
+
+
 ;-----------------------------------------
 
 O1RoomTiles .namespace
 .i_ef = $88,$98,$89,$99,3
 .i_df = $88,$98,$89,$99,3
 .i_cf = $88,$98,$89,$99,3
+.i_1cf = $82,$98,$89,$99,3
+.i_2cf = $83,$98,$89,$99,3
+.i_3cf = $84,$98,$89,$99,3
+.i_4cf = $85,$98,$89,$99,3
 O1RoomTiles .endnamespace
 
 O1RoomTilesValues = namespaceValuesToStr(O1RoomTiles)
@@ -37,8 +46,11 @@ O1RoomGenerateTiles .endm
 
 TILEDEF_TL_Overworld1Rooms:
 	O1RoomGenerateTiles 0
+	O1RoomGenerateTiles 1
 
 RESET:
+	.db low(temp + 5)
+	.db low(gen)
 
 NMI:
 	.org $fffa

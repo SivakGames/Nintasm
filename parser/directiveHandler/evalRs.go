@@ -1,13 +1,15 @@
 package directiveHandler
 
 import (
+	"fmt"
 	"misc/nintasm/assemble/errorHandler"
 	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
+	"misc/nintasm/interpreter"
 	"misc/nintasm/interpreter/operandFactory"
 	"misc/nintasm/romBuilder/romBuildingSettings"
 )
 
-func evalRs(operandList *[]Node) error {
+func evalRs(operationLabel string, operandList *[]Node) error {
 	rsValueNode := (*operandList)[0]
 
 	if !operandFactory.ValidateNodeIsNumeric(&rsValueNode) {
@@ -16,13 +18,20 @@ func evalRs(operandList *[]Node) error {
 		return errorHandler.AddNew(enumErrorCodes.NodeValueNotGTE, 1) // ❌ Fails
 	}
 
-	rsCurrentValue, err := romBuildingSettings.GetRSValue()
+	rsCurrentValue, rserr := romBuildingSettings.GetRSValue()
+	if rserr != nil {
+		return rserr
+	}
+
+	fmt.Println(rsCurrentValue, operationLabel, rsValueNode)
+
+	rsIdentifierNode := operandFactory.CreateIdentifierNode(operationLabel)
+	rsCurrentValueNode := operandFactory.CreateNumericLiteralNode(int(rsCurrentValue))
+	rsAssignmentNode := operandFactory.CreateAssignmentNode(rsIdentifierNode, rsCurrentValueNode)
+	_, err := interpreter.EvaluateNode(rsAssignmentNode)
 	if err != nil {
 		return err
 	}
-
-	//TODO - Something with value?
-	_ = rsCurrentValue
 
 	romBuildingSettings.AddToRSValue(uint(rsValueNode.AsNumber))
 

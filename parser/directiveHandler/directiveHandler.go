@@ -68,7 +68,7 @@ func EvaluateDirective(operationTokenEnum enumTokenTypes.Def, directiveName stri
 	case enumTokenTypes.DIRECTIVE_labeled:
 		switch directiveName {
 		case "RS":
-			return evalRs(operandList)
+			return evalRs(operationLabel, operandList)
 		case "FUNC":
 			return evalFunc(operationLabel, operandList)
 		default:
