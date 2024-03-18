@@ -1,7 +1,6 @@
 package directiveHandler
 
 import (
-	"fmt"
 	"misc/nintasm/assemble/errorHandler"
 	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
 	"misc/nintasm/interpreter"
@@ -22,8 +21,6 @@ func evalRs(operationLabel string, operandList *[]Node) error {
 	if rserr != nil {
 		return rserr
 	}
-
-	fmt.Println(rsCurrentValue, operationLabel, rsValueNode)
 
 	rsIdentifierNode := operandFactory.CreateIdentifierNode(operationLabel)
 	rsCurrentValueNode := operandFactory.CreateNumericLiteralNode(int(rsCurrentValue))

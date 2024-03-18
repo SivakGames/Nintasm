@@ -34,8 +34,8 @@ var assemblerBuiltInFunctions = map[string]assemblerFunction{
 	"substr":               {2, 3, []enumNodeTypes.Def{enumNodeTypes.MultiByte, enumNodeTypes.NumericLiteral, enumNodeTypes.NumericLiteral}},
 	"toCharmap":            {1, 1, []enumNodeTypes.Def{enumNodeTypes.StringLiteral}},
 	"reverseStr":           {1, 1, []enumNodeTypes.Def{enumNodeTypes.StringLiteral}},
-	"defined":              {1, 1, []enumNodeTypes.Def{enumNodeTypes.Identifier}},
 	"bank":                 {1, 1, []enumNodeTypes.Def{enumNodeTypes.Identifier}},
+	"defined":              {1, 1, []enumNodeTypes.Def{enumNodeTypes.Identifier}},
 	"namespaceValuesToStr": {1, 1, []enumNodeTypes.Def{enumNodeTypes.Identifier}},
 }
 
@@ -60,6 +60,8 @@ func processAssemblerFunction(node *Node) (bool, error) {
 
 	// ------------------------------------------------------------
 	//Do standard evaluation of node(s)
+	evaluatedArguments := make([]Node, len(*node.ArgumentList))
+
 	switch funcName {
 	case "ceil", "floor", "round",
 		"high", "low",
@@ -75,6 +77,7 @@ func processAssemblerFunction(node *Node) (bool, error) {
 			if evaluatedFuncNode.NodeType != functionData.argMustResolveTo[i] {
 				return isAsmFunc, errorHandler.AddNew(enumErrorCodes.InterpreterFuncArgWrongType, funcName)
 			}
+			evaluatedArguments[i] = evaluatedFuncNode
 		}
 	}
 
@@ -82,46 +85,63 @@ func processAssemblerFunction(node *Node) (bool, error) {
 	//Actually process the function...
 	switch funcName {
 	case "high":
-		node.AsNumber = ((*node.ArgumentList)[0].AsNumber & 0x0ff00) >> 8
+		node.AsNumber = (evaluatedArguments[0].AsNumber & 0x0ff00) >> 8
 	case "low":
-		node.AsNumber = ((*node.ArgumentList)[0].AsNumber & 0x000ff)
+		node.AsNumber = (evaluatedArguments[0].AsNumber & 0x000ff)
 	case "ceil":
-		node.AsNumber = int(math.Ceil(float64((*node.ArgumentList)[0].AsNumber)))
+		node.AsNumber = int(math.Ceil(float64(evaluatedArguments[0].AsNumber)))
 	case "floor":
-		node.AsNumber = int(math.Floor(float64((*node.ArgumentList)[0].AsNumber)))
+		node.AsNumber = int(math.Floor(float64(evaluatedArguments[0].AsNumber)))
 	case "round":
-		node.AsNumber = int(math.Round(float64((*node.ArgumentList)[0].AsNumber)))
+		node.AsNumber = int(math.Round(float64(evaluatedArguments[0].AsNumber)))
 	case "modfDeci":
-		result, _ := math.Modf(float64((*node.ArgumentList)[0].AsNumber))
+		result, _ := math.Modf(float64(evaluatedArguments[0].AsNumber))
 		node.AsNumber = int(result)
 	case "modfInt":
-		_, result := math.Modf(float64((*node.ArgumentList)[0].AsNumber))
+		_, result := math.Modf(float64(evaluatedArguments[0].AsNumber))
 		node.AsNumber = int(result)
 	case "sin":
-		node.AsNumber = int(math.Sin(float64((*node.ArgumentList)[0].AsNumber)))
+		node.AsNumber = int(math.Sin(float64(evaluatedArguments[0].AsNumber)))
 	case "cos":
-		node.AsNumber = int(math.Cos(float64((*node.ArgumentList)[0].AsNumber)))
+		node.AsNumber = int(math.Cos(float64(evaluatedArguments[0].AsNumber)))
 	case "sindeg":
-		node.AsNumber = int(math.Sin(float64((*node.ArgumentList)[0].AsNumber) * (180 / math.Pi)))
+		node.AsNumber = int(math.Sin(float64(evaluatedArguments[0].AsNumber) * (180 / math.Pi)))
 	case "cosdeg":
-		node.AsNumber = int(math.Cos(float64((*node.ArgumentList)[0].AsNumber) * (180 / math.Pi)))
+		node.AsNumber = int(math.Cos(float64(evaluatedArguments[0].AsNumber) * (180 / math.Pi)))
 	case "strlen":
-		identifierName := (*node.ArgumentList)[0]
-		node.AsNumber = len(*identifierName.ArgumentList)
+		if node.NodeType == enumNodeTypes.StringLiteral {
+			node.AsNumber = len(node.NodeValue)
+		} else {
+			node.AsNumber = len(*evaluatedArguments[0].ArgumentList)
+		}
 	case "substr":
 		var limit Node
 		var slicedNodes []Node
 
-		target := (*node.ArgumentList)[0]
-		offset := (*node.ArgumentList)[1]
-		if len(*node.ArgumentList) > 2 {
-			limit = (*node.ArgumentList)[2]
+		target := evaluatedArguments[0]
+		offset := evaluatedArguments[1]
+		if len(evaluatedArguments) > 2 {
+			limit = (evaluatedArguments)[2]
 			slicedNodes = (*target.ArgumentList)[offset.AsNumber:limit.AsNumber]
 		} else {
 			slicedNodes = (*target.ArgumentList)[offset.AsNumber:]
 		}
 		operandFactory.ConvertNodeToMultiBytes(node, slicedNodes)
 
+	case "toCharmap":
+		nodeString := (evaluatedArguments[0].NodeValue)
+		replacedStringAsBytes, err := charmapTable.MapStringToCharmap(nodeString)
+		if err != nil {
+			return isAsmFunc, err
+		}
+		multiBytes := []Node{}
+		for _, r := range replacedStringAsBytes {
+			n := operandFactory.CreateNumericLiteralNode(r)
+			multiBytes = append(multiBytes, n)
+		}
+		operandFactory.ConvertNodeToMultiBytes(node, multiBytes)
+
+	// NON pre-evaluated functions!
 	case "namespaceValuesToStr":
 		namespaceLabel := (*node.ArgumentList)[0].NodeValue
 		nsValues, err := namespaceTable.GetNamespaceValues(namespaceLabel)
@@ -152,19 +172,6 @@ func processAssemblerFunction(node *Node) (bool, error) {
 
 		node.NodeValue = namespaceLabel
 		operandFactory.ConvertNodeToMultiBytes(node, nsValuesAsNode)
-
-	case "toCharmap":
-		nodeString := ((*node.ArgumentList)[0].NodeValue)
-		replacedStringAsBytes, err := charmapTable.MapStringToCharmap(nodeString)
-		if err != nil {
-			return isAsmFunc, err
-		}
-		multiBytes := []Node{}
-		for _, r := range replacedStringAsBytes {
-			n := operandFactory.CreateNumericLiteralNode(r)
-			multiBytes = append(multiBytes, n)
-		}
-		operandFactory.ConvertNodeToMultiBytes(node, multiBytes)
 
 	case "bank":
 		_, err := EvaluateNode((*node.ArgumentList)[0])
