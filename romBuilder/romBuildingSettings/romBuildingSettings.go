@@ -18,7 +18,7 @@ func SetAutoZeroPage(newAutoZPValue bool) {
 
 // ------------------------------------
 
-var emptyRomFillValue uint8 = 0x00
+var emptyRomFillValue uint8 = 0xff
 
 func GetEmptyRomFillValue() uint8 {
 	return emptyRomFillValue

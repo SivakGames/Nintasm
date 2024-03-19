@@ -5,6 +5,7 @@ import (
 	"misc/nintasm/assemble/errorHandler"
 	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
 	"misc/nintasm/interpreter/operandFactory"
+	"misc/nintasm/romBuilder/romBuildingSettings"
 )
 
 type Node = operandFactory.Node
@@ -19,7 +20,13 @@ type bankType struct {
 }
 
 func newBank(bankSize int) bankType {
-	return bankType{bytes: make([]uint8, bankSize), orgIsSet: false, minOrg: -1, maxOrg: -1}
+	fillValue := romBuildingSettings.GetEmptyRomFillValue()
+	initBytes := make([]uint8, bankSize)
+	for i := range initBytes {
+		initBytes[i] = fillValue
+	}
+
+	return bankType{bytes: initBytes, orgIsSet: false, minOrg: -1, maxOrg: -1}
 }
 
 // The final ROM that will be built
