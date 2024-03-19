@@ -35,14 +35,17 @@ func EvaluateInstruction(instructionName string,
 	if len(*operandList) == 1 {
 		unevaluatedNode := (*operandList)[0]
 		if instructionMode == enumInstructionModes.REL {
-			orgToSubtract := romBuilder.GetOrg() - 2 //The -2 accounts for where things start
+			orgToSubtract := romBuilder.GetOrg() + 2 //The -2 accounts for where things start
 			branchNode := operandFactory.ConvertToBranchBinaryExpressionNode(unevaluatedNode, orgToSubtract)
 			unevaluatedNode = branchNode
 		}
 
 		operand, err = interpreter.EvaluateNode(unevaluatedNode)
 		if err != nil {
-			return err
+			err := errorHandler.CheckErrorContinuesUpwardPropagation(err, enumErrorCodes.Error)
+			if err != nil {
+				return err // ❌❌ CONTINUES Failing!
+			}
 		}
 
 	} else {

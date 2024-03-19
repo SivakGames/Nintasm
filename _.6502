@@ -19,35 +19,24 @@
 	.org $8000
 
 
-AddrDiffToByte .func (\2 - \1)
-
-GENINDEX_MiscPalettes .func AddrDiffToByte(ADDRTBL_MiscPalettes, \1)
-
-MiscPaletteIndexes .nameSpace
-.pauseSelectLeo = GENINDEX_MiscPalettes(ADDRTBL_MiscPalettes.pauseSelectLeo)
-MiscPaletteIndexes .endnameSpace
-;===========================================================
-
-ADDRTBL_MiscPalettes:
-;Selecting Leo on the pause screen
-.pauseSelectLeo:
-	.dw DATA_FIXED_FAC8
-
-
-;fac8
-;Leo
-DATA_FIXED_FAC8:
-	.db low(PPUADDR.palBg1)
-	.db MiscPaletteIndexes.pauseSelectLeo
-	.db $FE
-
-
+	.db low(NMI), high(NMI)
 
 RESET:
+	LDA #5
+	LDX TTTTT
+	LDA #21
+	BMI RESET
+
+	BEQ NMI
+		LDX #$Fe
+		LDX #$FF
 
 NMI:
+TTTTT:
+	.db 4
 	.org $fffa
 	.dw NMI, RESET, 0
+
 
 ;==========================================
 ; CHR start
