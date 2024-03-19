@@ -35,8 +35,7 @@ func EvaluateInstruction(instructionName string,
 	if len(*operandList) == 1 {
 		unevaluatedNode := (*operandList)[0]
 		if instructionMode == enumInstructionModes.REL {
-			orgToSubtract := romBuilder.GetOrg() + 2 //The -2 accounts for where things start
-			branchNode := operandFactory.ConvertToBranchBinaryExpressionNode(unevaluatedNode, orgToSubtract)
+			branchNode := operandFactory.ConvertToBranchBinaryExpressionNode(unevaluatedNode, romBuilder.GetOrg())
 			unevaluatedNode = branchNode
 		}
 

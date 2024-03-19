@@ -81,7 +81,7 @@ func assignModesAndOpcodes(modeMap *map[string]instructionOpcodesAndSupportedMod
 	for instructionNameAsKey, opcodeModeSet := range *modeMap {
 		baseOpcode := opcodeModeSet.BaseOpcode
 		for _, mode := range *opcodeModeSet.SupportedModes {
-			xyMod := instructionNameAsKey == "LDX" || instructionNameAsKey == "LDY"
+			xyMod := instructionNameAsKey == "LDX" || instructionNameAsKey == "LDY" || instructionNameAsKey == "CPX" || instructionNameAsKey == "CPY"
 			jmpMod := instructionNameAsKey == "JMP" || instructionNameAsKey == "JSR"
 			adj := getAdjustedOpcode(mode, baseOpcode, xyMod, jmpMod)
 			opcodeModeSet.ModeOpcodes[mode] = adj

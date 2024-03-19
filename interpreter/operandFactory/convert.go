@@ -47,6 +47,7 @@ func ConvertNodeToMultiBytes(node *Node, mutliBytes []Node) {
 
 func ConvertToBranchBinaryExpressionNode(originalNode Node, orgToSubtract int) Node {
 	orgToSubtractNode := CreateNumericLiteralNode(orgToSubtract)
-	branchNode := CreateBinaryExpressionNode("-", originalNode, orgToSubtractNode)
+	innerNode := CreateBinaryExpressionNode("-", originalNode, orgToSubtractNode)
+	branchNode := CreateBinaryExpressionNode("-", innerNode, CreateNumericLiteralNode(2))
 	return branchNode
 }

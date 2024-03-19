@@ -18,22 +18,28 @@
 	.bank 0
 	.org $8000
 
+AddrDiff .func (\2 - \1)
+AddrDiffToByte .func ( AddrDiff(\1, \2) >> 1 )
+GENINDEX_MiscPalettes .func AddrDiffToByte(ADDRTBL_MiscPalettes, \1)
 
-	.db low(NMI), high(NMI)
+MiscPaletteIndexes .nameSpace
+.pauseSelectLeo = GENINDEX_MiscPalettes(ADDRTBL_MiscPalettes.pauseSelectLeo)
+.enemySet00 = GENINDEX_MiscPalettes(ADDRTBL_MiscPalettes.enemySet00)
+MiscPaletteIndexes .endnameSpace
+
 
 RESET:
-	LDA #5
-	LDX TTTTT
-	LDA #21
-	BMI RESET
+	.db MiscPaletteIndexes.enemySet00
 
-	BEQ NMI
-		LDX #$Fe
-		LDX #$FF
+ADDRTBL_MiscPalettes:
+.pauseSelectLeo:
+	.dw $FAC8
+.enemySet00:
+	.dw $FADC
 
 NMI:
-TTTTT:
-	.db 4
+	RTI
+
 	.org $fffa
 	.dw NMI, RESET, 0
 
