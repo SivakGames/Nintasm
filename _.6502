@@ -37,7 +37,7 @@ ADDRTBL_MiscPalettes:
 ;fac8
 ;Leo
 DATA_FIXED_FAC8:
-	.db 3
+	.db low(PPUADDR.palBg1)
 	.db MiscPaletteIndexes.pauseSelectLeo
 	.db $FE
 

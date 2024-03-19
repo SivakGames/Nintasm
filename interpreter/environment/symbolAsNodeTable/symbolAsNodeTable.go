@@ -64,7 +64,15 @@ func init() {
 	generateKeys := func(baseKey string, startValue int, endValue, step int) {
 		for value := startValue; value < endValue; value += step {
 			key := fmt.Sprintf("%s%d", baseKey, (value-startValue)/step)
-			symbolTable[key] = generateNumericNodeForEnvironment(value)
+			genNode := generateNumericNodeForEnvironment(value)
+			symbolTable[key] = genNode
+		}
+	}
+	generateKeys2 := func(baseKey string, startValue int, endValue, step int) {
+		for value := startValue; value < endValue; value += step {
+			key := fmt.Sprintf("%s", baseKey)
+			genNode := generateNumericNodeForEnvironment(value)
+			symbolTable[key] = genNode
 		}
 	}
 
@@ -75,10 +83,22 @@ func init() {
 		generateKeys(name, start, end, 0x20)
 	}
 	for i := 0; i < 4; i++ {
+		start := i*0x00400 + 0x023c0
+		end := start + 0x00040
+		name := fmt.Sprintf("PPUADDR.nt%dattLine", i)
+		generateKeys(name, start, end, 0x04)
+	}
+	for i := 0; i < 4; i++ {
 		start := i*0x00400 + 0x03f00
 		end := start + 0x00004
 		name := fmt.Sprintf("PPUADDR.palBg%d", i)
-		generateKeys(name, start, end, 0x04)
+		generateKeys2(name, start, end, 0x04)
+	}
+	for i := 0; i < 4; i++ {
+		start := i*0x00400 + 0x03f10
+		end := start + 0x00004
+		name := fmt.Sprintf("PPUADDR.palSprite%d", i)
+		generateKeys2(name, start, end, 0x04)
 	}
 }
 
