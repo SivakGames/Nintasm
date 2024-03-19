@@ -20,6 +20,14 @@ func GetParentLabel() (string, error) {
 	return parentLabel, nil
 }
 
+func GetParentLabelNoError() string {
+	if len(parentLabelStack) == 0 {
+		return ""
+	}
+	parentLabel := parentLabelStack[len(parentLabelStack)-1]
+	return parentLabel
+}
+
 // Will overwrite at current position or add if none
 func OverwriteParentLabel(newLabel string) {
 	if len(parentLabelStack) == 0 {
@@ -28,6 +36,10 @@ func OverwriteParentLabel(newLabel string) {
 	}
 	parentLabelStack[len(parentLabelStack)-1] = newLabel
 	return
+}
+
+func ClearParentLabel() {
+	parentLabelStack = parentLabelStack[:0]
 }
 
 // ------------------------------------------------------------------

@@ -18,52 +18,30 @@
 	.bank 0
 	.org $8000
 
-NUM_BASIS = $01
-ALPHA_BASIS = $10
 
-DEFAULT_CHARMAP .charmap
-	.defchar " ", $00
-	
-	.defcharRange "1", "9", NUM_BASIS
-	.defchar "0", NUM_BASIS + 9
-	.defchar ".", $0b
-	.defchar "-", $0c
-	.defchar "#", $0d
-	.defchar "_", $0f
+AddrDiffToByte .func (\2 - \1)
 
-	.defcharRange "A", "Z", ALPHA_BASIS
-	
-	.defchar "'", $2a
-	.defchar "?", $2b
-	.defchar "!", $2c
-	.defchar ",", $2d
-	.defchar ":", $2e
-DEFAULT_CHARMAP .endcharmap
-;===============================================================
-;Nametable width minus the length of a string
-Diff_LineMinusStr .func (32 - strlen(\1))
+GENINDEX_MiscPalettes .func AddrDiffToByte(ADDRTBL_MiscPalettes, \1)
 
-;===============================================================
-;Nametable width minus the length of a string halved
-;Good for centering text/graphics, etc. 
-Diff_LineMinusStrHalf .func (Diff_LineMinusStr(\1) >> 1)
-
-;-----------------------------------------
-CALC_CopyrightScreenLeftToCenter .func Diff_LineMinusStr(\1) - 3 + Diff_LineMinusStrHalf(\2)
-CALC_CopyrightScreenCenterSpaces .func Diff_LineMinusStrHalf(\1) + (strlen(\1) % 2) + Diff_LineMinusStrHalf(\2)
-
+MiscPaletteIndexes .nameSpace
+.pauseSelectLeo = GENINDEX_MiscPalettes(ADDRTBL_MiscPalettes.pauseSelectLeo)
+MiscPaletteIndexes .endnameSpace
 ;===========================================================
-TEXTDATA_CopyrightText .nameSpace
-;(left-aligned text)
-.p1l1 = toCharmap("TEENAGE MUTANT NINJA")
-TEXTDATA_CopyrightText .endNameSpace
+
+ADDRTBL_MiscPalettes:
+;Selecting Leo on the pause screen
+.pauseSelectLeo:
+	.dw DATA_FIXED_FAC8
 
 
-PPU_TEMPL_CopyrightText:
-	.db $80 + strlen(TEXTDATA_CopyrightText.p1l1)
-	.db TEXTDATA_CopyrightText.p1l1
-	.db Diff_LineMinusStr(TEXTDATA_CopyrightText.p1l1)
-	.db $00
+;fac8
+;Leo
+DATA_FIXED_FAC8:
+	.db 3
+	.db MiscPaletteIndexes.pauseSelectLeo
+	.db $FE
+
+
 
 RESET:
 

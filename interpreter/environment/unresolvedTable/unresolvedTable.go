@@ -1,6 +1,7 @@
 package unresolvedTable
 
 import (
+	"fmt"
 	"misc/nintasm/assemble/errorHandler"
 	"misc/nintasm/assemble/fileStack"
 	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
@@ -18,6 +19,7 @@ type unresolvedEntry struct {
 	originalBank       int
 	originalOffset     int
 	originalNode       Node
+	parentLabel        string
 	neededBytes        int
 	fileName           string
 	lineNumber         uint8
@@ -34,6 +36,7 @@ func newUnresolvedEntry(node Node, neededBytes int) unresolvedEntry {
 		originalBank:       romBuilder.GetBankIndex(),
 		originalOffset:     romBuilder.GetCurrentInsertionIndex(),
 		originalNode:       node,
+		parentLabel:        interpreter.GetParentLabelNoError(),
 		neededBytes:        neededBytes,
 		fileName:           fileData.FileName,
 		lineNumber:         uint8(fileData.CurrentLineNumber),
@@ -53,10 +56,12 @@ func AddUnresolvedRomEntry(node Node, mustResolveSize int) {
 
 // Called at the end of pass 1
 func ResolvedUnresolvedSymbols() error {
+	interpreter.ClearParentLabel()
 	for len(unresolvedSymbolTable) > 0 {
 		originalUnresolvedLength := len(unresolvedSymbolTable)
 		newUnresolvedTable := []unresolvedEntry{}
 		for _, entry := range unresolvedSymbolTable {
+			interpreter.OverwriteParentLabel(entry.parentLabel)
 			evaluatedNode, err := interpreter.EvaluateNode(entry.originalNode)
 			if err != nil {
 				err := errorHandler.CheckErrorContinuesUpwardPropagation(err, enumErrorCodes.UnresolvedIdentifier)
@@ -70,9 +75,11 @@ func ResolvedUnresolvedSymbols() error {
 					newUnresolvedTable = append(newUnresolvedTable, entry)
 				}
 			}
+			interpreter.ClearParentLabel()
 		}
 		newUnresolvedLength := len(newUnresolvedTable)
 		if originalUnresolvedLength == newUnresolvedLength {
+			fmt.Println(unresolvedSymbolTable)
 			panic("🛑 DEADLOCK")
 		}
 		unresolvedSymbolTable = newUnresolvedTable
