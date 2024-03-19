@@ -57,6 +57,7 @@ func AddUnresolvedRomEntry(node Node, mustResolveSize int) {
 // Called at the end of pass 1
 func ResolvedUnresolvedSymbols() error {
 	interpreter.ClearParentLabel()
+
 	for len(unresolvedSymbolTable) > 0 {
 		originalUnresolvedLength := len(unresolvedSymbolTable)
 		newUnresolvedTable := []unresolvedEntry{}

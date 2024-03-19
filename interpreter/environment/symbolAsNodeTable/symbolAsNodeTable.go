@@ -52,6 +52,9 @@ var symbolTable = symbolTableType{
 	"PPUMASK.emphasizeGreen":    generateNumericNodeForEnvironment(0x40),
 	"PPUMASK.emphasizeBlue":     generateNumericNodeForEnvironment(0x80),
 
+	"PPUSTATUS": generateNumericNodeForEnvironment(0x02002),
+	"PPUSCROLL": generateNumericNodeForEnvironment(0x02005),
+
 	"PPUADDR": generateNumericNodeForEnvironment(0x02006),
 
 	"bank": generateAssemblerReservedWordNode("bank"),

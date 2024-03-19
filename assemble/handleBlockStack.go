@@ -39,7 +39,11 @@ func handleBlockStack(
 	} else {
 		//If in forced eval mode, evaluate the node right here
 		if blockStack.GetCaptureBlockListEvalFlag() {
-			err := parseOperandStringAndProcess(
+			err := blockStack.CheckOperationIsCapturable(reformattedLine, lineOperationParsedValues)
+			if err != nil {
+				return err // ❌ Fails
+			}
+			err = parseOperandStringAndProcess(
 				reformattedLine,
 				lineOperationParsedValues,
 			)

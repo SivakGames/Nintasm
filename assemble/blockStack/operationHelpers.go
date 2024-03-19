@@ -49,14 +49,25 @@ func CheckIfNewStartEndOperation(lineOperationParsedValues *util.LineOperationPa
 
 //-----------------------------------------------------
 
-func CheckOperationIsCapturableAndAppend(
+func CheckOperationIsCapturable(
 	originalLine string,
-	lineOperationParsedValues *util.LineOperationParsedValues,
-) error {
+	lineOperationParsedValues *util.LineOperationParsedValues) error {
 	err := checkOperationIsCapturableByCurrentBlockOperation(lineOperationParsedValues)
 	if err != nil {
 		return err
 	}
+	return nil
+}
+
+func CheckOperationIsCapturableAndAppend(
+	originalLine string,
+	lineOperationParsedValues *util.LineOperationParsedValues,
+) error {
+	err := CheckOperationIsCapturable(originalLine, lineOperationParsedValues)
+	if err != nil {
+		return err
+	}
+
 	currentStackOp := getCurrentCaptureBlockListCaptureBlockStackTopFurthestAlternate()
 	currentStackOp.CapturedLines = append(currentStackOp.CapturedLines, newCapturedLine(
 		originalLine,

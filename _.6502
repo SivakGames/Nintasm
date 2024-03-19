@@ -18,27 +18,12 @@
 	.bank 0
 	.org $8000
 
-AddrDiff .func (\2 - \1)
-AddrDiffToByte .func ( AddrDiff(\1, \2) >> 1 )
-GENINDEX_MiscPalettes .func AddrDiffToByte(ADDRTBL_MiscPalettes, \1)
-
-MiscPaletteIndexes .nameSpace
-.pauseSelectLeo = GENINDEX_MiscPalettes(ADDRTBL_MiscPalettes.pauseSelectLeo)
-.enemySet00 = GENINDEX_MiscPalettes(ADDRTBL_MiscPalettes.enemySet00)
-MiscPaletteIndexes .endnameSpace
-
-
 RESET:
-	.db MiscPaletteIndexes.enemySet00
-
-ADDRTBL_MiscPalettes:
-.pauseSelectLeo:
-	.dw $FAC8
-.enemySet00:
-	.dw $FADC
+	.repeat 64, \i
+	.db floor(sindeg( 360 * \i / 256 ) * 256)
+	.endrepeat
 
 NMI:
-	RTI
 
 	.org $fffa
 	.dw NMI, RESET, 0
