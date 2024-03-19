@@ -19,6 +19,7 @@
 	.org $8000
 
 RESET:
+	.db 1 / 4
 	.repeat 64, \i
 	.db floor(sindeg( 360 * \i / 256 ) * 256)
 	.endrepeat

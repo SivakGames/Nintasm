@@ -97,75 +97,9 @@ func EvaluateNode(node Node) (Node, error) {
 
 	case enumNodeTypes.BinaryExpression:
 		var err error
-		operation := node.NodeValue
-		left, err := EvaluateNode(*node.Left)
+		node, err = processBinaryExpression(node)
 		if err != nil {
 			return node, err
-		}
-
-		right, err := EvaluateNode(*node.Right)
-		if err != nil {
-			return node, err
-		}
-
-		if left.NodeType != right.NodeType {
-			badLeftValue := node.Left.NodeValue
-			badRightValue := node.Right.NodeValue
-			operandFactory.ConvertNodeToNumericLiteral(&node)
-			return node, errorHandler.AddNew(
-				enumErrorCodes.InterpreterBinaryMismatchedTypes,
-				badLeftValue, operation, badRightValue,
-			)
-		}
-
-		node.Left = nil
-		node.Right = nil
-
-		switch operation {
-		case "+":
-			node.AsNumber = left.AsNumber + right.AsNumber
-		case "-":
-			node.AsNumber = left.AsNumber - right.AsNumber
-		case "*":
-			node.AsNumber = left.AsNumber * right.AsNumber
-		case "/":
-			node.AsNumber = left.AsNumber / right.AsNumber
-		case "%":
-			node.AsNumber = left.AsNumber % right.AsNumber
-		case "|":
-			node.AsNumber = left.AsNumber | right.AsNumber
-		case "&":
-			node.AsNumber = left.AsNumber & right.AsNumber
-		case "^":
-			node.AsNumber = left.AsNumber ^ right.AsNumber
-		case "<<":
-			node.AsNumber = left.AsNumber << right.AsNumber
-		case ">>":
-			node.AsNumber = left.AsNumber >> right.AsNumber
-		case "<":
-			node.AsBool = left.AsNumber < right.AsNumber
-		case "<=":
-			node.AsBool = left.AsNumber <= right.AsNumber
-		case ">":
-			node.AsBool = left.AsNumber > right.AsNumber
-		case ">=":
-			node.AsBool = left.AsNumber > right.AsNumber
-		case "==":
-			node.AsBool = left.AsNumber == right.AsNumber
-		case "!=":
-			node.AsBool = left.AsNumber != right.AsNumber
-		case "&&":
-			node.AsBool = left.AsBool && right.AsBool
-		case "||":
-			node.AsBool = left.AsBool || right.AsBool
-		default:
-			panic("🛑 SOMETHING IS VERY WRONG WITH BINARY EXPRESSION INTERPRETING")
-		}
-		switch operation {
-		case "+", "-", "*", "/", "%", "|", "&", "^", "<<", ">>":
-			operandFactory.ConvertNodeToNumericLiteral(&node)
-		case "<", "<=", ">", ">=", "==", "!=", "&&", "||":
-			operandFactory.ConvertNodeToBooleanLiteral(&node)
 		}
 
 	case enumNodeTypes.UnaryExpression:
