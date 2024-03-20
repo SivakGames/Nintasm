@@ -57,8 +57,6 @@ func EvaluateNode(node Node) (Node, error) {
 			err := processAssemblerFunction(&node)
 			return node, err
 		}
-		// ---------------------------------------------
-		// Not ASM function, look for user-def function
 		return processCallExpression(node)
 
 	default:
