@@ -106,7 +106,14 @@ func CreateAssignLabelNode(labelName string, org int) Node {
 	return node
 }
 
-//===================================================
+// ++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+// Helper function to take a symbol and number and make an assignment node
+func CreateAssignmentNodeForNumber(symbolName string, number int) Node {
+	return CreateAssignmentNode(CreateIdentifierNode(symbolName), CreateNumericLiteralNode(number))
+}
+
+//====================================================
 //Types of identifiers
 
 func CreateIdentifierNode(nodeValue string) Node {
