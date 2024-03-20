@@ -20,12 +20,9 @@
 
 
 RESET:
-	.db 1 / 4
-	.repeat 64, \i
-	.db floor(sindeg( 360 * \i / 256 ) * 256)
-	.endrepeat
 
 NMI:
+	.db 2
 
 	.org $fffa
 	.dw NMI, RESET, 0

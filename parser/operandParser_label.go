@@ -42,8 +42,12 @@ func (p *LabelOperandParser) Process(operationType tokenEnum, operationValue str
 		labelAssignNode := operandFactory.CreateAssignLabelNode(operationLabel, romBuilder.GetOrg())
 		_, err := interpreter.EvaluateNode(labelAssignNode)
 		if err != nil {
-			return err // ❌ Fails
+			err := errorHandler.CheckErrorContinuesUpwardPropagation(err, enumErrorCodes.Error)
+			if err != nil {
+				return err // ❌❌ CONTINUES Failing!
+			}
 		}
+
 		return nil
 
 	case enumTokenTypes.ASSIGN_EQU, enumTokenTypes.ASSIGN_simple:
