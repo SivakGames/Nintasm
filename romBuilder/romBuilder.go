@@ -13,10 +13,11 @@ type Node = operandFactory.Node
 type romType []romSegmentType
 type romSegmentType []bankType
 type bankType struct {
-	bytes    []uint8
-	orgIsSet bool
-	maxOrg   int
-	minOrg   int
+	bytes         []uint8
+	orgIsSet      bool
+	maxOrg        int
+	minOrg        int
+	occupiedBytes uint
 }
 
 func newBank(bankSize int) bankType {
@@ -26,8 +27,10 @@ func newBank(bankSize int) bankType {
 		initBytes[i] = fillValue
 	}
 
-	return bankType{bytes: initBytes, orgIsSet: false, minOrg: -1, maxOrg: -1}
+	return bankType{bytes: initBytes, orgIsSet: false, minOrg: -1, maxOrg: -1, occupiedBytes: 0}
 }
+
+// ++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 // The final ROM that will be built
 var rom = make(romType, 0)
@@ -95,8 +98,8 @@ func GetCurrentBankSegment() *bankType {
 
 // The current bank segment (array of uint8 )
 func GetCurrentBankSegmentBytes() *[]uint8 {
-	currentRomSegment := GetCurrentBankSegment()
-	return &(*currentRomSegment).bytes
+	currentBankSegment := GetCurrentBankSegment()
+	return &(*currentBankSegment).bytes
 }
 
 // How many banks are in the current ROM segment
@@ -156,16 +159,19 @@ func SetOrg(newOrg int) error {
 
 // Take an array of uint8s and put it the right spot
 func AddBytesToRom(insertions []uint8) error {
-	currentBankSegment := GetCurrentBankSegmentBytes()
+	currentBankSegment := GetCurrentBankSegment()
+	currentBankSegmentBytes := GetCurrentBankSegmentBytes()
+
 	toInsertSpace := currentInsertionIndex + len(insertions)
-	overflowByteTotal := toInsertSpace - len(*currentBankSegment)
+	overflowByteTotal := toInsertSpace - len(*currentBankSegmentBytes)
 
 	if overflowByteTotal > 0 {
 		return errorHandler.AddNew(enumErrorCodes.BankOverflow, overflowByteTotal) //❌☠️ FATAL ERROR
 	}
 	for i := range insertions {
-		(*currentBankSegment)[currentInsertionIndex] = insertions[i]
+		(*currentBankSegmentBytes)[currentInsertionIndex] = insertions[i]
 		currentInsertionIndex++
+		(*currentBankSegment).occupiedBytes++
 	}
 
 	return nil
@@ -194,5 +200,4 @@ func ClearRom() {
 			(rom)[i][j].minOrg = 0
 		}
 	}
-	return
 }
