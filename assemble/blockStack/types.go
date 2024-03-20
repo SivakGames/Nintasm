@@ -55,20 +55,20 @@ func newCaptureBlock(blockOperationName string, operandList []Node) captureBlock
 
 // ++++++++++++++++++++++++++++++++++++
 
-type CaptureBlockList struct {
+type CaptureBlockListNode struct {
 	captureBlockStack []captureBlock
 	//Setting where the operation evaluates things while capturing
 	evalutesInsteadOfCapturing bool
 	//Mainly for macros - Will always capture nodes except for a corresponding ending block
 	forcedCapturing bool
-	nextList        *CaptureBlockList
+	nextNode        *CaptureBlockListNode
 }
 
-func newCaptureBlockList() CaptureBlockList {
-	return CaptureBlockList{
+func newCaptureBlockListNode() CaptureBlockListNode {
+	return CaptureBlockListNode{
 		captureBlockStack:          []captureBlock{},
 		evalutesInsteadOfCapturing: false,
 		forcedCapturing:            false,
-		nextList:                   nil,
+		nextNode:                   nil,
 	}
 }

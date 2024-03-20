@@ -68,7 +68,7 @@ func CheckOperationIsCapturableAndAppend(
 		return err
 	}
 
-	currentStackOp := getCurrentCaptureBlockListCaptureBlockStackTopFurthestAlternate()
+	currentStackOp := getCurrentCaptureBlockListNodeCaptureBlockStackTopFurthestAlternate()
 	currentStackOp.CapturedLines = append(currentStackOp.CapturedLines, newCapturedLine(
 		originalLine,
 		lineOperationParsedValues.OperationLabel,

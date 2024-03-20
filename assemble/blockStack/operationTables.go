@@ -115,7 +115,7 @@ var allowedOperationsForParentOps = map[string]captureableOpMap{
 }
 
 func getAllowedOperationsForCurrentBlockOperation() captureableOpMap {
-	blockEntry := getCurrentCaptureBlockListCaptureBlockStackTopFurthestAlternate()
+	blockEntry := getCurrentCaptureBlockListNodeCaptureBlockStackTopFurthestAlternate()
 	blockOperationName := blockEntry.BlockOperationName
 	allowedOperations, ok := allowedOperationsForParentOps[blockOperationName]
 	if !ok {

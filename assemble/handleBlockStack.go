@@ -76,8 +76,8 @@ func preProcessBlockStack() error {
 }
 
 func readCapturedLines(
-	currentOp *blockStack.CaptureBlockList,
-	tempNewOp *blockStack.CaptureBlockList) error {
+	currentOp *blockStack.CaptureBlockListNode,
+	tempNewOp *blockStack.CaptureBlockListNode) error {
 	var processCapturedErr error
 
 	lines := blockStack.GetLinesWithPtr(currentOp)
