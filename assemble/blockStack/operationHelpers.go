@@ -13,15 +13,15 @@ var GoToProcessingFlag bool = false
 //================================================
 
 func CheckIfEndOpMatchesOpeningOp(desiredEndOpName string) bool {
-	currentStackOp := getCurrentCaptureBlockListCaptureBlockStackTop()
+	currentStackOp := getCurrentCaptureBlockListNodeCaptureBlockStackTopEntry()
 	endOpName, _ := correspondingEndBlockOperations[currentStackOp.BlockOperationName]
 	return endOpName == strings.ToUpper(desiredEndOpName)
 }
 
-// Shared method for most ending labeled directives
+// Shared method for most ending labeled directives. Clears the label and pops from the capture block stack
 func ProcessEndLabeledDirective() {
 	ClearCurrentOperationLabel()
-	ForcePopCaptureBlock()
+	popFromCurrentCaptureBlockListCaptureBlockStack()
 }
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -68,7 +68,7 @@ func CheckOperationIsCapturableAndAppend(
 		return err
 	}
 
-	currentStackOp := getCurrentCaptureBlockListNodeCaptureBlockStackTopFurthestAlternate()
+	currentStackOp := getCurrentCaptureBlockListNodeCaptureBlockStackTopEntryFurthestAlternate()
 	currentStackOp.CapturedLines = append(currentStackOp.CapturedLines, newCapturedLine(
 		originalLine,
 		lineOperationParsedValues.OperationLabel,

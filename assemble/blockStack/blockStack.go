@@ -9,132 +9,60 @@ func init() {
 	captureBlockList = newCaptureBlockListNode()
 }
 
-// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-// Dealing with capture list itself
-// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+// +++++++++++++++++++++++++++++++++++++++++++++
 
-// When processing block ops (macros in particular), add another capture list
-func AddNewCaptureBlockListNode() {
-	createAndAppendNewCaptureBlockList()
-}
-
-func DestroyCaptureBlockListNodeWithPointer(ptr *CaptureBlockListNode) {
-	destroyCaptureBlockListAtPointer(ptr)
+//Traverse the list until finding the last (and current) node
+func getCurrentCaptureBlockListNode() *CaptureBlockListNode {
+	var listNode *CaptureBlockListNode = &captureBlockList
+	for listNode.nextNode != nil {
+		listNode = listNode.nextNode
+	}
+	return listNode
 }
 
-// +++++++++++++++++++++++++++++++++++++++++++++++++++
-func ClearCaptureBlockListEvalFlag() {
-	blockList := getCurrentCaptureBlockListNode()
-	blockList.evalutesInsteadOfCapturing = false
-}
-func GetCaptureBlockListEvalFlag() bool {
-	blockList := getCurrentCaptureBlockListNode()
-	return blockList.evalutesInsteadOfCapturing
-}
-func SetCaptureBlockListEvalFlag() {
-	blockList := getCurrentCaptureBlockListNode()
-	blockList.evalutesInsteadOfCapturing = true
+//Get the entire capture block stack for the current node
+func getCurrentCaptureBlockListNodeCaptureBlockStack() *[]captureBlock {
+	listNode := getCurrentCaptureBlockListNode()
+	return &listNode.captureBlockStack
 }
 
-// +++++++++++++++++++++++++++++++++++++++++++++++++++
-func ClearCaptureBlockListForcedCapturingFlag() {
-	blockList := getCurrentCaptureBlockListNode()
-	blockList.forcedCapturing = false
-}
-func GetCaptureBlockListForcedCapturingFlag() bool {
-	blockList := getCurrentCaptureBlockListNode()
-	return blockList.forcedCapturing
-}
-func SetCaptureBlockListForcedCapturingFlag() {
-	blockList := getCurrentCaptureBlockListNode()
-	blockList.forcedCapturing = true
-}
-
-// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-// Dealing with capture blocks in the current list
-// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-
-func PushCaptureBlock(blockOperationName string, operandList []Node) {
-	pushOntoCurrentCaptureBlockListCaptureBlockStack(blockOperationName, operandList)
-	defaultFlags := getStartOperationFlags(blockOperationName)
-	blockList := getCurrentCaptureBlockListNode()
-	blockList.evalutesInsteadOfCapturing = defaultFlags.ForcedEval
-	blockList.forcedCapturing = defaultFlags.ForcedCapture
-}
-
-func ForcePopCaptureBlock() {
-	popFromCurrentCaptureBlockListCaptureBlockStack()
-}
-
-func PopCaptureBlockThenExtendCapturedLines(extendedLines []CapturedLine) {
+func getCurrentCaptureBlockListNodeCaptureBlockStackTopEntry() *captureBlock {
 	blockStack := getCurrentCaptureBlockListNodeCaptureBlockStack()
+	return &(*blockStack)[len(*blockStack)-1]
+}
 
-	// More than 1 will
-	if len(*blockStack) > 1 {
-		popFromCurrentCaptureBlockListCaptureBlockStack()
-		captureBlock := getCurrentCaptureBlockListNodeCaptureBlockStackTopFurthestAlternate()
-		for _, line := range extendedLines {
-			captureBlock.CapturedLines = append(captureBlock.CapturedLines, line)
+func getCurrentCaptureBlockListNodeCaptureBlockStackTopEntryFurthestAlternate() *captureBlock {
+	block := getCurrentCaptureBlockListNodeCaptureBlockStackTopEntry()
+	for block.AlternateCaptureBlock != nil {
+		block = block.AlternateCaptureBlock
+	}
+	return block
+}
+
+// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+func createAndAppendNewCaptureBlockList() {
+	highestNode := getCurrentCaptureBlockListNode()
+	newNode := newCaptureBlockListNode()
+	(*highestNode).nextNode = &newNode
+}
+
+func destroyCaptureBlockListAtPointer(ptr *CaptureBlockListNode) {
+	var listNode *CaptureBlockListNode = &captureBlockList
+	for listNode.nextNode != nil {
+		if listNode.nextNode == ptr {
+			listNode.nextNode = nil
+			break
 		}
-
-	} else if len(*blockStack) == 1 {
-		//Set eval operands to true
-		captureBlock := getCurrentCaptureBlockListNodeCaptureBlockStackTopFurthestAlternate()
-		captureBlock.CapturedLines = extendedLines
-		GoToProcessingFlag = true
-
-	} else {
-		panic("🛑 Popping nothing/extending nothing!!!")
+		listNode = captureBlockList.nextNode
 	}
 }
 
-func CreateNewAlternateForCaptureBlock(blockOperationName string, operandList []Node) {
-	captureBlock := getCurrentCaptureBlockListNodeCaptureBlockStackTopFurthestAlternate()
-	altCaptureBlock := newCaptureBlock(blockOperationName, operandList)
-	captureBlock.AlternateCaptureBlock = &altCaptureBlock
+func pushOntoCurrentCaptureBlockListCaptureBlockStack(blockOperationName string, operandList []Node) {
+	blockEntries := getCurrentCaptureBlockListNodeCaptureBlockStack()
+	*blockEntries = append(*blockEntries, newCaptureBlock(blockOperationName, operandList))
 }
-
-//================================================
-
-func GetCurrentCaptureBlockStack() *[]captureBlock {
-	return getCurrentCaptureBlockListNodeCaptureBlockStack()
-}
-
-func GetCurrentCaptureBlock() *captureBlock {
-	captureBlock := getCurrentCaptureBlockListCaptureBlockStackTop()
-	return captureBlock
-}
-
-func GetCurrentCaptureBlockCapturedLines() *[]CapturedLine {
-	captureBlock := getCurrentCaptureBlockListNodeCaptureBlockStackTopFurthestAlternate()
-	return &captureBlock.CapturedLines
-}
-
-func GetCurrentCaptureBlockCapturedLinesAndOperandList() (*[]CapturedLine, *[]Node) {
-	captureBlock := getCurrentCaptureBlockListCaptureBlockStackTop()
-	return &captureBlock.CapturedLines, &captureBlock.OperandList
-}
-
-func GetCurrentCaptureBlockOperationName() string {
-	captureBlock := getCurrentCaptureBlockListNodeCaptureBlockStackTopFurthestAlternate()
-	return captureBlock.BlockOperationName
-}
-
-func SetBottomOfStackToEmptyBlock() {
-	blockStack := getCurrentCaptureBlockListNodeCaptureBlockStack()
-	(*blockStack)[0] = newCaptureBlock("nil", nil)
-}
-
-// ***************************************************
-func GetCurrentOpPtr() *CaptureBlockListNode {
-	return getCurrentCaptureBlockListNode()
-}
-func GetLinesWithPtr(pointer *CaptureBlockListNode) *[]CapturedLine {
-	return &pointer.captureBlockStack[0].CapturedLines
-}
-func GetBlockEntriesWithPtr(pointer *CaptureBlockListNode) *[]captureBlock {
-	return &pointer.captureBlockStack
-}
-func ClearBlockEntriesWithPtr(pointer *CaptureBlockListNode) {
-	pointer.captureBlockStack = (*pointer).captureBlockStack[:0]
+func popFromCurrentCaptureBlockListCaptureBlockStack() {
+	blockEntries := getCurrentCaptureBlockListNodeCaptureBlockStack()
+	*blockEntries = (*blockEntries)[:len(*blockEntries)-1]
 }
