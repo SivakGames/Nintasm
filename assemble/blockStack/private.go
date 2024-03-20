@@ -4,16 +4,16 @@ package blockStack
 
 //Traverse the list until finding the last (and current) node
 func getCurrentCaptureBlockListNode() *CaptureBlockListNode {
-	var list *CaptureBlockListNode = &captureBlockList
-	for list.nextNode != nil {
-		list = list.nextNode
+	var listNode *CaptureBlockListNode = &captureBlockList
+	for listNode.nextNode != nil {
+		listNode = listNode.nextNode
 	}
-	return list
+	return listNode
 }
 
 func getCurrentCaptureBlockListNodeCaptureBlockStack() *[]captureBlock {
-	list := getCurrentCaptureBlockListNode()
-	return &list.captureBlockStack
+	listNode := getCurrentCaptureBlockListNode()
+	return &listNode.captureBlockStack
 }
 
 func getCurrentCaptureBlockListCaptureBlockStackTop() *captureBlock {
@@ -32,19 +32,19 @@ func getCurrentCaptureBlockListNodeCaptureBlockStackTopFurthestAlternate() *capt
 // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 func createAndAppendNewCaptureBlockList() {
-	highestOp := getCurrentCaptureBlockListNode()
-	newOp := newCaptureBlockListNode()
-	(*highestOp).nextNode = &newOp
+	highestNode := getCurrentCaptureBlockListNode()
+	newNode := newCaptureBlockListNode()
+	(*highestNode).nextNode = &newNode
 }
 
 func destroyCaptureBlockListAtPointer(ptr *CaptureBlockListNode) {
-	var invokeOp *CaptureBlockListNode = &captureBlockList
-	for invokeOp.nextNode != nil {
-		if invokeOp.nextNode == ptr {
-			invokeOp.nextNode = nil
+	var listNode *CaptureBlockListNode = &captureBlockList
+	for listNode.nextNode != nil {
+		if listNode.nextNode == ptr {
+			listNode.nextNode = nil
 			break
 		}
-		invokeOp = captureBlockList.nextNode
+		listNode = captureBlockList.nextNode
 	}
 }
 

@@ -14,11 +14,11 @@ func init() {
 // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 // When processing block ops (macros in particular), add another capture list
-func AddNewCaptureBlockList() {
+func AddNewCaptureBlockListNode() {
 	createAndAppendNewCaptureBlockList()
 }
 
-func DestroyCaptureBlockListWithPointer(ptr *CaptureBlockListNode) {
+func DestroyCaptureBlockListNodeWithPointer(ptr *CaptureBlockListNode) {
 	destroyCaptureBlockListAtPointer(ptr)
 }
 

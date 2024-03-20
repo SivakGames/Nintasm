@@ -64,13 +64,13 @@ func handleBlockStack(
 
 func preProcessBlockStack() error {
 	currentOp := blockStack.GetCurrentOpPtr()
-	blockStack.AddNewCaptureBlockList() //Create new temp stack
+	blockStack.AddNewCaptureBlockListNode() //Create new temp stack
 	tempNewOp := blockStack.GetCurrentOpPtr()
 	err := readCapturedLines(currentOp, tempNewOp)
 	if err != nil {
 		return err
 	}
-	blockStack.DestroyCaptureBlockListWithPointer(tempNewOp) //Remove upper level buffer stack
+	blockStack.DestroyCaptureBlockListNodeWithPointer(tempNewOp) //Remove upper level buffer stack
 	blockStack.ClearBlockEntriesWithPtr(currentOp)
 	return nil
 }
