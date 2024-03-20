@@ -20,23 +20,17 @@ func evalDataBytesOperands(directiveName string, operandList *[]Node) error {
 	var asRomData = make([]uint8, 0)
 	var err error
 
-	isBigEndian := false
+	isBigEndian := directiveName == "DWBE"
 	operandSize := directiveOperandByteSizes[directiveName]
-
-	if directiveName == "DWBE" {
-		isBigEndian = true
-	}
 
 	for _, operand := range *operandList {
 		asRomData, err = nodesToBytes.ConvertNodeValueToUInts(operand, operandSize, isBigEndian)
 		if err != nil {
 			return err // ❌ Fails
 		}
-
 		if !operand.Resolved {
 			unresolvedTable.AddUnresolvedRomEntry(operand, operandSize)
 		}
-
 		err = romBuilder.AddBytesToRom(asRomData)
 		if err != nil {
 			return err // ❌ Fails

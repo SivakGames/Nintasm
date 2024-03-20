@@ -46,11 +46,9 @@ func evalMixedDataBytesOperands(directiveName string, operandList *[]Node) error
 		if err != nil {
 			return err // ❌ Fails
 		}
-
 		if !operand.Resolved {
 			unresolvedTable.AddUnresolvedRomEntry(operand, operandSize)
 		}
-
 		err = romBuilder.AddBytesToRom(asRomData)
 		if err != nil {
 			return err // ❌ Fails
