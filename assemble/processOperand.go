@@ -16,7 +16,7 @@ var macroOperandParser = parser.NewMacroOperandParser()
 // ============================================================
 
 // Main operand parsing...
-func parseOperandStringAndProcess(
+func parseAndProcessOperandString(
 	reformattedLine string,
 	lineOperationParsedValues *util.LineOperationParsedValues,
 ) error {

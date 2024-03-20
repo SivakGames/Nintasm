@@ -93,7 +93,7 @@ func ReadLines(lines *[]string, lineCounter *uint) error {
 		}
 
 		//Do regular operand parsing/processing
-		err := parseOperandStringAndProcess(
+		err := parseAndProcessOperandString(
 			reformattedLine,
 			&lineOperationParsedValues,
 		)

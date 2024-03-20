@@ -15,7 +15,7 @@ func handleBlockStack(
 
 	if isStartOrEndOperation {
 		// Operation will always process
-		err := parseOperandStringAndProcess(
+		err := parseAndProcessOperandString(
 			reformattedLine,
 			lineOperationParsedValues,
 		)
@@ -43,7 +43,7 @@ func handleBlockStack(
 			if err != nil {
 				return err // ❌ Fails
 			}
-			err = parseOperandStringAndProcess(
+			err = parseAndProcessOperandString(
 				reformattedLine,
 				lineOperationParsedValues,
 			)
@@ -108,7 +108,7 @@ func readCapturedLines(
 			b.OperationTokenValue,
 			b.ParentParserEnum,
 		)
-		processCapturedErr = parseOperandStringAndProcess(
+		processCapturedErr = parseAndProcessOperandString(
 			b.OriginalLine,
 			&processOperandArguments,
 		)
