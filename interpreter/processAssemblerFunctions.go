@@ -15,67 +15,66 @@ import (
 type assemblerFunction struct {
 	minArgs          int
 	maxArgs          int
+	selfEval         bool
 	argMustResolveTo []enumNodeTypes.Def
 }
 
 var assemblerBuiltInFunctions = map[string]assemblerFunction{
-	"high":                 {1, 1, []enumNodeTypes.Def{enumNodeTypes.NumericLiteral}},
-	"low":                  {1, 1, []enumNodeTypes.Def{enumNodeTypes.NumericLiteral}},
-	"ceil":                 {1, 1, []enumNodeTypes.Def{enumNodeTypes.NumericLiteral}},
-	"floor":                {1, 1, []enumNodeTypes.Def{enumNodeTypes.NumericLiteral}},
-	"round":                {1, 1, []enumNodeTypes.Def{enumNodeTypes.NumericLiteral}},
-	"modfDeci":             {1, 1, []enumNodeTypes.Def{enumNodeTypes.NumericLiteral}},
-	"modfInt":              {1, 1, []enumNodeTypes.Def{enumNodeTypes.NumericLiteral}},
-	"sin":                  {1, 1, []enumNodeTypes.Def{enumNodeTypes.NumericLiteral}},
-	"sindeg":               {1, 1, []enumNodeTypes.Def{enumNodeTypes.NumericLiteral}},
-	"cos":                  {1, 1, []enumNodeTypes.Def{enumNodeTypes.NumericLiteral}},
-	"cosdeg":               {1, 1, []enumNodeTypes.Def{enumNodeTypes.NumericLiteral}},
-	"strlen":               {1, 1, []enumNodeTypes.Def{enumNodeTypes.MultiByte}},
-	"substr":               {2, 3, []enumNodeTypes.Def{enumNodeTypes.MultiByte, enumNodeTypes.NumericLiteral, enumNodeTypes.NumericLiteral}},
-	"toCharmap":            {1, 1, []enumNodeTypes.Def{enumNodeTypes.StringLiteral}},
-	"reverseStr":           {1, 1, []enumNodeTypes.Def{enumNodeTypes.StringLiteral}},
-	"bank":                 {1, 1, []enumNodeTypes.Def{enumNodeTypes.Identifier}},
-	"defined":              {1, 1, []enumNodeTypes.Def{enumNodeTypes.Identifier}},
-	"namespaceValuesToStr": {1, 1, []enumNodeTypes.Def{enumNodeTypes.Identifier}},
+	"high":     {1, 1, true, []enumNodeTypes.Def{enumNodeTypes.NumericLiteral}},
+	"low":      {1, 1, true, []enumNodeTypes.Def{enumNodeTypes.NumericLiteral}},
+	"ceil":     {1, 1, true, []enumNodeTypes.Def{enumNodeTypes.NumericLiteral}},
+	"floor":    {1, 1, true, []enumNodeTypes.Def{enumNodeTypes.NumericLiteral}},
+	"round":    {1, 1, true, []enumNodeTypes.Def{enumNodeTypes.NumericLiteral}},
+	"modfDeci": {1, 1, true, []enumNodeTypes.Def{enumNodeTypes.NumericLiteral}},
+	"modfInt":  {1, 1, true, []enumNodeTypes.Def{enumNodeTypes.NumericLiteral}},
+	"sin":      {1, 1, true, []enumNodeTypes.Def{enumNodeTypes.NumericLiteral}},
+	"sindeg":   {1, 1, true, []enumNodeTypes.Def{enumNodeTypes.NumericLiteral}},
+	"cos":      {1, 1, true, []enumNodeTypes.Def{enumNodeTypes.NumericLiteral}},
+	"cosdeg":   {1, 1, true, []enumNodeTypes.Def{enumNodeTypes.NumericLiteral}},
+
+	"strlen": {1, 1, true, []enumNodeTypes.Def{enumNodeTypes.MultiByte}},
+	"substr": {2, 3, true, []enumNodeTypes.Def{enumNodeTypes.MultiByte, enumNodeTypes.NumericLiteral, enumNodeTypes.NumericLiteral}},
+
+	"toCharmap":            {1, 1, true, []enumNodeTypes.Def{enumNodeTypes.StringLiteral}},
+	"reverseStr":           {1, 1, false, []enumNodeTypes.Def{enumNodeTypes.StringLiteral}},
+	"bank":                 {1, 1, false, []enumNodeTypes.Def{enumNodeTypes.Identifier}},
+	"defined":              {1, 1, false, []enumNodeTypes.Def{enumNodeTypes.Identifier}},
+	"namespaceValuesToStr": {1, 1, false, []enumNodeTypes.Def{enumNodeTypes.Identifier}},
 }
 
-// Do built-in function
-func processAssemblerFunction(node *Node) (bool, error) {
+func isAssemblerFunction(node *Node) bool {
 	funcName := node.NodeValue
+	_, isAsmFunc := assemblerBuiltInFunctions[funcName]
+	return isAsmFunc
+}
 
-	functionData, isAsmFunc := assemblerBuiltInFunctions[funcName]
-	if !isAsmFunc {
-		return isAsmFunc, nil
-	}
+// Do built-in assembler function
+func processAssemblerFunction(node *Node) error {
+	funcName := node.NodeValue
+	functionData, _ := assemblerBuiltInFunctions[funcName]
 
 	// ------------------------------------------------------------
 	//Check number of arguments usable
 	numArgs := len(*node.ArgumentList)
 	if numArgs < functionData.minArgs {
-		return isAsmFunc, errorHandler.AddNew(enumErrorCodes.InterpreterFuncTooFewArgs, funcName)
+		return errorHandler.AddNew(enumErrorCodes.InterpreterFuncTooFewArgs, funcName)
 	}
 	if numArgs > functionData.maxArgs {
-		return isAsmFunc, errorHandler.AddNew(enumErrorCodes.InterpreterFuncTooManyArgs, funcName)
+		return errorHandler.AddNew(enumErrorCodes.InterpreterFuncTooManyArgs, funcName)
 	}
 
 	// ------------------------------------------------------------
 	//Do standard evaluation of node(s)
 	evaluatedArguments := make([]Node, len(*node.ArgumentList))
 
-	switch funcName {
-	case "ceil", "floor", "round",
-		"high", "low",
-		"sin", "sindeg", "cos", "cosdeg",
-		"modfDeci", "modfInt",
-		"strlen", "substr",
-		"toCharmap":
+	if functionData.selfEval {
 		for i, a := range *node.ArgumentList {
 			evaluatedFuncNode, err := EvaluateNode(a)
 			if err != nil {
-				return isAsmFunc, err
+				return err
 			}
 			if evaluatedFuncNode.NodeType != functionData.argMustResolveTo[i] {
-				return isAsmFunc, errorHandler.AddNew(enumErrorCodes.InterpreterFuncArgWrongType, funcName)
+				return errorHandler.AddNew(enumErrorCodes.InterpreterFuncArgWrongType, funcName)
 			}
 			evaluatedArguments[i] = evaluatedFuncNode
 		}
@@ -84,6 +83,9 @@ func processAssemblerFunction(node *Node) (bool, error) {
 	// ------------------------------------------------------------
 	//Actually process the function...
 	switch funcName {
+
+	//+-*/+-*/+-*/+-*/+-*/+-*/+-*/+-*/
+	//Math functions
 	case "high":
 		node.AsNumber = (evaluatedArguments[0].AsNumber & 0x0ff00) >> 8
 	case "low":
@@ -108,12 +110,14 @@ func processAssemblerFunction(node *Node) (bool, error) {
 		node.AsNumber = int(math.Sin(float64(evaluatedArguments[0].AsNumber) * (180 / math.Pi)))
 	case "cosdeg":
 		node.AsNumber = int(math.Cos(float64(evaluatedArguments[0].AsNumber) * (180 / math.Pi)))
+
 	case "strlen":
 		if node.NodeType == enumNodeTypes.StringLiteral {
 			node.AsNumber = len(node.NodeValue)
 		} else {
 			node.AsNumber = len(*evaluatedArguments[0].ArgumentList)
 		}
+
 	case "substr":
 		var limit Node
 		var slicedNodes []Node
@@ -132,7 +136,7 @@ func processAssemblerFunction(node *Node) (bool, error) {
 		nodeString := (evaluatedArguments[0].NodeValue)
 		replacedStringAsBytes, err := charmapTable.MapStringToCharmap(nodeString)
 		if err != nil {
-			return isAsmFunc, err
+			return err
 		}
 		multiBytes := []Node{}
 		for _, r := range replacedStringAsBytes {
@@ -146,17 +150,17 @@ func processAssemblerFunction(node *Node) (bool, error) {
 		namespaceLabel := (*node.ArgumentList)[0].NodeValue
 		nsValues, err := namespaceTable.GetNamespaceValues(namespaceLabel)
 		if err != nil {
-			return isAsmFunc, err
+			return err
 		}
 		nsValuesAsNode := []Node{}
 		for _, nsv := range *nsValues {
 			fullName := namespaceLabel + nsv.Key
 			if !nsv.Resolved {
-				return isAsmFunc, errorHandler.AddNew(enumErrorCodes.NamespaceToValuesNotResolved, nsv.Key)
+				return errorHandler.AddNew(enumErrorCodes.NamespaceToValuesNotResolved, nsv.Key)
 			}
 			lookedUpNode, _, err := environment.LookupIdentifierInSymbolAsNodeTable(fullName)
 			if err != nil {
-				return isAsmFunc, err
+				return err
 			}
 			switch lookedUpNode.NodeType {
 			case enumNodeTypes.NumericLiteral, enumNodeTypes.StringLiteral:
@@ -176,7 +180,7 @@ func processAssemblerFunction(node *Node) (bool, error) {
 	case "bank":
 		_, err := EvaluateNode((*node.ArgumentList)[0])
 		if err != nil {
-			return isAsmFunc, err
+			return err
 		}
 		bankValue, _ := symbolAsNodeTable.GetValueFromLabelAsBankTable((*node.ArgumentList)[0].NodeValue)
 		node.AsNumber = bankValue
@@ -196,6 +200,7 @@ func processAssemblerFunction(node *Node) (bool, error) {
 		}
 	}
 
+	//Final resolve
 	switch funcName {
 	case
 		"high", "low",
@@ -208,5 +213,5 @@ func processAssemblerFunction(node *Node) (bool, error) {
 
 	}
 
-	return isAsmFunc, nil
+	return nil
 }
