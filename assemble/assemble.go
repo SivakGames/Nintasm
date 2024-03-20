@@ -5,17 +5,17 @@ import (
 	"misc/nintasm/assemble/blockStack"
 	"misc/nintasm/assemble/fileHandler"
 	"misc/nintasm/assemble/fileStack"
-	enumParserTypes "misc/nintasm/constants/enums/parserTypes"
 	"misc/nintasm/interpreter/environment/predefSymbols"
 	"misc/nintasm/interpreter/environment/unresolvedTable"
 	"misc/nintasm/parser"
-	"misc/nintasm/util"
 )
 
-var directiveOperandParser = parser.NewDirectiveOperandParser()
-var instructionOperandParser = parser.NewInstructionOperandParser()
-var labelOperandParser = parser.NewLabelOperandParser()
-var macroOperandParser = parser.NewMacroOperandParser()
+// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+var lineInitParser = parser.NewInitialLineParser()
+var lineOperationParser = parser.NewOperationParser()
+
+// ============================================================
 
 // Main process starts - open input primary input file
 func Start(initialInputFile string) error {
@@ -60,11 +60,7 @@ func startReadingLinesTopFileStack() error {
 }
 
 func ReadLines(lines *[]string, lineCounter *uint) error {
-	lineInitParser := parser.NewInitialLineParser()
-	lineOperationParser := parser.NewOperationParser()
-
 	// Iterate over all lines
-
 	for i, rawLine := range *lines {
 		*lineCounter += 1
 
@@ -104,97 +100,14 @@ func ReadLines(lines *[]string, lineCounter *uint) error {
 		if err != nil {
 			return err
 		}
-	}
 
-	return nil
-}
-
-//==========================================================
-
-// Main operand parsing...
-func parseOperandStringAndProcess(
-	reformattedLine string,
-	lineOperationParsedValues *util.LineOperationParsedValues,
-) error {
-
-	switch lineOperationParsedValues.ParentParserEnum {
-
-	// -------------------
-	case enumParserTypes.Instruction:
-		operandParserErr := instructionOperandParser.SetupOperandParser(
-			reformattedLine,
-			lineOperationParsedValues.OperandStartPosition,
-		)
-		if operandParserErr != nil {
-			return operandParserErr
-		}
-		operandParserErr = instructionOperandParser.Process(lineOperationParsedValues.OperationTokenValue)
-		if operandParserErr != nil {
-			return operandParserErr
-		}
-
-	// -------------------
-	case enumParserTypes.Directive:
-		operandParserErr := directiveOperandParser.SetupOperandParser(
-			reformattedLine,
-			lineOperationParsedValues.OperandStartPosition,
-		)
-		if operandParserErr != nil {
-			return operandParserErr
-		}
-		operandParserErr = directiveOperandParser.Process(
-			lineOperationParsedValues.OperationTokenEnum,
-			lineOperationParsedValues.OperationTokenValue,
-			lineOperationParsedValues.OperationLabel,
-		)
-		if operandParserErr != nil {
-			return operandParserErr
-		}
-
-	// -------------------
-	case enumParserTypes.Label:
-		operandParserErr := labelOperandParser.SetupOperandParser(
-			reformattedLine,
-			lineOperationParsedValues.OperandStartPosition,
-		)
-		if operandParserErr != nil {
-			return operandParserErr
-		}
-		operandParserErr = labelOperandParser.Process(
-			lineOperationParsedValues.OperationTokenEnum,
-			lineOperationParsedValues.OperationTokenValue,
-			lineOperationParsedValues.OperationLabel,
-		)
-		if operandParserErr != nil {
-			return operandParserErr
-		}
-
-	// -------------------
-	case enumParserTypes.Macro:
-		operandParserErr := macroOperandParser.SetupOperandParser(
-			reformattedLine,
-			lineOperationParsedValues.OperandStartPosition,
-		)
-		if operandParserErr != nil {
-			return operandParserErr
-		}
-		operandParserErr = macroOperandParser.Process(lineOperationParsedValues.OperationTokenValue)
-		if operandParserErr != nil {
-			return operandParserErr
-		}
-
-		preProcessBlockStack()
-		macroOperandParser.EndInvokeMacro()
-
-	default:
-		panic("🛑 Parent parsing operation could not be determined!")
-	}
-
-	if fileHandler.TriggerNewStackCall {
-		fileHandler.TriggerNewStackCall = false
-		err := startReadingLinesTopFileStack()
-		if err != nil {
-			return err
+		// See if a new source file was opened via an include directive
+		if fileHandler.TriggerNewStackCall {
+			fileHandler.TriggerNewStackCall = false
+			err := startReadingLinesTopFileStack()
+			if err != nil {
+				return err
+			}
 		}
 	}
 
