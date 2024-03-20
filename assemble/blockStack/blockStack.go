@@ -1,12 +1,12 @@
 package blockStack
 
 //Main block capture linked list
-var blockCaptureList CaptureBlockListNode
+var captureBlockList CaptureBlockListNode
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 func init() {
-	blockCaptureList = newCaptureBlockListNode()
+	captureBlockList = newCaptureBlockListNode()
 }
 
 // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>

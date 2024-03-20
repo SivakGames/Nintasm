@@ -4,7 +4,7 @@ package blockStack
 
 //Traverse the list until finding the last (and current) node
 func getCurrentCaptureBlockListNode() *CaptureBlockListNode {
-	var list *CaptureBlockListNode = &blockCaptureList
+	var list *CaptureBlockListNode = &captureBlockList
 	for list.nextNode != nil {
 		list = list.nextNode
 	}
@@ -38,13 +38,13 @@ func createAndAppendNewCaptureBlockList() {
 }
 
 func destroyCaptureBlockListAtPointer(ptr *CaptureBlockListNode) {
-	var invokeOp *CaptureBlockListNode = &blockCaptureList
+	var invokeOp *CaptureBlockListNode = &captureBlockList
 	for invokeOp.nextNode != nil {
 		if invokeOp.nextNode == ptr {
 			invokeOp.nextNode = nil
 			break
 		}
-		invokeOp = blockCaptureList.nextNode
+		invokeOp = captureBlockList.nextNode
 	}
 }
 
