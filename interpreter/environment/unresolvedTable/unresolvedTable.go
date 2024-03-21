@@ -61,6 +61,7 @@ func ResolvedUnresolvedSymbols() error {
 		originalUnresolvedLength := len(unresolvedSymbolTable)
 		newUnresolvedTable := []unresolvedEntry{}
 		for _, entry := range unresolvedSymbolTable {
+			errorHandler.OverwriteNoFileDefaults(entry.fileName, uint(entry.lineNumber), entry.lineContent)
 			interpreter.OverwriteParentLabel(entry.parentLabel)
 			evaluatedNode, err := interpreter.EvaluateNode(entry.originalNode)
 			if err != nil {
@@ -77,11 +78,14 @@ func ResolvedUnresolvedSymbols() error {
 			}
 			interpreter.ClearParentLabel()
 		}
+
+		//If equal, then no more resolving can be done
 		newUnresolvedLength := len(newUnresolvedTable)
 		if originalUnresolvedLength == newUnresolvedLength {
-			for _, t := range newUnresolvedTable {
-				errorHandler.OverwriteNoFileDefaults(t.fileName, uint(t.lineNumber), t.lineContent)
-				errorHandler.AddNew(enumErrorCodes.ResolveImpossible)
+			environment.ClearUnresolvedSilentErrorFlag()
+			for _, entry := range newUnresolvedTable {
+				errorHandler.OverwriteNoFileDefaults(entry.fileName, uint(entry.lineNumber), entry.lineContent)
+				interpreter.EvaluateNode(entry.originalNode)
 			}
 			return errorHandler.AddNew(enumErrorCodes.ResolveDeadlock)
 		}

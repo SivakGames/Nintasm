@@ -125,3 +125,6 @@ func AddOtherIdentifierToMasterTable(symbolName string, symbolEnum enumSymbolTab
 func ClearUnresolvedSilentErrorFlag() {
 	unresolvedAddsSilentError = false
 }
+func GetUnresolvedSilentErrorFlag() bool {
+	return unresolvedAddsSilentError
+}
