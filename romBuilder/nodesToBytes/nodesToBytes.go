@@ -13,13 +13,13 @@ type Node = operandFactory.Node
 //------------------------------------------
 
 // Convert into bytes for ROM data
-func ConvertNodeValueToUInts(node Node, neededBytes int, isBigEndian bool) ([]uint8, error) {
+func ConvertNodeValueToUInts(node Node, operandByteSize int, isBigEndian bool, isExact bool) ([]uint8, error) {
 	var lowByte, highByte int = 0, 0
 
 	convertedValue := make([]uint8, 0)
 
 	if !node.Resolved {
-		switch neededBytes {
+		switch operandByteSize {
 		case 1:
 			convertedValue = append(convertedValue, 0)
 		case 2:
@@ -35,7 +35,7 @@ func ConvertNodeValueToUInts(node Node, neededBytes int, isBigEndian bool) ([]ui
 		highByte = (node.AsNumber & 0x0ff00) >> 8
 		lowByte = node.AsNumber & 0x000ff
 
-		switch neededBytes {
+		switch operandByteSize {
 		case 1:
 			if node.AsNumber < -0x000ff || node.AsNumber > 0x000ff {
 				return nil, errorHandler.AddNew(enumErrorCodes.ResolvedValueNot8Bit, node.AsNumber) // ❌ Fails
@@ -62,7 +62,7 @@ func ConvertNodeValueToUInts(node Node, neededBytes int, isBigEndian bool) ([]ui
 			lowByte = 0
 		}
 
-		switch neededBytes {
+		switch operandByteSize {
 		case 1:
 			errorHandler.AddNew(enumErrorCodes.ResolvedValueIsBool, lowByte) // ⚠️ Warns
 			convertedValue = append(convertedValue, uint8(lowByte))
@@ -72,7 +72,7 @@ func ConvertNodeValueToUInts(node Node, neededBytes int, isBigEndian bool) ([]ui
 			panic("🛑 Something is very wrong with boolean byte conversion!")
 		}
 	case enumNodeTypes.StringLiteral:
-		switch neededBytes {
+		switch operandByteSize {
 		case 1:
 			convertedStringAsBytes := make([]uint8, 0, len(node.NodeValue))
 			for _, c := range node.NodeValue {
@@ -96,7 +96,7 @@ func ConvertNodeValueToUInts(node Node, neededBytes int, isBigEndian bool) ([]ui
 
 	case enumNodeTypes.MultiByte:
 		for _, n := range *node.ArgumentList {
-			subValue, err := ConvertNodeValueToUInts(n, neededBytes, isBigEndian)
+			subValue, err := ConvertNodeValueToUInts(n, operandByteSize, isBigEndian, false)
 			if err != nil {
 				return nil, err
 			}
@@ -105,6 +105,11 @@ func ConvertNodeValueToUInts(node Node, neededBytes int, isBigEndian bool) ([]ui
 
 	default:
 		panic("🛑 Something is very wrong with operand conversion!")
+	}
+
+	//Multibytes are technially OK, but have to fit
+	if isExact && len(convertedValue) > operandByteSize {
+		return convertedValue, errorHandler.AddNew(enumErrorCodes.ResolvedValueTooBig, len(convertedValue), operandByteSize) // ❌ Fails
 	}
 
 	return convertedValue, nil

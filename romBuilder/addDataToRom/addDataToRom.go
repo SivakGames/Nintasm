@@ -16,7 +16,7 @@ type Node = operandFactory.Node
 //------------------------------------------
 
 func AddInstructionOperandToRom(operand Node, operandByteSize int, instructionMode enumInstructionModes.Def) error {
-	asRomData, err := nodesToBytes.ConvertNodeValueToUInts(operand, operandByteSize, false)
+	asRomData, err := nodesToBytes.ConvertNodeValueToUInts(operand, operandByteSize, false, true)
 	if err != nil {
 		return err // ❌ Fails
 	}
@@ -31,11 +31,6 @@ func AddInstructionOperandToRom(operand Node, operandByteSize int, instructionMo
 		errorHandler.AddNew(enumErrorCodes.ResolvedValueIsStringForInst) // ⚠️ Warns
 	}
 
-	//Multibytes are technially OK, but have to fit
-	if len(asRomData) > operandByteSize {
-		return errorHandler.AddNew(enumErrorCodes.ResolvedValueTooBig, len(asRomData), operandByteSize) // ❌ Fails
-	}
-
 	err = romBuilder.AddBytesToRom(asRomData)
 	if err != nil {
 		return err // ❌ Fails
@@ -46,8 +41,8 @@ func AddInstructionOperandToRom(operand Node, operandByteSize int, instructionMo
 
 //------------------------------------------
 
-func AddRawBytesToRom(operand Node, operandByteSize int, isBigEndian bool, byteSizeIsExact bool) error {
-	asRomData, err := nodesToBytes.ConvertNodeValueToUInts(operand, operandByteSize, isBigEndian)
+func AddRawBytesToRom(operand Node, operandByteSize int, isBigEndian bool) error {
+	asRomData, err := nodesToBytes.ConvertNodeValueToUInts(operand, operandByteSize, isBigEndian, false)
 	if err != nil {
 		return err // ❌ Fails
 	}

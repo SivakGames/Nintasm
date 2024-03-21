@@ -37,7 +37,7 @@ func evalMixedDataBytesOperands(directiveName string, operandList *[]Node) error
 		operandByteSize := mixedDataDirectiveBytesKeys[currentPatternKey].numBytes
 		isBigEndian := mixedDataDirectiveBytesKeys[currentPatternKey].bigEndian
 
-		err := addDataToRom.AddRawBytesToRom(operand, operandByteSize, isBigEndian, false)
+		err := addDataToRom.AddRawBytesToRom(operand, operandByteSize, isBigEndian)
 		if err != nil {
 			return err // ❌ Fails
 		}

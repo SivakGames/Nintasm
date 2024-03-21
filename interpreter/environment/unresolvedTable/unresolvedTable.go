@@ -102,7 +102,7 @@ func ResolvedUnresolvedRomEntries() error {
 			continue
 		}
 
-		asRomData, err := nodesToBytes.ConvertNodeValueToUInts(evaluatedNode, entry.neededBytes, false)
+		asRomData, err := nodesToBytes.ConvertNodeValueToUInts(evaluatedNode, entry.neededBytes, false, true)
 		if err != nil {
 			continue
 		}

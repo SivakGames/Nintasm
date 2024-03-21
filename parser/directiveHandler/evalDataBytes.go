@@ -30,7 +30,7 @@ func evalDataBytesOperands(directiveName string, operandList *[]Node) error {
 			}
 		}
 
-		err = addDataToRom.AddRawBytesToRom(evalOperand, operandByteSize, isBigEndian, false)
+		err = addDataToRom.AddRawBytesToRom(evalOperand, operandByteSize, isBigEndian)
 		if err != nil {
 			return err // ❌ Fails
 		}
