@@ -1,9 +1,10 @@
 package directiveHandler
 
 import (
-	"misc/nintasm/interpreter/environment/unresolvedTable"
-	"misc/nintasm/romBuilder"
-	"misc/nintasm/romBuilder/nodesToBytes"
+	"misc/nintasm/assemble/errorHandler"
+	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
+	"misc/nintasm/interpreter"
+	"misc/nintasm/romBuilder/addDataToRom"
 )
 
 // +++++++++++++++++++++++++
@@ -17,21 +18,19 @@ var directiveOperandByteSizes = map[string]int{
 
 // For .db, .dw, .dwbe
 func evalDataBytesOperands(directiveName string, operandList *[]Node) error {
-	var asRomData = make([]uint8, 0)
-	var err error
-
 	isBigEndian := directiveName == "DWBE"
-	operandSize := directiveOperandByteSizes[directiveName]
+	operandByteSize := directiveOperandByteSizes[directiveName]
 
 	for _, operand := range *operandList {
-		asRomData, err = nodesToBytes.ConvertNodeValueToUInts(operand, operandSize, isBigEndian)
+		evalOperand, err := interpreter.EvaluateNode(operand)
 		if err != nil {
-			return err // ❌ Fails
+			err := errorHandler.CheckErrorContinuesUpwardPropagation(err, enumErrorCodes.Error)
+			if err != nil {
+				return err // ❌❌ CONTINUES Failing!
+			}
 		}
-		if !operand.Resolved {
-			unresolvedTable.AddUnresolvedRomEntry(operand, operandSize)
-		}
-		err = romBuilder.AddBytesToRom(asRomData)
+
+		err = addDataToRom.AddRawBytesToRom(evalOperand, operandByteSize, isBigEndian, false)
 		if err != nil {
 			return err // ❌ Fails
 		}

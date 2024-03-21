@@ -21,8 +21,13 @@
 
 RESET:
 
+jjj = "AAA"
 NMI:
-	.db 2
+	LDA #jjj
+	.dw jjj
+
+	.db 2,3,jjj,5
+
 
 	.org $fffa
 	.dw NMI, RESET, 0

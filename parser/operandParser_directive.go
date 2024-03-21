@@ -32,6 +32,9 @@ var directiveAliases = map[string]string{
 }
 
 var directiveManuallyEvaluatesOperands = map[string]bool{
+	"DB":         true,
+	"DW":         true,
+	"DWBE":       true,
 	"REPEAT":     true,
 	"KV":         true,
 	"IKV":        true,

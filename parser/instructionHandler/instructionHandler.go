@@ -4,13 +4,13 @@ import (
 	"misc/nintasm/assemble/errorHandler"
 	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
 	enumInstructionModes "misc/nintasm/constants/enums/instructionModes"
+	enumNodeTypes "misc/nintasm/constants/enums/nodeTypes"
 	enumTokenTypes "misc/nintasm/constants/enums/tokenTypes"
 	"misc/nintasm/constants/instructionData"
 	"misc/nintasm/interpreter"
-	"misc/nintasm/interpreter/environment/unresolvedTable"
 	"misc/nintasm/interpreter/operandFactory"
 	"misc/nintasm/romBuilder"
-	"misc/nintasm/romBuilder/nodesToBytes"
+	"misc/nintasm/romBuilder/addDataToRom"
 )
 
 type instModeEnum = enumInstructionModes.Def
@@ -73,7 +73,9 @@ func EvaluateInstruction(instructionName string,
 		}
 
 		// Do ZP equivalent check and auto convert if possible
-		if supportedMode == instructionZPModeEquivalent && operand.Resolved {
+		if supportedMode == instructionZPModeEquivalent &&
+			operand.Resolved &&
+			operand.NodeType == enumNodeTypes.NumericLiteral {
 			if operandFactory.ValidateNumericNodeIs8BitValue(&operand) {
 				useInstructionZPMode = supportedMode
 			}
@@ -93,8 +95,9 @@ func EvaluateInstruction(instructionName string,
 	//Write data into ROM
 
 	instructionOpcode := opcodesAndSupportedModes.ModeOpcodes[instructionMode]
-	operandNeedsNBytes := instructionData.InstructionModeOperandRequiredBytes[instructionMode]
+	operandByteSize := instructionData.InstructionModeOperandRequiredBytes[instructionMode]
 
+	//++++++++++++++++++++++++++++++++++
 	//Add the opcode to ROM
 	opcodeByteToInsert := make([]uint8, 1)
 	opcodeByteToInsert[0] = instructionOpcode
@@ -103,22 +106,15 @@ func EvaluateInstruction(instructionName string,
 		return err // ❌ Fails
 	}
 
-	if operandNeedsNBytes > 0 {
-		asRomData, err := nodesToBytes.ConvertNodeValueToUInts(operand, operandNeedsNBytes, false)
-		if err != nil {
-			return err // ❌ Fails
-		}
-		if !operand.Resolved {
-			unresolvedTable.AddUnresolvedRomEntry(operand, operandNeedsNBytes)
-		}
-		err = romBuilder.AddBytesToRom(asRomData)
+	//Add the operand (if any) to ROM
+	if operandByteSize > 0 {
+		err := addDataToRom.AddInstructionOperandToRom(operand, operandByteSize, instructionMode)
 		if err != nil {
 			return err // ❌ Fails
 		}
 	}
 
 	return nil
-
 }
 
 // +++++++++++++++++

@@ -131,12 +131,14 @@ const (
 	BlockIsEmpty                = "BlockIsEmpty"
 	BlockOpUncapturableByParent = "BlockOpUncapturableByParent"
 
-	ResolvedValueNot8Bit       = "ResolvedValueNot8Bit"
-	ResolvedValueNot16Bit      = "ResolvedValueNot16Bit"
-	ResolvedValueIsBool        = "ResolvedValueIsBool"
-	ResolvedValue16BitBool     = "ResolvedValue16BitBool"
-	ResolvedValueMultiByteChar = "ResolvedValueMultiByteChar"
-	ResolvedValue16BitString   = "ResolvedValue16BitString"
+	ResolvedValueNot8Bit         = "ResolvedValueNot8Bit"
+	ResolvedValueNot16Bit        = "ResolvedValueNot16Bit"
+	ResolvedValueIsStringForInst = "ResolvedValueIsStringForInst"
+	ResolvedValueIsBool          = "ResolvedValueIsBool"
+	ResolvedValue16BitBool       = "ResolvedValue16BitBool"
+	ResolvedValueMultiByteChar   = "ResolvedValueMultiByteChar"
+	ResolvedValue16BitString     = "ResolvedValue16BitString"
+	ResolvedValueTooBig          = "ResolvedValueTooBig"
 
 	RsNotSet = "RsNotSet"
 )

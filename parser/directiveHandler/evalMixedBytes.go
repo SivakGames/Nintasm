@@ -1,9 +1,7 @@
 package directiveHandler
 
 import (
-	"misc/nintasm/interpreter/environment/unresolvedTable"
-	"misc/nintasm/romBuilder"
-	"misc/nintasm/romBuilder/nodesToBytes"
+	"misc/nintasm/romBuilder/addDataToRom"
 )
 
 // +++++++++++++++++++++++++
@@ -21,9 +19,6 @@ var mixedDataDirectiveBytesKeys = map[byte]mixedDataDirectiveBytesKeyFormat{
 
 // For .d_***_
 func evalMixedDataBytesOperands(directiveName string, operandList *[]Node) error {
-	var asRomData = make([]uint8, 0)
-	var err error
-
 	mixedPattern := directiveName[2:]
 	lastRepeats := mixedPattern[len(mixedPattern)-1] == '_'
 	if lastRepeats {
@@ -39,17 +34,10 @@ func evalMixedDataBytesOperands(directiveName string, operandList *[]Node) error
 		}
 
 		currentPatternKey := mixedPattern[mixedPatternIndex]
-		operandSize := mixedDataDirectiveBytesKeys[currentPatternKey].numBytes
+		operandByteSize := mixedDataDirectiveBytesKeys[currentPatternKey].numBytes
 		isBigEndian := mixedDataDirectiveBytesKeys[currentPatternKey].bigEndian
 
-		asRomData, err = nodesToBytes.ConvertNodeValueToUInts(operand, operandSize, isBigEndian)
-		if err != nil {
-			return err // ❌ Fails
-		}
-		if !operand.Resolved {
-			unresolvedTable.AddUnresolvedRomEntry(operand, operandSize)
-		}
-		err = romBuilder.AddBytesToRom(asRomData)
+		err := addDataToRom.AddRawBytesToRom(operand, operandByteSize, isBigEndian, false)
 		if err != nil {
 			return err // ❌ Fails
 		}

@@ -154,12 +154,14 @@ var errorTable = map[enumErrorCodes.Def]ErrorTableEntry{
 	enumErrorCodes.BlockIsEmpty:                newErrorTableEntry(enumErrorCodes.Warning, "Block is empty..."),
 	enumErrorCodes.BlockOpUncapturableByParent: newErrorTableEntry(enumErrorCodes.Error, "%v - This operation is uncapturable by block"),
 
-	enumErrorCodes.ResolvedValueNot8Bit:       newErrorTableEntry(enumErrorCodes.Error, "Operand must resolve to an 8 bit value! Got: %d"),
-	enumErrorCodes.ResolvedValueNot16Bit:      newErrorTableEntry(enumErrorCodes.Error, "Operand must resolve to a 16 bit value! Got: %d"),
-	enumErrorCodes.ResolvedValueIsBool:        newErrorTableEntry(enumErrorCodes.Warning, "Operand has resolved as bool; Will be converted to: %d"),
-	enumErrorCodes.ResolvedValue16BitBool:     newErrorTableEntry(enumErrorCodes.Error, "Boolean value cannot be used as a 16 bit operand"),
-	enumErrorCodes.ResolvedValueMultiByteChar: newErrorTableEntry(enumErrorCodes.Warning, "Character %v encoding requires more than a single byte. Using %d bytes"),
-	enumErrorCodes.ResolvedValue16BitString:   newErrorTableEntry(enumErrorCodes.Error, "String value cannot be used as a 16 bit operand"),
+	enumErrorCodes.ResolvedValueNot8Bit:         newErrorTableEntry(enumErrorCodes.Error, "Operand must resolve to an 8 bit value! Got: %d"),
+	enumErrorCodes.ResolvedValueNot16Bit:        newErrorTableEntry(enumErrorCodes.Error, "Operand must resolve to a 16 bit value! Got: %d"),
+	enumErrorCodes.ResolvedValueIsStringForInst: newErrorTableEntry(enumErrorCodes.Warning, "Operand has resolved as a string and not recommended for target instruction node"),
+	enumErrorCodes.ResolvedValueIsBool:          newErrorTableEntry(enumErrorCodes.Warning, "Operand has resolved as bool; Will be converted to: %d"),
+	enumErrorCodes.ResolvedValue16BitBool:       newErrorTableEntry(enumErrorCodes.Error, "Boolean value cannot be used as a 16 bit operand"),
+	enumErrorCodes.ResolvedValueMultiByteChar:   newErrorTableEntry(enumErrorCodes.Warning, "Character %v encoding requires more than a single byte. Using %d bytes"),
+	enumErrorCodes.ResolvedValue16BitString:     newErrorTableEntry(enumErrorCodes.Error, "String value cannot be used as a 16 bit operand"),
+	enumErrorCodes.ResolvedValueTooBig:          newErrorTableEntry(enumErrorCodes.Error, "Resolved value byte size of %d too large for target byte size of %d"),
 
 	enumErrorCodes.RsNotSet: newErrorTableEntry(enumErrorCodes.Error, "RS has not yet been set!"),
 }
