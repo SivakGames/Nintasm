@@ -1,7 +1,6 @@
 package unresolvedTable
 
 import (
-	"fmt"
 	"misc/nintasm/assemble/errorHandler"
 	"misc/nintasm/assemble/fileStack"
 	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
@@ -80,8 +79,11 @@ func ResolvedUnresolvedSymbols() error {
 		}
 		newUnresolvedLength := len(newUnresolvedTable)
 		if originalUnresolvedLength == newUnresolvedLength {
-			fmt.Println(unresolvedSymbolTable)
-			panic("🛑 DEADLOCK")
+			for _, t := range newUnresolvedTable {
+				errorHandler.OverwriteNoFileDefaults(t.fileName, uint(t.lineNumber), t.lineContent)
+				errorHandler.AddNew(enumErrorCodes.ResolveImpossible)
+			}
+			return errorHandler.AddNew(enumErrorCodes.ResolveDeadlock)
 		}
 		unresolvedSymbolTable = newUnresolvedTable
 	}

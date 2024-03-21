@@ -20,6 +20,7 @@
 
 
 RESET:
+	.db trt
 
 NMI:
 

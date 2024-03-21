@@ -71,7 +71,11 @@ func (p *DirectiveOperandParser) Process(operationTokenEnum tokenEnum, operation
 
 	operandList, err := p.GetOperandList(minOperands, maxOperands, manuallyEvaluatesOperands, captureMasks)
 	if err != nil {
-		return err // ❌ Fails
+		err := errorHandler.CheckErrorContinuesUpwardPropagation(err, enumErrorCodes.Error)
+		if err != nil {
+			return err // ❌❌ CONTINUES Failing!
+		}
+		return nil
 	}
 
 	err = directiveHandler.EvaluateDirective(operationTokenEnum, directiveName, operationLabel, &operandList)

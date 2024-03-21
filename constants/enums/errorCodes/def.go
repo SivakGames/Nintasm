@@ -139,6 +139,8 @@ const (
 	ResolvedValueMultiByteChar   = "ResolvedValueMultiByteChar"
 	ResolvedValue16BitString     = "ResolvedValue16BitString"
 	ResolvedValueTooBig          = "ResolvedValueTooBig"
+	ResolveImpossible            = "ResolveImpossible"
+	ResolveDeadlock              = "ResolveDeadlock"
 
 	RsNotSet = "RsNotSet"
 )
