@@ -1,8 +1,10 @@
 package assemble
 
 import (
+	"errors"
 	"fmt"
 	"misc/nintasm/assemble/blockStack"
+	"misc/nintasm/assemble/errorHandler"
 	"misc/nintasm/assemble/fileHandler"
 	"misc/nintasm/assemble/fileStack"
 	"misc/nintasm/interpreter/environment/predefSymbols"
@@ -32,6 +34,10 @@ func Start(initialInputFile string) error {
 	err = startReadingLinesTopFileStack()
 	if err != nil {
 		return err
+	}
+
+	if errorHandler.GetErrorCount() > 0 {
+		return errors.New("Pass 1 failed")
 	}
 
 	fmt.Println("=========Pass 2=========")

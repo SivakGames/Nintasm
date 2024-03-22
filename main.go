@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"misc/nintasm/assemble"
+	"misc/nintasm/assemble/errorHandler"
 	"misc/nintasm/romBuilder"
 	"os"
 	"time"
@@ -34,7 +35,7 @@ func main() {
 	err = assemble.Start(baseInputFileName)
 	if err != nil {
 		fmt.Println("\x1b[31mERRORZ HAPPENED\x1b[0m")
-		fmt.Println(err)
+		errorHandler.CheckAndPrintErrors()
 	}
 
 	romBuilder.GenerateRomBinFile()

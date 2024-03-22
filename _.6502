@@ -23,7 +23,10 @@ RESET:
 	.db 1
 
 NMI:
-
+	LDA "ABA"
+	LDA "ABA"
+	LDA "ABA"
+	
 	.org $fffa
 	.dw NMI, RESET, 0
 
