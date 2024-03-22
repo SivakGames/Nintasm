@@ -25,7 +25,10 @@ RESET:
 NMI:
 	LDA "ABA"
 	LDA "ABA"
-	LDA "ABA"
+
+	.include "__.6502"
+
+	LDA #"ABA"
 	
 	.org $fffa
 	.dw NMI, RESET, 0
