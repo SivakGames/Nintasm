@@ -26,13 +26,16 @@ func coloredSymbol(s string) string {
 func coloredNumber(s string) string {
 	return util.Colorize(s, "yellow", false)
 }
+func coloredString(s string) string {
+	return util.Colorize(s, "ansiGreen", false)
+}
 
 var errorTable = map[enumErrorCodes.Def]ErrorTableEntry{
 	enumErrorCodes.Other:      newErrorTableEntry(enumErrorCodes.Error, "%v"),
 	enumErrorCodes.OtherFatal: newErrorTableEntry(enumErrorCodes.Fatal, "🛑 %v"),
 
-	enumErrorCodes.IncludeFileNotExist: newErrorTableEntry(enumErrorCodes.Fatal, "Source file \x1b[92m%v\x1b[0m does not exist!"),
-	enumErrorCodes.FailOpenFile:        newErrorTableEntry(enumErrorCodes.Fatal, "Failed to open source file: %v"),
+	enumErrorCodes.IncludeFileNotExist: newErrorTableEntry(enumErrorCodes.Fatal, fmt.Sprintf("Source file %v does not exist!", coloredString("%v"))),
+	enumErrorCodes.FailOpenFile:        newErrorTableEntry(enumErrorCodes.Fatal, fmt.Sprintf("Failed to open source file: %v", coloredString("%v"))),
 	enumErrorCodes.FailScanFile:        newErrorTableEntry(enumErrorCodes.Fatal, "Failed to scan file!\n%v"),
 
 	enumErrorCodes.BinFileSeekAtEnd:          newErrorTableEntry(enumErrorCodes.Fatal, "Seek value of %d is at the very end of file so no bytes can be read!"),
@@ -161,7 +164,7 @@ var errorTable = map[enumErrorCodes.Def]ErrorTableEntry{
 	enumErrorCodes.ResolvedValue16BitBool:       newErrorTableEntry(enumErrorCodes.Error, "Boolean value cannot be used as a 16 bit operand"),
 	enumErrorCodes.ResolvedValueMultiByteChar:   newErrorTableEntry(enumErrorCodes.Warning, "Character %v encoding requires more than a single byte. Using %d bytes"),
 	enumErrorCodes.ResolvedValue16BitString:     newErrorTableEntry(enumErrorCodes.Error, "String value cannot be used as a 16 bit operand"),
-	enumErrorCodes.ResolvedValueTooBig:          newErrorTableEntry(enumErrorCodes.Error, "Resolved value byte size of %d too large for target byte size of %d"),
+	enumErrorCodes.ResolvedValueTooBig:          newErrorTableEntry(enumErrorCodes.Error, fmt.Sprintf("Resolved value byte size of %v too large for target byte size of %v", coloredNumber("%d"), coloredNumber("%d"))),
 	enumErrorCodes.ResolveImpossible:            newErrorTableEntry(enumErrorCodes.Error, "Symbol cannot be resolved!"),
 	enumErrorCodes.ResolveDeadlock:              newErrorTableEntry(enumErrorCodes.Fatal, "🛑 Resolve Deadlock - Symbols are set up in a way in which they will NEVER resolve!"),
 

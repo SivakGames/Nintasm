@@ -1,9 +1,16 @@
 package util
 
-import "fmt"
+import (
+	"fmt"
+	"strconv"
+	"strings"
+)
 
 func Colorize(text string, color string, isBG bool) string {
+	var colorText string
 	colorValue := 33
+	isAnsi := strings.HasPrefix(color, "ansi")
+
 	switch color {
 	case "red":
 		colorValue = 31
@@ -29,11 +36,39 @@ func Colorize(text string, color string, isBG bool) string {
 		colorValue = 95
 	case "lightcyan":
 		colorValue = 96
-	}
-	if isBG {
-		colorValue += 10
+	case "ansiPurple":
+		colorValue = genAnsi("104")
+	case "ansiTeal":
+		colorValue = genAnsi("011")
+	case "ansiGreen":
+		colorValue = genAnsi("351")
+	case "ansiOrange":
+		colorValue = genAnsi("520")
+	case "ansiRed":
+		colorValue = genAnsi("100")
+	case "ansiGray1":
+		colorValue = 236
+	case "ansiGray2":
+		colorValue = 244
 	}
 
-	colorText := fmt.Sprintf("\x1b[%dm", colorValue)
+	if !isAnsi {
+		if isBG {
+			colorValue += 10
+		}
+		colorText = fmt.Sprintf("\x1b[%dm", colorValue)
+	} else {
+		ansiG := 38
+		if isBG {
+			ansiG += 10
+		}
+		colorText = fmt.Sprintf("\x1b[%d;5;%dm", ansiG, colorValue)
+	}
+
 	return fmt.Sprintf("%v%v\x1b[0m", colorText, text)
+}
+
+func genAnsi(value string) int {
+	genValue, _ := strconv.ParseInt(value, 6, 64)
+	return int(genValue) + 16
 }

@@ -22,9 +22,9 @@ var totalErrors uint = 0
 // ++++++++++++++++++++++++++++++++++++++++
 
 type resolveSymbolData struct {
+	fileName    string
 	lineNumber  uint
 	lineContent string
-	fileName    string
 }
 
 var noFileDefaults = resolveSymbolData{

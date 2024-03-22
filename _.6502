@@ -23,7 +23,7 @@ RESET:
 	.db 1
 
 NMI:
-	LDA "ABA"
+	LDA <"ABA"
 	LDA "ABA"
 
 	.include "__.6502"

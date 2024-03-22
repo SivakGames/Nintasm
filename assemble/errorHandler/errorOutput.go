@@ -86,7 +86,7 @@ func printError(entry *ErrorEntry) {
 		severityColor = "red"
 		severityDescription = "ERROR"
 	case enumErrorCodes.Fatal:
-		severityColor = "magenta"
+		severityColor = "ansiRed"
 		severityDescription = "FATAL ERROR"
 	}
 	colorizedSeverity := util.Colorize(util.PadStringLeft(fmt.Sprintf(" %v ", severityDescription), 7, ' '), severityColor, true)
