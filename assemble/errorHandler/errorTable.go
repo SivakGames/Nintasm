@@ -23,6 +23,12 @@ func newErrorTableEntry(severity enumErrorCodes.Severity, description string) Er
 func coloredSymbol(s string) string {
 	return util.Colorize(s, "lightcyan", false)
 }
+func coloredIdentifier(s string) string {
+	return util.Colorize(s, "magenta", false)
+}
+func coloredDirective(s string) string {
+	return util.Colorize(s, "magenta", false)
+}
 func coloredNumber(s string) string {
 	return util.Colorize(s, "yellow", false)
 }
@@ -97,7 +103,7 @@ var errorTable = map[enumErrorCodes.Def]ErrorTableEntry{
 	enumErrorCodes.OrgTooBig:           newErrorTableEntry(enumErrorCodes.Error, "ORG is too big! Attempted: %d / Max Allowed: %d"),
 	enumErrorCodes.OrgLTProgramCounter: newErrorTableEntry(enumErrorCodes.Error, "Cannot set ORG to a value less than where the program counter currently is!\nThis would overwrite data!\n Attempted: %d / Currently at: %d"),
 
-	enumErrorCodes.InstUnsupportedMode:      newErrorTableEntry(enumErrorCodes.Error, "Mode is not supported by instruction!"),
+	enumErrorCodes.InstUnsupportedMode:      newErrorTableEntry(enumErrorCodes.Error, fmt.Sprintf("%v mode is not supported by instruction!", coloredNumber("%v"))),
 	enumErrorCodes.InstTokenAfterOperand:    newErrorTableEntry(enumErrorCodes.Error, "No more tokens can follow this instruction's operands! %v"),
 	enumErrorCodes.InstBadAccumMode:         newErrorTableEntry(enumErrorCodes.Error, "No tokens can follow A for accumulator mode."),
 	enumErrorCodes.InstXYUnusableMode:       newErrorTableEntry(enumErrorCodes.Error, "X or Y indexes cannot be used with target mode"),
@@ -109,7 +115,7 @@ var errorTable = map[enumErrorCodes.Def]ErrorTableEntry{
 	enumErrorCodes.DirectiveUnmatchedEndBlock: newErrorTableEntry(enumErrorCodes.Error, "Non-matching closing block with parent operation, %v"),
 	enumErrorCodes.DirectiveNestedLabelBlock:  newErrorTableEntry(enumErrorCodes.Error, "Cannot define a labeled block when in another block statement!"),
 
-	enumErrorCodes.MacroNotExist:                 newErrorTableEntry(enumErrorCodes.Error, "Specified macro %v doesn't exist!"),
+	enumErrorCodes.MacroNotExist:                 newErrorTableEntry(enumErrorCodes.Error, fmt.Sprintf("Specified macro %v doesn't exist!", coloredIdentifier("%v"))),
 	enumErrorCodes.MacroInvokeDoubleCurlyBrace:   newErrorTableEntry(enumErrorCodes.Error, "Macro invoking error - Must close curly brace before opening another!"),
 	enumErrorCodes.MacroInvokeUnclosedCurlyBrace: newErrorTableEntry(enumErrorCodes.Error, "Macro invoking error - Unclosed curly brace!"),
 
@@ -126,7 +132,7 @@ var errorTable = map[enumErrorCodes.Def]ErrorTableEntry{
 	enumErrorCodes.CaseNoSwitch:                      newErrorTableEntry(enumErrorCodes.Error, "Cannot have case outside a switch"),
 	enumErrorCodes.DefaultNoSwitch:                   newErrorTableEntry(enumErrorCodes.Error, "Cannot have default outside a switch"),
 
-	enumErrorCodes.NamespaceNotExist:            newErrorTableEntry(enumErrorCodes.Error, "Namespace %v does not exist!"),
+	enumErrorCodes.NamespaceNotExist:            newErrorTableEntry(enumErrorCodes.Error, fmt.Sprintf("Namespace %v does not exist!", coloredIdentifier("%v"))),
 	enumErrorCodes.NamespaceToValuesNotResolved: newErrorTableEntry(enumErrorCodes.Error, "Namespace value %v is not resolved and cannot be converted to a value"),
 
 	enumErrorCodes.CharMapNoneDefined:     newErrorTableEntry(enumErrorCodes.Error, "No character maps have been defined!"),
@@ -169,4 +175,8 @@ var errorTable = map[enumErrorCodes.Def]ErrorTableEntry{
 	enumErrorCodes.ResolveDeadlock:              newErrorTableEntry(enumErrorCodes.Fatal, "🛑 Resolve Deadlock - Symbols are set up in a way in which they will NEVER resolve!"),
 
 	enumErrorCodes.RsNotSet: newErrorTableEntry(enumErrorCodes.Error, "RS has not yet been set!"),
+}
+
+var errorHintTable = map[enumErrorCodes.Def]string{
+	enumErrorCodes.InstUnsupportedMode: fmt.Sprintf("Supported modes are: %v", coloredNumber("%v")),
 }

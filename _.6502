@@ -23,12 +23,9 @@ RESET:
 	.db 1
 
 NMI:
-	LDA <"ABA"
+	INX #1
 	LDA "ABA"
 
-	.include "__.6502"
-
-	LDA #"ABA"
 	
 	.org $fffa
 	.dw NMI, RESET, 0

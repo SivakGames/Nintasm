@@ -17,6 +17,7 @@ const ERROR_STACK_CAPACITY = 10
 // For underlining parts of the line
 var highlightStart int = -1
 var highlightEnd int = -1
+var currentHint string = ""
 var totalErrors uint = 0
 
 // ++++++++++++++++++++++++++++++++++++++++
@@ -56,6 +57,7 @@ func newErrorEntry(
 		return ErrorEntry{
 			code:        code,
 			message:     message,
+			hint:        currentHint,
 			fileName:    fileData.FileName,
 			lineNumber:  fileData.CurrentLineNumber,
 			lineContent: fileData.ProcessedLines[fileData.CurrentLineNumber-1],
@@ -65,6 +67,7 @@ func newErrorEntry(
 	return ErrorEntry{
 		code:        code,
 		message:     message,
+		hint:        currentHint,
 		fileName:    noFileDefaults.fileName,
 		lineNumber:  noFileDefaults.lineNumber,
 		lineContent: noFileDefaults.lineContent,
@@ -79,6 +82,7 @@ var errorStack = make([]ErrorEntry, ERROR_STACK_CAPACITY+1)
 func AddNew(errorTableKey enumErrorCodes.Def, args ...interface{}) error {
 	defer func() {
 		totalErrors++
+		currentHint = ""
 		Resetighlights()
 	}()
 
@@ -104,6 +108,15 @@ func AddNew(errorTableKey enumErrorCodes.Def, args ...interface{}) error {
 	}
 
 	return errors.New(fmt.Sprintf("%v%d", SEVERITY_PREFIX, entry.severity))
+}
+
+func AddHint(errorTableKey enumErrorCodes.Def, args ...interface{}) {
+	hint, hintExists := errorHintTable[errorTableKey]
+	if !hintExists {
+		AddNew(enumErrorCodes.Other, "Specified hint doesn't exist!")
+		return
+	}
+	currentHint = fmt.Sprintf(hint, args...)
 }
 
 // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx

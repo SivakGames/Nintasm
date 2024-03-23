@@ -89,7 +89,12 @@ func printError(entry *ErrorEntry) {
 		severityColor = "ansiRed"
 		severityDescription = "FATAL ERROR"
 	}
-	colorizedSeverity := util.Colorize(util.PadStringLeft(fmt.Sprintf(" %v ", severityDescription), 7, ' '), severityColor, true)
+	colorizedSeverity := util.Colorize(util.PadStringLeft(fmt.Sprintf(" %v ", severityDescription), ERROR_CAPTION_MIN_WIDTH, ' '), severityColor, true)
 	fmt.Println("▓", colorizedSeverity, entry.message)
+
+	if entry.hint != "" {
+		colorizedHint := util.Colorize(util.PadStringLeft(fmt.Sprintf(" %v ", "HINT"), ERROR_CAPTION_MIN_WIDTH, ' '), "ansiGray2", false)
+		fmt.Println("▓", colorizedHint, entry.hint)
+	}
 
 }

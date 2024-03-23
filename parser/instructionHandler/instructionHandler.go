@@ -11,6 +11,7 @@ import (
 	"misc/nintasm/interpreter/operandFactory"
 	"misc/nintasm/romBuilder"
 	"misc/nintasm/romBuilder/addDataToRom"
+	"strings"
 )
 
 type instModeEnum = enumInstructionModes.Def
@@ -84,7 +85,16 @@ func EvaluateInstruction(instructionName string,
 
 	// See if the mode the instruction is going to use was valid
 	if useInstructionMode == enumInstructionModes.None {
-		return errorHandler.AddNew(enumErrorCodes.InstUnsupportedMode) // ❌ Fails
+		modeDetails := instructionData.InstructionModeEnumDetails[instructionMode]
+		suppModeStrings := make([]string, len(*opcodesAndSupportedModes.SupportedModes))
+		for i, supportedMode := range *opcodesAndSupportedModes.SupportedModes {
+			x := instructionData.InstructionModeEnumDetails[supportedMode]
+			suppModeStrings[i] = x.Abbrev
+		}
+		result := strings.Join(suppModeStrings, ", ")
+
+		errorHandler.AddHint(enumErrorCodes.InstUnsupportedMode, result)
+		return errorHandler.AddNew(enumErrorCodes.InstUnsupportedMode, modeDetails.Abbrev) // ❌ Fails
 	}
 	//Overwrite mode with ZP version if possible
 	if useInstructionZPMode != enumInstructionModes.None {
