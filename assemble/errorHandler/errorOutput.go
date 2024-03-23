@@ -21,7 +21,7 @@ func newErrorOutput(fileName string) errorOutput {
 // =============================================================
 
 func CheckAndPrintErrors() {
-	if totalErrors == 0 {
+	if totalQueuedErrors == 0 {
 		return
 	}
 
@@ -30,7 +30,7 @@ func CheckAndPrintErrors() {
 
 	// Will first group by file
 
-	for i := 0; i < int(totalErrors); i++ {
+	for i := 0; i < int(totalQueuedErrors); i++ {
 		entry := errorStack[i]
 		_, exists := fileNameOutputOrderIndexes[entry.fileName]
 		if !exists {
@@ -97,4 +97,12 @@ func printError(entry *ErrorEntry) {
 		fmt.Println("▓", colorizedHint, entry.hint)
 	}
 
+}
+
+func PrintTotalErrorMessage() {
+	fmt.Println()
+	fmt.Println(util.Colorize("Assembly has terminated!", "ansiOrange", false))
+	totalErrorText := fmt.Sprintf("Total errors: %d", totalErrors)
+	totalWarningText := fmt.Sprintf("Total warnings: %d", totalWarnings)
+	fmt.Println(fmt.Sprintf("%v / %v", totalErrorText, totalWarningText))
 }

@@ -51,6 +51,10 @@ func Start(initialInputFile string) error {
 		return err
 	}
 
+	if errorHandler.GetErrorCount() > 0 {
+		return errors.New("Pass 2 failed")
+	}
+
 	return nil
 }
 

@@ -23,8 +23,7 @@ RESET:
 	.db 1
 
 NMI:
-	INX #1
-	LDA "ABA"
+	LDA #low(NMI)
 
 	
 	.org $fffa

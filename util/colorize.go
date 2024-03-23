@@ -42,6 +42,8 @@ func Colorize(text string, color string, isBG bool) string {
 		colorValue = genAnsi("011")
 	case "ansiGreen":
 		colorValue = genAnsi("351")
+	case "ansiSeaGreen":
+		colorValue = genAnsi("142")
 	case "ansiOrange":
 		colorValue = genAnsi("520")
 	case "ansiRed":

@@ -5,6 +5,7 @@ import (
 	"misc/nintasm/assemble"
 	"misc/nintasm/assemble/errorHandler"
 	"misc/nintasm/romBuilder"
+	"misc/nintasm/util"
 	"os"
 	"time"
 )
@@ -17,7 +18,7 @@ func main() {
 		return
 	}
 
-	// --------------------
+	// ---------------------------------------------------------
 
 	baseInputFileName := os.Args[1]
 
@@ -34,11 +35,27 @@ func main() {
 	start := time.Now()
 	err = assemble.Start(baseInputFileName)
 	if err != nil {
-		fmt.Println("\x1b[31mERRORZ HAPPENED\x1b[0m")
 		errorHandler.CheckAndPrintErrors()
+		errorHandler.PrintTotalErrorMessage()
+		return // ❌ Assembly Fails
 	}
 
-	romBuilder.GenerateRomBinFile()
+	// ---------------------------------------------------------
+	// Generate rom file
+
+	outFileName, romBuildErr := romBuilder.GenerateRomBinFile()
+	if romBuildErr != nil {
+		fmt.Println("No errors with code, but output file could not be generated...")
+		fmt.Println(romBuildErr)
+		return
+	}
+
+	// ---------------------------------------------------------
+	// 🟢 Assembly Succeeds!
+
+	fmt.Println("\nAssembly has succeeded!")
+	fmt.Println("Output file can be found at:", util.Colorize(outFileName, "ansiSeaGreen", false))
+	fmt.Println("")
 
 	assemblyTime := fmt.Sprintf("%.2f", time.Since(start).Seconds())
 	finalMessage := fmt.Sprintf("Assembly took: \x1b[33m%v\x1b[0m seconds", assemblyTime)

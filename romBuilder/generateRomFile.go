@@ -5,11 +5,11 @@ import (
 	"os"
 )
 
-func GenerateRomBinFile() error {
+func GenerateRomBinFile() (string, error) {
 	outFileName := fileHandler.AddRelativePathIncludeFileName("output.nes")
 	file, err := os.OpenFile(outFileName, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
 	if err != nil {
-		return err
+		return "", err
 	}
 	defer file.Close()
 
@@ -17,17 +17,17 @@ func GenerateRomBinFile() error {
 
 	_, err = file.Write(iNESHeader)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	for _, romSegment := range rom {
 		for _, bank := range romSegment {
 			_, err = file.Write(bank.bytes)
 			if err != nil {
-				return err
+				return "", err
 			}
 		}
 	}
 
-	return nil
+	return outFileName, nil
 }

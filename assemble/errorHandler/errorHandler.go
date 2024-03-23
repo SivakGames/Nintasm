@@ -18,7 +18,9 @@ const ERROR_STACK_CAPACITY = 10
 var highlightStart int = -1
 var highlightEnd int = -1
 var currentHint string = ""
+var totalQueuedErrors uint = 0
 var totalErrors uint = 0
+var totalWarnings uint = 0
 
 // ++++++++++++++++++++++++++++++++++++++++
 
@@ -81,7 +83,7 @@ var errorStack = make([]ErrorEntry, ERROR_STACK_CAPACITY+1)
 
 func AddNew(errorTableKey enumErrorCodes.Def, args ...interface{}) error {
 	defer func() {
-		totalErrors++
+		totalQueuedErrors++
 		currentHint = ""
 		Resetighlights()
 	}()
@@ -95,16 +97,24 @@ func AddNew(errorTableKey enumErrorCodes.Def, args ...interface{}) error {
 	} else {
 		entry = newErrorEntry(errorTableKey, "Non-error-code error???", enumErrorCodes.Fatal)
 	}
-	errorStack[totalErrors] = entry
+	errorStack[totalQueuedErrors] = entry
 
-	if totalErrors+2 > ERROR_STACK_CAPACITY {
-		totalErrors++
+	if totalQueuedErrors+2 > ERROR_STACK_CAPACITY {
+		totalQueuedErrors++
 		tooManyErrorsEntry := newErrorEntry(errorTableKey, "Too many errors!", enumErrorCodes.Fatal)
 		tooManyErrorsEntry.fileName = "OUTPUT LIMIT REACHED"
 		tooManyErrorsEntry.lineNumber = 0
 		tooManyErrorsEntry.lineContent = ""
-		errorStack[totalErrors] = tooManyErrorsEntry
+		errorStack[totalQueuedErrors] = tooManyErrorsEntry
 		return errors.New(fmt.Sprintf("%v%d", SEVERITY_PREFIX, tooManyErrorsEntry.severity))
+	}
+
+	switch entry.severity {
+	case enumErrorCodes.Fatal,
+		enumErrorCodes.Error:
+		totalErrors++
+	case enumErrorCodes.Warning:
+		totalWarnings++
 	}
 
 	return errors.New(fmt.Sprintf("%v%d", SEVERITY_PREFIX, entry.severity))
@@ -156,7 +166,7 @@ func Resetighlights() {
 // ------------------------------------------------
 
 func GetErrorCount() uint {
-	return totalErrors
+	return totalQueuedErrors
 }
 
 // ------------------------------------------------
