@@ -13,6 +13,10 @@ import (
 func main() {
 	var err error
 
+	util.ClearTerminal()
+
+	fmt.Println("Nintasm")
+
 	if len(os.Args) < 2 {
 		fmt.Println("Usage: go run . <filename> [-s]")
 		return
@@ -53,9 +57,10 @@ func main() {
 	// ---------------------------------------------------------
 	// 🟢 Assembly Succeeds!
 
-	fmt.Println("\nAssembly has succeeded!")
+	fmt.Println()
+	fmt.Println("Assembly has succeeded!")
 	fmt.Println("Output file can be found at:", util.Colorize(outFileName, "ansiSeaGreen", false))
-	fmt.Println("")
+	fmt.Println()
 
 	assemblyTime := fmt.Sprintf("%.2f", time.Since(start).Seconds())
 	finalMessage := fmt.Sprintf("Assembly took: \x1b[33m%v\x1b[0m seconds", assemblyTime)
