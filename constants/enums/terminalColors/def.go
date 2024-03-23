@@ -20,6 +20,7 @@ const (
 	AnsiPurple
 	AnsiTeal
 	AnsiGreen
+	AnsiDarkSeaGreen
 	AnsiSeaGreen
 	AnsiOrange
 	AnsiRed

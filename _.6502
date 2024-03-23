@@ -25,7 +25,9 @@ RESET:
 	.endrepeat
 
 NMI:
+	.repeat 7148
 	LDA #low(NMI)
+	.endrepeat
 
 	.bank 1
 	.org $c000
