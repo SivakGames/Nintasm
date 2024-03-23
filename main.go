@@ -59,6 +59,7 @@ func main() {
 
 	fmt.Println()
 	fmt.Println("Assembly has succeeded!")
+	romBuilder.OutputSegmentUsage()
 	fmt.Println("Output file can be found at:", util.Colorize(outFileName, "ansiSeaGreen", false))
 	fmt.Println()
 

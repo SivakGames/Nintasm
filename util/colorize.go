@@ -51,6 +51,12 @@ func Colorize(text string, color string, isBG bool) string {
 	case "ansiGray1":
 		colorValue = 236
 	case "ansiGray2":
+		colorValue = 238
+	case "ansiGray3":
+		colorValue = 240
+	case "ansiGray4":
+		colorValue = 242
+	case "ansiGray5":
 		colorValue = 244
 	}
 

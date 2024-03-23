@@ -14,17 +14,21 @@
 ;==========================================
 ; PRG start
 ;==========================================
-	.romSegment "32kb", "32kb", "PRG"
+	.romSegment "32kb", "16kb", "PRG"
 	.bank 0
 	.org $8000
 
 
 RESET:
+	.repeat 1
 	.db 1
+	.endrepeat
 
 NMI:
 	LDA #low(NMI)
 
+	.bank 1
+	.org $c000
 	
 	.org $fffa
 	.dw NMI, RESET, 0
