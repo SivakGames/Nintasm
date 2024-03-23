@@ -3,6 +3,7 @@ package errorHandler
 import (
 	"fmt"
 	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
+	enumTerminalColors "misc/nintasm/constants/enums/terminalColors"
 	"misc/nintasm/util"
 )
 
@@ -21,19 +22,19 @@ func newErrorTableEntry(severity enumErrorCodes.Severity, description string) Er
 }
 
 func coloredSymbol(s string) string {
-	return util.Colorize(s, "lightcyan", false)
+	return util.Colorize(s, enumTerminalColors.LightCyan, false)
 }
 func coloredIdentifier(s string) string {
-	return util.Colorize(s, "magenta", false)
+	return util.Colorize(s, enumTerminalColors.Magenta, false)
 }
 func coloredDirective(s string) string {
-	return util.Colorize(s, "magenta", false)
+	return util.Colorize(s, enumTerminalColors.LightMagenta, false)
 }
 func coloredNumber(s string) string {
-	return util.Colorize(s, "yellow", false)
+	return util.Colorize(s, enumTerminalColors.Yellow, false)
 }
 func coloredString(s string) string {
-	return util.Colorize(s, "ansiGreen", false)
+	return util.Colorize(s, enumTerminalColors.AnsiGreen, false)
 }
 
 var errorTable = map[enumErrorCodes.Def]ErrorTableEntry{

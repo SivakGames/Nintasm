@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"misc/nintasm/assemble/fileStack"
 	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
+	enumTerminalColors "misc/nintasm/constants/enums/terminalColors"
 	"misc/nintasm/util"
 )
 
@@ -50,7 +51,7 @@ func CheckAndPrintErrors() {
 }
 
 func printErrorFileName(fileName string) {
-	colorizedFileName := util.Colorize(fmt.Sprintf(" >> %v ", fileName), "red", true)
+	colorizedFileName := util.Colorize(fmt.Sprintf(" >> %v ", fileName), enumTerminalColors.Red, true)
 	fmt.Println("░", colorizedFileName)
 }
 
@@ -58,42 +59,42 @@ func printError(entry *ErrorEntry) {
 
 	//Line number and content
 	if entry.lineNumber > 0 {
-		colorizedLineNumber := util.Colorize(util.PadStringLeft(fmt.Sprintf(" %d ", entry.lineNumber), ERROR_CAPTION_MIN_WIDTH, ' '), "blue", true)
+		colorizedLineNumber := util.Colorize(util.PadStringLeft(fmt.Sprintf(" %d ", entry.lineNumber), ERROR_CAPTION_MIN_WIDTH, ' '), enumTerminalColors.Blue, true)
 		fmt.Println("▓", colorizedLineNumber, entry.lineContent)
 	}
 
 	subOp := fileStack.GetSubOp()
 	if subOp != nil {
-		colorizedLineNumber := util.Colorize(util.PadStringLeft(fmt.Sprintf(" %d ", subOp.SubOpLineNumber), ERROR_CAPTION_MIN_WIDTH-2, ' '), "blue", true)
+		colorizedLineNumber := util.Colorize(util.PadStringLeft(fmt.Sprintf(" %d ", subOp.SubOpLineNumber), ERROR_CAPTION_MIN_WIDTH-2, ' '), enumTerminalColors.Blue, true)
 		fmt.Println("▓▓▓", colorizedLineNumber, subOp.LineContent)
 	}
 
 	if highlightEnd > highlightStart {
-		marginSpacer := util.Colorize(util.PadStringLeft("", ERROR_CAPTION_MIN_WIDTH+2, '░'), "cyan", false)
+		marginSpacer := util.Colorize(util.PadStringLeft("", ERROR_CAPTION_MIN_WIDTH+2, '░'), enumTerminalColors.Cyan, false)
 		leadingSpace := util.PadStringLeft("", highlightStart, ' ')
-		arrows := util.Colorize(util.PadStringLeft("", highlightEnd-highlightStart, '~'), "lightred", false)
+		arrows := util.Colorize(util.PadStringLeft("", highlightEnd-highlightStart, '~'), enumTerminalColors.LightRed, false)
 		fmt.Println(marginSpacer, fmt.Sprintf("%v%v", leadingSpace, arrows))
 	}
 
 	//Severity and description
-	severityDescription, severityColor := "", ""
+	severityDescription, severityColor := "", enumTerminalColors.Red
 
 	switch entry.severity {
 	case enumErrorCodes.Warning:
-		severityColor = "yellow"
+		severityColor = enumTerminalColors.Yellow
 		severityDescription = "WARN"
 	case enumErrorCodes.Error:
-		severityColor = "red"
+		severityColor = enumTerminalColors.Red
 		severityDescription = "ERROR"
 	case enumErrorCodes.Fatal:
-		severityColor = "ansiRed"
+		severityColor = enumTerminalColors.AnsiRed
 		severityDescription = "FATAL ERROR"
 	}
 	colorizedSeverity := util.Colorize(util.PadStringLeft(fmt.Sprintf(" %v ", severityDescription), ERROR_CAPTION_MIN_WIDTH, ' '), severityColor, true)
 	fmt.Println("▓", colorizedSeverity, entry.message)
 
 	if entry.hint != "" {
-		colorizedHint := util.Colorize(util.PadStringLeft(fmt.Sprintf(" %v ", "HINT"), ERROR_CAPTION_MIN_WIDTH, ' '), "ansiGray2", false)
+		colorizedHint := util.Colorize(util.PadStringLeft(fmt.Sprintf(" %v ", "HINT"), ERROR_CAPTION_MIN_WIDTH, ' '), enumTerminalColors.AnsiGray3, false)
 		fmt.Println("▓", colorizedHint, entry.hint)
 	}
 
@@ -101,7 +102,7 @@ func printError(entry *ErrorEntry) {
 
 func PrintTotalErrorMessage() {
 	fmt.Println()
-	fmt.Println(util.Colorize("Assembly has terminated!", "ansiOrange", false))
+	fmt.Println(util.Colorize("Assembly has terminated!", enumTerminalColors.AnsiOrange, false))
 	totalErrorText := fmt.Sprintf("Total errors: %d", totalErrors)
 	totalWarningText := fmt.Sprintf("Total warnings: %d", totalWarnings)
 	fmt.Println(fmt.Sprintf("%v / %v", totalErrorText, totalWarningText))

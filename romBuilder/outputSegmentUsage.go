@@ -2,6 +2,7 @@ package romBuilder
 
 import (
 	"fmt"
+	enumTerminalColors "misc/nintasm/constants/enums/terminalColors"
 	"misc/nintasm/util"
 )
 
@@ -28,11 +29,9 @@ func OutputSegmentUsage() {
 				fmt.Sprintf("%d", bIdx),
 				bankCaptionNumberWidth, ' '),
 			)
-			color := ""
+			color := enumTerminalColors.AnsiGray2
 			if bIdx%2 == 0 {
-				color = "ansiGray2"
-			} else {
-				color = "ansiGray3"
+				color = enumTerminalColors.AnsiGray3
 			}
 
 			bankOutput := fmt.Sprintf("%v %v", util.Colorize(bankCaption, color, true), output)
@@ -46,14 +45,14 @@ func OutputSegmentUsage() {
 
 func calcAndGenOutput(maxBytes int, occupiedBytes int) string {
 	unoccupiedBytes := maxBytes - occupiedBytes
-	remainPercent := (float64(unoccupiedBytes) / float64(maxBytes)) * 100
+	remainPercent := 100 - (float64(unoccupiedBytes)/float64(maxBytes))*100
 
 	out2 := commaSeparated(maxBytes)
 	out1 := util.PadStringLeft(commaSeparated(occupiedBytes), len(out2), ' ')
 	out3 := commaSeparated(unoccupiedBytes)
 
 	output := fmt.Sprintf("%v%v%v (%.2f%%) - %v remaining",
-		out1, util.Colorize("/", "cyan", false), out2,
+		out1, util.Colorize("/", enumTerminalColors.Cyan, false), out2,
 		remainPercent, out3)
 	return output
 }

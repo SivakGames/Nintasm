@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"misc/nintasm/assemble"
 	"misc/nintasm/assemble/errorHandler"
+	enumTerminalColors "misc/nintasm/constants/enums/terminalColors"
 	"misc/nintasm/romBuilder"
 	"misc/nintasm/util"
 	"os"
@@ -60,7 +61,7 @@ func main() {
 	fmt.Println()
 	fmt.Println("Assembly has succeeded!")
 	romBuilder.OutputSegmentUsage()
-	fmt.Println("Output file can be found at:", util.Colorize(outFileName, "ansiSeaGreen", false))
+	fmt.Println("Output file can be found at:", util.Colorize(outFileName, enumTerminalColors.AnsiSeaGreen, false))
 	fmt.Println()
 
 	assemblyTime := fmt.Sprintf("%.2f", time.Since(start).Seconds())
