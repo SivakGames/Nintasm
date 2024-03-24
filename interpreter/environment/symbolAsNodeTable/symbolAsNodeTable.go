@@ -163,5 +163,5 @@ func generateAssemblerReservedWordNode(funcName string) Node {
 }
 
 func generateNumericNodeForEnvironment(number int) Node {
-	return operandFactory.CreateNumericLiteralNode(number)
+	return operandFactory.CreateNumericLiteralNode(float64(number))
 }

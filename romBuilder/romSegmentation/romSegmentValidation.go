@@ -52,7 +52,7 @@ func ValidateAndAddRomSegment(segmentSizeNode *Node, segmentBankSizeNode *Node, 
 	if err != nil {
 		return err
 	}
-	segmentSize = segmentSizeNode.AsNumber
+	segmentSize = int(segmentSizeNode.AsNumber)
 
 	// Check segment's bank size
 
@@ -69,7 +69,7 @@ func ValidateAndAddRomSegment(segmentSizeNode *Node, segmentBankSizeNode *Node, 
 		if err != nil {
 			return err
 		}
-		segmentBankSize = segmentBankSizeNode.AsNumber
+		segmentBankSize = int(segmentBankSizeNode.AsNumber)
 	}
 
 	// Extend ROM with new segment
@@ -83,7 +83,7 @@ func validateNodeNumerics(node *Node) error {
 		return errorHandler.AddNew(enumErrorCodes.NodeTypeNotNumeric)
 	} else if !operandFactory.ValidateNumericNodeIsGTEandLTEValues(node, ROM_SEGMENT_MIN_SIZE, ROM_SEGMENT_MAX_SIZE) {
 		return errorHandler.AddNew(enumErrorCodes.NodeValueNotGTEandLTE, ROM_SEGMENT_MIN_SIZE, ROM_SEGMENT_MAX_SIZE)
-	} else if !util.ValidateIsPowerOfTwo(node.AsNumber) {
+	} else if !util.ValidateIsPowerOfTwo(int(node.AsNumber)) {
 		return errorHandler.AddNew(enumErrorCodes.NodeValueNotPowerOf2)
 	}
 	return nil

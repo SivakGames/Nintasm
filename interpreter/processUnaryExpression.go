@@ -33,7 +33,7 @@ func processUnaryExpression(node Node) (Node, error) {
 	case "-":
 		node.AsNumber = -right.AsNumber
 	case "~":
-		node.AsNumber = ^right.AsNumber
+		node.AsNumber = float64(^int(right.AsNumber))
 	case "!":
 		node.AsBool = !right.AsBool
 	default:

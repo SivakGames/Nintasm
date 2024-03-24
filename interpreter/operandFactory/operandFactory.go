@@ -14,7 +14,7 @@ type NodeStruct struct {
 	Resolved     bool
 	NodeValue    string
 	AsBool       bool
-	AsNumber     int
+	AsNumber     float64
 	Left         *Node
 	Right        *Node
 	ArgumentList *[]Node
@@ -99,7 +99,7 @@ func CreateAssignmentNode(left Node, right Node) Node {
 func CreateAssignLabelNode(labelName string, org int) Node {
 	node := newNode(labelName, enumNodeTypes.AssignLabelExpression)
 	left := CreateIdentifierNode(labelName)
-	right := CreateNumericLiteralNode(org)
+	right := CreateNumericLiteralNode(float64(org))
 	node.Left = &left
 	node.Right = &right
 	return node
@@ -108,7 +108,7 @@ func CreateAssignLabelNode(labelName string, org int) Node {
 // ++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 // Helper function to take a symbol and number and make an assignment node
-func CreateAssignmentNodeForNumber(symbolName string, number int) Node {
+func CreateAssignmentNodeForNumber(symbolName string, number float64) Node {
 	return CreateAssignmentNode(CreateIdentifierNode(symbolName), CreateNumericLiteralNode(number))
 }
 
@@ -160,8 +160,8 @@ func CreateBooleanLiteralNode(asBool bool) Node {
 }
 
 // Numbers
-func CreateNumericLiteralNode(asNumber int) Node {
-	node := newNode(fmt.Sprintf("%d", asNumber), enumNodeTypes.NumericLiteral)
+func CreateNumericLiteralNode(asNumber float64) Node {
+	node := newNode(fmt.Sprintf("%d", int(asNumber)), enumNodeTypes.NumericLiteral)
 	node.AsNumber = asNumber
 	node.Resolved = true
 	return node

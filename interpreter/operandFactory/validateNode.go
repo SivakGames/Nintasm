@@ -32,19 +32,19 @@ func ValidateNodeIsNumeric(node *Node) bool {
 	return node.NodeType == enumNodeTypes.NumericLiteral
 }
 func ValidateNumericNodeIsGTValue(node *Node, minValue int) bool {
-	return node.AsNumber > minValue
+	return node.AsNumber > float64(minValue)
 }
 func ValidateNumericNodeIsGTEValue(node *Node, minValue int) bool {
-	return node.AsNumber >= minValue
+	return node.AsNumber >= float64(minValue)
 }
 func ValidateNumericNodeIsLTValue(node *Node, maxValue int) bool {
-	return node.AsNumber < maxValue
+	return node.AsNumber < float64(maxValue)
 }
 func ValidateNumericNodeIsLTEValue(node *Node, maxValue int) bool {
-	return node.AsNumber <= maxValue
+	return node.AsNumber <= float64(maxValue)
 }
 func ValidateNumericNodeIsGTEandLTEValues(node *Node, minValue int, maxValue int) bool {
-	return node.AsNumber >= minValue && node.AsNumber <= maxValue
+	return node.AsNumber >= float64(minValue) && node.AsNumber <= float64(maxValue)
 }
 func ValidateNumericNodeIsPositive(node *Node) bool {
 	return node.AsNumber >= 0

@@ -72,7 +72,7 @@ func MapStringToCharmap(stringToConvert string) ([]int, error) {
 			return replacedStringAsBytes, errorHandler.AddNew(enumErrorCodes.ToCharMapUndefChar, r, currentCharmapName) // ❌ Fails
 		}
 		for _, v := range nodes {
-			replacedStringAsBytes = append(replacedStringAsBytes, v.AsNumber)
+			replacedStringAsBytes = append(replacedStringAsBytes, int(v.AsNumber))
 		}
 	}
 

@@ -32,8 +32,8 @@ func ConvertNodeValueToUInts(node Node, operandByteSize int, isBigEndian bool, i
 
 	switch node.NodeType {
 	case enumNodeTypes.NumericLiteral:
-		highByte = (node.AsNumber & 0x0ff00) >> 8
-		lowByte = node.AsNumber & 0x000ff
+		highByte = (int(node.AsNumber) & 0x0ff00) >> 8
+		lowByte = int(node.AsNumber) & 0x000ff
 
 		switch operandByteSize {
 		case 1:

@@ -42,7 +42,7 @@ func evalIncbin(operandList *[]Node) error {
 		} else if !operandFactory.ValidateNumericNodeIsPositive(&seekNode) {
 			return errorHandler.AddNew(enumErrorCodes.NodeValueNotPositive) // ❌ Fails
 		}
-		seekValue = seekNode.AsNumber
+		seekValue = int(seekNode.AsNumber)
 	}
 
 	if len(*operandList) == 3 {
@@ -52,7 +52,7 @@ func evalIncbin(operandList *[]Node) error {
 		} else if !operandFactory.ValidateNumericNodeIsGTEValue(&readNode, 1) {
 			return errorHandler.AddNew(enumErrorCodes.NodeValueNotGTE, 1) // ❌ Fails
 		}
-		readValue = readNode.AsNumber
+		readValue = int(readNode.AsNumber)
 	}
 
 	byteBuffer, err := fileHandler.ProcessBinFile(newBinFileName, seekValue, readValue)

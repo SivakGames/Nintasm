@@ -764,13 +764,13 @@ func (p *OperandParser) literal() (Node, error) {
 	switch literalType {
 	case enumTokenTypes.NUMBER_hex:
 		asNumber, _ := strconv.ParseInt(literalValue[1:], 16, 64)
-		return operandFactory.CreateNumericLiteralNode(int(asNumber)), nil
+		return operandFactory.CreateNumericLiteralNode(float64(asNumber)), nil
 	case enumTokenTypes.NUMBER_binary:
 		asNumber, _ := strconv.ParseInt(literalValue[1:], 2, 64)
-		return operandFactory.CreateNumericLiteralNode(int(asNumber)), nil
+		return operandFactory.CreateNumericLiteralNode(float64(asNumber)), nil
 	case enumTokenTypes.NUMBER_decimal:
 		asNumber, _ := strconv.ParseInt(literalValue, 10, 64)
-		return operandFactory.CreateNumericLiteralNode(int(asNumber)), nil
+		return operandFactory.CreateNumericLiteralNode(float64(asNumber)), nil
 	case enumTokenTypes.STRING:
 		return operandFactory.CreateStringLiteralNode(literalValue), nil
 	case enumTokenTypes.BACKTICK_STRING:

@@ -42,17 +42,17 @@ func processBinaryExpression(node Node) (Node, error) {
 	case "/":
 		node.AsNumber = left.AsNumber / right.AsNumber
 	case "%":
-		node.AsNumber = left.AsNumber % right.AsNumber
+		node.AsNumber = float64(int(left.AsNumber) % int(right.AsNumber))
 	case "|":
-		node.AsNumber = left.AsNumber | right.AsNumber
+		node.AsNumber = float64(int(left.AsNumber) | int(right.AsNumber))
 	case "&":
-		node.AsNumber = left.AsNumber & right.AsNumber
+		node.AsNumber = float64(int(left.AsNumber) & int(right.AsNumber))
 	case "^":
-		node.AsNumber = left.AsNumber ^ right.AsNumber
+		node.AsNumber = float64(int(left.AsNumber) ^ int(right.AsNumber))
 	case "<<":
-		node.AsNumber = left.AsNumber << right.AsNumber
+		node.AsNumber = float64(int(left.AsNumber) << int(right.AsNumber))
 	case ">>":
-		node.AsNumber = left.AsNumber >> right.AsNumber
+		node.AsNumber = float64(int(left.AsNumber) >> int(right.AsNumber))
 	case "<":
 		node.AsBool = left.AsNumber < right.AsNumber
 	case "<=":

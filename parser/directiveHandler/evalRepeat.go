@@ -42,7 +42,8 @@ func evalEndRepeat() error {
 	capturedLines, operandList := blockStack.GetCurrentCaptureBlockCapturedLinesAndOperandList()
 
 	//Extract repeatAmount
-	repeatAmount := (*operandList)[0].AsNumber
+	repeatAmountNumber := (*operandList)[0].AsNumber
+	repeatAmount := int(repeatAmountNumber)
 
 	//Extract iterator name (if any)
 	iteratorName := ""

@@ -20,7 +20,7 @@ func evalDataSeriesOperands(directiveName string, operandList *[]Node) error {
 	}
 
 	repetitionNumber := repetitionNode.AsNumber
-	numRepetitions := repetitionNumber
+	numRepetitions := int(repetitionNumber)
 
 	if len(*operandList) == 2 {
 		padNode := &(*operandList)[1]

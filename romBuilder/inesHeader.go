@@ -66,7 +66,7 @@ func ValidateInesMap(inesNode *Node) error {
 	}
 
 	INESHeader.hasSetMapper = true
-	INESHeader.mapper = inesNode.AsNumber
+	INESHeader.mapper = int(inesNode.AsNumber)
 	return nil
 }
 
@@ -83,7 +83,7 @@ func ValidateInesMirroring(inesNode *Node) error {
 	}
 
 	INESHeader.hasSetMirroring = true
-	INESHeader.mirroring = inesNode.AsNumber
+	INESHeader.mirroring = int(inesNode.AsNumber)
 	return nil
 }
 
@@ -115,14 +115,14 @@ func ValidateInesPrg(inesNode *Node) error {
 		return err
 	}
 
-	if !util.ValidateIsPowerOfTwo(inesNode.AsNumber) {
+	if !util.ValidateIsPowerOfTwo(int(inesNode.AsNumber)) {
 		return errorHandler.AddNew(enumErrorCodes.NodeValueNotPowerOf2)
 	} else if operandFactory.ValidateNumericNodeIsGTValue(inesNode, 128) {
 		return errorHandler.AddNew(enumErrorCodes.NodeValueNotLTE, 128)
 	}
 
 	INESHeader.hasSetPrg = true
-	INESHeader.prgHeaderValue = inesNode.AsNumber
+	INESHeader.prgHeaderValue = int(inesNode.AsNumber)
 	INESHeader.prgSizeInKb = INESHeader.prgHeaderValue * INES_PRG_SIZE_MULTIPLIER
 	return nil
 }
@@ -155,14 +155,14 @@ func ValidateInesChr(inesNode *Node) error {
 		return err
 	}
 
-	if !util.ValidateIsPowerOfTwo(inesNode.AsNumber) {
+	if !util.ValidateIsPowerOfTwo(int(inesNode.AsNumber)) {
 		return errorHandler.AddNew(enumErrorCodes.NodeValueNotPowerOf2)
 	} else if operandFactory.ValidateNumericNodeIsGTValue(inesNode, 256) {
 		return errorHandler.AddNew(enumErrorCodes.NodeValueNotLTE, 256)
 	}
 
 	INESHeader.hasSetChr = true
-	INESHeader.chrHeaderValue = inesNode.AsNumber
+	INESHeader.chrHeaderValue = int(inesNode.AsNumber)
 	INESHeader.chrSizeInKb = INESHeader.chrHeaderValue * INES_CHR_SIZE_MULTIPLIER
 	return nil
 }

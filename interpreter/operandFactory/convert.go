@@ -10,7 +10,7 @@ import (
 
 func ConvertNodeToNumericLiteral(node *Node) {
 	node.NodeType = enumNodeTypes.NumericLiteral
-	node.NodeValue = fmt.Sprintf("%d", node.AsNumber)
+	node.NodeValue = fmt.Sprintf("%f", node.AsNumber)
 	node.Resolved = true
 	node.ArgumentList = nil
 	return
@@ -46,7 +46,7 @@ func ConvertNodeToMultiBytes(node *Node, mutliBytes []Node) {
 //Special node for branch instructions
 
 func ConvertToBranchBinaryExpressionNode(originalNode Node, orgToSubtract int) Node {
-	orgToSubtractNode := CreateNumericLiteralNode(orgToSubtract)
+	orgToSubtractNode := CreateNumericLiteralNode(float64(orgToSubtract))
 	innerNode := CreateBinaryExpressionNode("-", originalNode, orgToSubtractNode)
 	branchNode := CreateBinaryExpressionNode("-", innerNode, CreateNumericLiteralNode(2))
 	return branchNode

@@ -11,7 +11,7 @@ func ValidateAndSetBank(bankNode *Node) error {
 	if !operandFactory.ValidateNodeIsNumeric(bankNode) {
 		return errorHandler.AddNew(enumErrorCodes.NodeTypeNotNumeric)
 	}
-	newBankIndex := bankNode.AsNumber
+	newBankIndex := int(bankNode.AsNumber)
 	currentBankIndex := romBuilder.GetBankIndex()
 	if currentBankIndex+1 != newBankIndex {
 		return errorHandler.AddNew(enumErrorCodes.BankNotSequential)
@@ -35,7 +35,7 @@ func ValidateAndSetOrg(orgNode *Node) error {
 		return errorHandler.AddNew(enumErrorCodes.NodeValueNot16Bit)
 	}
 
-	newOrg := orgNode.AsNumber
+	newOrg := int(orgNode.AsNumber)
 	err := romBuilder.SetOrg(newOrg)
 
 	return err

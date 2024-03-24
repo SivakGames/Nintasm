@@ -38,6 +38,6 @@ func evalDefExpr(directiveName string, operandList *[]Node) error {
 		return err
 	}
 
-	exprmapTable.AddExprToExprmap(exprNode.NodeValue, exprValueNode.AsNumber)
+	exprmapTable.AddExprToExprmap(exprNode.NodeValue, int(exprValueNode.AsNumber))
 	return nil
 }

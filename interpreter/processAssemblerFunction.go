@@ -87,35 +87,35 @@ func processAssemblerFunction(node *Node) error {
 	//+-*/+-*/+-*/+-*/+-*/+-*/+-*/+-*/
 	//Math functions
 	case "high":
-		node.AsNumber = (evaluatedArguments[0].AsNumber & 0x0ff00) >> 8
+		node.AsNumber = float64((int(evaluatedArguments[0].AsNumber) & 0x0ff00) >> 8)
 	case "low":
-		node.AsNumber = (evaluatedArguments[0].AsNumber & 0x000ff)
+		node.AsNumber = float64(int(evaluatedArguments[0].AsNumber) & 0x000ff)
 	case "ceil":
-		node.AsNumber = int(math.Ceil(float64(evaluatedArguments[0].AsNumber)))
+		node.AsNumber = math.Ceil(evaluatedArguments[0].AsNumber)
 	case "floor":
-		node.AsNumber = int(math.Floor(float64(evaluatedArguments[0].AsNumber)))
+		node.AsNumber = math.Floor(evaluatedArguments[0].AsNumber)
 	case "round":
-		node.AsNumber = int(math.Round(float64(evaluatedArguments[0].AsNumber)))
+		node.AsNumber = math.Round(evaluatedArguments[0].AsNumber)
 	case "modfDeci":
-		result, _ := math.Modf(float64(evaluatedArguments[0].AsNumber))
-		node.AsNumber = int(result)
+		result, _ := math.Modf(evaluatedArguments[0].AsNumber)
+		node.AsNumber = result
 	case "modfInt":
-		_, result := math.Modf(float64(evaluatedArguments[0].AsNumber))
-		node.AsNumber = int(result)
+		_, result := math.Modf(evaluatedArguments[0].AsNumber)
+		node.AsNumber = result
 	case "sin":
-		node.AsNumber = int(math.Sin(float64(evaluatedArguments[0].AsNumber)))
+		node.AsNumber = math.Sin(evaluatedArguments[0].AsNumber)
 	case "cos":
-		node.AsNumber = int(math.Cos(float64(evaluatedArguments[0].AsNumber)))
+		node.AsNumber = math.Cos(evaluatedArguments[0].AsNumber)
 	case "sindeg":
-		node.AsNumber = int(math.Sin(float64(evaluatedArguments[0].AsNumber) * (180 / math.Pi)))
+		node.AsNumber = math.Sin(evaluatedArguments[0].AsNumber * math.Pi / 180)
 	case "cosdeg":
-		node.AsNumber = int(math.Cos(float64(evaluatedArguments[0].AsNumber) * (180 / math.Pi)))
+		node.AsNumber = math.Cos(evaluatedArguments[0].AsNumber * math.Pi / 180)
 
 	case "strlen":
 		if node.NodeType == enumNodeTypes.StringLiteral {
-			node.AsNumber = len(node.NodeValue)
+			node.AsNumber = float64(len(node.NodeValue))
 		} else {
-			node.AsNumber = len(*evaluatedArguments[0].ArgumentList)
+			node.AsNumber = float64(len(*evaluatedArguments[0].ArgumentList))
 		}
 
 	case "substr":
@@ -126,9 +126,9 @@ func processAssemblerFunction(node *Node) error {
 		offset := evaluatedArguments[1]
 		if len(evaluatedArguments) > 2 {
 			limit = (evaluatedArguments)[2]
-			slicedNodes = (*target.ArgumentList)[offset.AsNumber:limit.AsNumber]
+			slicedNodes = (*target.ArgumentList)[int(offset.AsNumber):int(limit.AsNumber)]
 		} else {
-			slicedNodes = (*target.ArgumentList)[offset.AsNumber:]
+			slicedNodes = (*target.ArgumentList)[int(offset.AsNumber):]
 		}
 		operandFactory.ConvertNodeToMultiBytes(node, slicedNodes)
 
@@ -140,7 +140,7 @@ func processAssemblerFunction(node *Node) error {
 		}
 		multiBytes := []Node{}
 		for _, r := range replacedStringAsBytes {
-			n := operandFactory.CreateNumericLiteralNode(r)
+			n := operandFactory.CreateNumericLiteralNode(float64(r))
 			multiBytes = append(multiBytes, n)
 		}
 		operandFactory.ConvertNodeToMultiBytes(node, multiBytes)
@@ -183,7 +183,7 @@ func processAssemblerFunction(node *Node) error {
 			return err
 		}
 		bankValue, _ := symbolAsNodeTable.GetValueFromLabelAsBankTable((*node.ArgumentList)[0].NodeValue)
-		node.AsNumber = bankValue
+		node.AsNumber = float64(bankValue)
 
 	case "defined":
 		baseNode := (*node.ArgumentList)[0]

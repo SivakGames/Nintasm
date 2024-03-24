@@ -52,7 +52,7 @@ func ValidateSizeStringAliasUsable(node *Node, aliasTable *map[enumSizeAliases.D
 	if !ok {
 		return errorHandler.AddNew(enumErrorCodes.UnacceptableAlias)
 	}
-	node.AsNumber = value
+	node.AsNumber = float64(value)
 	operandFactory.ConvertNodeToNumericLiteral(node)
 	return nil
 }
@@ -60,13 +60,13 @@ func ValidateSizeStringAliasUsable(node *Node, aliasTable *map[enumSizeAliases.D
 //+++++++++++++++++++++++++++++++++++
 
 func ValidateSizeNumberAliasUsable(node *Node, aliasTable *map[enumSizeAliases.Def]int, inesOperationDescription string) error {
-	enumValue, enumOk := ValidateSizeNumericAlias(node.AsNumber)
+	enumValue, enumOk := ValidateSizeNumericAlias(int(node.AsNumber))
 	if enumOk {
 		value, ok := (*aliasTable)[enumValue]
 		if !ok {
 			return errorHandler.AddNew(enumErrorCodes.UnacceptableAlias)
 		}
-		node.AsNumber = value
+		node.AsNumber = float64(value)
 	}
 	return nil
 }

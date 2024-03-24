@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"fmt"
 	"misc/nintasm/assemble/errorHandler"
 	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
 	enumTokenTypes "misc/nintasm/constants/enums/tokenTypes"
@@ -55,6 +56,7 @@ func (p *Parser) eat(desiredTokenType tokenEnum) error {
 
 	}
 	if p.lookaheadType != desiredTokenType {
+		fmt.Println(p.lookaheadValue)
 		return errorHandler.AddNew(enumErrorCodes.ParserUnexpectedToken, p.lookaheadValue) // ❌ Fails
 	}
 	return nil

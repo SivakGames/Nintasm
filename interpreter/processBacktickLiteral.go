@@ -16,7 +16,7 @@ func processBacktickLiteral(node Node) (Node, error) {
 	if !exprExists {
 		return node, errorHandler.AddNew(enumErrorCodes.ExprMapUndefExpr, node.NodeValue)
 	}
-	node.AsNumber = exprAsNum
+	node.AsNumber = float64(exprAsNum)
 	operandFactory.ConvertNodeToNumericLiteral(&node)
 	return node, nil
 }

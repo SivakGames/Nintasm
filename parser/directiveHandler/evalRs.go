@@ -22,7 +22,7 @@ func evalRs(operationLabel string, operandList *[]Node) error {
 		return rserr
 	}
 
-	rsAssignmentNode := operandFactory.CreateAssignmentNodeForNumber(operationLabel, int(rsCurrentValue))
+	rsAssignmentNode := operandFactory.CreateAssignmentNodeForNumber(operationLabel, float64(rsCurrentValue))
 	_, err := interpreter.EvaluateNode(rsAssignmentNode)
 	if err != nil {
 		return err
