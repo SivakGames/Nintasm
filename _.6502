@@ -32,12 +32,19 @@ NMI:
 	.repeat 129
 	.db 1
 	.endrepeat 
+	
 	LDX #2
 
 .xxx:
 
+	bpl .yyy
+
 	RTS
 
+
+	.repeat 129
+	.db 15
+	.endrepeat 
 
 	.bank 1
 	.org $c000

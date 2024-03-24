@@ -72,6 +72,7 @@ func preProcessBlockStack() error {
 	}
 	blockStack.DestroyCaptureBlockListNodeWithPointer(tempNewOp) //Remove upper level buffer stack
 	blockStack.ClearBlockEntriesWithPtr(currentOp)
+	fileStack.ClearSubOp()
 	return nil
 }
 
