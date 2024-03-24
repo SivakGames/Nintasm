@@ -172,6 +172,7 @@ var errorTable = map[enumErrorCodes.Def]ErrorTableEntry{
 	enumErrorCodes.ResolvedValueMultiByteChar:   newErrorTableEntry(enumErrorCodes.Warning, "Character %v encoding requires more than a single byte. Using %d bytes"),
 	enumErrorCodes.ResolvedValue16BitString:     newErrorTableEntry(enumErrorCodes.Error, "String value cannot be used as a 16 bit operand"),
 	enumErrorCodes.ResolvedValueTooBig:          newErrorTableEntry(enumErrorCodes.Error, fmt.Sprintf("Resolved value byte size of %v too large for target byte size of %v", coloredNumber("%d"), coloredNumber("%d"))),
+	enumErrorCodes.ResolvedValueNotInt:          newErrorTableEntry(enumErrorCodes.Warning, "Resolved numeric value of %.4f is not an int. Truncating to %d"),
 	enumErrorCodes.ResolveImpossible:            newErrorTableEntry(enumErrorCodes.Error, "Symbol cannot be resolved!"),
 	enumErrorCodes.ResolveDeadlock:              newErrorTableEntry(enumErrorCodes.Fatal, "🛑 Resolve Deadlock - Symbols are set up in a way in which they will NEVER resolve!"),
 

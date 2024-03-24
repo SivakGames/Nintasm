@@ -59,7 +59,7 @@ func main() {
 	// 🟢 Assembly Succeeds!
 
 	fmt.Println()
-	romBuilder.OutputSegmentUsage()
+	//romBuilder.OutputSegmentUsage()
 	fmt.Println("Assembly has succeeded!")
 	fmt.Println("Output file can be found at:", util.Colorize(outFileName, enumTerminalColors.AnsiSeaGreen, false))
 	fmt.Println()

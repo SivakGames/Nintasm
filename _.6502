@@ -20,14 +20,19 @@
 
 
 RESET:
-	.repeat 1
-	.db 1
-	.endrepeat
 
 NMI:
-	.repeat $1ef0
-	LDA #low(NMI)
+
+	LDA #2
+	BEQ .xxx
+
+	.repeat 33
+	.db 1,2,3,4
 	.endrepeat
+
+.xxx:
+	RTS
+
 
 	.bank 1
 	.org $c000

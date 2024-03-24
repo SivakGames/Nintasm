@@ -1,6 +1,9 @@
 package operandFactory
 
-import enumNodeTypes "misc/nintasm/constants/enums/nodeTypes"
+import (
+	"math"
+	enumNodeTypes "misc/nintasm/constants/enums/nodeTypes"
+)
 
 //-----------------------------------Primitives
 
@@ -30,6 +33,10 @@ func ValidateNodeIsSubstitutionID(node *Node) bool {
 
 func ValidateNodeIsNumeric(node *Node) bool {
 	return node.NodeType == enumNodeTypes.NumericLiteral
+}
+func ValidateNodeIsInt(node *Node) bool {
+	_, d := math.Modf(node.AsNumber)
+	return d == 0
 }
 func ValidateNumericNodeIsGTValue(node *Node, minValue int) bool {
 	return node.AsNumber > float64(minValue)

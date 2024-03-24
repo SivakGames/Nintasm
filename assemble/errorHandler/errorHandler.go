@@ -12,7 +12,7 @@ import (
 // ++++++++++++++++++++++++++++++++++++++++
 
 const ERROR_CAPTION_MIN_WIDTH = 7
-const ERROR_STACK_CAPACITY = 1
+const ERROR_STACK_CAPACITY = 100
 
 // For underlining parts of the line
 var highlightStart int = -1
@@ -97,7 +97,6 @@ func AddNew(errorTableKey enumErrorCodes.Def, args ...interface{}) error {
 	} else {
 		entry = newErrorEntry(errorTableKey, "Non-error-code error???", enumErrorCodes.Fatal)
 	}
-	fmt.Println("HERWREW", totalQueuedErrors, entry)
 	errorStack[totalQueuedErrors] = entry
 
 	if totalQueuedErrors+2 > ERROR_STACK_CAPACITY {
