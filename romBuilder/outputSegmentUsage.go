@@ -57,7 +57,7 @@ func calcAndGenOutput(maxBytes int, occupiedBytes int) string {
 	out2 := util.CommaSeparatedNumber(maxBytes)
 	out1 := util.PadStringLeft(util.CommaSeparatedNumber(occupiedBytes), len(out2), ' ')
 	//out3 := commaSeparated(unoccupiedBytes)
-	percentVisual := util.PadStringRight(fmt.Sprintf("(%.2f%%)", availablePercent), 9, ' ')
+	percentVisual := util.PadStringLeft(fmt.Sprintf("(%.2f%%)", availablePercent), 9, ' ')
 	percentVisual = strings.ReplaceAll(percentVisual, "(", util.Colorize("(", enumTerminalColors.Cyan, false))
 	percentVisual = strings.ReplaceAll(percentVisual, ")", util.Colorize(")", enumTerminalColors.Cyan, false))
 
