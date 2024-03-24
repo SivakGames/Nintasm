@@ -14,40 +14,40 @@
 ;==========================================
 ; PRG start
 ;==========================================
-	.romSegment "32kb", "16kb", "PRG"
+	.romSegment "32kb", "32kb", "PRG"
 	.bank 0
 	.org $8000
 
-
+;-----------------------------------------
 RESET:
+	__resetCode__
 
+
+RESET_end:
+	;Enable NMI
+	LDA #(PPUCTRL.enableNMI | PPUCTRL.spritePatternTable)
+	STA PPUCTRL
+
+	__setPPU__ PPUADDR.palBg0
+
+	;Let the whole screen be PINK!
+	LDA #$25
+	STA $2007
+
+Forever:
+	JMP Forever
+
+;-----------------------------------------
 NMI:
+	LDA #0 
+	STA $2006 
+	STA $2006
+	RTI
 
+;-----------------------------------------
 
-	LDA #2
-	
-	LDX #2
-
-	.repeat 129
-	.db 1
-	.endrepeat 
-	
-	LDX #2
-
-
-	RTS
-
-
-	.repeat 129
-	.db 15
-	.endrepeat 
-
-	.bank 1
-	.org $c000
-	
 	.org $fffa
 	.dw NMI, RESET, 0
-
 
 ;==========================================
 ; CHR start

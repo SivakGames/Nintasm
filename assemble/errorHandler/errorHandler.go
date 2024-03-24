@@ -39,13 +39,15 @@ var noFileDefaults = resolveSymbolData{
 // ++++++++++++++++++++++++++++++++++++++++
 
 type ErrorEntry struct {
-	code        enumErrorCodes.Def
-	lineNumber  uint
-	lineContent string
-	fileName    string
-	message     string
-	hint        string
-	severity    enumErrorCodes.Severity
+	code             enumErrorCodes.Def
+	severity         enumErrorCodes.Severity
+	fileName         string
+	lineNumber       uint
+	lineContent      string
+	message          string
+	hint             string
+	subOpLineNumber  uint
+	subOpLineContent string
 }
 
 func newErrorEntry(
@@ -53,28 +55,29 @@ func newErrorEntry(
 	message string,
 	severity enumErrorCodes.Severity,
 ) ErrorEntry {
+	entry := ErrorEntry{
+		code:             code,
+		severity:         severity,
+		message:          message,
+		hint:             currentHint,
+		fileName:         noFileDefaults.fileName,
+		lineNumber:       noFileDefaults.lineNumber,
+		lineContent:      noFileDefaults.lineContent,
+		subOpLineContent: "",
+		subOpLineNumber:  0,
+	}
 	fileData := fileStack.GetTopOfFileStack()
-
 	if fileData != nil {
-		return ErrorEntry{
-			code:        code,
-			message:     message,
-			hint:        currentHint,
-			fileName:    fileData.FileName,
-			lineNumber:  fileData.CurrentLineNumber,
-			lineContent: fileData.ProcessedLines[fileData.CurrentLineNumber-1],
-			severity:    severity,
-		}
+		entry.fileName = fileData.FileName
+		entry.lineNumber = fileData.CurrentLineNumber
+		entry.lineContent = fileData.ProcessedLines[fileData.CurrentLineNumber-1]
 	}
-	return ErrorEntry{
-		code:        code,
-		message:     message,
-		hint:        currentHint,
-		fileName:    noFileDefaults.fileName,
-		lineNumber:  noFileDefaults.lineNumber,
-		lineContent: noFileDefaults.lineContent,
-		severity:    severity,
+	subOp := fileStack.GetSubOp()
+	if subOp != nil {
+		entry.subOpLineContent = subOp.LineContent
+		entry.subOpLineNumber = subOp.SubOpLineNumber
 	}
+	return entry
 }
 
 var errorStack = make([]ErrorEntry, ERROR_STACK_CAPACITY+1)

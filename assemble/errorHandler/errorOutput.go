@@ -2,7 +2,6 @@ package errorHandler
 
 import (
 	"fmt"
-	"misc/nintasm/assemble/fileStack"
 	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
 	enumTerminalColors "misc/nintasm/constants/enums/terminalColors"
 	"misc/nintasm/util"
@@ -63,10 +62,9 @@ func printError(entry *ErrorEntry) {
 		fmt.Println("▓", colorizedLineNumber, entry.lineContent)
 	}
 
-	subOp := fileStack.GetSubOp()
-	if subOp != nil {
-		colorizedLineNumber := util.Colorize(util.PadStringLeft(fmt.Sprintf(" %d ", subOp.SubOpLineNumber), ERROR_CAPTION_MIN_WIDTH-2, ' '), enumTerminalColors.Blue, true)
-		fmt.Println("▓▓▓", colorizedLineNumber, subOp.LineContent)
+	if entry.subOpLineNumber > 0 {
+		colorizedLineNumber := util.Colorize(util.PadStringLeft(fmt.Sprintf(" %d ", entry.subOpLineNumber), ERROR_CAPTION_MIN_WIDTH-2, ' '), enumTerminalColors.Blue, true)
+		fmt.Println("▓▓▓", colorizedLineNumber, entry.subOpLineContent)
 	}
 
 	if highlightEnd > highlightStart {

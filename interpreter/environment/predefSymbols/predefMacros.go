@@ -44,30 +44,71 @@ var builtInMacro_ResetCode = []string{
 	" BPL .vbwait2",
 }
 
-var preGenMacros = map[string]macroTable.MacroTableType{}
-
-func init() {
-	generatedMacro := make(macroTable.MacroTableType, len(builtInMacro_ResetCode))
-	lineOperationParser := parser.NewOperationParser()
-
-	for i, bim := range builtInMacro_ResetCode {
-		lineOperationParser.Process(bim)
-		lineOperationParsedValues := lineOperationParser.GetLineOperationValues()
-		generatedMacro[i] = blockStack.CapturedLine{
-			OriginalLine: bim,
-			LineOperationParsedValues: util.LineOperationParsedValues{
-				OperationLabel:       lineOperationParsedValues.OperationLabel,
-				OperationTokenEnum:   lineOperationParsedValues.OperationTokenEnum,
-				OperationTokenValue:  lineOperationParsedValues.OperationTokenValue,
-				OperandStartPosition: lineOperationParsedValues.OperandStartPosition,
-				ParentParserEnum:     lineOperationParsedValues.ParentParserEnum,
-			},
-		}
-	}
-	preGenMacros["__resetCode__"] = generatedMacro
+var builtInMacro_SetPPU = []string{
+	" .if \\# == 2",
+	" LDA \\1",
+	" STA $2006",
+	" LDA \\2",
+	" STA $2006",
+	" .elseif \\# == 1",
+	" LDA #high(\\1)",
+	" STA $2006",
+	" LDA #low(\\1)",
+	" STA $2006",
+	" .else",
+	" .throw \"Too many arguments for predefined __setPPU__ macro!\" ",
+	" .endif",
 }
 
+type predefMacro struct {
+	name  string
+	lines *[]string
+}
+
+func newPredefMacro(name string, lines *[]string) predefMacro {
+	return predefMacro{
+		name:  name,
+		lines: lines,
+	}
+}
+
+var macrozzz = []predefMacro{
+	newPredefMacro("__resetCode__", &builtInMacro_ResetCode),
+	newPredefMacro("__setPPU__", &builtInMacro_SetPPU),
+}
+
+var preGenMacros = map[string]macroTable.MacroTableType{}
+
+// -------------------------------------------------
+
+func init() {
+	for _, m := range macrozzz {
+		generatedMacro := make(macroTable.MacroTableType, len(*m.lines))
+		lineOperationParser := parser.NewOperationParser()
+
+		for i, bim := range *m.lines {
+			lineOperationParser.Process(bim)
+			lineOperationParsedValues := lineOperationParser.GetLineOperationValues()
+			generatedMacro[i] = blockStack.CapturedLine{
+				OriginalLine: bim,
+				LineOperationParsedValues: util.LineOperationParsedValues{
+					OperationLabel:       lineOperationParsedValues.OperationLabel,
+					OperationTokenEnum:   lineOperationParsedValues.OperationTokenEnum,
+					OperationTokenValue:  lineOperationParsedValues.OperationTokenValue,
+					OperandStartPosition: lineOperationParsedValues.OperandStartPosition,
+					ParentParserEnum:     lineOperationParsedValues.ParentParserEnum,
+				},
+			}
+		}
+		preGenMacros[m.name] = generatedMacro
+	}
+}
+
+// ===================================================
+
 func AddPregensToMacroTable() {
-	environment.AddOtherIdentifierToMasterTable("__resetCode__", enumSymbolTableTypes.Macro)
-	macroTable.AddCapturedLinesToMacro("__resetCode__", macroTable.Macro, preGenMacros["__resetCode__"])
+	for _, m := range macrozzz {
+		environment.AddOtherIdentifierToMasterTable(m.name, enumSymbolTableTypes.Macro)
+		macroTable.AddCapturedLinesToMacro(m.name, macroTable.Macro, preGenMacros[m.name])
+	}
 }
