@@ -23,12 +23,14 @@ type unresolvedEntry struct {
 	fileName           string
 	lineNumber         uint8
 	lineContent        string
+	isBranch           bool
+	isBigEndian        bool
 }
 
 var unresolvedSymbolTable = []unresolvedEntry{}
 var unresolvedRomTable = []unresolvedEntry{}
 
-func newUnresolvedEntry(node Node, neededBytes int) unresolvedEntry {
+func newUnresolvedEntry(node Node, neededBytes int, isBranch bool, isBigEndian bool) unresolvedEntry {
 	fileData := fileStack.GetTopOfFileStack()
 	return unresolvedEntry{
 		originalRomSegment: romBuilder.GetRomSegmentIndex(),
@@ -40,16 +42,18 @@ func newUnresolvedEntry(node Node, neededBytes int) unresolvedEntry {
 		fileName:           fileData.FileName,
 		lineNumber:         uint8(fileData.CurrentLineNumber),
 		lineContent:        fileData.ProcessedLines[fileData.CurrentLineNumber-1],
+		isBranch:           isBranch,
+		isBigEndian:        isBigEndian,
 	}
 }
 
 func AddUnresolvedSymbol(node Node) {
-	unresolvedSymbolTable = append(unresolvedSymbolTable, newUnresolvedEntry(node, 0))
+	unresolvedSymbolTable = append(unresolvedSymbolTable, newUnresolvedEntry(node, 0, false, false))
 	return
 }
 
-func AddUnresolvedRomEntry(node Node, mustResolveSize int) {
-	unresolvedRomTable = append(unresolvedRomTable, newUnresolvedEntry(node, mustResolveSize))
+func AddUnresolvedRomEntry(node Node, mustResolveSize int, isBranch bool, isBigEndian bool) {
+	unresolvedRomTable = append(unresolvedRomTable, newUnresolvedEntry(node, mustResolveSize, isBranch, isBigEndian))
 	return
 }
 
@@ -108,7 +112,7 @@ func ResolvedUnresolvedRomEntries() error {
 			continue
 		}
 
-		asRomData, err := nodesToBytes.ConvertNodeValueToUInts(evaluatedNode, entry.neededBytes, false, true)
+		asRomData, err := nodesToBytes.ConvertNodeValueToUInts(evaluatedNode, entry.neededBytes, entry.isBranch, entry.isBigEndian, true)
 		if err != nil {
 			continue
 		}

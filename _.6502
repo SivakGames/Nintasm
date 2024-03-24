@@ -23,14 +23,19 @@ RESET:
 
 NMI:
 
+
 	LDA #2
 	BEQ .xxx
 
-	.repeat 33
-	.db 1,2,3,4
-	.endrepeat
+	LDX #2
+
+	.repeat 129
+	.db 1
+	.endrepeat 
+	LDX #2
 
 .xxx:
+
 	RTS
 
 

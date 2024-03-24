@@ -16,14 +16,15 @@ type Node = operandFactory.Node
 //------------------------------------------
 
 func AddInstructionOperandToRom(operand Node, operandByteSize int, instructionMode enumInstructionModes.Def) error {
-	asRomData, err := nodesToBytes.ConvertNodeValueToUInts(operand, operandByteSize, false, true)
+	isBranch := instructionMode == enumInstructionModes.REL
+	asRomData, err := nodesToBytes.ConvertNodeValueToUInts(operand, operandByteSize, isBranch, false, true)
 	if err != nil {
 		return err // ❌ Fails
 	}
 
 	// Will try and resolve again in pass 2
 	if !operand.Resolved {
-		unresolvedTable.AddUnresolvedRomEntry(operand, operandByteSize)
+		unresolvedTable.AddUnresolvedRomEntry(operand, operandByteSize, isBranch, false)
 	}
 
 	//Warning about string operands used for modes that aren't immediate
@@ -42,14 +43,14 @@ func AddInstructionOperandToRom(operand Node, operandByteSize int, instructionMo
 //------------------------------------------
 
 func AddRawBytesToRom(operand Node, operandByteSize int, isBigEndian bool) error {
-	asRomData, err := nodesToBytes.ConvertNodeValueToUInts(operand, operandByteSize, isBigEndian, false)
+	asRomData, err := nodesToBytes.ConvertNodeValueToUInts(operand, operandByteSize, false, isBigEndian, false)
 	if err != nil {
 		return err // ❌ Fails
 	}
 
 	// Will try and resolve again in pass 2
 	if !operand.Resolved {
-		unresolvedTable.AddUnresolvedRomEntry(operand, operandByteSize)
+		unresolvedTable.AddUnresolvedRomEntry(operand, operandByteSize, false, isBigEndian)
 	}
 
 	err = romBuilder.AddBytesToRom(asRomData)

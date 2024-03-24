@@ -59,6 +59,9 @@ func ValidateNumericNodeIsPositive(node *Node) bool {
 func ValidateNumericNodeIsGTZero(node *Node) bool {
 	return node.AsNumber > 0
 }
+func ValidateNumericNodeIsSigned8BitValue(node *Node) bool {
+	return node.AsNumber > -0x00081 && node.AsNumber < 0x00080
+}
 func ValidateNumericNodeIs8BitValue(node *Node) bool {
 	return node.AsNumber > -0x00100 && node.AsNumber < 0x00100
 }

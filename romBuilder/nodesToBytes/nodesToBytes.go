@@ -13,7 +13,7 @@ type Node = operandFactory.Node
 //------------------------------------------
 
 // Convert into bytes for ROM data
-func ConvertNodeValueToUInts(node Node, operandByteSize int, isBigEndian bool, isExact bool) ([]uint8, error) {
+func ConvertNodeValueToUInts(node Node, operandByteSize int, isBranch bool, isBigEndian bool, isExact bool) ([]uint8, error) {
 	var lowByte, highByte int = 0, 0
 
 	convertedValue := make([]uint8, 0)
@@ -32,22 +32,26 @@ func ConvertNodeValueToUInts(node Node, operandByteSize int, isBigEndian bool, i
 
 	switch node.NodeType {
 	case enumNodeTypes.NumericLiteral:
-		if !operandFactory.ValidateNodeIsInt(&node) {
-			errorHandler.AddNew(enumErrorCodes.ResolvedValueNotInt, node.AsNumber, int(node.AsNumber))
-
-		}
-
 		highByte = (int(node.AsNumber) & 0x0ff00) >> 8
 		lowByte = int(node.AsNumber) & 0x000ff
 
+		//Floats with any decimal points warn
+		if !operandFactory.ValidateNodeIsInt(&node) {
+			errorHandler.AddNew(enumErrorCodes.ResolvedValueNotInt, node.AsNumber, int(node.AsNumber))
+		}
+
 		switch operandByteSize {
 		case 1:
-			if node.AsNumber < -0x000ff || node.AsNumber > 0x000ff {
+			if !operandFactory.ValidateNumericNodeIs8BitValue(&node) {
 				return nil, errorHandler.AddNew(enumErrorCodes.ResolvedValueNot8Bit, int(node.AsNumber)) // ❌ Fails
 			}
+			if isBranch && !operandFactory.ValidateNumericNodeIsSigned8BitValue(&node) {
+				return nil, errorHandler.AddNew(enumErrorCodes.ResolvedValueBranchTooFar, int(node.AsNumber)) // ❌ Fails
+			}
+
 			convertedValue = append(convertedValue, uint8(lowByte))
 		case 2:
-			if node.AsNumber < -0x0ffff || node.AsNumber > 0x0ffff {
+			if !operandFactory.ValidateNumericNodeIs16BitValue(&node) {
 				return nil, errorHandler.AddNew(enumErrorCodes.ResolvedValueNot16Bit, int(node.AsNumber)) // ❌ Fails
 			}
 			if !isBigEndian {
@@ -101,7 +105,7 @@ func ConvertNodeValueToUInts(node Node, operandByteSize int, isBigEndian bool, i
 
 	case enumNodeTypes.MultiByte:
 		for _, n := range *node.ArgumentList {
-			subValue, err := ConvertNodeValueToUInts(n, operandByteSize, isBigEndian, false)
+			subValue, err := ConvertNodeValueToUInts(n, operandByteSize, isBranch, isBigEndian, false)
 			if err != nil {
 				return nil, err
 			}
