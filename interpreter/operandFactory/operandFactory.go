@@ -3,7 +3,6 @@ package operandFactory
 import (
 	"fmt"
 	enumNodeTypes "misc/nintasm/constants/enums/nodeTypes"
-	"strconv"
 	"strings"
 )
 
@@ -162,7 +161,7 @@ func CreateBooleanLiteralNode(asBool bool) Node {
 
 // Numbers
 func CreateNumericLiteralNode(asNumber int) Node {
-	node := newNode(strconv.Itoa(asNumber), enumNodeTypes.NumericLiteral)
+	node := newNode(fmt.Sprintf("%d", asNumber), enumNodeTypes.NumericLiteral)
 	node.AsNumber = asNumber
 	node.Resolved = true
 	return node
