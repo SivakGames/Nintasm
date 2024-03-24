@@ -24,13 +24,13 @@ func Start(initialInputFile string) error {
 	var err error
 
 	predefSymbols.AddPregensToMacroTable()
-
-	fmt.Println("=========Pass 1=========")
-
 	err = fileHandler.GetFirstInputFile(initialInputFile)
 	if err != nil {
 		return err
 	}
+
+	fmt.Println("=========Pass 1=========")
+
 	err = startReadingLinesTopFileStack()
 	if err != nil {
 		return err

@@ -6,7 +6,7 @@ import (
 )
 
 func GenerateRomBinFile() (string, error) {
-	outFileName := fileHandler.AddRelativePathIncludeFileName("output.nes")
+	outFileName := fileHandler.GenerateOutFileName()
 	file, err := os.OpenFile(outFileName, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
 	if err != nil {
 		return "", err

@@ -25,8 +25,7 @@ NMI:
 
 
 	LDA #2
-	BEQ .xxx
-
+	
 	LDX #2
 
 	.repeat 129
@@ -35,9 +34,6 @@ NMI:
 	
 	LDX #2
 
-.xxx:
-
-	bpl .yyy
 
 	RTS
 

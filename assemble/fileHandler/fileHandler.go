@@ -9,10 +9,12 @@ import (
 	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 var relativeFileDirectory string
 var TriggerNewStackCall bool = false
+var outFileName string = ""
 
 // ---------------------------------------------------
 
@@ -21,7 +23,7 @@ func GetFirstInputFile(inputFileName string) error {
 	var err error
 
 	// Get the directory part of the input file path
-	dir, base := filepath.Dir(inputFileName), filepath.Base(inputFileName)
+	dir, base, inFileExtension := filepath.Dir(inputFileName), filepath.Base(inputFileName), filepath.Ext(inputFileName)
 
 	// Check if the directory exists
 	_, err = os.Stat(dir)
@@ -38,11 +40,12 @@ func GetFirstInputFile(inputFileName string) error {
 	}
 
 	relativeFileDirectory = absPath
-
 	err = OpenInputFileAndPushLinesToStack(relativeFileDirectory + "/" + base)
 	if err != nil {
 		return err
 	}
+
+	outFileName = strings.TrimSuffix(base, inFileExtension) + ".nes"
 	return nil
 }
 
@@ -78,6 +81,12 @@ func OpenInputFileAndPushLinesToStack(inputFileName string) error {
 
 	fileStack.PushToTopOfStack(inputFileName, processedLines)
 	return nil
+}
+
+// --------------------------------
+
+func GenerateOutFileName() string {
+	return AddRelativePathIncludeFileName(outFileName)
 }
 
 // --------------------------------
