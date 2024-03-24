@@ -25,7 +25,7 @@ RESET:
 	.endrepeat
 
 NMI:
-	.repeat 7148
+	.repeat $1ef0
 	LDA #low(NMI)
 	.endrepeat
 
