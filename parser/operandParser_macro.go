@@ -42,7 +42,7 @@ func (mop *MacroOperandParser) Process(macroName string) error {
 	for i, operand := range operandList {
 		macroTable.AddToReplacementListOnTopOfStack(fmt.Sprintf("\\%d", i+1), operand.NodeValue)
 	}
-	macroTable.AddNumToReplacementListOnTopOfStack(fmt.Sprintf("%d", len(operandList)))
+	macroTable.AddNumArgsToReplacementListOnTopOfStack(fmt.Sprintf("%d", len(operandList)))
 
 	//Iterate over macro lines and apply replacements
 	for i := range mop.capturedLinesToUnpack {

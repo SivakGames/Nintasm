@@ -34,7 +34,7 @@ func AddToReplacementListOnTopOfStack(replaceName string, replaceValue string) {
 	current := GetReplacementListOnTopOfStack()
 	*current = append(*current, NewReplacer(replaceName, replaceValue))
 }
-func AddNumToReplacementListOnTopOfStack(replaceValue string) {
+func AddNumArgsToReplacementListOnTopOfStack(replaceValue string) {
 	current := GetReplacementListOnTopOfStack()
 	*current = append(*current, Replacer{
 		ReplaceRegex:  regexp.MustCompile(`\\#`),
