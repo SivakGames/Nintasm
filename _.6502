@@ -45,6 +45,15 @@ NMI:
 	RTI
 
 ;-----------------------------------------
+	.repeat 2, \i
+l".baba{NMI + 1}":
+	.db 5,6,7,8
+	.endRepeat
+
+ggg = {
+	1,2,3,4,
+	2,3,4,5,
+}
 
 	.org $fffa
 	.dw NMI, RESET, 0

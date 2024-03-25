@@ -9,6 +9,8 @@ const (
 	INIT_LINE_OTHER_CHARS
 	//Whitespace
 	WHITESPACE
+	//Template strings
+	TEMPLATE_STRING
 	//Strings
 	STRING
 	BACKTICK_STRING

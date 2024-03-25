@@ -24,6 +24,10 @@ type OperandParser struct {
 	Parser
 }
 
+func newOperandParser() OperandParser {
+	return OperandParser{}
+}
+
 //=============================================
 //=============================================
 // Main parser for operands starts here

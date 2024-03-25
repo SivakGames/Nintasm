@@ -1,7 +1,6 @@
 package directiveHandler
 
 import (
-	"fmt"
 	"misc/nintasm/assemble/blockStack"
 	"misc/nintasm/assemble/errorHandler"
 	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
@@ -44,7 +43,6 @@ func evalDefault(directiveName string, operandList *[]Node) error {
 
 	baseSwitchEntry := blockStack.GetCurrentCaptureBlock()
 	baseSwitchNode := (*baseSwitchEntry).OperandList[0]
-	fmt.Println(baseSwitchNode)
 
 	*operandList = append(*operandList, baseSwitchNode)
 	blockStack.CreateNewAlternateForCaptureBlock(directiveName, *operandList)

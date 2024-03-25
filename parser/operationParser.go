@@ -141,6 +141,10 @@ func (p *OperationParser) getRegularOperation() error {
 // Line has no whitespace at the start
 func (p *OperationParser) getLabelOperation() error {
 
+	if p.lookaheadType == enumTokenTypes.TEMPLATE_STRING {
+		p.getTemplateString(p.lookaheadValue)
+	}
+
 	// Check for local label
 	isLocal := p.lookaheadType == enumTokenTypes.DELIMITER_period
 	if isLocal {

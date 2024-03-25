@@ -28,6 +28,9 @@ var (
 	commentSpec = []specRegexEnum{
 		{regexp.MustCompile(`^;.*`), enumTokenTypes.None},
 	}
+	templateStringSpec = []specRegexEnum{
+		{regexp.MustCompile(`^l\"[^\"]*\"`), enumTokenTypes.TEMPLATE_STRING},
+	}
 	stringSpec = []specRegexEnum{
 		{regexp.MustCompile(`^\"[^\"]*\"`), enumTokenTypes.STRING},
 		{regexp.MustCompile(`^\'[^\']*\'`), enumTokenTypes.STRING},
@@ -119,13 +122,14 @@ var (
 	CombinedInitialSpec   []specRegexEnum
 	CombinedStartLineSpec []specRegexEnum
 	CombinedOperandSpec   []specRegexEnum
-	IndirectCapturingSpec []specRegexEnum
+	TemplateStringSpec    []specRegexEnum
 )
 
 // Generate the combined specs
 func init() {
 	CombinedInitialSpec = append(commentSpec, whitespaceAcknowledgeSpec...)
-	CombinedInitialSpec = append(CombinedInitialSpec, commentSpec...)
+	//	CombinedInitialSpec = append(CombinedInitialSpec, commentSpec...)
+	CombinedInitialSpec = append(CombinedInitialSpec, templateStringSpec...)
 	CombinedInitialSpec = append(CombinedInitialSpec, stringSpec...)
 	CombinedInitialSpec = append(CombinedInitialSpec, initialLineAnythingSpec...)
 
@@ -133,20 +137,20 @@ func init() {
 	CombinedStartLineSpec = append(CombinedStartLineSpec, delimiterSpec...)
 	CombinedStartLineSpec = append(CombinedStartLineSpec, instructionSpec...)
 	CombinedStartLineSpec = append(CombinedStartLineSpec, directiveSpec...)
+	CombinedStartLineSpec = append(CombinedStartLineSpec, templateStringSpec...)
 	CombinedStartLineSpec = append(CombinedStartLineSpec, remainingSpec...)
 	CombinedStartLineSpec = append(CombinedStartLineSpec, stringSpec...)
 
 	CombinedOperandSpec = append(commentSpec, whitespaceIgnoreSpec...)
 	CombinedOperandSpec = append(CombinedOperandSpec, delimiterSpec...)
 	CombinedOperandSpec = append(CombinedOperandSpec, instructionSpec...)
+	CombinedOperandSpec = append(CombinedOperandSpec, templateStringSpec...)
 	CombinedOperandSpec = append(CombinedOperandSpec, remainingSpec...)
 	CombinedOperandSpec = append(CombinedOperandSpec, stringSpec...)
 
-	// IndirectCapturingSpec = append(commentSpec, whitespaceAcknowledgeSpec...)
-	// IndirectCapturingSpec = append(IndirectCapturingSpec, delimiterSpec...)
-	// IndirectCapturingSpec = append(IndirectCapturingSpec, stringSpec...)
-	// IndirectCapturingSpec = append(IndirectCapturingSpec, indirectCapturingDelimiterspec...)
-
+	TemplateStringSpec = append(commentSpec, whitespaceAcknowledgeSpec...)
+	TemplateStringSpec = append(TemplateStringSpec, delimiterSpec...)
+	TemplateStringSpec = append(TemplateStringSpec, remainingSpec...)
 }
 
 // ================================================
@@ -159,8 +163,8 @@ func GenerateSpec(specType string) []specRegexEnum {
 		return CombinedStartLineSpec
 	case "operand":
 		return CombinedOperandSpec
-		//case "indirectCapturing":
-		//	return IndirectCapturingSpec
+	case "templateString":
+		return TemplateStringSpec
 	}
 	panic("🛑 UNKNOWN TOKENIZER SPEC NAME")
 }

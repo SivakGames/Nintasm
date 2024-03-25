@@ -1,7 +1,6 @@
 package parser
 
 import (
-	"fmt"
 	"misc/nintasm/assemble/errorHandler"
 	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
 	enumTokenTypes "misc/nintasm/constants/enums/tokenTypes"
@@ -19,7 +18,7 @@ type Parser struct {
 	tokenizer      tokenizer.Tokenizer
 }
 
-func New() Parser {
+func newParser() Parser {
 	return Parser{
 		hasMore:        false,
 		lookaheadType:  enumTokenTypes.None,
@@ -27,6 +26,8 @@ func New() Parser {
 		tokenizer:      tokenizer.New(),
 	}
 }
+
+// ====================================================
 
 // Should be called upon first starting parsing
 // Will setup the tokenizer and get the tokenizer in position for the next token
@@ -56,7 +57,6 @@ func (p *Parser) eat(desiredTokenType tokenEnum) error {
 
 	}
 	if p.lookaheadType != desiredTokenType {
-		fmt.Println(p.lookaheadValue)
 		return errorHandler.AddNew(enumErrorCodes.ParserUnexpectedToken, p.lookaheadValue) // ❌ Fails
 	}
 	return nil
@@ -95,5 +95,11 @@ func (p *OperandParser) SetupOperandParser(line string, operandListStringStartPo
 	if err != nil {
 		return err
 	}
+	return nil
+}
+
+// Template string parsing
+func (p *Parser) getTemplateString(tokenValue string) error {
+	templateStringParser.parseTemplateString(tokenValue)
 	return nil
 }

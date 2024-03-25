@@ -10,7 +10,7 @@ import (
 
 func ConvertNodeToNumericLiteral(node *Node) {
 	node.NodeType = enumNodeTypes.NumericLiteral
-	node.NodeValue = fmt.Sprintf("%f", node.AsNumber)
+	node.NodeValue = fmt.Sprintf("%d", int(node.AsNumber))
 	node.Resolved = true
 	node.ArgumentList = nil
 	return
