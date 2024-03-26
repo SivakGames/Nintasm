@@ -103,7 +103,7 @@ func (p *OperationParser) getRegularOperation() error {
 			parentParserEnum = enumParserTypes.Directive
 			break
 		}
-		return errorHandler.AddNew(enumErrorCodes.OperationDirectiveUnknown) // ❌ Fails
+		return errorHandler.AddNew(enumErrorCodes.OperationDirectiveUnknown, p.lookaheadValue) // ❌ Fails
 
 	case enumTokenTypes.IDENTIFIER:
 		parentParserEnum = enumParserTypes.Macro

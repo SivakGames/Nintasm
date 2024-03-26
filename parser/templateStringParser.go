@@ -41,7 +41,7 @@ func (p *Parser) parseTemplateString(templateString string) (string, error) {
 	}
 
 	if !p.tokenizer.IsTokenIdentifierLike(identifierToValidate) {
-		return templateString, errorHandler.AddNew(enumErrorCodes.ParserTemplateStringNotIdentifier, identifierToValidate)
+		return templateString, errorHandler.AddNew(enumErrorCodes.ParserTemplateStringNotIdentifier, identifierString)
 	}
 
 	return identifierString, nil

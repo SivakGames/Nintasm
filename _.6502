@@ -44,15 +44,14 @@ NMI:
 	STA $2006
 	RTI
 
-.aa:
 
 ;-----------------------------------------
 	.repeat 4, \i
 l".baba{\i}":
-	.db \i,\i+1
+	.db \i
 	.endRepeat
 
-	.db 767777
+	.db 76
 
 	.org $fffa
 	.dw NMI, RESET, 0

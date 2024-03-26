@@ -21,6 +21,9 @@ func newErrorTableEntry(severity enumErrorCodes.Severity, description string) Er
 	}
 }
 
+func highlight(s string) string {
+	return util.Colorize(s, enumTerminalColors.Yellow, false)
+}
 func coloredSymbol(s string) string {
 	return util.Colorize(s, enumTerminalColors.LightCyan, false)
 }
@@ -53,12 +56,12 @@ var errorTable = map[enumErrorCodes.Def]ErrorTableEntry{
 
 	enumErrorCodes.ParserEndOfInput:                  newErrorTableEntry(enumErrorCodes.Error, "Parsing error - Unexpected end of input!"),
 	enumErrorCodes.OperandStatementEmpty:             newErrorTableEntry(enumErrorCodes.Error, "Parsing error - Operand is missing!"),
-	enumErrorCodes.ParserUnexpectedToken:             newErrorTableEntry(enumErrorCodes.Error, fmt.Sprintf("Parsing error - Unexpected token: %v", coloredSymbol("%v"))),
+	enumErrorCodes.ParserUnexpectedToken:             newErrorTableEntry(enumErrorCodes.Error, fmt.Sprintf("Parsing error - Unexpected token: %v", highlight("%v"))),
 	enumErrorCodes.ParserTemplateStringNotIdentifier: newErrorTableEntry(enumErrorCodes.Error, fmt.Sprintf("Template string resolved to %v which is not a valid identifier!", coloredSymbol("%v"))),
 
 	enumErrorCodes.OperationUNKNOWN:                 newErrorTableEntry(enumErrorCodes.Error, "UNKNOWN OPERATION"),
 	enumErrorCodes.OperationBadTokenAfter:           newErrorTableEntry(enumErrorCodes.Error, "ILLEGAL token(s) after operation: %v"),
-	enumErrorCodes.OperationDirectiveUnknown:        newErrorTableEntry(enumErrorCodes.Error, "Operation parsing failed - Unknown directive!"),
+	enumErrorCodes.OperationDirectiveUnknown:        newErrorTableEntry(enumErrorCodes.Error, fmt.Sprintf("Operation parsing failed - Unknown directive! .%v", coloredDirective("%v"))),
 	enumErrorCodes.OperationEmpty:                   newErrorTableEntry(enumErrorCodes.Error, "Operation parsing failed - UNEXPECTED EMPTY OPERATION"),
 	enumErrorCodes.OperationLabelBadTokenAfter:      newErrorTableEntry(enumErrorCodes.Error, "ILLEGAL token(s) after labeled operation: %v"),
 	enumErrorCodes.OperationLabelMissingColon:       newErrorTableEntry(enumErrorCodes.Error, "Incomplete label/labeled operation - either needs colon or directive"),

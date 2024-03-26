@@ -25,6 +25,18 @@ func NewLabelOperandParser() LabelOperandParser {
 }
 
 func (p *LabelOperandParser) Process(operationTokenEnum tokenEnum, operationLabel string) error {
+	err := p.doProcess(operationTokenEnum, operationLabel)
+	if err != nil {
+		err := errorHandler.CheckErrorContinuesUpwardPropagation(err, enumErrorCodes.Error)
+		if err != nil {
+			return err // ❌❌ CONTINUES Failing!
+		}
+		return nil
+	}
+	return nil
+}
+
+func (p *LabelOperandParser) doProcess(operationTokenEnum tokenEnum, operationLabel string) error {
 	if operationTokenEnum == enumTokenTypes.TEMPLATE_STRING {
 		newLabel, err := p.getTemplateString(operationLabel)
 		if err != nil {

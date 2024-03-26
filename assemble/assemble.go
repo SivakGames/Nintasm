@@ -7,6 +7,7 @@ import (
 	"misc/nintasm/assemble/errorHandler"
 	"misc/nintasm/assemble/fileHandler"
 	"misc/nintasm/assemble/fileStack"
+	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
 	"misc/nintasm/interpreter/environment/predefSymbols"
 	"misc/nintasm/interpreter/environment/unresolvedTable"
 	"misc/nintasm/parser"
@@ -88,8 +89,13 @@ func ReadLines(lines *[]string, lineCounter *uint) error {
 		//Step 2 - determine line op
 		lineOperationErr := lineOperationParser.Process(reformattedLine)
 		if lineOperationErr != nil {
-			return lineOperationErr
+			lineOperationErr := errorHandler.CheckErrorContinuesUpwardPropagation(lineOperationErr, enumErrorCodes.Error)
+			if lineOperationErr != nil {
+				return lineOperationErr // ❌❌ CONTINUES Failing!
+			}
+			continue
 		}
+
 		lineOperationParsedValues := lineOperationParser.GetLineOperationValues()
 
 		//Intermediate - determine if capturing things in a block stack
