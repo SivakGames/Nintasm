@@ -18,9 +18,10 @@ const (
 
 	TokenizerUnknownIllegalToken = "TokenizerUnknownIllegalToken"
 
-	ParserEndOfInput      = "ParserEndOfInput"
-	OperandStatementEmpty = "OperandStatementEmpty"
-	ParserUnexpectedToken = "ParserUnexpectedToken"
+	ParserEndOfInput                  = "ParserEndOfInput"
+	OperandStatementEmpty             = "OperandStatementEmpty"
+	ParserUnexpectedToken             = "ParserUnexpectedToken"
+	ParserTemplateStringNotIdentifier = "ParserTemplateStringNotIdentifier"
 
 	OperationBadTokenAfter           = "OperationBadTokenAfter"
 	OperationDirectiveUnknown        = "OperationDirectiveUnknown"

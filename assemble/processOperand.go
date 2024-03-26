@@ -65,7 +65,6 @@ func parseAndProcessOperandString(
 		}
 		operandParserErr = labelOperandParser.Process(
 			lineOperationParsedValues.OperationTokenEnum,
-			lineOperationParsedValues.OperationTokenValue,
 			lineOperationParsedValues.OperationLabel,
 		)
 		if operandParserErr != nil {

@@ -62,6 +62,17 @@ func (p *Parser) eat(desiredTokenType tokenEnum) error {
 	return nil
 }
 
+// See if the next token type is the desired token to follow
+func (p *Parser) eatSilently(desiredTokenType tokenEnum) enumErrorCodes.Def {
+	if p.lookaheadType == enumTokenTypes.None {
+		return enumErrorCodes.ParserEndOfInput // ❌ Fails
+	}
+	if p.lookaheadType != desiredTokenType {
+		return enumErrorCodes.ParserUnexpectedToken // ❌ Fails
+	}
+	return enumErrorCodes.None
+}
+
 func (p *Parser) eatAndAdvance(desiredTokenType tokenEnum) error {
 	err := p.eat(desiredTokenType)
 	if err != nil {
@@ -99,7 +110,6 @@ func (p *OperandParser) SetupOperandParser(line string, operandListStringStartPo
 }
 
 // Template string parsing
-func (p *Parser) getTemplateString(tokenValue string) error {
-	templateStringParser.parseTemplateString(tokenValue)
-	return nil
+func (p *Parser) getTemplateString(tokenValue string) (string, error) {
+	return templateStringParser.parseTemplateString(tokenValue)
 }

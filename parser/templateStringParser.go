@@ -1,8 +1,12 @@
 package parser
 
 import (
-	"fmt"
+	"misc/nintasm/assemble/errorHandler"
+	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
 	enumTokenTypes "misc/nintasm/constants/enums/tokenTypes"
+	"misc/nintasm/interpreter"
+	"misc/nintasm/interpreter/environment"
+	"strings"
 )
 
 // --------------------------------------------------
@@ -13,7 +17,7 @@ var templateStringOperandParser = newOperandParser()
 // ==================================================
 
 // Template string parsing
-func (p *Parser) parseTemplateString(templateString string) error {
+func (p *Parser) parseTemplateString(templateString string) (string, error) {
 	templateLabel := templateString[2 : len(templateString)-1]
 	p.startAndAdvanceToNext(templateLabel, "templateString")
 	identifierString := ""
@@ -22,7 +26,7 @@ func (p *Parser) parseTemplateString(templateString string) error {
 		if p.lookaheadType == enumTokenTypes.DELIMITER_leftCurlyBrace {
 			o, err := p.getTemplateOperand()
 			if err != nil {
-				return err
+				return templateString, err
 			}
 			identifierString += o
 		} else {
@@ -30,26 +34,55 @@ func (p *Parser) parseTemplateString(templateString string) error {
 			p.eatFreelyAndAdvance(p.lookaheadType)
 		}
 	}
-	fmt.Println(identifierString)
-	return nil
+
+	identifierToValidate := identifierString
+	if strings.HasPrefix(identifierToValidate, ".") {
+		identifierToValidate = identifierToValidate[1:]
+	}
+
+	if !p.tokenizer.IsTokenIdentifierLike(identifierToValidate) {
+		return templateString, errorHandler.AddNew(enumErrorCodes.ParserTemplateStringNotIdentifier, identifierToValidate)
+	}
+
+	return identifierString, nil
 }
 
 func (p *Parser) getTemplateOperand() (string, error) {
-	p.eatFreelyAndAdvance(enumTokenTypes.DELIMITER_leftCurlyBrace)
+	var err error
+
+	err = p.eatFreelyAndAdvance(enumTokenTypes.DELIMITER_leftCurlyBrace)
+	if err != nil {
+		return "", err
+	}
+
 	operandString := ""
 	for p.lookaheadType != enumTokenTypes.DELIMITER_rightCurlyBrace {
 		operandString += p.lookaheadValue
 		p.eatFreelyAndAdvance(p.lookaheadType)
 	}
-	p.eatFreelyAndAdvance(enumTokenTypes.DELIMITER_rightCurlyBrace)
-
-	templateStringOperandParser.startAndAdvanceToNext(operandString, "operand")
-	node, err := templateStringOperandParser.GetOperandList(1, 1, false, []string{})
+	err = p.eatFreelyAndAdvance(enumTokenTypes.DELIMITER_rightCurlyBrace)
 	if err != nil {
-		return "", err
+		return operandString, err
 	}
 
-	fmt.Println(node)
+	err = templateStringOperandParser.startAndAdvanceToNext(operandString, "operand")
+	if err != nil {
+		return operandString, err
+	}
 
-	return node[0].NodeValue, nil
+	operandList, err := templateStringOperandParser.GetOperandList(1, 1, true, []string{})
+	if err != nil {
+		return operandString, err
+	}
+
+	unresolvedFlag := environment.GetUnresolvedSilentErrorFlag()
+	environment.ClearUnresolvedSilentErrorFlag()
+	defer environment.SetUnresolvedSilentErrorFlagTo(unresolvedFlag)
+
+	evaluatedNode, err := interpreter.EvaluateNode(operandList[0])
+	if err != nil {
+		return operandString, err
+	}
+
+	return evaluatedNode.NodeValue, nil
 }

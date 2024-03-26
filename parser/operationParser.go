@@ -140,38 +140,44 @@ func (p *OperationParser) getRegularOperation() error {
 // LABEL OPERATION
 // Line has no whitespace at the start
 func (p *OperationParser) getLabelOperation() error {
-
-	if p.lookaheadType == enumTokenTypes.TEMPLATE_STRING {
-		p.getTemplateString(p.lookaheadValue)
-	}
-
+	// Check for template label
+	isTemplate := p.lookaheadType == enumTokenTypes.TEMPLATE_STRING
 	// Check for local label
 	isLocal := p.lookaheadType == enumTokenTypes.DELIMITER_period
+	// Label itself
+	operationLabel := p.lookaheadValue
+
+	finalTokenEnum := enumTokenTypes.IDENTIFIER
+
 	if isLocal {
 		err := p.eatFreelyAndAdvance(enumTokenTypes.DELIMITER_period)
 		if err != nil {
 			return err
 		}
-
-	}
-
-	// Label itself has been determined
-	operationLabel := p.lookaheadValue
-	if isLocal {
-		operationLabel = "." + operationLabel
+		operationLabel += p.lookaheadValue
 	}
 
 	//⭐⭐ We JUST try to eat first ⭐⭐
-	//Will expect an identifier to signify a label...
-	err := p.eat(enumTokenTypes.IDENTIFIER)
-	if err != nil {
-		//⚠️ ... but in the case of a LOCAL label, label-likes ARE allowed
-		if !isLocal || !p.tokenizer.IsTokenIdentifierLike(operationLabel) {
-			return err
+
+	//Will expect an identifier to signify a label
+	enumErrCode := p.eatSilently(enumTokenTypes.IDENTIFIER)
+	if enumErrCode != enumErrorCodes.None {
+		//⚠️ in the case of a LOCAL label, label-likes ARE allowed
+		if isLocal {
+			if !p.tokenizer.IsTokenIdentifierLike(operationLabel) {
+				return errorHandler.AddNew(enumErrCode, p.lookaheadValue)
+			}
+		} else if isTemplate {
+			err := p.eat(enumTokenTypes.TEMPLATE_STRING)
+			if err != nil {
+				return err
+			}
+			finalTokenEnum = enumTokenTypes.TEMPLATE_STRING
 		}
+
 	}
 
-	err = p.advanceToNext()
+	err := p.advanceToNext()
 	if err != nil {
 		return err
 	}
@@ -190,7 +196,7 @@ func (p *OperationParser) getLabelOperation() error {
 		if p.lookaheadType == enumTokenTypes.None {
 			// 🟢 Label parsing succeeds
 			p.operationLabel = operationLabel
-			p.operationTokenEnum = enumTokenTypes.IDENTIFIER
+			p.operationTokenEnum = finalTokenEnum
 			p.operationTokenValue = ""
 			p.parentParserEnum = enumParserTypes.Label
 			return nil

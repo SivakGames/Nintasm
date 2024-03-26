@@ -66,8 +66,10 @@ func evalEndRepeat() error {
 		for i := 0; i < repeatAmount; i++ {
 			replaceNum := strconv.Itoa(i)
 			for _, j := range *capturedLines {
-				replaced := iterNameAsRegex.ReplaceAllString(j.OriginalLine, replaceNum)
-				j.OriginalLine = replaced
+				replacedOriginalLine := iterNameAsRegex.ReplaceAllString(j.OriginalLine, replaceNum)
+				replacedOperationLabel := iterNameAsRegex.ReplaceAllString(j.OperationLabel, replaceNum)
+				j.OriginalLine = replacedOriginalLine
+				j.OperationLabel = replacedOperationLabel
 				replacedLines[replacedIndex] = j
 				replacedIndex++
 			}

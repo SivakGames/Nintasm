@@ -51,9 +51,10 @@ var errorTable = map[enumErrorCodes.Def]ErrorTableEntry{
 
 	enumErrorCodes.TokenizerUnknownIllegalToken: newErrorTableEntry(enumErrorCodes.Error, "Unknown/Illegal token: %v"),
 
-	enumErrorCodes.ParserEndOfInput:      newErrorTableEntry(enumErrorCodes.Error, "Parsing error - Unexpected end of input!"),
-	enumErrorCodes.OperandStatementEmpty: newErrorTableEntry(enumErrorCodes.Error, "Parsing error - Operand is missing!"),
-	enumErrorCodes.ParserUnexpectedToken: newErrorTableEntry(enumErrorCodes.Error, fmt.Sprintf("Parsing error - Unexpected token: %v", coloredSymbol("%v"))),
+	enumErrorCodes.ParserEndOfInput:                  newErrorTableEntry(enumErrorCodes.Error, "Parsing error - Unexpected end of input!"),
+	enumErrorCodes.OperandStatementEmpty:             newErrorTableEntry(enumErrorCodes.Error, "Parsing error - Operand is missing!"),
+	enumErrorCodes.ParserUnexpectedToken:             newErrorTableEntry(enumErrorCodes.Error, fmt.Sprintf("Parsing error - Unexpected token: %v", coloredSymbol("%v"))),
+	enumErrorCodes.ParserTemplateStringNotIdentifier: newErrorTableEntry(enumErrorCodes.Error, fmt.Sprintf("Template string resolved to %v which is not a valid identifier!", coloredSymbol("%v"))),
 
 	enumErrorCodes.OperationUNKNOWN:                 newErrorTableEntry(enumErrorCodes.Error, "UNKNOWN OPERATION"),
 	enumErrorCodes.OperationBadTokenAfter:           newErrorTableEntry(enumErrorCodes.Error, "ILLEGAL token(s) after operation: %v"),
@@ -157,15 +158,15 @@ var errorTable = map[enumErrorCodes.Def]ErrorTableEntry{
 	enumErrorCodes.InterpreterFuncTooFewArgs:           newErrorTableEntry(enumErrorCodes.Error, "Too few arguments for %v function!"),
 	enumErrorCodes.InterpreterFuncTooManyArgs:          newErrorTableEntry(enumErrorCodes.Error, "Too many arguments for %v function!"),
 	enumErrorCodes.InterpreterFuncArgWrongType:         newErrorTableEntry(enumErrorCodes.Error, "Argument is wrong type for %v function"),
-	enumErrorCodes.InterpreterAlreadyDefined:           newErrorTableEntry(enumErrorCodes.Error, "Symbol %v has been previously defined! (Defined as %v)"),
-	enumErrorCodes.InterpreterSymbolNotFound:           newErrorTableEntry(enumErrorCodes.Error, "Symbol %v was not found and must be resolved!"),
+	enumErrorCodes.InterpreterAlreadyDefined:           newErrorTableEntry(enumErrorCodes.Error, fmt.Sprintf("Symbol %v has been previously defined! (Defined as %v)", coloredSymbol("%v"), coloredNumber("%v"))),
+	enumErrorCodes.InterpreterSymbolNotFound:           newErrorTableEntry(enumErrorCodes.Error, fmt.Sprintf("Symbol %v was not found and must be resolved!", coloredSymbol("%v"))),
 	enumErrorCodes.InterpreterIdentifierNotValueSymbol: newErrorTableEntry(enumErrorCodes.Error, "Identifier %v is not usable as a numeric value!"),
 
 	enumErrorCodes.BlockIsEmpty:                newErrorTableEntry(enumErrorCodes.Warning, "Block is empty..."),
 	enumErrorCodes.BlockOpUncapturableByParent: newErrorTableEntry(enumErrorCodes.Error, "%v - This operation is uncapturable by block"),
 
-	enumErrorCodes.ResolvedValueNot8Bit:         newErrorTableEntry(enumErrorCodes.Error, "Operand must resolve to an 8 bit value! Got: %d"),
-	enumErrorCodes.ResolvedValueNot16Bit:        newErrorTableEntry(enumErrorCodes.Error, "Operand must resolve to a 16 bit value! Got: %d"),
+	enumErrorCodes.ResolvedValueNot8Bit:         newErrorTableEntry(enumErrorCodes.Error, fmt.Sprintf("Operand must resolve to an 8 bit value! Got: %v", coloredNumber("%d"))),
+	enumErrorCodes.ResolvedValueNot16Bit:        newErrorTableEntry(enumErrorCodes.Error, fmt.Sprintf("Operand must resolve to a 16 bit value! Got: %v", coloredNumber("%d"))),
 	enumErrorCodes.ResolvedValueIsStringForInst: newErrorTableEntry(enumErrorCodes.Warning, "Operand has resolved as a string and not recommended for target instruction node"),
 	enumErrorCodes.ResolvedValueIsBool:          newErrorTableEntry(enumErrorCodes.Warning, "Operand has resolved as bool; Will be converted to: %d"),
 	enumErrorCodes.ResolvedValue16BitBool:       newErrorTableEntry(enumErrorCodes.Error, "Boolean value cannot be used as a 16 bit operand"),

@@ -19,7 +19,7 @@ type Tokenizer struct {
 }
 
 // Used for seeing if a value is label-like (used mainly for local labels to avoid token overlap)
-var identifierLikeRegex *regexp.Regexp = regexp.MustCompile("^[A-Za-z_][0-9A-Za-z_]*")
+var identifierLikeRegex *regexp.Regexp = regexp.MustCompile("^[A-Za-z_][0-9A-Za-z_]*$")
 
 func New() Tokenizer {
 	return Tokenizer{

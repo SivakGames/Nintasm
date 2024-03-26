@@ -128,3 +128,9 @@ func ClearUnresolvedSilentErrorFlag() {
 func GetUnresolvedSilentErrorFlag() bool {
 	return unresolvedAddsSilentError
 }
+func SetUnresolvedSilentErrorFlagTo(value bool) {
+	unresolvedAddsSilentError = value
+}
+func SetUnresolvedSilentErrorFlag() {
+	unresolvedAddsSilentError = true
+}

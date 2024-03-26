@@ -24,7 +24,16 @@ func NewLabelOperandParser() LabelOperandParser {
 	return LabelOperandParser{}
 }
 
-func (p *LabelOperandParser) Process(operationType tokenEnum, operationValue string, operationLabel string) error {
+func (p *LabelOperandParser) Process(operationTokenEnum tokenEnum, operationLabel string) error {
+	if operationTokenEnum == enumTokenTypes.TEMPLATE_STRING {
+		newLabel, err := p.getTemplateString(operationLabel)
+		if err != nil {
+			return err // ❌ Fails
+		}
+		operationLabel = newLabel
+		operationTokenEnum = enumTokenTypes.IDENTIFIER
+	}
+
 	isLocal := strings.HasPrefix(operationLabel, ".")
 	if isLocal {
 		_, err := interpreter.GetParentLabel()
@@ -33,7 +42,7 @@ func (p *LabelOperandParser) Process(operationType tokenEnum, operationValue str
 		}
 	}
 
-	switch operationType {
+	switch operationTokenEnum {
 	case enumTokenTypes.IDENTIFIER:
 		if !isLocal {
 			interpreter.OverwriteParentLabel(operationLabel)
