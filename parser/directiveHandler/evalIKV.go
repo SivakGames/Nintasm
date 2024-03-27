@@ -56,6 +56,7 @@ func evalEndIkv(operandList *[]Node) error {
 	for _, md := range macroData {
 		for _, replacementListItem := range *replacementList {
 			md.OriginalLine = replacementListItem.ReplaceRegex.ReplaceAllLiteralString(md.OriginalLine, replacementListItem.ReplaceString)
+			md.OperationLabel = replacementListItem.ReplaceRegex.ReplaceAllLiteralString(md.OperationLabel, replacementListItem.ReplaceString)
 		}
 		modifiedCapturedLines = append(modifiedCapturedLines, md)
 	}

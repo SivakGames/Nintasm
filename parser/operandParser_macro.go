@@ -63,6 +63,7 @@ func (mop *MacroOperandParser) ApplyReplacementsToCapturedLine(capturedLineIndex
 
 	for _, replacementListItem := range *replacementList {
 		replacedCapturedLine.OriginalLine = replacementListItem.ReplaceRegex.ReplaceAllLiteralString(replacedCapturedLine.OriginalLine, replacementListItem.ReplaceString)
+		replacedCapturedLine.OperationLabel = replacementListItem.ReplaceRegex.ReplaceAllLiteralString(replacedCapturedLine.OperationLabel, replacementListItem.ReplaceString)
 	}
 
 	return replacedCapturedLine
