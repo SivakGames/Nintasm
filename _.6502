@@ -22,6 +22,7 @@
 RESET:
 	__resetCode__
 
+	.dw 2 + 2
 
 RESET_end:
 	;Enable NMI

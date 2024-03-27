@@ -42,6 +42,18 @@ func ConvertNodeToMultiBytes(node *Node, mutliBytes []Node) {
 	return
 }
 
+func ConvertNodeToEmpty(node *Node) {
+	node.NodeType = enumNodeTypes.Empty
+	node.Resolved = true
+	node.NodeValue = ""
+	node.AsBool = false
+	node.AsNumber = 0
+	node.Left = nil
+	node.Right = nil
+	node.ArgumentList = nil
+	return
+}
+
 //-----------------------------------
 //Special node for branch instructions
 

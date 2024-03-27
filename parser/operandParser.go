@@ -112,6 +112,13 @@ func (p *OperandParser) getOperandAndAppend(operandList *[]Node, captureMasks *[
 		if err != nil {
 			return err // ❌❌ CONTINUES Failing!
 		}
+		if operandFactory.ValidateNodeIsError(&operand) {
+			err := p.eatFreelyAndAdvance(p.lookaheadType)
+			if err != nil {
+				return err
+			}
+			operandFactory.ConvertNodeToEmpty(&operand)
+		}
 	}
 
 	if p.lookaheadType == enumTokenTypes.DELIMITER_comma ||

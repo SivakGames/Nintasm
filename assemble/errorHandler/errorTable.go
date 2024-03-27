@@ -69,14 +69,14 @@ var errorTable = map[enumErrorCodes.Def]ErrorTableEntry{
 	enumErrorCodes.OperationLabeledDirectiveUnknown: newErrorTableEntry(enumErrorCodes.Error, "Operation parsing failed - Unknown labeled directive!"),
 
 	enumErrorCodes.OperandListStartingComma:       newErrorTableEntry(enumErrorCodes.Error, "Operand list cannot start with a comma!"),
-	enumErrorCodes.OperandListTooMany:             newErrorTableEntry(enumErrorCodes.Error, "Too many operands for operation! Takes at most: %d"),
-	enumErrorCodes.OperandListTooFew:              newErrorTableEntry(enumErrorCodes.Error, "Too few operands for operation! Needs at least: %d"),
+	enumErrorCodes.OperandListTooMany:             newErrorTableEntry(enumErrorCodes.Error, fmt.Sprintf("Too many operands for operation! Takes at most: %v", coloredNumber("%d"))),
+	enumErrorCodes.OperandListTooFew:              newErrorTableEntry(enumErrorCodes.Error, fmt.Sprintf("Too few operands for operation! Needs at least: %v", coloredNumber("%d"))),
 	enumErrorCodes.OperandBadCalleeName:           newErrorTableEntry(enumErrorCodes.Error, "Illegal functional callee name: %v"),
 	enumErrorCodes.OperandMisplacedLiteral:        newErrorTableEntry(enumErrorCodes.Error, "Misplaced literal - %v"),
 	enumErrorCodes.OperandMisplacedIdentifier:     newErrorTableEntry(enumErrorCodes.Error, "Misplaced identifier - %v"),
 	enumErrorCodes.OperandMissingPrimaryExpr:      newErrorTableEntry(enumErrorCodes.Error, "No primary expression found"),
 	enumErrorCodes.OperandPeriodMissingIdentifier: newErrorTableEntry(enumErrorCodes.Error, "Identifier must follow period!"),
-	enumErrorCodes.OperandBadPrimaryExpr:          newErrorTableEntry(enumErrorCodes.Error, "Bad primary expression - %v"),
+	enumErrorCodes.OperandBadPrimaryExpr:          newErrorTableEntry(enumErrorCodes.Error, fmt.Sprintf("Bad primary expression - %v", highlight("%v"))),
 
 	enumErrorCodes.NodeTypeNotBool:           newErrorTableEntry(enumErrorCodes.Error, "Value must be a boolean!"),
 	enumErrorCodes.NodeTypeNotIdentifier:     newErrorTableEntry(enumErrorCodes.Error, "Value must be an identifier!"),
