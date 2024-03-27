@@ -10,6 +10,9 @@ import (
 func ValidateNodeIsEmpty(node *Node) bool {
 	return node.NodeType == enumNodeTypes.Empty
 }
+func ValidateNodeIsError(node *Node) bool {
+	return node.NodeType == enumNodeTypes.Error
+}
 
 //-----------------------------------Primitives
 
