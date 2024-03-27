@@ -21,6 +21,7 @@ const (
 	ParserEndOfInput                  = "ParserEndOfInput"
 	OperandStatementEmpty             = "OperandStatementEmpty"
 	ParserUnexpectedToken             = "ParserUnexpectedToken"
+	ParserTemplateStringEmpty         = "ParserTemplateStringEmpty"
 	ParserTemplateStringNotIdentifier = "ParserTemplateStringNotIdentifier"
 
 	OperationBadTokenAfter           = "OperationBadTokenAfter"

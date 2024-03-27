@@ -35,12 +35,16 @@ func (p *Parser) parseTemplateString(templateString string) (string, error) {
 		}
 	}
 
+	if identifierString == "" {
+		return identifierString, errorHandler.AddNew(enumErrorCodes.ParserTemplateStringEmpty)
+	}
+
 	identifierToValidate := identifierString
 	if strings.HasPrefix(identifierToValidate, ".") {
 		identifierToValidate = identifierToValidate[1:]
 	}
 
-	if !p.tokenizer.IsTokenIdentifierLike(identifierToValidate) {
+	if !p.tokenizer.IsTokenIdentifierLikeWithParent(identifierToValidate) {
 		return templateString, errorHandler.AddNew(enumErrorCodes.ParserTemplateStringNotIdentifier, identifierString)
 	}
 

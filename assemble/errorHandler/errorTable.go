@@ -58,6 +58,7 @@ var errorTable = map[enumErrorCodes.Def]ErrorTableEntry{
 	enumErrorCodes.OperandStatementEmpty:             newErrorTableEntry(enumErrorCodes.Error, "Parsing error - Operand is missing!"),
 	enumErrorCodes.ParserUnexpectedToken:             newErrorTableEntry(enumErrorCodes.Error, fmt.Sprintf("Parsing error - Unexpected token: %v", highlight("%v"))),
 	enumErrorCodes.ParserTemplateStringNotIdentifier: newErrorTableEntry(enumErrorCodes.Error, fmt.Sprintf("Template string resolved to %v which is not a valid identifier!", coloredSymbol("%v"))),
+	enumErrorCodes.ParserTemplateStringEmpty:         newErrorTableEntry(enumErrorCodes.Error, fmt.Sprintf("Template string cannot be empty!")),
 
 	enumErrorCodes.OperationUNKNOWN:                 newErrorTableEntry(enumErrorCodes.Error, "UNKNOWN OPERATION"),
 	enumErrorCodes.OperationBadTokenAfter:           newErrorTableEntry(enumErrorCodes.Error, "ILLEGAL token(s) after operation: %v"),

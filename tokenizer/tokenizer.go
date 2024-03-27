@@ -20,6 +20,7 @@ type Tokenizer struct {
 
 // Used for seeing if a value is label-like (used mainly for local labels to avoid token overlap)
 var identifierLikeRegex *regexp.Regexp = regexp.MustCompile("^[A-Za-z_][0-9A-Za-z_]*$")
+var identifierWithParentLikeRegex *regexp.Regexp = regexp.MustCompile("^[A-Za-z_][0-9A-Za-z_]*\\.[A-Za-z_][0-9A-Za-z_]*$")
 
 func New() Tokenizer {
 	return Tokenizer{
@@ -83,6 +84,10 @@ func (t *Tokenizer) GetPrevCursor() int {
 // (i.e. starts with letter/underscore and followed by letters, underscores, numbers) then it's OK
 func (t *Tokenizer) IsTokenIdentifierLike(identifierLikeToken string) bool {
 	return identifierLikeRegex.MatchString(identifierLikeToken)
+}
+func (t *Tokenizer) IsTokenIdentifierLikeWithParent(identifierLikeToken string) bool {
+	return identifierWithParentLikeRegex.MatchString(identifierLikeToken) ||
+		identifierLikeRegex.MatchString(identifierLikeToken)
 }
 
 func (t *Tokenizer) RepositionCursor(newPosition int) {

@@ -60,7 +60,7 @@ func EvaluateNode(node Node) (Node, error) {
 		return processCallExpression(node)
 
 	default:
-		errorHandler.AddNew(enumErrorCodes.Other, "???")
+		errorHandler.AddNew(enumErrorCodes.OtherFatal, "???")
 		errMsg := fmt.Sprintf("🛑 UNKNOWN NODE BEING INTERPRETED!!! %v", node.NodeValue)
 		panic(errMsg)
 	}

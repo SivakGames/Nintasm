@@ -8,6 +8,7 @@ import (
 	"misc/nintasm/interpreter"
 	"misc/nintasm/interpreter/operandFactory"
 	"strconv"
+	"strings"
 )
 
 type instModeEnum = enumInstructionModes.Def
@@ -690,6 +691,9 @@ func (p *OperandParser) primaryExpression() (Node, error) {
 
 	case enumTokenTypes.IDENTIFIER:
 		return p.identifier()
+
+	case enumTokenTypes.TEMPLATE_STRING:
+		return p.templateString()
 	}
 
 	// ❌ Fails
@@ -805,6 +809,30 @@ func (p *OperandParser) identifier() (Node, error) {
 	}
 
 	return operandFactory.CreateIdentifierNode(literalValue), nil
+}
+
+// -----------------
+func (p *OperandParser) templateString() (Node, error) {
+	literalValue := p.lookaheadValue
+	templateLabel, err := p.getTemplateString(literalValue)
+	if err != nil {
+		return operandFactory.ErrorNode(literalValue),
+			err // ❌ Fails
+	}
+	if strings.HasPrefix(templateLabel, ".") {
+		parentLabel, err := interpreter.GetParentLabel()
+		if err != nil {
+			return operandFactory.ErrorNode(literalValue), err // ❌ Fails
+		}
+		templateLabel = parentLabel + templateLabel
+	}
+
+	err = p.eatFreelyAndAdvance(enumTokenTypes.TEMPLATE_STRING)
+	if err != nil {
+		return p.badEat(err) // ❌ Fails
+	}
+
+	return operandFactory.CreateIdentifierNode(templateLabel), nil
 }
 
 // xxxxxxxxxxxxxxxxxxx
