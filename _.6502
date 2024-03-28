@@ -45,25 +45,25 @@
 ;	STA $2006
 ;	RTI
 
-AA .macro
-	.db 35
-AA .endm
-
-GG .macro
-	.db \1
+BB .macro
+	.if defined(\1)
+		.db \1 & $0ff
+	.else
+		.repeat 500, \i
+		BB \i
+		.endrepeat
+	.endif
 	
-GG .endm
+BB .endm
+
 
 	
 ABC:
 ;-----------------------------------------
+	BB
 
-
-	.repeat 3, \i
-	GG 10+\i
-	.endrepeat
 	
-
+	.org $fff0
 
 	.org $fffa
 	;.dw NMI, RESET, 0

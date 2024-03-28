@@ -54,7 +54,7 @@ func destroyCaptureBlockListAtPointer(ptr *CaptureBlockListNode) {
 			listNode.nextNode = nil
 			break
 		}
-		listNode = captureBlockList.nextNode
+		listNode = listNode.nextNode
 	}
 }
 
