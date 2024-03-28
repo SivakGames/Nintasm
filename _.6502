@@ -45,42 +45,24 @@
 ;	STA $2006
 ;	RTI
 
+	.dw l"._{\3}"
+
 GG .macro
-	LDA \1
-l"._{\1}":
-	LDA #2
-	LDX #5
+	LDX \1
+l"._{\3}":
+	LDA \2
+	STA $0600, x
+	DEX
+		BPL l"._{\3}"
 GG .endm
 
-	.repeat 4, \i
-	.dw l"ABC.baba{\i}"
-	.endRepeat
-
+	
 ABC:
 ;-----------------------------------------
-	.repeat 4, \i
-l".baba{\i}":
-	.db \i, \i+10
-	.endRepeat
-
-	GG 1
-	GG 2
-	GG 3
-	GG 4
-	GG 5
-	GG 6
-	GG 11
-	GG 12
-	GG 13
-	GG 14
-	GG 15
-	GG 16
-	GG 21
-	GG 22
-	GG 23
-	GG 24
-	GG 25
-	GG 26
+	.repeat 10, \i
+	GG 10+\i, #66, \i
+	.endrepeat
+	
 
 
 	.org $fffa

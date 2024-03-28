@@ -19,6 +19,16 @@ func NewMacroOperandParser() MacroOperandParser {
 	return MacroOperandParser{}
 }
 
+var macroCaptureMask []string
+
+func init() {
+	captureMasks := make([]string, MACRO_MAX_OPERANDS)
+	for i := range captureMasks {
+		captureMasks[i] = "macro"
+	}
+	macroCaptureMask = captureMasks
+}
+
 // Main macro invoke parser
 func (mop *MacroOperandParser) Process(macroName string) error {
 	var err error
@@ -32,7 +42,7 @@ func (mop *MacroOperandParser) Process(macroName string) error {
 
 	operandList, err := mop.GetOperandList(
 		MACRO_MIN_OPERANDS, MACRO_MAX_OPERANDS, MACRO_MANAULLY_EVALS,
-		[]string{"macro"},
+		macroCaptureMask,
 	)
 	if err != nil {
 		return err // ❌ Fails
