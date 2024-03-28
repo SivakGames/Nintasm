@@ -62,7 +62,10 @@ func (p *Parser) getTemplateOperand() (string, error) {
 	operandString := ""
 	for p.lookaheadType != enumTokenTypes.DELIMITER_rightCurlyBrace {
 		operandString += p.lookaheadValue
-		p.eatFreelyAndAdvance(p.lookaheadType)
+		err = p.eatFreelyAndAdvance(p.lookaheadType)
+		if err != nil {
+			return operandString, err
+		}
 	}
 	err = p.eatFreelyAndAdvance(enumTokenTypes.DELIMITER_rightCurlyBrace)
 	if err != nil {

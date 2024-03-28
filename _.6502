@@ -45,22 +45,22 @@
 ;	STA $2006
 ;	RTI
 
-	.dw l"._{\3}"
+AA .macro
+	.db 35
+AA .endm
 
 GG .macro
-	LDX \1
-l"._{\3}":
-	LDA \2
-	STA $0600, x
-	DEX
-		BPL l"._{\3}"
+	.db \1
+	
 GG .endm
 
 	
 ABC:
 ;-----------------------------------------
-	.repeat 10, \i
-	GG 10+\i, #66, \i
+
+
+	.repeat 3, \i
+	GG 10+\i
 	.endrepeat
 	
 

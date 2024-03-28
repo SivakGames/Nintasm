@@ -151,6 +151,7 @@ func init() {
 	TemplateStringSpec = append(commentSpec, whitespaceAcknowledgeSpec...)
 	TemplateStringSpec = append(TemplateStringSpec, delimiterSpec...)
 	TemplateStringSpec = append(TemplateStringSpec, remainingSpec...)
+	TemplateStringSpec = append(CombinedStartLineSpec, stringSpec...)
 }
 
 // ================================================
