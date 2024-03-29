@@ -10,7 +10,7 @@ import (
 func OutputSegmentUsage() {
 	for rsIdx, romSegment := range rom {
 		fmt.Println(strings.Repeat("─", 64))
-		segmentHeader := fmt.Sprintf(" Rom Segment %d - Byte Usage / Bank Size ", rsIdx)
+		segmentHeader := fmt.Sprintf(" Rom Segment %d - Byte Usage / Bank Size │ %% free ", rsIdx)
 		fmt.Println(util.Colorize(segmentHeader, enumTerminalColors.AnsiTeal, true))
 		fmt.Println(strings.Repeat("─", 64))
 		totalSegmentOccupied := 0

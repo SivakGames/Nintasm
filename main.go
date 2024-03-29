@@ -23,7 +23,7 @@ func main() {
 		enumTerminalColors.AnsiOrange,
 		enumTerminalColors.LightYellow,
 		enumTerminalColors.None,
-		true)
+		false)
 
 	if len(os.Args) < 2 {
 		fmt.Println("Usage: go run . <filename> [-s]")

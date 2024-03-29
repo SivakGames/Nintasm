@@ -40,10 +40,9 @@ func GetFirstInputFile(inputFileName string) error {
 		return err
 	}
 
-	fmt.Println(util.Colorize("─────────", enumTerminalColors.AnsiGray5, false))
+	fmt.Println(util.Colorize("▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁", enumTerminalColors.AnsiGray5, false))
 	fmt.Println(fmt.Sprintf(" Attempting to assemble: %v", util.Colorize(base, enumTerminalColors.AnsiGreen, false)))
-	fmt.Println(util.Colorize("─────────", enumTerminalColors.AnsiGray5, false))
-	fmt.Println()
+	fmt.Println(util.Colorize("▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔", enumTerminalColors.AnsiGray5, false))
 
 	relativeFileDirectory = absPath
 	err = OpenInputFileAndPushLinesToStack(relativeFileDirectory + "/" + base)

@@ -8,9 +8,11 @@ import (
 	"misc/nintasm/assemble/fileHandler"
 	"misc/nintasm/assemble/fileStack"
 	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
+	enumTerminalColors "misc/nintasm/constants/enums/terminalColors"
 	"misc/nintasm/interpreter/environment/predefSymbols"
 	"misc/nintasm/interpreter/environment/unresolvedTable"
 	"misc/nintasm/parser"
+	"misc/nintasm/util"
 )
 
 // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -30,7 +32,9 @@ func Start(initialInputFile string) error {
 		return err
 	}
 
-	fmt.Println("=========Pass 1=========")
+	passCaption := util.Colorize(" Pass 1 ", enumTerminalColors.AnsiPurple, true)
+
+	fmt.Println(passCaption, util.GeneratePercentBar(51))
 
 	err = startReadingLinesTopFileStack()
 	if err != nil {
@@ -41,7 +45,7 @@ func Start(initialInputFile string) error {
 		return errors.New("Pass 1 failed")
 	}
 
-	fmt.Println("=========Pass 2=========")
+	fmt.Println(passCaption, util.GeneratePercentBar(0))
 
 	err = unresolvedTable.ResolvedUnresolvedSymbols()
 	if err != nil {

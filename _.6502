@@ -14,7 +14,7 @@
 ;==========================================
 ; PRG start
 ;==========================================
-	.romSegment "32kb", "32kb", "PRG"
+	.romSegment "32kb", "8kb", "PRG"
 	.bank 0
 	.org $8000
 
@@ -46,6 +46,12 @@ NMI:
 	RTI
 
 
+	.bank 1
+	.org $a000
+	.bank 2
+	.org $e000
+	.bank 3
+	.org $a000
 
 	.org $fffa
 	.dw NMI, RESET, 0
