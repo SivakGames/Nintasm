@@ -1,12 +1,15 @@
 package main
 
 import (
+	"flag"
 	"fmt"
+	"io"
 	"misc/nintasm/assemble"
 	"misc/nintasm/assemble/errorHandler"
 	enumTerminalColors "misc/nintasm/constants/enums/terminalColors"
 	"misc/nintasm/romBuilder"
 	"misc/nintasm/util"
+	"misc/nintasm/util/commandLine"
 	"os"
 	"time"
 )
@@ -16,7 +19,11 @@ func main() {
 
 	util.ClearTerminal()
 
-	fmt.Println("Nintasm")
+	util.DrawBox("Nintasm v1.000",
+		enumTerminalColors.AnsiOrange,
+		enumTerminalColors.LightYellow,
+		enumTerminalColors.None,
+		true)
 
 	if len(os.Args) < 2 {
 		fmt.Println("Usage: go run . <filename> [-s]")
@@ -26,16 +33,14 @@ func main() {
 	// ---------------------------------------------------------
 
 	baseInputFileName := os.Args[1]
+	rFlag := flag.Bool("r", false, "Raw rom file without INES Header")
+	sFlag := flag.Bool("s", false, "Show segment usage")
 
-	//	sFlag := flag.Bool("s", false, "A S boolean flag")
-	//	rFlag := flag.Bool("r", false, "A R boolean flag")
-	//
-	//	flag.CommandLine.SetOutput(ioutil.Discard)
-	//	err = flag.CommandLine.Parse(os.Args[2:])
-	//
-	//	fmt.Println("File:", filename)
-	//	fmt.Println("Command:", *sFlag)
-	//	fmt.Println("Command:", *rFlag)
+	flag.CommandLine.SetOutput(io.Discard)
+	flag.CommandLine.Parse(os.Args[2:])
+
+	commandLine.SettingRawROMFile = *rFlag
+	commandLine.SettingShowSegmentUsage = *sFlag
 
 	start := time.Now()
 	err = assemble.Start(baseInputFileName)
@@ -59,7 +64,9 @@ func main() {
 	// 🟢 Assembly Succeeds!
 
 	fmt.Println()
-	//romBuilder.OutputSegmentUsage()
+	if commandLine.SettingShowSegmentUsage {
+		romBuilder.OutputSegmentUsage()
+	}
 	fmt.Println("Assembly has succeeded!")
 	fmt.Println("Output file can be found at:", util.Colorize(outFileName, enumTerminalColors.AnsiSeaGreen, false))
 	fmt.Println()

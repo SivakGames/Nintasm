@@ -48,16 +48,11 @@ func AddNewRomSegment(totalSize int, bankSize int) error {
 	}
 
 	newSegment := make([]bankType, int(numBanks))
-	//newOrgDefs := make([]bankDefStruct, int(numBanks))
-
 	for i := range newSegment {
-		//newSegment[i] = make([]uint8, bankSize)
-		//	newOrgDefs[i] = newBankDef(bankSize)
 		newSegment[i] = newBank(bankSize)
 	}
 
 	rom = append(rom, newSegment)
-
 	currentBankIndex = -1
 	currentInsertionIndex = -1
 	return nil

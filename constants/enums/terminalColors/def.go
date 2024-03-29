@@ -4,7 +4,8 @@ package enumTerminalColors
 type Def int
 
 const (
-	Red Def = iota + 1
+	None Def = iota + 0
+	Red
 	Green
 	Yellow
 	Blue

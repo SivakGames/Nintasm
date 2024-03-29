@@ -7,6 +7,8 @@ import (
 	"misc/nintasm/assemble/errorHandler"
 	"misc/nintasm/assemble/fileStack"
 	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
+	enumTerminalColors "misc/nintasm/constants/enums/terminalColors"
+	"misc/nintasm/util"
 	"os"
 	"path/filepath"
 	"strings"
@@ -31,13 +33,17 @@ func GetFirstInputFile(inputFileName string) error {
 		return errorHandler.AddNew(enumErrorCodes.IncludeFileNotExist, inputFileName) //❌☠️ FATAL ERROR
 	} else if err != nil {
 		return errorHandler.AddNew(enumErrorCodes.OtherFatal, err) //❌☠️ FATAL ERROR
-
 	}
 
 	absPath, err := filepath.Abs(dir)
 	if err != nil {
 		return err
 	}
+
+	fmt.Println(util.Colorize("─────────", enumTerminalColors.AnsiGray5, false))
+	fmt.Println(fmt.Sprintf(" Attempting to assemble: %v", util.Colorize(base, enumTerminalColors.AnsiGreen, false)))
+	fmt.Println(util.Colorize("─────────", enumTerminalColors.AnsiGray5, false))
+	fmt.Println()
 
 	relativeFileDirectory = absPath
 	err = OpenInputFileAndPushLinesToStack(relativeFileDirectory + "/" + base)
@@ -62,8 +68,6 @@ func AddRelativePathIncludeFileName(inputFileName string) string {
 func OpenInputFileAndPushLinesToStack(inputFileName string) error {
 	file, err := os.Open(inputFileName)
 	if err != nil {
-		fmt.Println(os.Stat(inputFileName))
-		fmt.Println(err)
 		return errorHandler.AddNew(enumErrorCodes.FailOpenFile, inputFileName) // ❌ Fails
 	}
 	defer file.Close()

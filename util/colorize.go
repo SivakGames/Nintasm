@@ -37,8 +37,11 @@ var colorMap = map[enumTerminalColors.Def]int{
 
 func Colorize(text string, color enumTerminalColors.Def, isBG bool) string {
 	var colorText string
-	isAnsi := color > enumTerminalColors.ANSI_START
+	if color == enumTerminalColors.None {
+		return text
+	}
 
+	isAnsi := color > enumTerminalColors.ANSI_START
 	colorValue := colorMap[color]
 
 	if !isAnsi {
