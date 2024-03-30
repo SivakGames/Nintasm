@@ -65,12 +65,16 @@ func getRom() *romType {
 
 //+++++++++++++++++++++++++++
 
-// The current ROM segment (array of bank segments)
-func GetCurrentRomSegment() *romSegmentType {
+func GetRomSegmentByIndex(index int) *romSegmentType {
 	if len(rom) > 0 {
-		return &rom[len(rom)-1]
+		return &rom[index]
 	}
 	panic("🛑 Attempted to access ROM with no segments!!!")
+}
+
+// The current ROM segment (array of bank segments)
+func GetCurrentRomSegment() *romSegmentType {
+	return GetRomSegmentByIndex(len(rom) - 1)
 }
 
 // How many rom segments are currently defined
@@ -81,6 +85,16 @@ func GetTotalRomSegmentsInRom() int {
 // How many rom segments are currently defined
 func GetRomSegmentIndex() int {
 	return GetTotalRomSegmentsInRom() - 1
+}
+
+func GetRomSegmentByIndexTotalSize(index int) int {
+	segment := GetRomSegmentByIndex(index)
+	x := &(*segment)
+	accumBytes := 0
+	for _, b := range *x {
+		accumBytes += len(b.bytes)
+	}
+	return accumBytes
 }
 
 //+++++++++++++++++++++++++++

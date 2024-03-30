@@ -2,17 +2,15 @@ package assemble
 
 import (
 	"errors"
-	"fmt"
 	"misc/nintasm/assemble/blockStack"
 	"misc/nintasm/assemble/errorHandler"
 	"misc/nintasm/assemble/fileHandler"
 	"misc/nintasm/assemble/fileStack"
 	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
-	enumTerminalColors "misc/nintasm/constants/enums/terminalColors"
 	"misc/nintasm/interpreter/environment/predefSymbols"
 	"misc/nintasm/interpreter/environment/unresolvedTable"
 	"misc/nintasm/parser"
-	"misc/nintasm/util"
+	"misc/nintasm/romBuilder"
 )
 
 // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -32,9 +30,7 @@ func Start(initialInputFile string) error {
 		return err
 	}
 
-	passCaption := util.Colorize(" Pass 1 ", enumTerminalColors.AnsiPurple, true)
-
-	fmt.Println(passCaption, util.GeneratePercentBar(51))
+	romBuilder.DrawPassCaptions()
 
 	err = startReadingLinesTopFileStack()
 	if err != nil {
@@ -45,7 +41,7 @@ func Start(initialInputFile string) error {
 		return errors.New("Pass 1 failed")
 	}
 
-	fmt.Println(passCaption, util.GeneratePercentBar(0))
+	romBuilder.DrawPass1Complete()
 
 	err = unresolvedTable.ResolvedUnresolvedSymbols()
 	if err != nil {

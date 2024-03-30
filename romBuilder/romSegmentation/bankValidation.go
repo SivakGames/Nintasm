@@ -22,6 +22,7 @@ func ValidateAndSetBank(bankNode *Node) error {
 	}
 
 	romBuilder.SetBankIndex(newBankIndex)
+	romBuilder.DrawPass1Progress()
 
 	return nil
 }

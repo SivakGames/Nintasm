@@ -49,9 +49,9 @@ NMI:
 	.bank 1
 	.org $a000
 	.bank 2
-	.org $e000
+	.org $c000
 	.bank 3
-	.org $a000
+	.org $e000
 
 	.org $fffa
 	.dw NMI, RESET, 0
