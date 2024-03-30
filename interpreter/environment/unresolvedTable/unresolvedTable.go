@@ -95,6 +95,7 @@ func ResolvedUnresolvedSymbols() error {
 		}
 		unresolvedSymbolTable = newUnresolvedTable
 	}
+	romBuilder.DrawPass2Progress()
 	return nil
 }
 

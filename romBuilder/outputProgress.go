@@ -20,6 +20,8 @@ func drawEmptyPass(passNum int) {
 	fmt.Println(passCaption, util.GeneratePercentBar(0))
 }
 
+// 1111111111111111111111111111111111111111111111111111111111111111
+
 func DrawPass1Progress() {
 	totalINESByteSize := float64(GetInesTotalRomSizeInKb())
 	romSegmentIndex := GetRomSegmentIndex()
@@ -37,16 +39,26 @@ func DrawPass1Progress() {
 
 	currentlyUsed := float64(romBankBytes*bankIndex + prevSegmentBytes)
 	percentage := float64((currentlyUsed)/totalINESByteSize) * 100
-	DrawPass1Bar(percentage)
+	DrawPassBar(percentage, 2)
 }
 
 func DrawPass1Complete() {
-	DrawPass1Bar(100)
+	DrawPassBar(100, 2)
 }
 
-func DrawPass1Bar(percentage float64) {
-	fmt.Print(fmt.Sprintf("\x1b[0G\x1b[2A\x1b[%dC", PASS_CAPTION_LEN+1))
+// 2222222222222222222222222222222222222222222222222222222222222222
+
+func DrawPass2Progress() {
+	DrawPassBar(50, 1)
+}
+
+func DrawPass2Complete() {
+	DrawPassBar(100, 1)
+}
+
+func DrawPassBar(percentage float64, moveUpAmt int) {
+	fmt.Print(fmt.Sprintf("\x1b[0G\x1b[%dA\x1b[%dC", moveUpAmt, PASS_CAPTION_LEN+1))
 	passBar := util.GeneratePercentBar(percentage)
 	fmt.Println(passBar)
-	fmt.Print("\x1b[1E")
+	fmt.Print(fmt.Sprintf("\x1b[%dE", moveUpAmt-1))
 }
