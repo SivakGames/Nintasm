@@ -14,15 +14,13 @@
 ;==========================================
 ; PRG start
 ;==========================================
-	.romSegment "32kb", "8kb", "PRG"
+	.romSegment "32kb", "32kb", "PRG"
 	.bank 0
 	.org $8000
 
 ;-----------------------------------------
 RESET:
 	__resetCode__
-
-	.dw 2 + 2
 
 RESET_end:
 	;Enable NMI
@@ -44,14 +42,6 @@ NMI:
 	STA $2006 
 	STA $2006
 	RTI
-
-
-	.bank 1
-	.org $a000
-	.bank 2
-	.org $c000
-	.bank 3
-	.org $e000
 
 	.org $fffa
 	.dw NMI, RESET, 0

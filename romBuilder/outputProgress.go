@@ -48,8 +48,8 @@ func DrawPass1Complete() {
 
 // 2222222222222222222222222222222222222222222222222222222222222222
 
-func DrawPass2Progress() {
-	DrawPassBar(50, 1)
+func DrawPass2Progress(value float64) {
+	DrawPassBar(value, 1)
 }
 
 func DrawPass2Complete() {
@@ -59,6 +59,8 @@ func DrawPass2Complete() {
 func DrawPassBar(percentage float64, moveUpAmt int) {
 	fmt.Print(fmt.Sprintf("\x1b[0G\x1b[%dA\x1b[%dC", moveUpAmt, PASS_CAPTION_LEN+1))
 	passBar := util.GeneratePercentBar(percentage)
-	fmt.Println(passBar)
-	fmt.Print(fmt.Sprintf("\x1b[%dE", moveUpAmt-1))
+	fmt.Print(passBar)
+	if (moveUpAmt) > 0 {
+		fmt.Print(fmt.Sprintf("\x1b[%dE", moveUpAmt))
+	}
 }

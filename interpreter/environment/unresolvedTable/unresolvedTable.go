@@ -60,9 +60,14 @@ func AddUnresolvedRomEntry(node Node, mustResolveSize int, isBranch bool, isBigE
 // Called at the end of pass 1
 func ResolvedUnresolvedSymbols() error {
 	interpreter.ClearParentLabel()
+	totalUnresolved := len(unresolvedSymbolTable)
 
 	for len(unresolvedSymbolTable) > 0 {
 		originalUnresolvedLength := len(unresolvedSymbolTable)
+		unresolvedDiff := float64(totalUnresolved - originalUnresolvedLength)
+		pass2Progress := (unresolvedDiff / float64(totalUnresolved)) * 50
+		romBuilder.DrawPass2Progress(pass2Progress)
+
 		newUnresolvedTable := []unresolvedEntry{}
 		for _, entry := range unresolvedSymbolTable {
 			errorHandler.OverwriteNoFileDefaults(entry.fileName, uint(entry.lineNumber), entry.lineContent)
@@ -95,13 +100,17 @@ func ResolvedUnresolvedSymbols() error {
 		}
 		unresolvedSymbolTable = newUnresolvedTable
 	}
-	romBuilder.DrawPass2Progress()
+	romBuilder.DrawPass2Progress(50)
 	return nil
 }
 
 // Called at the end of pass 1
 func ResolvedUnresolvedRomEntries() error {
 	environment.ClearUnresolvedSilentErrorFlag()
+	totalSuccessfullyResolved := 0
+	totalUnresolved := len(unresolvedRomTable)
+	resolvedAddPercent := 50.0
+
 	for _, entry := range unresolvedRomTable {
 		errorHandler.OverwriteNoFileDefaults(entry.fileName, uint(entry.lineNumber), entry.lineContent)
 		evaluatedNode, err := interpreter.EvaluateNode(entry.originalNode)
@@ -118,7 +127,15 @@ func ResolvedUnresolvedRomEntries() error {
 			continue
 		}
 		romBuilder.OverwriteResolvedBytesInRom(entry.originalRomSegment, entry.originalBank, entry.originalOffset, asRomData)
+		totalSuccessfullyResolved++
 	}
 
+	if totalUnresolved > 0 {
+		resolvedAddPercent *= (float64(totalSuccessfullyResolved) / float64(totalUnresolved))
+	}
+
+	romBuilder.DrawPass2Progress(50 + resolvedAddPercent)
+
+	//romBuilder.DrawPass2Progress(100)
 	return nil
 }

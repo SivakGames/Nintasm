@@ -27,6 +27,7 @@ func CheckAndPrintErrors() {
 
 	errorOutputs := make([]errorOutput, 0)
 	fileNameOutputOrderIndexes := make(map[string]int)
+	fmt.Println()
 
 	// Will first group by file
 
