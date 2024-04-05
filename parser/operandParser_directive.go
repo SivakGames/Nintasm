@@ -35,12 +35,13 @@ var directiveManuallyEvaluatesOperands = map[string]bool{
 	"DB":         true,
 	"DW":         true,
 	"DWBE":       true,
-	"REPEAT":     true,
+	"FUNC":       true,
+	"GNSI":       true,
 	"KV":         true,
 	"IKV":        true,
+	"REPEAT":     true,
 	"SETCHARMAP": true,
 	"SETEXPRMAP": true,
-	"FUNC":       true,
 }
 
 var directiveEvaluatesLikeMacroOperands = map[string][]string{
@@ -91,6 +92,31 @@ func (p *DirectiveOperandParser) Process(operationTokenEnum tokenEnum, operation
 
 // +++++++++++++++++++++++++
 
+var directiveNameMinMaxOperands = map[string][2]int{
+	"BANK":         {1, 1},
+	"CHARMAP":      {0, 0},
+	"CASE":         {1, 1},
+	"DEFAULT":      {0, 0},
+	"DEFCHAR":      {2, 3},
+	"DEFCHARRANGE": {3, 3},
+	"DEFEXPR":      {2, 2},
+	"ELSE":         {0, 0},
+	"ELSEIF":       {1, 1},
+	"EXPRMAP":      {0, 0},
+	"GNSI":         {1, 2},
+	"IF":           {1, 1},
+	"IKV":          {1, 1},
+	"INCBIN":       {1, 3},
+	"INCLUDE":      {1, 1},
+	"KVMACRO":      {0, 0},
+	"MACRO":        {0, 0},
+	"NAMESPACE":    {0, 0},
+	"ORG":          {1, 1},
+	"REPEAT":       {1, 2},
+	"ROMSEGMENT":   {1, 3},
+	"SWITCH":       {1, 1},
+}
+
 var directiveMinMaxOperands = map[enumTokenTypes.Def][2]int{
 	enumTokenTypes.DIRECTIVE_dataBytes:       {1, 128},
 	enumTokenTypes.DIRECTIVE_dataSeries:      {1, 2},
@@ -105,39 +131,16 @@ var directiveMinMaxOperands = map[enumTokenTypes.Def][2]int{
 	enumTokenTypes.DIRECTIVE_throw:           {1, 1},
 }
 
-var directiveNameMinMaxOperands = map[string][2]int{
-	"BANK":         {1, 1},
-	"CHARMAP":      {0, 0},
-	"CASE":         {1, 1},
-	"DEFAULT":      {0, 0},
-	"DEFCHAR":      {2, 3},
-	"DEFCHARRANGE": {3, 3},
-	"DEFEXPR":      {2, 2},
-	"ELSE":         {0, 0},
-	"ELSEIF":       {1, 1},
-	"EXPRMAP":      {0, 0},
-	"IF":           {1, 1},
-	"IKV":          {1, 1},
-	"INCBIN":       {1, 3},
-	"INCLUDE":      {1, 1},
-	"KVMACRO":      {0, 0},
-	"MACRO":        {0, 0},
-	"NAMESPACE":    {0, 0},
-	"ORG":          {1, 1},
-	"REPEAT":       {1, 2},
-	"ROMSEGMENT":   {1, 3},
-	"SWITCH":       {1, 1},
-}
-
 func getMinMaxOperandsForDirective(directiveEnum tokenEnum, directiveName string) (int, int) {
 	var minMaxOperands [2]int
 	var checkOk bool
 
-	minMaxOperands, checkOk = directiveMinMaxOperands[directiveEnum]
+	// Named directives have higher precedence than general groups
+	minMaxOperands, checkOk = directiveNameMinMaxOperands[directiveName]
 	if checkOk {
 		return minMaxOperands[0], minMaxOperands[1]
 	}
-	minMaxOperands, checkOk = directiveNameMinMaxOperands[directiveName]
+	minMaxOperands, checkOk = directiveMinMaxOperands[directiveEnum]
 	if checkOk {
 		return minMaxOperands[0], minMaxOperands[1]
 	}

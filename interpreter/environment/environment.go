@@ -12,6 +12,7 @@ import (
 	"misc/nintasm/interpreter/environment/symbolAsNodeTable"
 	"misc/nintasm/interpreter/operandFactory"
 	"misc/nintasm/romBuilder"
+	"strings"
 )
 
 type Node = operandFactory.Node
@@ -20,6 +21,11 @@ var masterLookupTable = map[string]enumSymbolTableTypes.Def{}
 var unresolvedAddsSilentError = true
 
 // ----------------------------------
+
+func CheckIfIdentifierExistsInMasterTable(symbolName string) (enumSymbolTableTypes.Def, bool) {
+	symbolTableEnum, exists := masterLookupTable[symbolName]
+	return symbolTableEnum, exists
+}
 
 func CheckIfAlreadyDefinedInMasterTable(symbolName string) error {
 	var exists bool
@@ -67,6 +73,16 @@ func LookupIdentifierInSymbolAsNodeTable(symbolName string) (Node, bool, error) 
 		return node, false, errorHandler.AddNew(enumErrorCodes.InterpreterSymbolNotFound, symbolName)
 	}
 	return node, true, nil
+}
+
+func GetLocalLabelsOfParent(symbolName string) []string {
+	localLabelsFromParent := make([]string, 0)
+	for key := range masterLookupTable {
+		if strings.HasPrefix(key, symbolName+".") {
+			localLabelsFromParent = append(localLabelsFromParent, key)
+		}
+	}
+	return localLabelsFromParent
 }
 
 // -----------------------------------------------------------------------------

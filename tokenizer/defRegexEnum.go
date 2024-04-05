@@ -57,7 +57,7 @@ var (
 		{regexp.MustCompile(generateBoundaries("kv|keyvalue")), enumTokenTypes.DIRECTIVE_invokeKeyVal},
 		{regexp.MustCompile(generateBoundaries("end(?:if|ikv|repeat|switch)")), enumTokenTypes.DIRECTIVE_blockEnd},
 
-		{regexp.MustCompile(generateBoundaries("func|rs")), enumTokenTypes.DIRECTIVE_labeled},
+		{regexp.MustCompile(generateBoundaries("func|gnsi|rs")), enumTokenTypes.DIRECTIVE_labeled},
 		{regexp.MustCompile(generateBoundaries("nameSpace|macro|kvMacro|charMap|exprMap")), enumTokenTypes.DIRECTIVE_labeledBlockStart},
 		{regexp.MustCompile(generateBoundaries("end(?:nameSpace|m|kvm|charMap|exprMap)")), enumTokenTypes.DIRECTIVE_labeledBlockEnd},
 	}
