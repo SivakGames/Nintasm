@@ -23,8 +23,8 @@ func evalGnsi(operationLabel string, operandList *[]Node) error {
 	gnsiResolveSize := 0
 	if len(*operandList) > 1 {
 		gnsiResolveSizeNode := (*operandList)[1]
-		if !operandFactory.ValidateNumericNodeIsGTEandLTEValues(&gnsiResolveSizeNode, 0, 1) {
-			return errorHandler.AddNew(enumErrorCodes.NodeValueNotGTEandLTE, 0, 1)
+		if !operandFactory.ValidateNumericNodeIsPositive(&gnsiResolveSizeNode) {
+			return errorHandler.AddNew(enumErrorCodes.NodeValueNotPositive)
 		}
 		gnsiResolveSize = int(gnsiResolveSizeNode.AsNumber)
 	}
