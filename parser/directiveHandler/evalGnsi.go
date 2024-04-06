@@ -46,7 +46,7 @@ func evalGnsi(operationLabel string, operandList *[]Node) error {
 
 	parentNode, _, _ := environment.LookupIdentifierInSymbolAsNodeTable(gnsiLabelName)
 
-	var gnsiResolveOpNode *Node
+	var gnsiResolveOpNode *Node = nil
 	if len(*operandList) > 1 {
 		gnsiResolveOpNode = &(*operandList)[1]
 	}
@@ -56,10 +56,17 @@ func evalGnsi(operationLabel string, operandList *[]Node) error {
 		localLabelStartingIndex := strings.Index(localLabel, ".")
 		isolatedLocalLabel := localLabel[localLabelStartingIndex+1:]
 
+		var finalNode Node
+
 		difference := localLabelNode.AsNumber - parentNode.AsNumber
-		finalNode, err := evalGnsiChild(difference, gnsiResolveOpNode)
-		if err != nil {
-			return err
+
+		if gnsiResolveOpNode == nil {
+			finalNode = operandFactory.CreateNumericLiteralNode(difference)
+		} else {
+			finalNode, err = evalGnsiChild(difference, gnsiResolveOpNode)
+			if err != nil {
+				return err
+			}
 		}
 
 		newName := operationLabel + "." + isolatedLocalLabel

@@ -51,7 +51,7 @@ TTT:
 .l2:
 	.dw $5551
 
-ggg .gnsi TTT, \1 >> 1
+ggg .gnsi TTT
 
 
 	.db ggg.l0
