@@ -4,7 +4,9 @@ import (
 	"misc/nintasm/assemble/errorHandler"
 	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
 	enumSymbolTableTypes "misc/nintasm/constants/enums/symbolTableTypes"
+	"misc/nintasm/interpreter"
 	"misc/nintasm/interpreter/environment"
+	"misc/nintasm/interpreter/environment/symbolAsNodeTable"
 	"misc/nintasm/interpreter/operandFactory"
 	"strings"
 )
@@ -15,18 +17,14 @@ func evalGnsi(operationLabel string, operandList *[]Node) error {
 		return err
 	}
 
+	unresFlag := environment.GetUnresolvedSilentErrorFlag()
+	environment.ClearUnresolvedSilentErrorFlag()
+
+	defer environment.SetUnresolvedSilentErrorFlagTo(unresFlag)
+
 	gnsiLabelNode := (*operandList)[0]
 	if !operandFactory.ValidateNodeIsIdentifier(&gnsiLabelNode) {
 		return errorHandler.AddNew(enumErrorCodes.NodeTypeNotIdentifier) // ❌ Fails
-	}
-
-	gnsiResolveSize := 0
-	if len(*operandList) > 1 {
-		gnsiResolveSizeNode := (*operandList)[1]
-		if !operandFactory.ValidateNumericNodeIsPositive(&gnsiResolveSizeNode) {
-			return errorHandler.AddNew(enumErrorCodes.NodeValueNotPositive)
-		}
-		gnsiResolveSize = int(gnsiResolveSizeNode.AsNumber)
 	}
 
 	gnsiLabelName := gnsiLabelNode.NodeValue
@@ -48,18 +46,39 @@ func evalGnsi(operationLabel string, operandList *[]Node) error {
 
 	parentNode, _, _ := environment.LookupIdentifierInSymbolAsNodeTable(gnsiLabelName)
 
+	var gnsiResolveOpNode *Node
+	if len(*operandList) > 1 {
+		gnsiResolveOpNode = &(*operandList)[1]
+	}
+
 	for _, localLabel := range localLabelsFromParent {
 		localLabelNode, _, _ := environment.LookupIdentifierInSymbolAsNodeTable(localLabel)
-		index := strings.Index(localLabel, ".")
-		isolatedLabel := localLabel[index+1:]
-		difference := int(localLabelNode.AsNumber-parentNode.AsNumber) >> gnsiResolveSize
-		differenceNode := operandFactory.CreateNumericLiteralNode(float64(difference))
-		newName := operationLabel + "." + isolatedLabel
-		err := environment.AddIdentifierToSymbolAsNodeTable(newName, differenceNode)
+		localLabelStartingIndex := strings.Index(localLabel, ".")
+		isolatedLocalLabel := localLabel[localLabelStartingIndex+1:]
+
+		difference := localLabelNode.AsNumber - parentNode.AsNumber
+		finalNode, err := evalGnsiChild(difference, gnsiResolveOpNode)
+		if err != nil {
+			return err
+		}
+
+		newName := operationLabel + "." + isolatedLocalLabel
+		err = environment.AddIdentifierToSymbolAsNodeTable(newName, finalNode)
 		if err != nil {
 			return err
 		}
 	}
 
 	return nil
+}
+
+func evalGnsiChild(difference float64, gnsiResolveOpNode *Node) (Node, error) {
+	differenceNode := operandFactory.CreateNumericLiteralNode(difference)
+
+	symbolAsNodeTable.PushToSymbolTableStack()
+	defer symbolAsNodeTable.PopFromSymbolTableStack()
+	symbolAsNodeTable.AddSymbolToTopTableStack("\\1", differenceNode)
+	finalNode, err := interpreter.EvaluateNode(*gnsiResolveOpNode)
+
+	return finalNode, err
 }

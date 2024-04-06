@@ -38,10 +38,25 @@ Forever:
 
 ;-----------------------------------------
 NMI:
-	LDA #0 
+	LDA #0
 	STA $2006 
 	STA $2006
 	RTI
+
+TTT:
+.l0:
+	.dw 5, 2
+.l1:
+	.dw 2, 3,4,5
+.l2:
+	.dw $5551
+
+ggg .gnsi TTT, \1 >> 1
+
+
+	.db ggg.l0
+	.db ggg.l1, "A"
+	.db ggg.l2, "A"
 
 	.org $fffa
 	.dw NMI, RESET, 0
