@@ -104,6 +104,7 @@ const (
 
 	NamespaceNotExist            = "NamespaceNotExist"
 	NamespaceToValuesNotResolved = "NamespaceToValuesNotResolved"
+	BytesWithinLabelNoEnd        = "BytesWithinLabelNoEnd"
 
 	CharMapNoneDefined     = "CharMapNoneDefined"
 	CharMapNotExist        = "CharMapNotExist"

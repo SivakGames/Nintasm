@@ -68,13 +68,14 @@ func LookupIdentifierInSymbolAsNodeTable(symbolName string) (Node, bool, error) 
 			return node, false, errorHandler.AddNew(enumErrorCodes.InterpreterIdentifierNotValueSymbol, symbolName)
 		}
 		if unresolvedAddsSilentError {
-			return node, false, errorHandler.AddUnresolved(symbolName)
+			return node, false, errorHandler.AddUnresolved()
 		}
 		return node, false, errorHandler.AddNew(enumErrorCodes.InterpreterSymbolNotFound, symbolName)
 	}
 	return node, true, nil
 }
 
+// Get all local labels with a parent label. Used for generating namespace indexes (GNSI)
 func GetLocalLabelsOfParent(symbolName string) []string {
 	localLabelsFromParent := make([]string, 0)
 	for key := range masterLookupTable {
@@ -92,7 +93,7 @@ func LookupSubstitutionID(symbolName string) (Node, error) {
 	substitutionNode, exists := symbolAsNodeTable.LookupSymbolInTopOfSymbolTableStack(symbolName)
 	if !exists {
 		if unresolvedAddsSilentError {
-			return operandFactory.CreateUndefinedNode(symbolName), errorHandler.AddUnresolved(symbolName)
+			return operandFactory.CreateUndefinedNode(symbolName), errorHandler.AddUnresolved()
 		}
 		return substitutionNode, errorHandler.AddNew(enumErrorCodes.InterpreterSymbolNotFound, symbolName)
 	}

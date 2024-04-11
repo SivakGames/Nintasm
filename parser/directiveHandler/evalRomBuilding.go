@@ -1,6 +1,9 @@
 package directiveHandler
 
-import "misc/nintasm/romBuilder/romSegmentation"
+import (
+	"misc/nintasm/interpreter"
+	"misc/nintasm/romBuilder/romSegmentation"
+)
 
 // +++++++++++++++++++++++++
 
@@ -20,10 +23,13 @@ func evalRomBuildingOperands(directiveName string, operandList *[]Node) error {
 		if len(*romBuildingNodes) == 3 {
 			segmentDescriptionNode = &(*romBuildingNodes)[2]
 		}
+
+		interpreter.ClearParentLabel()
 		return romSegmentation.ValidateAndAddRomSegment(segmentSizeNode, segmentBankSizeNode, segmentDescriptionNode)
 
 	case "BANK":
 		bankNode := &(*operandList)[0]
+		interpreter.ClearParentLabel()
 		return romSegmentation.ValidateAndSetBank(bankNode)
 
 	case "ORG":

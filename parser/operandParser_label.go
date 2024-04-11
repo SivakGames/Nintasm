@@ -6,6 +6,7 @@ import (
 	enumTokenTypes "misc/nintasm/constants/enums/tokenTypes"
 	"misc/nintasm/interpreter"
 	"misc/nintasm/interpreter/environment/namespaceTable"
+	"misc/nintasm/interpreter/environment/symbolAsNodeTable"
 	"misc/nintasm/interpreter/environment/unresolvedTable"
 	"misc/nintasm/interpreter/operandFactory"
 	"misc/nintasm/romBuilder"
@@ -57,7 +58,11 @@ func (p *LabelOperandParser) doProcess(operationTokenEnum tokenEnum, operationLa
 	switch operationTokenEnum {
 	case enumTokenTypes.IDENTIFIER:
 		if !isLocal {
+			prevParent := interpreter.GetParentLabelNoError()
 			interpreter.OverwriteParentLabel(operationLabel)
+			if prevParent != "" {
+				symbolAsNodeTable.AddIdentifierKeyToPrevLabelNextLabelTable(prevParent, operationLabel)
+			}
 		}
 
 		labelAssignNode := operandFactory.CreateAssignLabelNode(operationLabel, romBuilder.GetOrg())

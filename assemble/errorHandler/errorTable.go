@@ -140,6 +140,7 @@ var errorTable = map[enumErrorCodes.Def]ErrorTableEntry{
 
 	enumErrorCodes.NamespaceNotExist:            newErrorTableEntry(enumErrorCodes.Error, fmt.Sprintf("Namespace %v does not exist!", coloredIdentifier("%v"))),
 	enumErrorCodes.NamespaceToValuesNotResolved: newErrorTableEntry(enumErrorCodes.Error, "Namespace value %v is not resolved and cannot be converted to a value"),
+	enumErrorCodes.BytesWithinLabelNoEnd:        newErrorTableEntry(enumErrorCodes.Error, "No ending label found so range cannot be calculated"),
 
 	enumErrorCodes.CharMapNoneDefined:     newErrorTableEntry(enumErrorCodes.Error, "No character maps have been defined!"),
 	enumErrorCodes.CharMapNotExist:        newErrorTableEntry(enumErrorCodes.Error, "Specified charmap doesn't exist!"),

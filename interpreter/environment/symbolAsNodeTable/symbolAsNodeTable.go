@@ -15,6 +15,10 @@ var labalAsBankTable = map[string]int{}
 
 // ++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+var prevLabelNextLabelTable = map[string]string{}
+
+// ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 type symbolTableType = map[string]Node
 
 // Used when doing function calls
@@ -101,9 +105,11 @@ func init() {
 func AddIdentifierKeyToSymbolAsNodeTable(symbolName string, node Node) {
 	symbolTable[symbolName] = node
 }
-
 func AddIdentifierKeyToLabelAsBankTable(symbolName string, bankId int) {
 	labalAsBankTable[symbolName] = bankId
+}
+func AddIdentifierKeyToPrevLabelNextLabelTable(prevLabel string, nextLabel string) {
+	prevLabelNextLabelTable[prevLabel] = nextLabel
 }
 
 func GetNodeFromSymbolAsNodeTable(symbolName string) (Node, bool) {
@@ -113,6 +119,10 @@ func GetNodeFromSymbolAsNodeTable(symbolName string) (Node, bool) {
 func GetValueFromLabelAsBankTable(symbolName string) (int, bool) {
 	bankValue, exists := labalAsBankTable[symbolName]
 	return bankValue, exists
+}
+func GetValueFromPrevLabelNextLabelTable(symbolName string) (string, bool) {
+	nextLabelName, exists := prevLabelNextLabelTable[symbolName]
+	return nextLabelName, exists
 }
 
 // ------------------------------------------

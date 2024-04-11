@@ -135,7 +135,7 @@ func AddHint(errorTableKey enumErrorCodes.Def, args ...interface{}) {
 // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
 // A silent error initially...
-func AddUnresolved(symbolName string) error {
+func AddUnresolved() error {
 	return errors.New(fmt.Sprintf("%v%d", SEVERITY_PREFIX, enumErrorCodes.UnresolvedIdentifier))
 }
 
