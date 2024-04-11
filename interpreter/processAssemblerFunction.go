@@ -37,7 +37,7 @@ var assemblerBuiltInFunctions = map[string]assemblerFunction{
 
 	"toCharmap":            {1, 1, true, []enumNodeTypes.Def{enumNodeTypes.StringLiteral}},
 	"reverseStr":           {1, 1, false, []enumNodeTypes.Def{enumNodeTypes.StringLiteral}},
-	"bytesWithinLabel":     {1, 1, false, []enumNodeTypes.Def{enumNodeTypes.Identifier}},
+	"bytesInLabel":         {1, 1, false, []enumNodeTypes.Def{enumNodeTypes.Identifier}},
 	"bank":                 {1, 1, false, []enumNodeTypes.Def{enumNodeTypes.Identifier}},
 	"defined":              {1, 1, false, []enumNodeTypes.Def{enumNodeTypes.Identifier}},
 	"namespaceValuesToStr": {1, 1, false, []enumNodeTypes.Def{enumNodeTypes.Identifier}},
@@ -186,7 +186,7 @@ func processAssemblerFunction(node *Node) error {
 		bankValue, _ := symbolAsNodeTable.GetValueFromLabelAsBankTable((*node.ArgumentList)[0].NodeValue)
 		node.AsNumber = float64(bankValue)
 
-	case "bytesWithinLabel":
+	case "bytesInLabel":
 		baseNode := (*node.ArgumentList)[0]
 		prevLabel := baseNode.NodeValue
 		nextLabel, exists := symbolAsNodeTable.GetValueFromPrevLabelNextLabelTable(prevLabel)
