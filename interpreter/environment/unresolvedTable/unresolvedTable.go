@@ -112,6 +112,7 @@ func ResolvedUnresolvedRomEntries() error {
 	resolvedAddPercent := 50.0
 
 	for _, entry := range unresolvedRomTable {
+		interpreter.OverwriteParentLabel(entry.parentLabel)
 		errorHandler.OverwriteNoFileDefaults(entry.fileName, uint(entry.lineNumber), entry.lineContent)
 		evaluatedNode, err := interpreter.EvaluateNode(entry.originalNode)
 		if err != nil {
@@ -127,6 +128,7 @@ func ResolvedUnresolvedRomEntries() error {
 			continue
 		}
 		romBuilder.OverwriteResolvedBytesInRom(entry.originalRomSegment, entry.originalBank, entry.originalOffset, asRomData)
+		interpreter.ClearParentLabel()
 		totalSuccessfullyResolved++
 	}
 
