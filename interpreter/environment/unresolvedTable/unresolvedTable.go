@@ -19,6 +19,7 @@ type unresolvedEntry struct {
 	originalOffset     int
 	originalNode       Node
 	parentLabel        string
+	localLabel         string
 	neededBytes        int
 	fileName           string
 	lineNumber         uint8
@@ -38,6 +39,7 @@ func newUnresolvedEntry(node Node, neededBytes int, isBranch bool, isBigEndian b
 		originalOffset:     romBuilder.GetCurrentInsertionIndex(),
 		originalNode:       node,
 		parentLabel:        interpreter.GetParentLabelNoError(),
+		localLabel:         interpreter.GetLocalLabel(),
 		neededBytes:        neededBytes,
 		fileName:           fileData.FileName,
 		lineNumber:         uint8(fileData.CurrentLineNumber),

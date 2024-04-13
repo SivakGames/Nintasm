@@ -25,11 +25,13 @@ func evalRomBuildingOperands(directiveName string, operandList *[]Node) error {
 		}
 
 		interpreter.ClearParentLabel()
+		interpreter.ClearLocalLabel()
 		return romSegmentation.ValidateAndAddRomSegment(segmentSizeNode, segmentBankSizeNode, segmentDescriptionNode)
 
 	case "BANK":
 		bankNode := &(*operandList)[0]
 		interpreter.ClearParentLabel()
+		interpreter.ClearLocalLabel()
 		return romSegmentation.ValidateAndSetBank(bankNode)
 
 	case "ORG":

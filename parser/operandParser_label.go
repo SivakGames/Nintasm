@@ -63,6 +63,9 @@ func (p *LabelOperandParser) doProcess(operationTokenEnum tokenEnum, operationLa
 			if prevParent != "" {
 				symbolAsNodeTable.AddIdentifierKeyToPrevLabelNextLabelTable(prevParent, operationLabel)
 			}
+			interpreter.ClearLocalLabel()
+		} else {
+			interpreter.SetLocalLabel(operationLabel)
 		}
 
 		labelAssignNode := operandFactory.CreateAssignLabelNode(operationLabel, romBuilder.GetOrg())

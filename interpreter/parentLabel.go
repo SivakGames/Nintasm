@@ -9,6 +9,7 @@ import (
 
 var PopParentLabelWhenBlockOpDone bool = false
 var parentLabelStack []string
+var currentLocalLabel string
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -35,7 +36,6 @@ func OverwriteParentLabel(newLabel string) {
 		return
 	}
 	parentLabelStack[len(parentLabelStack)-1] = newLabel
-	return
 }
 
 func ClearParentLabel() {
@@ -46,10 +46,19 @@ func ClearParentLabel() {
 
 func AppendParentLabel(newLabel string) {
 	parentLabelStack = append(parentLabelStack, newLabel)
-	return
 }
 
 func PopParentLabel() {
 	parentLabelStack = parentLabelStack[:len(parentLabelStack)-1]
-	return
+}
+
+// ------------------------------------------------------------------
+func ClearLocalLabel() {
+	currentLocalLabel = ""
+}
+func GetLocalLabel() string {
+	return currentLocalLabel
+}
+func SetLocalLabel(newLabel string) {
+	currentLocalLabel = newLabel
 }
