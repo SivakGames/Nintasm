@@ -57,13 +57,15 @@ ggg .gnsi TTT
 	.db "BBBBB"
 
 JEST:
-	.db bytesInLabel(JEST2) >> 2
+	.db bytesInCurrentLabel()
 	.db  0,4,5,0
 	.db  0,2,5,8
 	.db  0,2,5,8
 	.db  0,2,5,8
 
 	.db -8,4,5,0
+	.db -8,2,5,8
+	.db -8,2,5,8
 	.db -8,2,5,8
 
 

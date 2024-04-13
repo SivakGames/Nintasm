@@ -37,6 +37,7 @@ var assemblerBuiltInFunctions = map[string]assemblerFunction{
 
 	"toCharmap":            {1, 1, true, []enumNodeTypes.Def{enumNodeTypes.StringLiteral}},
 	"reverseStr":           {1, 1, false, []enumNodeTypes.Def{enumNodeTypes.StringLiteral}},
+	"bytesInCurrentLabel":  {0, 0, false, []enumNodeTypes.Def{}},
 	"bytesInLabel":         {1, 1, false, []enumNodeTypes.Def{enumNodeTypes.Identifier}},
 	"bank":                 {1, 1, false, []enumNodeTypes.Def{enumNodeTypes.Identifier}},
 	"defined":              {1, 1, false, []enumNodeTypes.Def{enumNodeTypes.Identifier}},
@@ -186,9 +187,20 @@ func processAssemblerFunction(node *Node) error {
 		bankValue, _ := symbolAsNodeTable.GetValueFromLabelAsBankTable((*node.ArgumentList)[0].NodeValue)
 		node.AsNumber = float64(bankValue)
 
-	case "bytesInLabel":
-		baseNode := (*node.ArgumentList)[0]
-		prevLabel := baseNode.NodeValue
+	case "bytesInCurrentLabel",
+		"bytesInLabel":
+
+		prevLabel := ""
+		if funcName == "bytesInCurrentLabel" {
+			parentLabel, err := GetParentLabel()
+			if err != nil {
+				return err
+			}
+			prevLabel = parentLabel
+		} else {
+			baseNode := (*node.ArgumentList)[0]
+			prevLabel = baseNode.NodeValue
+		}
 		nextLabel, exists := symbolAsNodeTable.GetValueFromPrevLabelNextLabelTable(prevLabel)
 		prevNode, resolved, err := environment.LookupIdentifierInSymbolAsNodeTable(prevLabel)
 		if !resolved {
