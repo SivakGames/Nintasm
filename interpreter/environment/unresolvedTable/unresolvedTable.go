@@ -62,6 +62,7 @@ func AddUnresolvedRomEntry(node Node, mustResolveSize int, isBranch bool, isBigE
 // Called at the end of pass 1
 func ResolvedUnresolvedSymbols() error {
 	interpreter.ClearParentLabel()
+	interpreter.ClearLocalLabel()
 	totalUnresolved := len(unresolvedSymbolTable)
 
 	for len(unresolvedSymbolTable) > 0 {
@@ -74,6 +75,7 @@ func ResolvedUnresolvedSymbols() error {
 		for _, entry := range unresolvedSymbolTable {
 			errorHandler.OverwriteNoFileDefaults(entry.fileName, uint(entry.lineNumber), entry.lineContent)
 			interpreter.OverwriteParentLabel(entry.parentLabel)
+			interpreter.SetLocalLabel(entry.localLabel)
 			evaluatedNode, err := interpreter.EvaluateNode(entry.originalNode)
 			if err != nil {
 				err := errorHandler.CheckErrorContinuesUpwardPropagation(err, enumErrorCodes.UnresolvedIdentifier)
@@ -87,6 +89,7 @@ func ResolvedUnresolvedSymbols() error {
 					newUnresolvedTable = append(newUnresolvedTable, entry)
 				}
 			}
+			interpreter.ClearLocalLabel()
 			interpreter.ClearParentLabel()
 		}
 
@@ -115,6 +118,7 @@ func ResolvedUnresolvedRomEntries() error {
 
 	for _, entry := range unresolvedRomTable {
 		interpreter.OverwriteParentLabel(entry.parentLabel)
+		interpreter.SetLocalLabel(entry.localLabel)
 		errorHandler.OverwriteNoFileDefaults(entry.fileName, uint(entry.lineNumber), entry.lineContent)
 		evaluatedNode, err := interpreter.EvaluateNode(entry.originalNode)
 		if err != nil {
@@ -131,6 +135,7 @@ func ResolvedUnresolvedRomEntries() error {
 		}
 		romBuilder.OverwriteResolvedBytesInRom(entry.originalRomSegment, entry.originalBank, entry.originalOffset, asRomData)
 		interpreter.ClearParentLabel()
+		interpreter.ClearLocalLabel()
 		totalSuccessfullyResolved++
 	}
 

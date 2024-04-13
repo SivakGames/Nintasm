@@ -58,16 +58,22 @@ ggg .gnsi TTT
 
 JEST:
 	.db bytesInCurrentLabel()
+._1:
+	.db bytesInCurrentLocalLabel()
 	.db  0,4,5,0
+._2:
+	.db bytesInCurrentLocalLabel()
+	.db  0,2,5,8
+._3:
+	.db bytesInCurrentLocalLabel()
 	.db  0,2,5,8
 	.db  0,2,5,8
-	.db  0,2,5,8
-
+._4:
 	.db -8,4,5,0
 	.db -8,2,5,8
 	.db -8,2,5,8
 	.db -8,2,5,8
-
+.end:
 
 JEST2:
 

@@ -16,6 +16,7 @@ var labalAsBankTable = map[string]int{}
 // ++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 var prevLabelNextLabelTable = map[string]string{}
+var prevLocalLabelNextLocalLabelTable = map[string]string{}
 
 // ++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -111,6 +112,9 @@ func AddIdentifierKeyToLabelAsBankTable(symbolName string, bankId int) {
 func AddIdentifierKeyToPrevLabelNextLabelTable(prevLabel string, nextLabel string) {
 	prevLabelNextLabelTable[prevLabel] = nextLabel
 }
+func AddIdentifierKeyToPrevLocalLabelNextLocalLabelTable(prevLabel string, nextLabel string) {
+	prevLocalLabelNextLocalLabelTable[prevLabel] = nextLabel
+}
 
 func GetNodeFromSymbolAsNodeTable(symbolName string) (Node, bool) {
 	node, exists := symbolTable[symbolName]
@@ -123,6 +127,10 @@ func GetValueFromLabelAsBankTable(symbolName string) (int, bool) {
 func GetValueFromPrevLabelNextLabelTable(symbolName string) (string, bool) {
 	nextLabelName, exists := prevLabelNextLabelTable[symbolName]
 	return nextLabelName, exists
+}
+func GetValueFromPrevLocalLabelNextLocalLabelTable(symbolName string) (string, bool) {
+	nextLocalLabelName, exists := prevLocalLabelNextLocalLabelTable[symbolName]
+	return nextLocalLabelName, exists
 }
 
 // ------------------------------------------

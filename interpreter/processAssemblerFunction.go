@@ -35,13 +35,15 @@ var assemblerBuiltInFunctions = map[string]assemblerFunction{
 	"strlen": {1, 1, true, []enumNodeTypes.Def{enumNodeTypes.MultiByte}},
 	"substr": {2, 3, true, []enumNodeTypes.Def{enumNodeTypes.MultiByte, enumNodeTypes.NumericLiteral, enumNodeTypes.NumericLiteral}},
 
-	"toCharmap":            {1, 1, true, []enumNodeTypes.Def{enumNodeTypes.StringLiteral}},
-	"reverseStr":           {1, 1, false, []enumNodeTypes.Def{enumNodeTypes.StringLiteral}},
-	"bytesInCurrentLabel":  {0, 0, false, []enumNodeTypes.Def{}},
-	"bytesInLabel":         {1, 1, false, []enumNodeTypes.Def{enumNodeTypes.Identifier}},
-	"bank":                 {1, 1, false, []enumNodeTypes.Def{enumNodeTypes.Identifier}},
-	"defined":              {1, 1, false, []enumNodeTypes.Def{enumNodeTypes.Identifier}},
-	"namespaceValuesToStr": {1, 1, false, []enumNodeTypes.Def{enumNodeTypes.Identifier}},
+	"toCharmap":                {1, 1, true, []enumNodeTypes.Def{enumNodeTypes.StringLiteral}},
+	"reverseStr":               {1, 1, false, []enumNodeTypes.Def{enumNodeTypes.StringLiteral}},
+	"bytesInCurrentLabel":      {0, 0, false, []enumNodeTypes.Def{}},
+	"bytesInLabel":             {1, 1, false, []enumNodeTypes.Def{enumNodeTypes.Identifier}},
+	"bytesInCurrentLocalLabel": {0, 0, false, []enumNodeTypes.Def{}},
+	"bytesInLocalLabel":        {1, 1, false, []enumNodeTypes.Def{enumNodeTypes.Identifier}},
+	"bank":                     {1, 1, false, []enumNodeTypes.Def{enumNodeTypes.Identifier}},
+	"defined":                  {1, 1, false, []enumNodeTypes.Def{enumNodeTypes.Identifier}},
+	"namespaceValuesToStr":     {1, 1, false, []enumNodeTypes.Def{enumNodeTypes.Identifier}},
 }
 
 func isAssemblerFunction(node *Node) bool {
@@ -188,20 +190,47 @@ func processAssemblerFunction(node *Node) error {
 		node.AsNumber = float64(bankValue)
 
 	case "bytesInCurrentLabel",
-		"bytesInLabel":
+		"bytesInLabel",
+		"bytesInCurrentLocalLabel",
+		"bytesInLocalLabel":
 
 		prevLabel := ""
-		if funcName == "bytesInCurrentLabel" {
+		nextLabel := ""
+		exists := false
+
+		switch funcName {
+		case "bytesInCurrentLabel":
 			parentLabel, err := GetParentLabel()
 			if err != nil {
 				return err
 			}
 			prevLabel = parentLabel
-		} else {
+		case "bytesInLabel":
 			baseNode := (*node.ArgumentList)[0]
 			prevLabel = baseNode.NodeValue
+		case "bytesInCurrentLocalLabel":
+			parentLabel, err := GetParentLabel()
+			if err != nil {
+				return err
+			}
+			currentLocalLabel := GetLocalLabel()
+			if currentLocalLabel == "" {
+				return errorHandler.AddNew(enumErrorCodes.Other, "GRRR!")
+			}
+			prevLabel = parentLabel + currentLocalLabel
+
+		case "bytesInLocalLabel":
+			return errorHandler.AddNew(enumErrorCodes.Other, "GRRR 2!")
 		}
-		nextLabel, exists := symbolAsNodeTable.GetValueFromPrevLabelNextLabelTable(prevLabel)
+
+		if funcName == "bytesInCurrentLabel" || funcName == "bytesInLabel" {
+			nextLabel, exists = symbolAsNodeTable.GetValueFromPrevLabelNextLabelTable(prevLabel)
+		} else {
+			nextLabel, exists = symbolAsNodeTable.GetValueFromPrevLocalLabelNextLocalLabelTable(prevLabel)
+		}
+
+		// ------------------------------
+
 		prevNode, resolved, err := environment.LookupIdentifierInSymbolAsNodeTable(prevLabel)
 		if !resolved {
 			return err
