@@ -69,17 +69,13 @@ JEST:
 	.db  0,2,5,8
 	.db  0,2,5,8
 ._4:
+	.db bytesInCurrentLocalLabel()
 	.db -8,4,5,0
 	.db -8,2,5,8
 	.db -8,2,5,8
 	.db -8,2,5,8
-.end:
 
-JEST2:
 
-	.db ggg.l0
-	.db ggg.l1, "A"
-	.db ggg.l2, "A"
 END:
 
 	.org $fffa

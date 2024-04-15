@@ -57,20 +57,25 @@ func (p *LabelOperandParser) doProcess(operationTokenEnum tokenEnum, operationLa
 
 	switch operationTokenEnum {
 	case enumTokenTypes.IDENTIFIER:
-		if !isLocal {
-			prevParent := interpreter.GetParentLabelNoError()
-			interpreter.OverwriteParentLabel(operationLabel)
-			if prevParent != "" {
-				symbolAsNodeTable.AddIdentifierKeyToPrevLabelNextLabelTable(prevParent, operationLabel)
-			}
-			interpreter.ClearLocalLabel()
-		} else {
+		if isLocal {
 			prevLocal := interpreter.GetLocalLabel()
 			interpreter.SetLocalLabel(operationLabel)
 			if prevLocal != "" {
 				prevParent := interpreter.GetParentLabelNoError()
 				symbolAsNodeTable.AddIdentifierKeyToPrevLocalLabelNextLocalLabelTable(prevParent+prevLocal, prevParent+operationLabel)
 			}
+		} else {
+			prevParent := interpreter.GetParentLabelNoError()
+			interpreter.OverwriteParentLabel(operationLabel)
+			if prevParent != "" {
+				symbolAsNodeTable.AddIdentifierKeyToPrevLabelNextLabelTable(prevParent, operationLabel)
+			}
+			prevLocal := interpreter.GetLocalLabel()
+			if prevLocal != "" {
+				symbolAsNodeTable.AddIdentifierKeyToPrevLocalLabelNextLocalLabelTable(prevParent+prevLocal, operationLabel)
+			}
+			interpreter.ClearLocalLabel()
+
 		}
 
 		labelAssignNode := operandFactory.CreateAssignLabelNode(operationLabel, romBuilder.GetOrg())
