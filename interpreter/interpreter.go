@@ -20,9 +20,11 @@ func EvaluateNode(node Node) (Node, error) {
 	case enumNodeTypes.Empty,
 		enumNodeTypes.BooleanLiteral,
 		enumNodeTypes.NumericLiteral,
-		enumNodeTypes.MultiByte,
 		enumNodeTypes.StringLiteral:
 		return node, nil
+
+	case enumNodeTypes.MultiByte:
+		return processMultiByte(node)
 
 	case enumNodeTypes.Identifier,
 		enumNodeTypes.MemberExpression:

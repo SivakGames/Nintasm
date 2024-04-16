@@ -672,6 +672,9 @@ func (p *OperandParser) primaryExpression() (Node, error) {
 	case enumTokenTypes.DELIMITER_leftParenthesis:
 		return p.parenthesizedExpression()
 
+	case enumTokenTypes.DELIMITER_leftSquareBracket:
+		return p.multiByteExpression()
+
 	//Dots will prepend the parent label
 	case enumTokenTypes.DELIMITER_period:
 		parentLabel, err := interpreter.GetParentLabel()
@@ -764,6 +767,27 @@ func (p *OperandParser) parenthesizedExpression() (Node, error) {
 	}
 
 	return expression, nil
+}
+
+// [[[[[[[[[[[[[[[[
+func (p *OperandParser) multiByteExpression() (Node, error) {
+	err := p.eatFreelyAndAdvance(enumTokenTypes.DELIMITER_leftSquareBracket)
+	if err != nil {
+		return p.badEat(err) // ❌ Fails
+	}
+
+	argumentList, err := p.argumentList()
+	if err != nil {
+		return operandFactory.ErrorNode(p.lookaheadValue), nil
+	}
+
+	err = p.eatAndAdvance(enumTokenTypes.DELIMITER_rightSquareBracket)
+	if err != nil {
+		return p.badEat(err) // ❌ Fails
+	}
+
+	return operandFactory.CreateMultiByteNode(argumentList), nil
+
 }
 
 // -----------------

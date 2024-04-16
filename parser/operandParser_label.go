@@ -14,7 +14,7 @@ import (
 )
 
 const ASSIGNMENT_MIN_OPERANDS = 1
-const ASSIGNMENT_MAX_OPERANDS = 64
+const ASSIGNMENT_MAX_OPERANDS = 1
 const ASSIGNMENT_MANAULLY_EVALS = false
 
 type LabelOperandParser struct {
@@ -115,18 +115,7 @@ func (p *LabelOperandParser) doProcess(operationTokenEnum tokenEnum, operationLa
 			}
 
 		} else {
-			for i, o := range operandList {
-				evalNode, err := interpreter.EvaluateNode(o)
-				if err != nil {
-					return err
-				}
-				operandList[i] = evalNode
-			}
-			multiByteNode := operandFactory.CreateMultiByteNode(operandList)
-			err := doAssignment(operationLabel, &multiByteNode)
-			if err != nil {
-				return err
-			}
+			panic("🛑 Somehow many things being assigned")
 		}
 		return nil
 
