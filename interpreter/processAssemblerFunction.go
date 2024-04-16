@@ -35,15 +35,15 @@ var assemblerBuiltInFunctions = map[string]assemblerFunction{
 	"strlen": {1, 1, true, []enumNodeTypes.Def{enumNodeTypes.MultiByte}},
 	"substr": {2, 3, true, []enumNodeTypes.Def{enumNodeTypes.MultiByte, enumNodeTypes.NumericLiteral, enumNodeTypes.NumericLiteral}},
 
-	"toCharmap":                {1, 1, true, []enumNodeTypes.Def{enumNodeTypes.StringLiteral}},
-	"reverseStr":               {1, 1, false, []enumNodeTypes.Def{enumNodeTypes.StringLiteral}},
-	"bytesInCurrentLabel":      {0, 0, false, []enumNodeTypes.Def{}},
-	"bytesInLabel":             {1, 1, false, []enumNodeTypes.Def{enumNodeTypes.Identifier}},
-	"bytesInCurrentLocalLabel": {0, 0, false, []enumNodeTypes.Def{}},
-	"bytesInLocalLabel":        {1, 1, false, []enumNodeTypes.Def{enumNodeTypes.Identifier}},
-	"bank":                     {1, 1, false, []enumNodeTypes.Def{enumNodeTypes.Identifier}},
-	"defined":                  {1, 1, false, []enumNodeTypes.Def{enumNodeTypes.Identifier}},
-	"namespaceValuesToStr":     {1, 1, false, []enumNodeTypes.Def{enumNodeTypes.Identifier}},
+	"toCharmap":            {1, 1, true, []enumNodeTypes.Def{enumNodeTypes.StringLiteral}},
+	"reverseStr":           {1, 1, false, []enumNodeTypes.Def{enumNodeTypes.StringLiteral}},
+	"bytesInCurrentLabel":  {0, 0, false, []enumNodeTypes.Def{}},
+	"bytesInLabel":         {1, 1, false, []enumNodeTypes.Def{enumNodeTypes.Identifier}},
+	"bytesInCurrentLocal":  {0, 0, false, []enumNodeTypes.Def{}},
+	"bytesInLocal":         {1, 1, false, []enumNodeTypes.Def{enumNodeTypes.Identifier}},
+	"bank":                 {1, 1, false, []enumNodeTypes.Def{enumNodeTypes.Identifier}},
+	"defined":              {1, 1, false, []enumNodeTypes.Def{enumNodeTypes.Identifier}},
+	"namespaceValuesToStr": {1, 1, false, []enumNodeTypes.Def{enumNodeTypes.Identifier}},
 }
 
 func isAssemblerFunction(node *Node) bool {
@@ -191,8 +191,8 @@ func processAssemblerFunction(node *Node) error {
 
 	case "bytesInCurrentLabel",
 		"bytesInLabel",
-		"bytesInCurrentLocalLabel",
-		"bytesInLocalLabel":
+		"bytesInCurrentLocal",
+		"bytesInLocal":
 
 		prevLabel := ""
 		nextLabel := ""
@@ -208,7 +208,7 @@ func processAssemblerFunction(node *Node) error {
 		case "bytesInLabel":
 			baseNode := (*node.ArgumentList)[0]
 			prevLabel = baseNode.NodeValue
-		case "bytesInCurrentLocalLabel":
+		case "bytesInCurrentLocal":
 			parentLabel, err := GetParentLabel()
 			if err != nil {
 				return err
@@ -219,7 +219,7 @@ func processAssemblerFunction(node *Node) error {
 			}
 			prevLabel = parentLabel + currentLocalLabel
 
-		case "bytesInLocalLabel":
+		case "bytesInLocal":
 			return errorHandler.AddNew(enumErrorCodes.Other, "GRRR 2!")
 		}
 

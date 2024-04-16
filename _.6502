@@ -43,40 +43,6 @@ NMI:
 	STA $2006
 	RTI
 
-TTT:
-.l0:
-	.dw 5, 2
-.l1:
-	.dw 2, 3,4,5
-.l2:
-	.dw $5551
-
-ggg .gnsi TTT
-
-
-	.db "BBBBB"
-
-JEST:
-	.db bytesInCurrentLabel()
-._1:
-	.db bytesInCurrentLocalLabel()
-	.db  0,4,5,0
-._2:
-	.db bytesInCurrentLocalLabel()
-	.db  0,2,5,8
-._3:
-	.db bytesInCurrentLocalLabel()
-	.db  0,2,5,8
-	.db  0,2,5,8
-._4:
-	.db bytesInCurrentLocalLabel()
-	.db -8,4,5,0
-	.db -8,2,5,8
-	.db -8,2,5,8
-	.db -8,2,5,8
-
-
-END:
 
 	.org $fffa
 	.dw NMI, RESET, 0
