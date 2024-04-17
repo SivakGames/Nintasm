@@ -32,11 +32,13 @@ var assemblerBuiltInFunctions = map[string]assemblerFunction{
 	"cos":      {1, 1, true, []enumNodeTypes.Def{enumNodeTypes.NumericLiteral}},
 	"cosdeg":   {1, 1, true, []enumNodeTypes.Def{enumNodeTypes.NumericLiteral}},
 
-	"strlen": {1, 1, true, []enumNodeTypes.Def{enumNodeTypes.MultiByte}},
-	"substr": {2, 3, true, []enumNodeTypes.Def{enumNodeTypes.MultiByte, enumNodeTypes.NumericLiteral, enumNodeTypes.NumericLiteral}},
+	"strlen":     {1, 1, true, []enumNodeTypes.Def{enumNodeTypes.StringLiteral}},
+	"bytelen":    {1, 1, true, []enumNodeTypes.Def{enumNodeTypes.MultiByte}},
+	"itemlen":    {1, 1, true, []enumNodeTypes.Def{enumNodeTypes.MultiByte}},
+	"substr":     {2, 3, true, []enumNodeTypes.Def{enumNodeTypes.StringLiteral, enumNodeTypes.NumericLiteral, enumNodeTypes.NumericLiteral}},
+	"reverseStr": {1, 1, true, []enumNodeTypes.Def{enumNodeTypes.StringLiteral}},
 
 	"toCharmap":            {1, 1, true, []enumNodeTypes.Def{enumNodeTypes.StringLiteral}},
-	"reverseStr":           {1, 1, false, []enumNodeTypes.Def{enumNodeTypes.StringLiteral}},
 	"bytesInCurrentLabel":  {0, 0, false, []enumNodeTypes.Def{}},
 	"bytesInLabel":         {1, 1, false, []enumNodeTypes.Def{enumNodeTypes.Identifier}},
 	"bytesInCurrentLocal":  {0, 0, false, []enumNodeTypes.Def{}},
@@ -116,25 +118,41 @@ func processAssemblerFunction(node *Node) error {
 		node.AsNumber = math.Cos(evaluatedArguments[0].AsNumber * math.Pi / 180)
 
 	case "strlen":
-		if node.NodeType == enumNodeTypes.StringLiteral {
-			node.AsNumber = float64(len(node.NodeValue))
-		} else {
-			node.AsNumber = float64(len(*evaluatedArguments[0].ArgumentList))
+		node.AsNumber = float64(len(*&evaluatedArguments[0].NodeValue))
+	case "bytelen":
+		node.AsNumber = float64(len(*evaluatedArguments[0].ArgumentList))
+	case "itemCount":
+		node.AsNumber = float64(len(*evaluatedArguments[0].ArgumentList))
+
+	case "reverseStr":
+		original := evaluatedArguments[0].NodeValue
+		chars := []rune(original)
+		for i, j := 0, len(chars)-1; i < j; i, j = i+1, j-1 {
+			chars[i], chars[j] = chars[j], chars[i]
 		}
+		node.NodeValue = string(chars)
 
 	case "substr":
-		var limit Node
-		var slicedNodes []Node
+		var slicedString string
 
 		target := evaluatedArguments[0]
-		offset := evaluatedArguments[1]
-		if len(evaluatedArguments) > 2 {
-			limit = (evaluatedArguments)[2]
-			slicedNodes = (*target.ArgumentList)[int(offset.AsNumber):int(limit.AsNumber)]
-		} else {
-			slicedNodes = (*target.ArgumentList)[int(offset.AsNumber):]
+		startIndex := int(evaluatedArguments[1].AsNumber)
+		if startIndex >= len(target.NodeValue) {
+			return errorHandler.AddNew(enumErrorCodes.Other, "NO!")
 		}
-		operandFactory.ConvertNodeToMultiBytes(node, slicedNodes)
+
+		if len(evaluatedArguments) > 2 {
+			endIndex := int(evaluatedArguments[2].AsNumber)
+			if endIndex > len(target.NodeValue) {
+				return errorHandler.AddNew(enumErrorCodes.Other, "NO 1!")
+			} else if endIndex <= startIndex {
+				return errorHandler.AddNew(enumErrorCodes.Other, "NO 2!")
+			}
+			slicedString = (*&target.NodeValue)[startIndex:endIndex]
+		} else {
+			slicedString = (*&target.NodeValue)[startIndex:]
+		}
+		node.NodeValue = slicedString
 
 	case "toCharmap":
 		nodeString := (evaluatedArguments[0].NodeValue)
@@ -277,9 +295,10 @@ func processAssemblerFunction(node *Node) error {
 		"modfDeci", "modfInt",
 		"sin", "sindeg", "cos", "cosdeg",
 		"bank",
-		"strlen":
+		"strlen", "bytelen", "itemCount":
 		operandFactory.ConvertNodeToNumericLiteral(node)
-
+	case "substr", "reverseStr":
+		operandFactory.ConvertNodeToStringLiteral(node)
 	}
 
 	return nil
