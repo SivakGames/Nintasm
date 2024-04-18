@@ -37,6 +37,7 @@ var assemblerBuiltInFunctions = map[string]assemblerFunction{
 	"substr":     {2, 3, true, []enumNodeTypes.Def{enumNodeTypes.StringLiteral, enumNodeTypes.NumericLiteral, enumNodeTypes.NumericLiteral}},
 	"reverseStr": {1, 1, true, []enumNodeTypes.Def{enumNodeTypes.StringLiteral}},
 	"itemlen":    {1, 1, true, []enumNodeTypes.Def{enumNodeTypes.MultiByte}},
+	"subitem":    {2, 3, true, []enumNodeTypes.Def{enumNodeTypes.MultiByte, enumNodeTypes.NumericLiteral, enumNodeTypes.NumericLiteral}},
 	"bytelen":    {1, 1, true, []enumNodeTypes.Def{enumNodeTypes.MultiByte}},
 
 	"toCharmap":            {1, 1, true, []enumNodeTypes.Def{enumNodeTypes.StringLiteral}},
@@ -131,7 +132,7 @@ func processAssemblerFunction(node *Node) error {
 		}
 		node.AsNumber = float64(len(convertedBytes))
 
-	case "itemCount":
+	case "itemlen":
 		node.AsNumber = float64(len(*evaluatedArguments[0].ArgumentList))
 
 	case "reverseStr":
@@ -162,6 +163,27 @@ func processAssemblerFunction(node *Node) error {
 			slicedString = (*&target.NodeValue)[startIndex:]
 		}
 		node.NodeValue = slicedString
+
+	case "subitem":
+		var slicedItem []Node
+		target := evaluatedArguments[0]
+		startIndex := int(evaluatedArguments[1].AsNumber)
+		if startIndex >= len(target.NodeValue) {
+			return errorHandler.AddNew(enumErrorCodes.Other, "NO a!")
+		}
+
+		if len(evaluatedArguments) > 2 {
+			endIndex := int(evaluatedArguments[2].AsNumber)
+			if endIndex > len(target.NodeValue) {
+				return errorHandler.AddNew(enumErrorCodes.Other, "NO a1!")
+			} else if endIndex <= startIndex {
+				return errorHandler.AddNew(enumErrorCodes.Other, "NO a2!")
+			}
+			slicedItem = (*target.ArgumentList)[startIndex:endIndex]
+		} else {
+			slicedItem = (*target.ArgumentList)[startIndex:]
+		}
+		node.ArgumentList = &slicedItem
 
 	case "toCharmap":
 		nodeString := (evaluatedArguments[0].NodeValue)
@@ -304,10 +326,12 @@ func processAssemblerFunction(node *Node) error {
 		"modfDeci", "modfInt",
 		"sin", "sindeg", "cos", "cosdeg",
 		"bank",
-		"strlen", "bytelen", "itemCount":
+		"strlen", "bytelen", "itemlen":
 		operandFactory.ConvertNodeToNumericLiteral(node)
 	case "substr", "reverseStr":
 		operandFactory.ConvertNodeToStringLiteral(node)
+	case "subitem":
+		operandFactory.ConvertNodeToMultiBytes(node, *node.ArgumentList)
 	}
 
 	return nil

@@ -18,11 +18,9 @@
 	.bank 0
 	.org $8000
 
-	.db strlen("STS")
-	.db "1A2"
-	.db reverseStr("1A2")
-	.db 1,2,3,4,5,6
-	.db bytelen([1,2,44,251,4,5,"1231"])
+	.db subitem([1,2,44,251], 1)
+
+	.db floor(itemlen([1,2,3]) / 5)
 
 ;-----------------------------------------
 RESET:
