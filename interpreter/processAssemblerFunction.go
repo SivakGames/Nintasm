@@ -34,10 +34,10 @@ var assemblerBuiltInFunctions = map[string]assemblerFunction{
 	"cosdeg":   {1, 1, true, []enumNodeTypes.Def{enumNodeTypes.NumericLiteral}},
 
 	"strlen":     {1, 1, true, []enumNodeTypes.Def{enumNodeTypes.StringLiteral}},
-	"bytelen":    {1, 1, true, []enumNodeTypes.Def{enumNodeTypes.MultiByte}},
-	"itemlen":    {1, 1, true, []enumNodeTypes.Def{enumNodeTypes.MultiByte}},
 	"substr":     {2, 3, true, []enumNodeTypes.Def{enumNodeTypes.StringLiteral, enumNodeTypes.NumericLiteral, enumNodeTypes.NumericLiteral}},
 	"reverseStr": {1, 1, true, []enumNodeTypes.Def{enumNodeTypes.StringLiteral}},
+	"itemlen":    {1, 1, true, []enumNodeTypes.Def{enumNodeTypes.MultiByte}},
+	"bytelen":    {1, 1, true, []enumNodeTypes.Def{enumNodeTypes.MultiByte}},
 
 	"toCharmap":            {1, 1, true, []enumNodeTypes.Def{enumNodeTypes.StringLiteral}},
 	"bytesInCurrentLabel":  {0, 0, false, []enumNodeTypes.Def{}},
@@ -144,7 +144,6 @@ func processAssemblerFunction(node *Node) error {
 
 	case "substr":
 		var slicedString string
-
 		target := evaluatedArguments[0]
 		startIndex := int(evaluatedArguments[1].AsNumber)
 		if startIndex >= len(target.NodeValue) {
