@@ -10,6 +10,7 @@ import (
 	"misc/nintasm/interpreter/environment/namespaceTable"
 	"misc/nintasm/interpreter/environment/symbolAsNodeTable"
 	"misc/nintasm/interpreter/operandFactory"
+	"misc/nintasm/romBuilder/nodesToBytes"
 )
 
 type assemblerFunction struct {
@@ -120,7 +121,16 @@ func processAssemblerFunction(node *Node) error {
 	case "strlen":
 		node.AsNumber = float64(len(*&evaluatedArguments[0].NodeValue))
 	case "bytelen":
-		node.AsNumber = float64(len(*evaluatedArguments[0].ArgumentList))
+		convertedBytes := make([]uint8, 0)
+		for _, c := range *evaluatedArguments[0].ArgumentList {
+			cConverted, err := nodesToBytes.ConvertNodeValueToUInts(c, 1, false, false, false)
+			if err != nil {
+				return err
+			}
+			convertedBytes = append(convertedBytes, cConverted...)
+		}
+		node.AsNumber = float64(len(convertedBytes))
+
 	case "itemCount":
 		node.AsNumber = float64(len(*evaluatedArguments[0].ArgumentList))
 
