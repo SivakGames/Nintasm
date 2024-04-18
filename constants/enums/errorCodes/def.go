@@ -106,6 +106,10 @@ const (
 	NamespaceToValuesNotResolved = "NamespaceToValuesNotResolved"
 	BytesWithinLabelNoEnd        = "BytesWithinLabelNoEnd"
 
+	SubFuncStartTooBig        = "SubFuncStartTooBig"
+	SubFuncEndTooBig          = "SubFuncEndTooBig"
+	SubFuncEndBiggerThanStart = "SubFuncEndBiggerThanStart"
+
 	CharMapNoneDefined     = "CharMapNoneDefined"
 	CharMapNotExist        = "CharMapNotExist"
 	CharMapDuplicateKey    = "CharMapDuplicateKey"
@@ -120,6 +124,7 @@ const (
 	ToExprMapUndefExpr  = "ToExprMapUndefExpr"
 
 	InterpreterNoParentLabel            = "InterpreterNoParentLabel"
+	InterpreterNoLocalLabel             = "InterpreterNoLocalLabel"
 	InterpreterUnaryNotBoolean          = "InterpreterUnaryNotBoolean"
 	InterpreterUnaryNotNumeric          = "InterpreterUnaryNotNumeric"
 	InterpreterBinaryMismatchedTypes    = "InterpreterBinaryMismatchedTypes"

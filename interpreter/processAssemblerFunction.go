@@ -148,15 +148,15 @@ func processAssemblerFunction(node *Node) error {
 		target := evaluatedArguments[0]
 		startIndex := int(evaluatedArguments[1].AsNumber)
 		if startIndex >= len(target.NodeValue) {
-			return errorHandler.AddNew(enumErrorCodes.Other, "NO!")
+			return errorHandler.AddNew(enumErrorCodes.SubFuncStartTooBig, len(target.NodeValue)-1)
 		}
 
 		if len(evaluatedArguments) > 2 {
 			endIndex := int(evaluatedArguments[2].AsNumber)
 			if endIndex > len(target.NodeValue) {
-				return errorHandler.AddNew(enumErrorCodes.Other, "NO 1!")
+				return errorHandler.AddNew(enumErrorCodes.SubFuncEndTooBig, len(target.NodeValue))
 			} else if endIndex <= startIndex {
-				return errorHandler.AddNew(enumErrorCodes.Other, "NO 2!")
+				return errorHandler.AddNew(enumErrorCodes.SubFuncEndBiggerThanStart)
 			}
 			slicedString = (*&target.NodeValue)[startIndex:endIndex]
 		} else {
@@ -168,16 +168,16 @@ func processAssemblerFunction(node *Node) error {
 		var slicedItem []Node
 		target := evaluatedArguments[0]
 		startIndex := int(evaluatedArguments[1].AsNumber)
-		if startIndex >= len(target.NodeValue) {
-			return errorHandler.AddNew(enumErrorCodes.Other, "NO a!")
+		if startIndex >= len(*target.ArgumentList) {
+			return errorHandler.AddNew(enumErrorCodes.SubFuncStartTooBig, len(*target.ArgumentList)-1)
 		}
 
 		if len(evaluatedArguments) > 2 {
 			endIndex := int(evaluatedArguments[2].AsNumber)
-			if endIndex > len(target.NodeValue) {
-				return errorHandler.AddNew(enumErrorCodes.Other, "NO a1!")
+			if endIndex > len(*target.ArgumentList) {
+				return errorHandler.AddNew(enumErrorCodes.SubFuncEndTooBig, len(*target.ArgumentList))
 			} else if endIndex <= startIndex {
-				return errorHandler.AddNew(enumErrorCodes.Other, "NO a2!")
+				return errorHandler.AddNew(enumErrorCodes.SubFuncEndBiggerThanStart)
 			}
 			slicedItem = (*target.ArgumentList)[startIndex:endIndex]
 		} else {
@@ -264,12 +264,12 @@ func processAssemblerFunction(node *Node) error {
 			}
 			currentLocalLabel := GetLocalLabel()
 			if currentLocalLabel == "" {
-				return errorHandler.AddNew(enumErrorCodes.Other, "GRRR!")
+				return errorHandler.AddNew(enumErrorCodes.InterpreterNoLocalLabel)
 			}
 			prevLabel = parentLabel + currentLocalLabel
 
 		case "bytesInLocal":
-			return errorHandler.AddNew(enumErrorCodes.Other, "GRRR 2!")
+			return errorHandler.AddNew(enumErrorCodes.Other, "Bytes in local not yet created")
 		}
 
 		if funcName == "bytesInCurrentLabel" || funcName == "bytesInLabel" {

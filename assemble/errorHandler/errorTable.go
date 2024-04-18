@@ -142,6 +142,10 @@ var errorTable = map[enumErrorCodes.Def]ErrorTableEntry{
 	enumErrorCodes.NamespaceToValuesNotResolved: newErrorTableEntry(enumErrorCodes.Error, "Namespace value %v is not resolved and cannot be converted to a value"),
 	enumErrorCodes.BytesWithinLabelNoEnd:        newErrorTableEntry(enumErrorCodes.Error, "No ending label found so range cannot be calculated"),
 
+	enumErrorCodes.SubFuncStartTooBig:        newErrorTableEntry(enumErrorCodes.Error, "Starting index is too big! Highest index possible: %d"),
+	enumErrorCodes.SubFuncEndTooBig:          newErrorTableEntry(enumErrorCodes.Error, "Ending index is too big! Highest index possible: %d"),
+	enumErrorCodes.SubFuncEndBiggerThanStart: newErrorTableEntry(enumErrorCodes.Error, "End index must be greater than start!"),
+
 	enumErrorCodes.CharMapNoneDefined:     newErrorTableEntry(enumErrorCodes.Error, "No character maps have been defined!"),
 	enumErrorCodes.CharMapNotExist:        newErrorTableEntry(enumErrorCodes.Error, "Specified charmap doesn't exist!"),
 	enumErrorCodes.CharMapDuplicateKey:    newErrorTableEntry(enumErrorCodes.Error, "Character %c has already been defined in current map %v"),
@@ -156,6 +160,7 @@ var errorTable = map[enumErrorCodes.Def]ErrorTableEntry{
 	enumErrorCodes.ToExprMapUndefExpr:  newErrorTableEntry(enumErrorCodes.Error, "Expression `%v` is not defined in currently used exprmap"),
 
 	enumErrorCodes.InterpreterNoParentLabel:            newErrorTableEntry(enumErrorCodes.Error, "Cannot use operation! No parent label!"),
+	enumErrorCodes.InterpreterNoLocalLabel:             newErrorTableEntry(enumErrorCodes.Error, "Cannot use operation! No local label!"),
 	enumErrorCodes.InterpreterUnaryNotBoolean:          newErrorTableEntry(enumErrorCodes.Error, "Unary expression must be boolean: %v %v"),
 	enumErrorCodes.InterpreterUnaryNotNumeric:          newErrorTableEntry(enumErrorCodes.Error, "Unary expression must be numeric: %v %v"),
 	enumErrorCodes.InterpreterBinaryMismatchedTypes:    newErrorTableEntry(enumErrorCodes.Error, fmt.Sprintf("Binary expression types mismatched: %v %v %v", "%v", coloredSymbol("%v"), "%v")),

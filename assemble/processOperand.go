@@ -85,7 +85,10 @@ func parseAndProcessOperandString(
 			return operandParserErr
 		}
 
-		preProcessBlockStack()
+		operandParserErr = preProcessBlockStack()
+		if operandParserErr != nil {
+			return operandParserErr
+		}
 		macroOperandParser.EndInvokeMacro()
 
 	default:

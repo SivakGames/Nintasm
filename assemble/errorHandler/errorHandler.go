@@ -104,6 +104,7 @@ func AddNew(errorTableKey enumErrorCodes.Def, args ...interface{}) error {
 
 	if totalQueuedErrors+2 > ERROR_STACK_CAPACITY {
 		totalQueuedErrors++
+		totalErrors++
 		tooManyErrorsEntry := newErrorEntry(errorTableKey, "Too many errors!", enumErrorCodes.Fatal)
 		tooManyErrorsEntry.fileName = "OUTPUT LIMIT REACHED"
 		tooManyErrorsEntry.lineNumber = 0
