@@ -29,7 +29,7 @@ var startBlockOperationFlags = map[string]startOpFlags{
 	"EXPRMAP":   newStartOpFlags(true, false),
 	"IF":        newStartOpFlags(false, false),
 	"IKV":       newStartOpFlags(true, false),
-	"IM":        newStartOpFlags(true, false),
+	"IM":        newStartOpFlags(true, false), //Invoke macro
 	"KVMACRO":   newStartOpFlags(false, true),
 	"MACRO":     newStartOpFlags(false, true),
 	"NAMESPACE": newStartOpFlags(true, false),

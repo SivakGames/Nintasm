@@ -18,7 +18,12 @@
 	.bank 0
 	.org $8000
 
-	.db subitem([1,2,3], 2,3)
+	.repeat 5, \i
+	.if \i == 1
+	.db 1
+	.endif
+
+	.endrepeat
 
 ;-----------------------------------------
 RESET:
