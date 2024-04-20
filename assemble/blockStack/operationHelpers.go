@@ -39,9 +39,17 @@ func CheckIfNewStartEndOperation(lineOperationParsedValues *util.LineOperationPa
 
 	//If in forced evaluate mode, see if there is a pair to force-close it
 
-	if GetCaptureBlockListForcedCapturingFlag() &&
-		!CheckIfEndOpMatchesOpeningOp(lineOperationParsedValues.OperationTokenValue) {
-		return false
+	if GetCaptureBlockListForcedCapturingFlag() {
+		nnn := GetCurrentOpPtr()
+		xx := nnn.overwriteForcedCapture
+		_, bbb := (*xx)[strings.ToUpper(lineOperationParsedValues.OperationTokenValue)]
+		if bbb {
+			return true
+		}
+
+		if !CheckIfEndOpMatchesOpeningOp(lineOperationParsedValues.OperationTokenValue) {
+			return false
+		}
 	}
 
 	return true

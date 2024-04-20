@@ -51,6 +51,7 @@ func PushCaptureBlock(blockOperationName string, operandList []Node) {
 	blockList := getCurrentCaptureBlockListNode()
 	blockList.evalutesInsteadOfCapturing = defaultFlags.ForcedEval
 	blockList.forcedCapturing = defaultFlags.ForcedCapture
+	blockList.overwriteForcedCapture = &defaultFlags.OverwriteForcedCapture
 }
 
 func PopCaptureBlockThenExtendCapturedLines(extendedLines []CapturedLine) {

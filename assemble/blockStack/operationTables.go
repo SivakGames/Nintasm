@@ -13,28 +13,30 @@ import (
 // When opening a block, what to set the flags to
 
 type startOpFlags struct {
-	ForcedEval    bool
-	ForcedCapture bool
+	ForcedEval             bool
+	ForcedCapture          bool
+	OverwriteForcedCapture map[string]bool
 }
 
-func newStartOpFlags(forcedEval bool, forcedCapture bool) startOpFlags {
+func newStartOpFlags(forcedEval bool, forcedCapture bool, overwriteForcedCapture map[string]bool) startOpFlags {
 	return startOpFlags{
-		ForcedEval:    forcedEval,
-		ForcedCapture: forcedCapture,
+		ForcedEval:             forcedEval,
+		ForcedCapture:          forcedCapture,
+		OverwriteForcedCapture: overwriteForcedCapture,
 	}
 }
 
 var startBlockOperationFlags = map[string]startOpFlags{
-	"CHARMAP":   newStartOpFlags(true, false),
-	"EXPRMAP":   newStartOpFlags(true, false),
-	"IF":        newStartOpFlags(false, false),
-	"IKV":       newStartOpFlags(true, false),
-	"IM":        newStartOpFlags(true, false), //Invoke macro
-	"KVMACRO":   newStartOpFlags(false, true),
-	"MACRO":     newStartOpFlags(false, true),
-	"NAMESPACE": newStartOpFlags(true, false),
-	"REPEAT":    newStartOpFlags(false, false),
-	"SWITCH":    newStartOpFlags(false, false),
+	"CHARMAP":   newStartOpFlags(true, false, map[string]bool{}),
+	"EXPRMAP":   newStartOpFlags(true, false, map[string]bool{}),
+	"IF":        newStartOpFlags(false, false, map[string]bool{}),
+	"IKV":       newStartOpFlags(true, false, map[string]bool{}),
+	"IM":        newStartOpFlags(true, false, map[string]bool{}), //Invoke macro
+	"KVMACRO":   newStartOpFlags(false, true, map[string]bool{}),
+	"MACRO":     newStartOpFlags(false, true, map[string]bool{}),
+	"NAMESPACE": newStartOpFlags(true, false, map[string]bool{}),
+	"REPEAT":    newStartOpFlags(false, true, map[string]bool{"REPEAT": true}),
+	"SWITCH":    newStartOpFlags(false, false, map[string]bool{}),
 }
 
 // The default values for flags when a new operation is pushed
@@ -110,7 +112,7 @@ var allowedOperationsForParentOps = map[string]captureableOpMap{
 	"NAMESPACE": {
 		enumTokenTypes.ASSIGN_simple: true,
 	},
-	"REPEAT": sharedCapturableOps,
+	"REPEAT": sharedCapturableMacroOps,
 	"SWITCH": {
 		enumTokenTypes.DIRECTIVE_blockStart: true,
 	},

@@ -60,8 +60,9 @@ type CaptureBlockListNode struct {
 	//Setting where the operation evaluates things while capturing
 	evalutesInsteadOfCapturing bool
 	//Mainly for macros - Will always capture nodes except for a corresponding ending block
-	forcedCapturing bool
-	nextNode        *CaptureBlockListNode
+	forcedCapturing        bool
+	overwriteForcedCapture *map[string]bool
+	nextNode               *CaptureBlockListNode
 }
 
 func newCaptureBlockListNode() CaptureBlockListNode {
