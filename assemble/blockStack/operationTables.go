@@ -80,15 +80,16 @@ var sharedCapturableOps = captureableOpMap{
 }
 
 var sharedCapturableMacroOps = captureableOpMap{
-	enumTokenTypes.INSTRUCTION:          true,
-	enumTokenTypes.DIRECTIVE_dataBytes:  true,
-	enumTokenTypes.DIRECTIVE_dataSeries: true,
-	enumTokenTypes.DIRECTIVE_mixedData:  true,
-	enumTokenTypes.DIRECTIVE_blockStart: true,
-	enumTokenTypes.DIRECTIVE_blockEnd:   true,
-	enumTokenTypes.DIRECTIVE_throw:      true,
-	enumTokenTypes.IDENTIFIER:           true,
-	enumTokenTypes.TEMPLATE_STRING:      true,
+	enumTokenTypes.INSTRUCTION:            true,
+	enumTokenTypes.DIRECTIVE_dataBytes:    true,
+	enumTokenTypes.DIRECTIVE_dataSeries:   true,
+	enumTokenTypes.DIRECTIVE_mixedData:    true,
+	enumTokenTypes.DIRECTIVE_blockStart:   true,
+	enumTokenTypes.DIRECTIVE_blockEnd:     true,
+	enumTokenTypes.DIRECTIVE_invokeKeyVal: true,
+	enumTokenTypes.DIRECTIVE_throw:        true,
+	enumTokenTypes.IDENTIFIER:             true,
+	enumTokenTypes.TEMPLATE_STRING:        true,
 }
 
 // Dictates which operations can be captured by the parent
