@@ -87,6 +87,11 @@ func GetCurrentCaptureBlockStack() *[]captureBlock {
 	return getCurrentCaptureBlockListNodeCaptureBlockStack()
 }
 
+func GetCurrentCaptureBlockStackLen() int {
+	blockStack := getCurrentCaptureBlockListNodeCaptureBlockStack()
+	return len(*blockStack)
+}
+
 func GetCurrentCaptureBlock() *captureBlock {
 	return getCurrentCaptureBlockListNodeCaptureBlockStackTopEntry()
 }

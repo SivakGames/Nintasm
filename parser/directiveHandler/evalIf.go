@@ -13,6 +13,9 @@ func evalIf(directiveName string, operandList *[]Node) error {
 }
 
 func evalElseIf(directiveName string, operandList *[]Node) error {
+	if blockStack.GetCurrentCaptureBlockStackLen() == 0 {
+		return errorHandler.AddNew(enumErrorCodes.IfStatementElseIfNoParentIf)
+	}
 	lastOpName := blockStack.GetCurrentCaptureBlockOperationName()
 	//See if else has been declared - can't do else if afterwards
 	if lastOpName == "ELSE" {
@@ -23,6 +26,9 @@ func evalElseIf(directiveName string, operandList *[]Node) error {
 }
 
 func evalElse(directiveName string, operandList *[]Node) error {
+	if blockStack.GetCurrentCaptureBlockStackLen() == 0 {
+		return errorHandler.AddNew(enumErrorCodes.IfStatementElseNoParentIf)
+	}
 	lastOpName := blockStack.GetCurrentCaptureBlockOperationName()
 	//See if else has been declared - can't do duplicate elses
 	if lastOpName == "ELSE" {

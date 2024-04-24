@@ -129,6 +129,7 @@ var errorTable = map[enumErrorCodes.Def]ErrorTableEntry{
 	enumErrorCodes.AssignmentLocalNotInNamespace: newErrorTableEntry(enumErrorCodes.Error, "Cannot use local assignment outside of namespace"),
 	enumErrorCodes.AssignmentNamespaceNotLocal:   newErrorTableEntry(enumErrorCodes.Error, "Must use local assignment within namespace"),
 
+	enumErrorCodes.IfStatementElseIfNoParentIf:       newErrorTableEntry(enumErrorCodes.Error, "Cannot use elseif without parent if"),
 	enumErrorCodes.IfStatementElseIfAfterElse:        newErrorTableEntry(enumErrorCodes.Error, "Cannot have elseif after else"),
 	enumErrorCodes.IfStatementDuplicateElse:          newErrorTableEntry(enumErrorCodes.Error, "Cannot only have 1 else in this block"),
 	enumErrorCodes.SwitchStatementBadOperand:         newErrorTableEntry(enumErrorCodes.Error, "Switch operand type must be or resolve to a number or string"),

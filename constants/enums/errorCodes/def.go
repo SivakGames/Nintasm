@@ -93,7 +93,9 @@ const (
 	AssignmentLocalNotInNamespace = "AssignmentLocalNotInNamespace"
 	AssignmentNamespaceNotLocal   = "AssignmentNamespaceNotLocal"
 
+	IfStatementElseIfNoParentIf       = "IfStatementElseIfNoParentIf"
 	IfStatementElseIfAfterElse        = "IfStatementElseIfAfterElse"
+	IfStatementElseNoParentIf         = "IfStatementElseNoParentIf"
 	IfStatementDuplicateElse          = "IfStatementDuplicateElse"
 	SwitchStatementBadOperand         = "SwitchStatementBadOperand"
 	SwitchStatementCaseAfterDefault   = "SwitchStatementCaseAfterDefault"
