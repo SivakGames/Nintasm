@@ -71,14 +71,34 @@ func startReadingLinesTopFileStack() error {
 }
 
 func ReadLines(lines *[]string, lineCounter *uint) error {
+	accumulatingMultiLine := false
+	accumulatingLineContent := ""
+
 	// Iterate over all lines
 	for i, rawLine := range *lines {
 		*lineCounter += 1
 
 		//Step 1 - Reformat line
 		reformattedLine, lineInitErr := lineInitParser.Process(rawLine)
-		(*lines)[i] = reformattedLine
 
+		if reformattedLine == "{" || reformattedLine == "}" {
+			if (reformattedLine == "{" && accumulatingMultiLine) || (reformattedLine == "}" && !accumulatingMultiLine) {
+				return errorHandler.AddNew(enumErrorCodes.Other, "NO!") // ❌❌ CONTINUES Failing!
+			}
+
+			accumulatingMultiLine = !accumulatingMultiLine
+			if accumulatingMultiLine {
+				accumulatingLineContent = ""
+				reformattedLine = ""
+			} else {
+				reformattedLine = accumulatingLineContent
+			}
+		} else if accumulatingMultiLine {
+			accumulatingLineContent += reformattedLine
+			reformattedLine = ""
+		}
+
+		(*lines)[i] = reformattedLine
 		if lineInitErr != nil {
 			return lineInitErr
 		}
