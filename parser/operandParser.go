@@ -650,7 +650,25 @@ func (p *OperandParser) memberExpression() (Node, error) {
 		if err != nil {
 			return operandFactory.ErrorNode(p.lookaheadValue), err // ❌ Fails
 		}
-		return operandFactory.CreateMemberExpressionNode(parent, key, false), nil
+		return operandFactory.CreateMemberExpressionNode(parent, key, false, nil), nil
+	} else if p.lookaheadType == enumTokenTypes.DELIMITER_leftSquareBracket {
+		indexNodes := []Node{}
+		for p.lookaheadType == enumTokenTypes.DELIMITER_leftSquareBracket {
+			err = p.eatFreelyAndAdvance(enumTokenTypes.DELIMITER_leftSquareBracket)
+			if err != nil {
+				return p.badEat(err) // ❌ Fails
+			}
+			err = p.getArgumentAndAppend(&indexNodes)
+			if err != nil {
+				return result, err // ❌ Fails
+			}
+
+			err = p.eatAndAdvance(enumTokenTypes.DELIMITER_rightSquareBracket)
+			if err != nil {
+				return result, err // ❌ Fails
+			}
+		}
+		return operandFactory.CreateMemberExpressionNode(parent, "_", true, indexNodes), nil
 	}
 
 	return result, nil
@@ -861,6 +879,7 @@ func (p *OperandParser) templateString() (Node, error) {
 
 // xxxxxxxxxxxxxxxxxxx
 
+// Adds a highlighting thing for positional indicators in errors
 func (p *OperandParser) addErrorHighlighter() {
 	p.addErrorHighlighterWithOffset(0)
 }

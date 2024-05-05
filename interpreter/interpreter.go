@@ -26,8 +26,19 @@ func EvaluateNode(node Node) (Node, error) {
 	case enumNodeTypes.MultiByte:
 		return processMultiByte(node)
 
-	case enumNodeTypes.Identifier,
-		enumNodeTypes.MemberExpression:
+	case enumNodeTypes.Identifier:
+		resolvedNode, resolved, err := environment.LookupIdentifierInSymbolAsNodeTable(node.NodeValue)
+		if resolved {
+			return resolvedNode, err
+		}
+		return node, err
+
+	case enumNodeTypes.MemberExpression:
+		// node[index] style
+		if node.ArgumentList != nil && len(*node.ArgumentList) > 0 {
+			return processComputedMemberExpression(node)
+		}
+		// node.key style
 		resolvedNode, resolved, err := environment.LookupIdentifierInSymbolAsNodeTable(node.NodeValue)
 		if resolved {
 			return resolvedNode, err
