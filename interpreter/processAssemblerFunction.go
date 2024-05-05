@@ -33,14 +33,20 @@ var assemblerBuiltInFunctions = map[string]assemblerFunction{
 	"cos":      {1, 1, true, []enumNodeTypes.Def{enumNodeTypes.NumericLiteral}},
 	"cosdeg":   {1, 1, true, []enumNodeTypes.Def{enumNodeTypes.NumericLiteral}},
 
+	//String-related
 	"strlen":     {1, 1, true, []enumNodeTypes.Def{enumNodeTypes.StringLiteral}},
 	"substr":     {2, 3, true, []enumNodeTypes.Def{enumNodeTypes.StringLiteral, enumNodeTypes.NumericLiteral, enumNodeTypes.NumericLiteral}},
 	"reverseStr": {1, 1, true, []enumNodeTypes.Def{enumNodeTypes.StringLiteral}},
-	"itemlen":    {1, 1, true, []enumNodeTypes.Def{enumNodeTypes.MultiByte}},
-	"subitem":    {2, 3, true, []enumNodeTypes.Def{enumNodeTypes.MultiByte, enumNodeTypes.NumericLiteral, enumNodeTypes.NumericLiteral}},
-	"bytelen":    {1, 1, true, []enumNodeTypes.Def{enumNodeTypes.MultiByte}},
+	"toCharmap":  {1, 1, true, []enumNodeTypes.Def{enumNodeTypes.StringLiteral}},
 
-	"toCharmap":            {1, 1, true, []enumNodeTypes.Def{enumNodeTypes.StringLiteral}},
+	//Array-related
+	"itemlen":  {1, 1, true, []enumNodeTypes.Def{enumNodeTypes.MultiByte}},
+	"subitem":  {2, 3, true, []enumNodeTypes.Def{enumNodeTypes.MultiByte, enumNodeTypes.NumericLiteral, enumNodeTypes.NumericLiteral}},
+	"bytelen":  {1, 1, true, []enumNodeTypes.Def{enumNodeTypes.MultiByte}},
+	"contains": {2, 2, true, []enumNodeTypes.Def{enumNodeTypes.MultiByte, enumNodeTypes.NumericLiteral}},
+	"index":    {2, 2, true, []enumNodeTypes.Def{enumNodeTypes.MultiByte, enumNodeTypes.NumericLiteral}},
+
+	//Misc
 	"bytesInCurrentLabel":  {0, 0, false, []enumNodeTypes.Def{}},
 	"bytesInLabel":         {1, 1, false, []enumNodeTypes.Def{enumNodeTypes.Identifier}},
 	"bytesInCurrentLocal":  {0, 0, false, []enumNodeTypes.Def{}},
@@ -185,6 +191,36 @@ func processAssemblerFunction(node *Node) error {
 		}
 		node.ArgumentList = &slicedItem
 
+	case "contains":
+		target := evaluatedArguments[0].ArgumentList
+		containValue := int(evaluatedArguments[1].AsNumber)
+		foundContain := false
+
+		for _, v := range *target {
+			if containValue == int(v.AsNumber) {
+				foundContain = true
+				break
+			}
+		}
+		node.AsBool = foundContain
+
+	case "index":
+		target := evaluatedArguments[0].ArgumentList
+		containValue := int(evaluatedArguments[1].AsNumber)
+		foundIndex := -1
+
+		for i, v := range *target {
+			if containValue == int(v.AsNumber) {
+				foundIndex = i
+				break
+			}
+		}
+		if foundIndex < 0 {
+			return errorHandler.AddNew(enumErrorCodes.Other, "index function failed and didn't find value")
+		}
+
+		node.AsNumber = float64(foundIndex)
+
 	case "toCharmap":
 		nodeString := (evaluatedArguments[0].NodeValue)
 		replacedStringAsBytes, err := charmapTable.MapStringToCharmap(nodeString)
@@ -326,10 +362,13 @@ func processAssemblerFunction(node *Node) error {
 		"modfDeci", "modfInt",
 		"sin", "sindeg", "cos", "cosdeg",
 		"bank",
-		"strlen", "bytelen", "itemlen":
+		"strlen", "bytelen", "itemlen",
+		"index":
 		operandFactory.ConvertNodeToNumericLiteral(node)
 	case "substr", "reverseStr":
 		operandFactory.ConvertNodeToStringLiteral(node)
+	case "contains":
+		operandFactory.ConvertNodeToBooleanLiteral(node)
 	case "subitem":
 		operandFactory.ConvertNodeToMultiBytes(node, *node.ArgumentList)
 	}
