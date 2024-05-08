@@ -79,6 +79,19 @@ var sharedCapturableOps = captureableOpMap{
 	enumTokenTypes.TEMPLATE_STRING:      true,
 }
 
+var ifCapturableOps = captureableOpMap{
+	enumTokenTypes.INSTRUCTION:          true,
+	enumTokenTypes.ASSIGN_EQU:           true,
+	enumTokenTypes.ASSIGN_simple:        true,
+	enumTokenTypes.DIRECTIVE_dataBytes:  true,
+	enumTokenTypes.DIRECTIVE_dataSeries: true,
+	enumTokenTypes.DIRECTIVE_include:    true,
+	enumTokenTypes.DIRECTIVE_mixedData:  true,
+	enumTokenTypes.DIRECTIVE_throw:      true,
+	enumTokenTypes.IDENTIFIER:           true,
+	enumTokenTypes.TEMPLATE_STRING:      true,
+}
+
 var sharedCapturableMacroOps = captureableOpMap{
 	enumTokenTypes.INSTRUCTION:            true,
 	enumTokenTypes.DIRECTIVE_dataBytes:    true,
@@ -101,9 +114,9 @@ var allowedOperationsForParentOps = map[string]captureableOpMap{
 	"EXPRMAP": {
 		enumTokenTypes.DIRECTIVE_defExprMap: true,
 	},
-	"IF":     sharedCapturableOps,
-	"ELSEIF": sharedCapturableOps,
-	"ELSE":   sharedCapturableOps,
+	"IF":     ifCapturableOps,
+	"ELSEIF": ifCapturableOps,
+	"ELSE":   ifCapturableOps,
 	"IKV": {
 		enumTokenTypes.DIRECTIVE_invokeKeyVal: true,
 	},
@@ -117,8 +130,8 @@ var allowedOperationsForParentOps = map[string]captureableOpMap{
 	"SWITCH": {
 		enumTokenTypes.DIRECTIVE_blockStart: true,
 	},
-	"CASE":    sharedCapturableOps,
-	"DEFAULT": sharedCapturableOps,
+	"CASE":    ifCapturableOps,
+	"DEFAULT": ifCapturableOps,
 }
 
 func getAllowedOperationsForCurrentBlockOperation() captureableOpMap {

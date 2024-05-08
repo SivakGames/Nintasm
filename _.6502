@@ -18,6 +18,13 @@
 	.bank 0
 	.org $8000
 
+aatatat = 1
+
+	.if defined(atatat)
+	.include "atat.txt"
+	.endif
+
+
 ;-----------------------------------------
 RESET:
 	__resetCode__
