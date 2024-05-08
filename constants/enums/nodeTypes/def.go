@@ -14,6 +14,7 @@ const (
 	CallExpression
 	LogicalExpression
 	MemberExpression
+	TernaryExpression
 	UnaryExpression
 
 	BacktickStringLiteral

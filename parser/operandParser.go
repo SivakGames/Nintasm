@@ -364,7 +364,7 @@ func (p *OperandParser) statement() (Node, error) {
 		return operandFactory.EmptyNode(), errorHandler.AddNew(enumErrorCodes.OperandStatementEmpty)
 	}
 
-	statement, err := p.logicalOrExpression()
+	statement, err := p.ternaryExpression()
 	if err != nil {
 		return statement, err
 	}
@@ -389,6 +389,41 @@ func (p *OperandParser) statement() (Node, error) {
 	Here we have the food chain of expressions in order of
 	lowest predence to highest
 */
+
+// ?: expression
+func (p *OperandParser) ternaryExpression() (Node, error) {
+	conditionExpression, err := p.logicalOrExpression()
+	if err != nil {
+		return conditionExpression, err
+	}
+	if p.lookaheadType != enumTokenTypes.OPERATOR_questionMark {
+		return conditionExpression, err
+	}
+
+	//Have a question mark
+	err = p.eatAndAdvance(enumTokenTypes.OPERATOR_questionMark)
+	if err != nil {
+		return p.badEat(err) // ❌ Fails
+	}
+
+	trueExpression, err := p.statement()
+	if err != nil {
+		return trueExpression, err // ❌ Fails
+	}
+
+	//Get rid of the colon
+	err = p.eatAndAdvance(enumTokenTypes.DELIMITER_colon)
+	if err != nil {
+		return p.badEat(err) // ❌ Fails
+	}
+
+	falseExpression, err := p.statement()
+	if err != nil {
+		return falseExpression, err // ❌ Fails
+	}
+
+	return operandFactory.CreateTernaryExpressionNode(conditionExpression, trueExpression, falseExpression), nil
+}
 
 // || expression
 func (p *OperandParser) logicalOrExpression() (Node, error) {

@@ -70,7 +70,7 @@ func CreateMemberExpressionNode(parent string, key string, computed bool, argume
 	return node
 }
 
-// """Standard binary expression"""
+// Standard binary expression
 // nodeValue is the operator
 func CreateBinaryExpressionNode(nodeValue string, left Node, right Node) Node {
 	node := newNode(nodeValue, enumNodeTypes.BinaryExpression)
@@ -79,7 +79,16 @@ func CreateBinaryExpressionNode(nodeValue string, left Node, right Node) Node {
 	return node
 }
 
-// """Standard unary expression"""
+// Standard ternary expression
+func CreateTernaryExpressionNode(condition Node, left Node, right Node) Node {
+	node := newNode("?:", enumNodeTypes.TernaryExpression)
+	node.Left = &left
+	node.Right = &right
+	node.ArgumentList = &[]Node{condition}
+	return node
+}
+
+// Standard unary expression
 func CreateUnaryExpressionNode(nodeValue string, right Node) Node {
 	node := newNode(nodeValue, enumNodeTypes.UnaryExpression)
 	node.Right = &right

@@ -62,6 +62,9 @@ func EvaluateNode(node Node) (Node, error) {
 	case enumNodeTypes.BinaryExpression:
 		return processBinaryExpression(node)
 
+	case enumNodeTypes.TernaryExpression:
+		return processTernaryExpression(node)
+
 	case enumNodeTypes.UnaryExpression:
 		return processUnaryExpression(node)
 
