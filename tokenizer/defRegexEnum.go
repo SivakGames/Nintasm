@@ -114,6 +114,7 @@ var (
 		{regexp.MustCompile(`^\|`), enumTokenTypes.OPERATOR_bitwiseOr},
 		{regexp.MustCompile(`^\^`), enumTokenTypes.OPERATOR_bitwiseXor},
 		{regexp.MustCompile(`^\~`), enumTokenTypes.OPERATOR_negate},
+		{regexp.MustCompile(`^\?`), enumTokenTypes.OPERATOR_questionMark},
 	}
 )
 

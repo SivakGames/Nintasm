@@ -81,4 +81,5 @@ const (
 	OPERATOR_bitwiseOr
 	OPERATOR_bitwiseXor
 	OPERATOR_negate
+	OPERATOR_questionMark
 )

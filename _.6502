@@ -20,9 +20,7 @@
 
 aatatat = 1
 
-	.if defined(atatat)
-	.include "atat.txt"
-	.endif
+	.db defined(atatat) ? 1 : 2
 
 
 ;-----------------------------------------
