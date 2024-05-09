@@ -10,7 +10,7 @@ const (
 	//Whitespace
 	WHITESPACE
 	//Template strings
-	TEMPLATE_STRING
+	DYNAMIC_LABEL
 	//Strings
 	STRING
 	BACKTICK_STRING

@@ -748,7 +748,7 @@ func (p *OperandParser) primaryExpression() (Node, error) {
 	case enumTokenTypes.IDENTIFIER:
 		return p.identifier()
 
-	case enumTokenTypes.TEMPLATE_STRING:
+	case enumTokenTypes.DYNAMIC_LABEL:
 		return p.templateString()
 	}
 
@@ -904,7 +904,7 @@ func (p *OperandParser) templateString() (Node, error) {
 		templateLabel = parentLabel + templateLabel
 	}
 
-	err = p.eatFreelyAndAdvance(enumTokenTypes.TEMPLATE_STRING)
+	err = p.eatFreelyAndAdvance(enumTokenTypes.DYNAMIC_LABEL)
 	if err != nil {
 		return p.badEat(err) // ❌ Fails
 	}

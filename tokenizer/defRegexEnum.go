@@ -29,7 +29,7 @@ var (
 		{regexp.MustCompile(`^;.*`), enumTokenTypes.None},
 	}
 	templateStringSpec = []specRegexEnum{
-		{regexp.MustCompile(`^l\"[^\"]*\"`), enumTokenTypes.TEMPLATE_STRING},
+		{regexp.MustCompile(`^l\"[^\"]*\"`), enumTokenTypes.DYNAMIC_LABEL},
 	}
 	stringSpec = []specRegexEnum{
 		{regexp.MustCompile(`^\"[^\"]*\"`), enumTokenTypes.STRING},

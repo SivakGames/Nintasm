@@ -141,7 +141,7 @@ func (p *OperationParser) getRegularOperation() error {
 // Line has no whitespace at the start
 func (p *OperationParser) getLabelOperation() error {
 	// Check for template label
-	isTemplate := p.lookaheadType == enumTokenTypes.TEMPLATE_STRING
+	isTemplate := p.lookaheadType == enumTokenTypes.DYNAMIC_LABEL
 	// Check for local label
 	isLocal := p.lookaheadType == enumTokenTypes.DELIMITER_period
 	// Label itself
@@ -168,11 +168,11 @@ func (p *OperationParser) getLabelOperation() error {
 				return errorHandler.AddNew(enumErrCode, p.lookaheadValue)
 			}
 		} else if isTemplate {
-			err := p.eat(enumTokenTypes.TEMPLATE_STRING)
+			err := p.eat(enumTokenTypes.DYNAMIC_LABEL)
 			if err != nil {
 				return err
 			}
-			finalTokenEnum = enumTokenTypes.TEMPLATE_STRING
+			finalTokenEnum = enumTokenTypes.DYNAMIC_LABEL
 		}
 
 	}
