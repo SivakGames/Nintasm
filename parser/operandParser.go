@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"fmt"
 	"misc/nintasm/assemble/errorHandler"
 	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
 	enumInstructionModes "misc/nintasm/constants/enums/instructionModes"
@@ -748,7 +749,8 @@ func (p *OperandParser) primaryExpression() (Node, error) {
 	case enumTokenTypes.IDENTIFIER:
 		return p.identifier()
 
-	case enumTokenTypes.DYNAMIC_LABEL:
+	case enumTokenTypes.DYNAMIC_LABEL,
+		enumTokenTypes.DYNAMIC_STRING:
 		return p.templateString()
 	}
 
@@ -891,25 +893,33 @@ func (p *OperandParser) identifier() (Node, error) {
 // -----------------
 func (p *OperandParser) templateString() (Node, error) {
 	literalValue := p.lookaheadValue
-	templateLabel, err := p.getTemplateString(literalValue)
+	templateString, err := p.getTemplateString(literalValue, p.lookaheadType)
 	if err != nil {
 		return operandFactory.ErrorNode(literalValue),
 			err // ❌ Fails
 	}
-	if strings.HasPrefix(templateLabel, ".") {
-		parentLabel, err := interpreter.GetParentLabel()
-		if err != nil {
-			return operandFactory.ErrorNode(literalValue), err // ❌ Fails
+	if p.lookaheadType == enumTokenTypes.DYNAMIC_LABEL {
+		if strings.HasPrefix(templateString, ".") {
+			parentLabel, err := interpreter.GetParentLabel()
+			if err != nil {
+				return operandFactory.ErrorNode(literalValue), err // ❌ Fails
+			}
+			templateString = parentLabel + templateString
 		}
-		templateLabel = parentLabel + templateLabel
-	}
 
-	err = p.eatFreelyAndAdvance(enumTokenTypes.DYNAMIC_LABEL)
+		err = p.eatFreelyAndAdvance(enumTokenTypes.DYNAMIC_LABEL)
+		if err != nil {
+			return p.badEat(err) // ❌ Fails
+		}
+		return operandFactory.CreateIdentifierNode(templateString), nil
+	}
+	err = p.eatFreelyAndAdvance(enumTokenTypes.DYNAMIC_STRING)
 	if err != nil {
 		return p.badEat(err) // ❌ Fails
 	}
+	fmt.Println(templateString)
 
-	return operandFactory.CreateIdentifierNode(templateLabel), nil
+	return operandFactory.CreateStringLiteralNode("\"" + templateString + "\""), nil
 }
 
 // xxxxxxxxxxxxxxxxxxx

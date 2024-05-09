@@ -39,7 +39,7 @@ func (p *LabelOperandParser) Process(operationTokenEnum tokenEnum, operationLabe
 
 func (p *LabelOperandParser) doProcess(operationTokenEnum tokenEnum, operationLabel string) error {
 	if operationTokenEnum == enumTokenTypes.DYNAMIC_LABEL {
-		newLabel, err := p.getTemplateString(operationLabel)
+		newLabel, err := p.getTemplateString(operationLabel, operationTokenEnum)
 		if err != nil {
 			return err // ❌ Fails
 		}

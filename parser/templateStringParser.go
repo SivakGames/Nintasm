@@ -17,10 +17,10 @@ var templateStringOperandParser = newOperandParser()
 // ==================================================
 
 // Template string parsing
-func (p *Parser) parseTemplateString(templateString string) (string, error) {
+func (p *Parser) parseTemplateString(templateString string, tokenType enumTokenTypes.Def) (string, error) {
 	templateLabel := templateString[2 : len(templateString)-1]
 	p.startAndAdvanceToNext(templateLabel, "templateString")
-	identifierString := ""
+	dynamicString := ""
 
 	for p.lookaheadType != enumTokenTypes.None {
 		if p.lookaheadType == enumTokenTypes.DELIMITER_leftCurlyBrace {
@@ -28,27 +28,29 @@ func (p *Parser) parseTemplateString(templateString string) (string, error) {
 			if err != nil {
 				return templateString, err
 			}
-			identifierString += o
+			dynamicString += o
 		} else {
-			identifierString += p.lookaheadValue
+			dynamicString += p.lookaheadValue
 			p.eatFreelyAndAdvance(p.lookaheadType)
 		}
 	}
 
-	if identifierString == "" {
-		return identifierString, errorHandler.AddNew(enumErrorCodes.ParserTemplateStringEmpty)
+	if dynamicString == "" {
+		return dynamicString, errorHandler.AddNew(enumErrorCodes.ParserTemplateStringEmpty)
 	}
 
-	identifierToValidate := identifierString
-	if strings.HasPrefix(identifierToValidate, ".") {
-		identifierToValidate = identifierToValidate[1:]
+	if tokenType == enumTokenTypes.DYNAMIC_LABEL {
+		identifierToValidate := dynamicString
+		if strings.HasPrefix(identifierToValidate, ".") {
+			identifierToValidate = identifierToValidate[1:]
+		}
+
+		if !p.tokenizer.IsTokenIdentifierLikeWithParent(identifierToValidate) {
+			return templateString, errorHandler.AddNew(enumErrorCodes.ParserTemplateStringNotIdentifier, dynamicString)
+		}
 	}
 
-	if !p.tokenizer.IsTokenIdentifierLikeWithParent(identifierToValidate) {
-		return templateString, errorHandler.AddNew(enumErrorCodes.ParserTemplateStringNotIdentifier, identifierString)
-	}
-
-	return identifierString, nil
+	return dynamicString, nil
 }
 
 func (p *Parser) getTemplateOperand() (string, error) {

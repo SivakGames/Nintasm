@@ -110,6 +110,6 @@ func (p *OperandParser) SetupOperandParser(line string, operandListStringStartPo
 }
 
 // Template string parsing
-func (p *Parser) getTemplateString(tokenValue string) (string, error) {
-	return templateStringParser.parseTemplateString(tokenValue)
+func (p *Parser) getTemplateString(tokenValue string, tokenType enumTokenTypes.Def) (string, error) {
+	return templateStringParser.parseTemplateString(tokenValue, tokenType)
 }

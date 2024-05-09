@@ -11,6 +11,7 @@ const (
 	WHITESPACE
 	//Template strings
 	DYNAMIC_LABEL
+	DYNAMIC_STRING
 	//Strings
 	STRING
 	BACKTICK_STRING
