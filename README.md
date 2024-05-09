@@ -27,9 +27,9 @@ There are, however, sample programs included in the repository that can be built
 	- [General Assembler Syntax](#general-assembler-syntax)
 		- [**Comments**](#comments)
 		- [**Labels**](#labels)
-		- [**Directives**](#directives)
 		- [**Instructions**](#instructions)
-		- [**Sample Program**](#sample-program)
+		- [**Directives**](#directives)
+		- [**Sample Program Snippet**](#sample-program-snippet)
 	- [Working With Numbers](#working-with-numbers)
 		- [Example of General Number Use](#example-of-general-number-use)
 		- [Negative Numbers](#negative-numbers)
@@ -92,6 +92,8 @@ There are, however, sample programs included in the repository that can be built
 	- [Expression Maps](#expression-maps)
 		- [Other Expression Map Directives](#other-expression-map-directives)
 		- [Examples of Using Expression Maps](#examples-of-using-expression-maps)
+	- [Dynamic Labels](#dynamic-labels)
+		- [Examples of Using Dynamic Labels](#examples-of-using-dynamic-labels)
 	- [**Happy Assembly!**](#happy-assembly)
 
 ---
@@ -168,12 +170,6 @@ Programs have these basic operations: labels, directives, and 6502 instructions.
 - It's important to note that label names are case-sensitive. (e.g. `LDA Label` vs `LDA label` are **NOT** the same thing)
 - It's possible to define local labels underneath a parent label. These follow the same rules and naming conventions as a label, however, they start with a period ( `.` ). Local labels can be referenced anywhere in the code by placing their parent label in front of them. However, while inside the local scope, the parent label's name can be omitted.
 
-### **Directives**
-
-- Directives are assembler-defined operations that are not specific to the 6502 processor but assist in building and defining various aspects of the game.
-- A directive is a statement that begins with _at least_ one whitespace character followed by a period ( `.` ) and then the name of the directive. (e.g. `.byte` )
-- Directive names are NOT case sensitive. `.byte` and `.BYTE` will have the same effect and no error will be thrown. However, it's generally good practice to maintain consistent casing throughout the program.
-
 ### **Instructions**
 
 The majority of programs will utilize the standard set of 56 instructions offered by the 6502 processor.
@@ -181,7 +177,13 @@ The majority of programs will utilize the standard set of 56 instructions offere
 - Instructions must have _at least_ one whitespace character preceding them.
 - Similar to directives, instruction names are not case-sensitive. For example, `lda` and `LDA` will have the same effect. However, it is generally recommended to consistently use a specific case throughout the program.
 
-### **Sample Program**
+### **Directives**
+
+- Directives are assembler-defined operations that are not specific to the 6502 processor but assist in building and defining various aspects of the game.
+- A directive is a statement that begins with _at least_ one whitespace character followed by a period ( `.` ) and then the name of the directive. (e.g. `.byte` )
+- Directive names are NOT case sensitive. `.byte` and `.BYTE` will have the same effect and no error will be thrown. However, it's generally good practice to maintain consistent casing throughout the program.
+
+### **Sample Program Snippet**
 
 This simple program illustrates the usage of the basic building blocks.
 
@@ -1082,7 +1084,37 @@ MyExprmap2 .endexprmap
 
 ---
 
-<!-- omit in toc -->
+## Dynamic Labels
+
+There may be cases where multiple labels are desired (typically in repeat statements or macros) where providing a unique name every time can be cumbersome.
+
+Dynamic labels can be achieved by using a lowercase `l` followed by double quotes. Within the double quotes, curly braces can be used to evaluate the expression.
+
+Local labels can also be dynamic.  The period must be inside the quotes.
+
+### Examples of Using Dynamic Labels
+
+```text
+abc = 1
+
+;This label becomes Dynamic1
+l"Dynamic{abc}":
+
+;This label becomes Dynamic2
+l"Dynamic{abc+1}":
+
+;Creates 10 local labels called .repeatDynamic0, .repeatDynamic1, ..., .repeatDynamic9
+    .repeat 10, \i
+l".repeatDynamic{\i}":
+    .endRepeat
+
+;Using the 10 dynamic labels in a .dw statement
+    .repeat 10, \i
+    .dw l".repeatDyanmic{\i}"
+    .endRepeat
+```
+
+---
 
 ## **Happy Assembly!**
 
