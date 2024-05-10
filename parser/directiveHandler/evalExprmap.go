@@ -19,6 +19,7 @@ func evalExprmap(directiveName string, exprmapLabel string, operandList *[]Node)
 func evalEndExprmap() error {
 	capturedLines := blockStack.GetCurrentCaptureBlockCapturedLines()
 	blockStack.PopCaptureBlockThenExtendCapturedLines(*capturedLines)
+	blockStack.ClearCurrentOperationLabel()
 	return nil
 }
 
