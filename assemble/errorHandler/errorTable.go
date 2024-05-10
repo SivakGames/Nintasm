@@ -156,8 +156,8 @@ var errorTable = map[enumErrorCodes.Def]ErrorTableEntry{
 
 	enumErrorCodes.ExprMapNoneDefined:  newErrorTableEntry(enumErrorCodes.Error, "No expression maps have been defined!"),
 	enumErrorCodes.ExprMapNotExist:     newErrorTableEntry(enumErrorCodes.Error, "Specified exprmap doesn't exist!"),
-	enumErrorCodes.ExprMapDuplicateKey: newErrorTableEntry(enumErrorCodes.Error, "Expression %v has already been defined in current map"),
-	enumErrorCodes.ExprMapUndefExpr:    newErrorTableEntry(enumErrorCodes.Error, "Expression `%v` is not defined in currently used exprmap %v"),
+	enumErrorCodes.ExprMapDuplicateKey: newErrorTableEntry(enumErrorCodes.Error, fmt.Sprintf("Expression %v has already been defined in current map", coloredSymbol("`%v`"))),
+	enumErrorCodes.ExprMapUndefExpr:    newErrorTableEntry(enumErrorCodes.Error, fmt.Sprintf("Expression %v is not defined in currently used exprmap %v", coloredSymbol("`%v`"), coloredIdentifier("%v"))),
 	enumErrorCodes.ToExprMapUndefExpr:  newErrorTableEntry(enumErrorCodes.Error, "Expression `%v` is not defined in currently used exprmap"),
 
 	enumErrorCodes.InterpreterNoParentLabel:            newErrorTableEntry(enumErrorCodes.Error, "Cannot use operation! No parent label!"),

@@ -1,7 +1,6 @@
 package parser
 
 import (
-	"fmt"
 	"misc/nintasm/assemble/errorHandler"
 	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
 	enumInstructionModes "misc/nintasm/constants/enums/instructionModes"
@@ -917,8 +916,6 @@ func (p *OperandParser) templateString() (Node, error) {
 	if err != nil {
 		return p.badEat(err) // ❌ Fails
 	}
-	fmt.Println(templateString)
-
 	return operandFactory.CreateStringLiteralNode("\"" + templateString + "\""), nil
 }
 

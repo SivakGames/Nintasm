@@ -17,7 +17,8 @@ func evalExprmap(directiveName string, exprmapLabel string, operandList *[]Node)
 }
 
 func evalEndExprmap() error {
-	blockStack.ProcessEndLabeledDirective()
+	capturedLines := blockStack.GetCurrentCaptureBlockCapturedLines()
+	blockStack.PopCaptureBlockThenExtendCapturedLines(*capturedLines)
 	return nil
 }
 
@@ -33,7 +34,7 @@ func evalDefExpr(directiveName string, operandList *[]Node) error {
 		return errorHandler.AddNew(enumErrorCodes.NodeValueNot8Bit) // ❌ Fails
 	}
 
-	_, err := exprmapTable.CheckIfAlreadyExistsInExprmap(exprValueNode.NodeValue)
+	_, err := exprmapTable.CheckIfAlreadyExistsInExprmap(exprNode.NodeValue)
 	if err != nil {
 		return err
 	}

@@ -14,7 +14,8 @@ func processBacktickLiteral(node Node) (Node, error) {
 	}
 	exprAsNum, exprExists := exprmapTable.CheckIfDefinedInExprmap(node.NodeValue)
 	if !exprExists {
-		return node, errorHandler.AddNew(enumErrorCodes.ExprMapUndefExpr, node.NodeValue)
+		exprmapName := exprmapTable.GetCurrentExprmapName()
+		return node, errorHandler.AddNew(enumErrorCodes.ExprMapUndefExpr, node.NodeValue, exprmapName)
 	}
 	node.AsNumber = float64(exprAsNum)
 	operandFactory.ConvertNodeToNumericLiteral(&node)

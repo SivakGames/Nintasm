@@ -36,6 +36,10 @@ func AddExprToExprmap(newExpr string, exprValue int) error {
 
 // ----------------------------------
 
+func GetCurrentExprmapName() string {
+	return currentExprmapName
+}
+
 func GetCurrentExprmap() (ExprmapTableType, error) {
 	if currentExprmapName == "" {
 		return nil, errorHandler.AddNew(enumErrorCodes.ExprMapNoneDefined) // ❌ Fails

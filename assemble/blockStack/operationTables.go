@@ -28,7 +28,7 @@ func newStartOpFlags(forcedEval bool, forcedCapture bool, overwriteForcedCapture
 
 var startBlockOperationFlags = map[string]startOpFlags{
 	"CHARMAP":   newStartOpFlags(true, false, map[string]bool{}),
-	"EXPRMAP":   newStartOpFlags(true, false, map[string]bool{}),
+	"EXPRMAP":   newStartOpFlags(false, true, map[string]bool{}),
 	"IF":        newStartOpFlags(false, false, map[string]bool{}),
 	"IKV":       newStartOpFlags(true, false, map[string]bool{}),
 	"IM":        newStartOpFlags(true, false, map[string]bool{}), //Invoke macro
@@ -79,12 +79,13 @@ var sharedCapturableOps = captureableOpMap{
 	enumTokenTypes.DYNAMIC_LABEL:        true,
 }
 
-var ifCapturableOps = captureableOpMap{
+var ifRepeatCapturableOps = captureableOpMap{
 	enumTokenTypes.INSTRUCTION:          true,
 	enumTokenTypes.ASSIGN_EQU:           true,
 	enumTokenTypes.ASSIGN_simple:        true,
 	enumTokenTypes.DIRECTIVE_dataBytes:  true,
 	enumTokenTypes.DIRECTIVE_dataSeries: true,
+	enumTokenTypes.DIRECTIVE_defExprMap: true,
 	enumTokenTypes.DIRECTIVE_include:    true,
 	enumTokenTypes.DIRECTIVE_mixedData:  true,
 	enumTokenTypes.DIRECTIVE_throw:      true,
@@ -113,10 +114,12 @@ var allowedOperationsForParentOps = map[string]captureableOpMap{
 	},
 	"EXPRMAP": {
 		enumTokenTypes.DIRECTIVE_defExprMap: true,
+		enumTokenTypes.DIRECTIVE_blockStart: true,
+		enumTokenTypes.DIRECTIVE_blockEnd:   true,
 	},
-	"IF":     ifCapturableOps,
-	"ELSEIF": ifCapturableOps,
-	"ELSE":   ifCapturableOps,
+	"IF":     ifRepeatCapturableOps,
+	"ELSEIF": ifRepeatCapturableOps,
+	"ELSE":   ifRepeatCapturableOps,
 	"IKV": {
 		enumTokenTypes.DIRECTIVE_invokeKeyVal: true,
 	},
@@ -126,12 +129,12 @@ var allowedOperationsForParentOps = map[string]captureableOpMap{
 	"NAMESPACE": {
 		enumTokenTypes.ASSIGN_simple: true,
 	},
-	"REPEAT": sharedCapturableMacroOps,
+	"REPEAT": ifRepeatCapturableOps,
 	"SWITCH": {
 		enumTokenTypes.DIRECTIVE_blockStart: true,
 	},
-	"CASE":    ifCapturableOps,
-	"DEFAULT": ifCapturableOps,
+	"CASE":    ifRepeatCapturableOps,
+	"DEFAULT": ifRepeatCapturableOps,
 }
 
 func getAllowedOperationsForCurrentBlockOperation() captureableOpMap {
