@@ -42,6 +42,10 @@ func addToMasterTable(symbolName string, symbolEnum enumSymbolTableTypes.Def) er
 	masterLookupTable[symbolName] = symbolEnum
 	return nil
 }
+func removeFromMasterTable(symbolName string) error {
+	delete(masterLookupTable, symbolName)
+	return nil
+}
 
 // ============================================================================
 // ============================================================================
@@ -134,6 +138,24 @@ func AddOtherIdentifierToMasterTable(symbolName string, symbolEnum enumSymbolTab
 		namespaceTable.AddIdentifierKeyToNamespaceTable(symbolName)
 	default:
 		panic("🛑 Bad symbol type being added to environment!")
+	}
+	return nil
+}
+
+// ============================================================================
+// ============================================================================
+
+// Add things that do not hold any numeric value(s) to the master env. table and their own respective tables
+func RemoveOtherIdentifierFromMasterTable(symbolName string, symbolEnum enumSymbolTableTypes.Def) error {
+	removeFromMasterTable(symbolName)
+	switch symbolEnum {
+	case enumSymbolTableTypes.KVMacro:
+		macroTable.RemoveIdentifierKeyFromKVMacroTable(symbolName)
+	case enumSymbolTableTypes.Macro:
+		macroTable.RemoveIdentifierKeyFromMacroTable(symbolName)
+
+	default:
+		panic("🛑 Bad symbol type being removed from environment!")
 	}
 	return nil
 }

@@ -61,6 +61,7 @@ var (
 		{regexp.MustCompile(generateBoundaries("func|gnsi|rs")), enumTokenTypes.DIRECTIVE_labeled},
 		{regexp.MustCompile(generateBoundaries("nameSpace|macro|kvMacro|charMap|exprMap")), enumTokenTypes.DIRECTIVE_labeledBlockStart},
 		{regexp.MustCompile(generateBoundaries("end(?:nameSpace|m|kvm|charMap|exprMap)")), enumTokenTypes.DIRECTIVE_labeledBlockEnd},
+		{regexp.MustCompile(generateBoundaries("deleteMacro")), enumTokenTypes.DIRECTIVE_deleteSymbol},
 	}
 	delimiterSpec = []specRegexEnum{
 		{regexp.MustCompile(`^,`), enumTokenTypes.DELIMITER_comma},

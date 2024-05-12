@@ -29,6 +29,14 @@ func AddIdentifierKeyToKVMacroTable(macroName string) {
 	kvMacroSymbolTable[macroName] = MacroTableType{}
 }
 
+// xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+func RemoveIdentifierKeyFromMacroTable(macroName string) {
+	delete(macroSymbolTable, macroName)
+}
+func RemoveIdentifierKeyFromKVMacroTable(macroName string) {
+	delete(kvMacroSymbolTable, macroName)
+}
+
 // ----------------------------------
 
 func AddCapturedLinesToMacro(macroName string, macroEnum LookupMacroEnumType, capturedLines MacroTableType) error {

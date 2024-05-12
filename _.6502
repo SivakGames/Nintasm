@@ -18,9 +18,23 @@
 	.bank 0
 	.org $8000
 
+bbb .macro
+	.db 2
+bbb .endm
+
+	bbb
+	.deleteMacro bbb
+
+bbb .macro
+	.db 21
+bbb .endm
+
+	bbb
+
 ;-----------------------------------------
 RESET:
 	__resetCode__
+
 
 RESET_end:
 	;Enable NMI

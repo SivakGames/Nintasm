@@ -26,6 +26,7 @@ const (
 	DIRECTIVE_dataBytes
 	DIRECTIVE_dataSeries
 	DIRECTIVE_defExprMap
+	DIRECTIVE_deleteSymbol
 	DIRECTIVE_if
 	DIRECTIVE_include
 	DIRECTIVE_INES
