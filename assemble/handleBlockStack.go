@@ -81,7 +81,7 @@ func readCapturedLines(
 	tempNewOp *blockStack.CaptureBlockListNode) error {
 	var processCapturedErr error
 
-	lines := blockStack.GetLinesWithPtr(currentOp)
+	lines := blockStack.GetCapturedLinesWithPtr(currentOp)
 	monitorStack := blockStack.GetBlockEntriesWithPtr(tempNewOp)
 
 	//Iterate over captured lines
@@ -116,6 +116,9 @@ func readCapturedLines(
 		if processCapturedErr != nil {
 			return processCapturedErr // ❌ Fails
 		}
+		/*if blockStack.GetExitOpName() != "" {
+			return nil
+		} */
 	}
 
 	return nil

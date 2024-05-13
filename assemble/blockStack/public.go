@@ -123,11 +123,11 @@ func GetCurrentOpPtr() *CaptureBlockListNode {
 func GetCurrentActiveOpPtr() *CaptureBlockListNode {
 	return getActiveCaptureBlockListNode()
 }
-func GetLinesWithPtr(pointer *CaptureBlockListNode) *[]CapturedLine {
-	return &pointer.captureBlockStack[0].CapturedLines
-}
 func GetBlockEntriesWithPtr(pointer *CaptureBlockListNode) *[]captureBlock {
 	return &pointer.captureBlockStack
+}
+func GetCapturedLinesWithPtr(pointer *CaptureBlockListNode) *[]CapturedLine {
+	return &pointer.captureBlockStack[0].CapturedLines
 }
 func ClearBlockEntriesWithPtr(pointer *CaptureBlockListNode) {
 	pointer.captureBlockStack = (*pointer).captureBlockStack[:0]
@@ -136,4 +136,8 @@ func ClearBlockEntriesWithPtr(pointer *CaptureBlockListNode) {
 // -------------------------------------------------
 func SetExitOpName(opName string) {
 	exitOpName = opName
+}
+
+func GetExitOpName() string {
+	return exitOpName
 }
