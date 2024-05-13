@@ -66,6 +66,7 @@ func preProcessBlockStack() error {
 	currentOp := blockStack.GetCurrentOpPtr()
 	blockStack.AddNewCaptureBlockListNode() //Create new temp stack
 	tempNewOp := blockStack.GetCurrentOpPtr()
+	currentOpName := blockStack.GetCapturedLinesOpNameWithPtr(currentOp)
 	err := readCapturedLines(currentOp, tempNewOp)
 	if err != nil {
 		return err
@@ -73,6 +74,10 @@ func preProcessBlockStack() error {
 	blockStack.DestroyCaptureBlockListNodeWithPointer(tempNewOp) //Remove upper level buffer stack
 	blockStack.ClearBlockEntriesWithPtr(currentOp)
 	fileStack.ClearSubOp()
+	if blockStack.GetExitOpName() != "" && currentOpName == blockStack.GetExitOpName() {
+		blockStack.SetExitOpName("")
+	}
+
 	return nil
 }
 
@@ -98,6 +103,9 @@ func readCapturedLines(
 			if processCapturedErr != nil {
 				return processCapturedErr // ❌ Fails
 			}
+			if blockStack.GetExitOpName() != "" {
+				break
+			}
 			continue
 		}
 
@@ -116,9 +124,9 @@ func readCapturedLines(
 		if processCapturedErr != nil {
 			return processCapturedErr // ❌ Fails
 		}
-		/*if blockStack.GetExitOpName() != "" {
-			return nil
-		} */
+		if blockStack.GetExitOpName() != "" {
+			break
+		}
 	}
 
 	return nil

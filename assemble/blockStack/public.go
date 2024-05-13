@@ -129,6 +129,9 @@ func GetBlockEntriesWithPtr(pointer *CaptureBlockListNode) *[]captureBlock {
 func GetCapturedLinesWithPtr(pointer *CaptureBlockListNode) *[]CapturedLine {
 	return &pointer.captureBlockStack[0].CapturedLines
 }
+func GetCapturedLinesOpNameWithPtr(pointer *CaptureBlockListNode) string {
+	return (&pointer.captureBlockStack[0]).BlockOperationName
+}
 func ClearBlockEntriesWithPtr(pointer *CaptureBlockListNode) {
 	pointer.captureBlockStack = (*pointer).captureBlockStack[:0]
 }

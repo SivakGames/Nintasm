@@ -18,15 +18,6 @@
 	.bank 0
 	.org $8000
 	
-bbb .macro
-	.db 2
-	.exitMacro
-	.db 5
-bbb .endm
-
-
-	bbb
-
 ;-----------------------------------------
 RESET:
 	__resetCode__
