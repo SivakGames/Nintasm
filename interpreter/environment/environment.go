@@ -147,6 +147,15 @@ func AddOtherIdentifierToMasterTable(symbolName string, symbolEnum enumSymbolTab
 
 // Add things that do not hold any numeric value(s) to the master env. table and their own respective tables
 func RemoveOtherIdentifierFromMasterTable(symbolName string, symbolEnum enumSymbolTableTypes.Def) error {
+	identifierEnum, identifierExists := CheckIfIdentifierExistsInMasterTable(symbolName)
+
+	if !identifierExists {
+		return errorHandler.AddNew(enumErrorCodes.Other, "Symbol not found so deleting nothing...")
+	}
+	if identifierEnum != symbolEnum {
+		return errorHandler.AddNew(enumErrorCodes.Other, "Deleted type is not right")
+	}
+
 	removeFromMasterTable(symbolName)
 	switch symbolEnum {
 	case enumSymbolTableTypes.KVMacro:

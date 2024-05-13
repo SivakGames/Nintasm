@@ -29,21 +29,20 @@ var directiveAliases = map[string]string{
 	"PAD":          "DS",
 	"AUTOZEROPAGE": "AUTOZP",
 	"KEYVALUE":     "KV",
-	"DELETEMACRO":  "DELM",
 }
 
 var directiveManuallyEvaluatesOperands = map[string]bool{
-	"DB":         true,
-	"DW":         true,
-	"DWBE":       true,
-	"DELM":       true,
-	"FUNC":       true,
-	"GNSI":       true,
-	"KV":         true,
-	"IKV":        true,
-	"REPEAT":     true,
-	"SETCHARMAP": true,
-	"SETEXPRMAP": true,
+	"DB":          true,
+	"DW":          true,
+	"DWBE":        true,
+	"DELETEMACRO": true,
+	"FUNC":        true,
+	"GNSI":        true,
+	"KV":          true,
+	"IKV":         true,
+	"REPEAT":      true,
+	"SETCHARMAP":  true,
+	"SETEXPRMAP":  true,
 }
 
 var directiveEvaluatesLikeMacroOperands = map[string][]string{

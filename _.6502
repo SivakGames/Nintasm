@@ -17,12 +17,14 @@
 	.romSegment "32kb", "32kb", "PRG"
 	.bank 0
 	.org $8000
+
+atata = 23
+
+	.deleteMacro atata
 	
 ;-----------------------------------------
 RESET:
 	__resetCode__
-
-
 
 RESET_end:
 	;Enable NMI
