@@ -17,13 +17,18 @@
 	.romSegment "32kb", "32kb", "PRG"
 	.bank 0
 	.org $8000
+	
+	;.defchar "A", 5
+	.exitMacro
 
 bbb .macro
 	.db 2
+	.exitMacro
+	.db 5
 bbb .endm
 
 	bbb
-	.deleteMacro bbb
+	.delM bbb
 
 bbb .macro
 	.db 21
@@ -34,6 +39,7 @@ bbb .endm
 ;-----------------------------------------
 RESET:
 	__resetCode__
+
 
 
 RESET_end:

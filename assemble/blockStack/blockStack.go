@@ -28,7 +28,10 @@ func getCurrentCaptureBlockListNodeCaptureBlockStack() *[]captureBlock {
 
 func getCurrentCaptureBlockListNodeCaptureBlockStackTopEntry() *captureBlock {
 	blockStack := getCurrentCaptureBlockListNodeCaptureBlockStack()
-	return &(*blockStack)[len(*blockStack)-1]
+	if len(*blockStack) > 0 {
+		return &(*blockStack)[len(*blockStack)-1]
+	}
+	panic("🛑 Block stack has no length!")
 }
 
 func getCurrentCaptureBlockListNodeCaptureBlockStackTopEntryFurthestAlternate() *captureBlock {

@@ -27,6 +27,7 @@ const (
 	DIRECTIVE_dataSeries
 	DIRECTIVE_defExprMap
 	DIRECTIVE_deleteSymbol
+	DIRECTIVE_exitMacro
 	DIRECTIVE_if
 	DIRECTIVE_include
 	DIRECTIVE_INES

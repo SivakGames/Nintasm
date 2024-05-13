@@ -56,6 +56,8 @@ func EvaluateDirective(operationTokenEnum enumTokenTypes.Def, directiveName stri
 		return evalThrow(operandList)
 	case enumTokenTypes.DIRECTIVE_deleteSymbol:
 		return evalDeleteMacro(operandList)
+	case enumTokenTypes.DIRECTIVE_exitMacro:
+		return evalExitMacro()
 
 	case enumTokenTypes.DIRECTIVE_include:
 		switch directiveName {
