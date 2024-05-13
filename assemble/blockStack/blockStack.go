@@ -2,6 +2,7 @@ package blockStack
 
 //Main block capture linked list
 var captureBlockList CaptureBlockListNode
+var exitOpName string = ""
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -18,6 +19,17 @@ func getCurrentCaptureBlockListNode() *CaptureBlockListNode {
 		listNode = listNode.nextNode
 	}
 	return listNode
+}
+
+//Traverse the list until finding the current active Node
+func getActiveCaptureBlockListNode() *CaptureBlockListNode {
+	var listNode *CaptureBlockListNode = &captureBlockList
+	prevNode := listNode
+	for listNode.nextNode != nil {
+		prevNode = listNode
+		listNode = listNode.nextNode
+	}
+	return prevNode
 }
 
 //Get the entire capture block stack for the current node

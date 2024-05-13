@@ -120,6 +120,9 @@ func SetBottomOfStackToEmptyBlock() {
 func GetCurrentOpPtr() *CaptureBlockListNode {
 	return getCurrentCaptureBlockListNode()
 }
+func GetCurrentActiveOpPtr() *CaptureBlockListNode {
+	return getActiveCaptureBlockListNode()
+}
 func GetLinesWithPtr(pointer *CaptureBlockListNode) *[]CapturedLine {
 	return &pointer.captureBlockStack[0].CapturedLines
 }
@@ -128,4 +131,9 @@ func GetBlockEntriesWithPtr(pointer *CaptureBlockListNode) *[]captureBlock {
 }
 func ClearBlockEntriesWithPtr(pointer *CaptureBlockListNode) {
 	pointer.captureBlockStack = (*pointer).captureBlockStack[:0]
+}
+
+// -------------------------------------------------
+func SetExitOpName(opName string) {
+	exitOpName = opName
 }
