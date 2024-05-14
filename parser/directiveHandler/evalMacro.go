@@ -14,14 +14,15 @@ import (
 var symbolRegex = regexp.MustCompile(`^\\[A-Za-z_][0-9A-Za-z_]*`)
 
 func evalMacro(directiveName string, macroLabel string, operandList *[]Node) error {
+	useArguments := []string{}
 	if len(*operandList) > 0 {
 		firstOperand := (*operandList)[0]
 		if operandFactory.ValidateNodeIsNumeric(&firstOperand) {
 			if len(*operandList) > 1 {
 				return errorHandler.AddNew(enumErrorCodes.Other, "Only 1 numeric value if using numbers")
 			}
-			if !operandFactory.ValidateNumericNodeIsGTZero(&firstOperand) {
-				return errorHandler.AddNew(enumErrorCodes.Other, "Must use a value > 0")
+			if !operandFactory.ValidateNumericNodeIsPositive(&firstOperand) {
+				return errorHandler.AddNew(enumErrorCodes.NodeValueNotPositive)
 			}
 
 		} else {
@@ -39,12 +40,16 @@ func evalMacro(directiveName string, macroLabel string, operandList *[]Node) err
 				}
 
 				definedArguments[o.NodeValue] = true
+				useArguments = append(useArguments, o.NodeValue)
 			}
 		}
 	}
 
 	blockStack.PushCaptureBlock(directiveName, *operandList)
 	environment.AddOtherIdentifierToMasterTable(macroLabel, enumSymbolTableTypes.Macro)
+	if len(*operandList) > 0 {
+		macroTable.AddArgumentsToMacroTable(macroLabel, &useArguments)
+	}
 	return nil
 }
 

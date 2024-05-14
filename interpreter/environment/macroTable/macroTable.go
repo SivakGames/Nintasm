@@ -10,8 +10,13 @@ import (
 
 type MacroTableType = []blockStack.CapturedLine
 
-var macroSymbolTable = map[string]MacroTableType{}
-var kvMacroSymbolTable = map[string]MacroTableType{}
+type MacroXX struct {
+	Lines     MacroTableType
+	Arguments *[]string
+}
+
+var macroSymbolTable = map[string]MacroXX{}
+var kvMacroSymbolTable = map[string]MacroXX{}
 
 // The possible values for simple operations
 type LookupMacroEnumType int
@@ -23,10 +28,10 @@ const (
 
 // ----------------------------------
 func AddIdentifierKeyToMacroTable(macroName string) {
-	macroSymbolTable[macroName] = MacroTableType{}
+	macroSymbolTable[macroName] = MacroXX{}
 }
 func AddIdentifierKeyToKVMacroTable(macroName string) {
-	kvMacroSymbolTable[macroName] = MacroTableType{}
+	kvMacroSymbolTable[macroName] = MacroXX{}
 }
 
 // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -39,17 +44,28 @@ func RemoveIdentifierKeyFromKVMacroTable(macroName string) {
 
 // ----------------------------------
 
-func AddCapturedLinesToMacro(macroName string, macroEnum LookupMacroEnumType, capturedLines MacroTableType) error {
+func AddCapturedLinesToMacro(macroName string, macroEnum LookupMacroEnumType, capturedLines MacroTableType) {
 	if macroEnum == Macro {
-		macroSymbolTable[macroName] = capturedLines
+		macro := macroSymbolTable[macroName]
+		macro.Lines = capturedLines
+		macroSymbolTable[macroName] = macro
 	} else {
-		kvMacroSymbolTable[macroName] = capturedLines
+		macro := kvMacroSymbolTable[macroName]
+		macro.Lines = capturedLines
+		kvMacroSymbolTable[macroName] = macro
 	}
-	return nil
 }
 
-func LookupMacroInEnvironment(macroName string, macroEnum LookupMacroEnumType) (MacroTableType, bool) {
-	var macro MacroTableType
+func AddArgumentsToMacroTable(macroName string, arguments *[]string) {
+	macro := macroSymbolTable[macroName]
+	macro.Arguments = arguments
+	macroSymbolTable[macroName] = macro
+}
+
+// ----------------------------------
+
+func LookupMacroInEnvironment(macroName string, macroEnum LookupMacroEnumType) (MacroXX, bool) {
+	var macro MacroXX
 	var ok bool
 
 	if macroEnum == Macro {
@@ -63,7 +79,7 @@ func LookupMacroInEnvironment(macroName string, macroEnum LookupMacroEnumType) (
 func LookupAndGetMacroInEnvironment(symbolName string, macroEnum LookupMacroEnumType) (MacroTableType, error) {
 	macro, ok := LookupMacroInEnvironment(symbolName, macroEnum)
 	if ok {
-		return macro, nil
+		return macro.Lines, nil
 	} else {
 		return nil, errorHandler.AddNew(enumErrorCodes.MacroNotExist, symbolName)
 	}
