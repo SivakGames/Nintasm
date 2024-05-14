@@ -18,10 +18,11 @@
 	.bank 0
 	.org $8000
 
-atata = 23
 
-	.deleteMacro atata
-	
+ttt .macro \b1, \c5, \w14
+	.db 6
+ttt .endm
+
 ;-----------------------------------------
 RESET:
 	__resetCode__

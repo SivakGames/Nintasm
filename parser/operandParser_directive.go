@@ -110,7 +110,7 @@ var directiveNameMinMaxOperands = map[string][2]int{
 	"INCBIN":       {1, 3},
 	"INCLUDE":      {1, 1},
 	"KVMACRO":      {0, 0},
-	"MACRO":        {0, 0},
+	"MACRO":        {0, 32},
 	"NAMESPACE":    {0, 0},
 	"ORG":          {1, 1},
 	"REPEAT":       {1, 2},
