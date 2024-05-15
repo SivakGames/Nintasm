@@ -44,7 +44,7 @@ func evalEndIkv(operandList *[]Node) error {
 	macroNameNode := &(*originalOperandList)[0]
 
 	// Get macro's data
-	macroData, _, err := macroTable.LookupAndGetMacroInEnvironment(macroNameNode.NodeValue, macroTable.KVMacro)
+	macroData, _, err := macroTable.LookupAndGetMacroInEnvironment(macroNameNode.NodeValue, macroTable.Macro)
 	if err != nil {
 		return err
 	}

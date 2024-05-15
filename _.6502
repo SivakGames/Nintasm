@@ -25,6 +25,11 @@ ttt .endm
 
 	ttt 12, 14
 
+	.ikv ttt
+	.kv \a2, 13
+	.kv \a3, 14
+	.endikv
+
 ;-----------------------------------------
 RESET:
 	__resetCode__
