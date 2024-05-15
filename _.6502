@@ -19,9 +19,11 @@
 	.org $8000
 
 
-ttt .macro \a2
-	.db 6
+ttt .macro \a2, \a3
+	.db \a2, \a3
 ttt .endm
+
+	ttt 12, 14
 
 ;-----------------------------------------
 RESET:

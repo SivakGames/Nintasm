@@ -3,6 +3,8 @@ package parser
 import (
 	"fmt"
 	"misc/nintasm/assemble/blockStack"
+	"misc/nintasm/assemble/errorHandler"
+	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
 	"misc/nintasm/interpreter/environment/macroTable"
 )
 
@@ -33,9 +35,10 @@ func init() {
 func (mop *MacroOperandParser) Process(macroName string) error {
 	var err error
 	var capturedLinesToProcess []blockStack.CapturedLine
+	var validArguments *[]string
 
 	macroTable.AppendToReplacementStack()
-	mop.capturedLinesToUnpack, _, err = macroTable.LookupAndGetMacroInEnvironment(macroName, macroTable.Macro)
+	mop.capturedLinesToUnpack, validArguments, err = macroTable.LookupAndGetMacroInEnvironment(macroName, macroTable.Macro)
 	if err != nil {
 		return err
 	}
@@ -48,9 +51,21 @@ func (mop *MacroOperandParser) Process(macroName string) error {
 		return err // ❌ Fails
 	}
 
-	// Put numeric replacements on stack
-	for i, operand := range operandList {
-		macroTable.AddToReplacementListOnTopOfStack(fmt.Sprintf("\\%d", i+1), operand.NodeValue)
+	if validArguments != nil {
+		if len(operandList) < len(*validArguments) {
+			return errorHandler.AddNew(enumErrorCodes.Other, "Too few args")
+		}
+		if len(operandList) > len(*validArguments) {
+			return errorHandler.AddNew(enumErrorCodes.Other, "Too many args")
+		}
+		for i, operand := range operandList {
+			macroTable.AddToReplacementListOnTopOfStack((*validArguments)[i], operand.NodeValue)
+		}
+	} else {
+		// Put numeric replacements on stack
+		for i, operand := range operandList {
+			macroTable.AddToReplacementListOnTopOfStack(fmt.Sprintf("\\%d", i+1), operand.NodeValue)
+		}
 	}
 	macroTable.AddNumArgsToReplacementListOnTopOfStack(fmt.Sprintf("%d", len(operandList)))
 
