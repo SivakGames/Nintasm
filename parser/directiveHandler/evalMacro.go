@@ -16,32 +16,21 @@ var symbolRegex = regexp.MustCompile(`^\\[A-Za-z_][0-9A-Za-z_]*`)
 func evalMacro(directiveName string, macroLabel string, operandList *[]Node) error {
 	useArguments := []string{}
 	if len(*operandList) > 0 {
-		firstOperand := (*operandList)[0]
-		if operandFactory.ValidateNodeIsNumeric(&firstOperand) {
-			if len(*operandList) > 1 {
-				return errorHandler.AddNew(enumErrorCodes.Other, "Only 1 numeric value if using numbers")
+		definedArguments := map[string]bool{}
+		for _, o := range *operandList {
+			if !operandFactory.ValidateNodeIsSubstitutionID(&o) {
+				return errorHandler.AddNew(enumErrorCodes.Other, "Must use a substitution type value")
 			}
-			if !operandFactory.ValidateNumericNodeIsPositive(&firstOperand) {
-				return errorHandler.AddNew(enumErrorCodes.NodeValueNotPositive)
+			_, exists := definedArguments[o.NodeValue]
+			if exists {
+				return errorHandler.AddNew(enumErrorCodes.Other, "Already exists!")
+			}
+			if !symbolRegex.MatchString(o.NodeValue) {
+				return errorHandler.AddNew(enumErrorCodes.Other, "Substition value must start with a letter or underscore after the backslash and be followed by numbers, underscores, or numbers")
 			}
 
-		} else {
-			definedArguments := map[string]bool{}
-			for _, o := range *operandList {
-				if !operandFactory.ValidateNodeIsSubstitutionID(&o) {
-					return errorHandler.AddNew(enumErrorCodes.Other, "Must use a substitution type value")
-				}
-				_, exists := definedArguments[o.NodeValue]
-				if exists {
-					return errorHandler.AddNew(enumErrorCodes.Other, "Already exists!")
-				}
-				if !symbolRegex.MatchString(o.NodeValue) {
-					return errorHandler.AddNew(enumErrorCodes.Other, "Substition value must start with a letter or underscore after the backslash and be followed by numbers, underscores, or numbers")
-				}
-
-				definedArguments[o.NodeValue] = true
-				useArguments = append(useArguments, o.NodeValue)
-			}
+			definedArguments[o.NodeValue] = true
+			useArguments = append(useArguments, o.NodeValue)
 		}
 	}
 

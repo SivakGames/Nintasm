@@ -19,7 +19,7 @@
 	.org $8000
 
 
-ttt .macro 
+ttt .macro \a2
 	.db 6
 ttt .endm
 
