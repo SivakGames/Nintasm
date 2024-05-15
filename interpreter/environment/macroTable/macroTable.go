@@ -76,11 +76,11 @@ func LookupMacroInEnvironment(macroName string, macroEnum LookupMacroEnumType) (
 	return macro, ok
 }
 
-func LookupAndGetMacroInEnvironment(symbolName string, macroEnum LookupMacroEnumType) (MacroTableType, error) {
+func LookupAndGetMacroInEnvironment(symbolName string, macroEnum LookupMacroEnumType) (MacroTableType, *[]string, error) {
 	macro, ok := LookupMacroInEnvironment(symbolName, macroEnum)
 	if ok {
-		return macro.Lines, nil
+		return macro.Lines, macro.Arguments, nil
 	} else {
-		return nil, errorHandler.AddNew(enumErrorCodes.MacroNotExist, symbolName)
+		return nil, nil, errorHandler.AddNew(enumErrorCodes.MacroNotExist, symbolName)
 	}
 }
