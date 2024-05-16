@@ -38,7 +38,7 @@ func (mop *MacroOperandParser) Process(macroName string) error {
 	var validArguments *[]string
 
 	macroTable.AppendToReplacementStack()
-	mop.capturedLinesToUnpack, validArguments, err = macroTable.LookupAndGetMacroInEnvironment(macroName, macroTable.Macro)
+	mop.capturedLinesToUnpack, validArguments, err = macroTable.LookupAndGetMacroInEnvironment(macroName)
 	if err != nil {
 		return err
 	}

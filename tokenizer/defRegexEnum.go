@@ -59,8 +59,8 @@ var (
 		{regexp.MustCompile(generateBoundaries("end(?:if|ikv|repeat|switch)")), enumTokenTypes.DIRECTIVE_blockEnd},
 
 		{regexp.MustCompile(generateBoundaries("func|gnsi|rs")), enumTokenTypes.DIRECTIVE_labeled},
-		{regexp.MustCompile(generateBoundaries("nameSpace|macro|kvMacro|charMap|exprMap")), enumTokenTypes.DIRECTIVE_labeledBlockStart},
-		{regexp.MustCompile(generateBoundaries("end(?:nameSpace|m|kvm|charMap|exprMap)")), enumTokenTypes.DIRECTIVE_labeledBlockEnd},
+		{regexp.MustCompile(generateBoundaries("nameSpace|macro|charMap|exprMap")), enumTokenTypes.DIRECTIVE_labeledBlockStart},
+		{regexp.MustCompile(generateBoundaries("end(?:nameSpace|m|charMap|exprMap)")), enumTokenTypes.DIRECTIVE_labeledBlockEnd},
 		{regexp.MustCompile(generateBoundaries("exitMacro")), enumTokenTypes.DIRECTIVE_exitMacro},
 		{regexp.MustCompile(generateBoundaries("deleteMacro")), enumTokenTypes.DIRECTIVE_deleteSymbol},
 	}

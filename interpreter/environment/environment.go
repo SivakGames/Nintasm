@@ -130,8 +130,6 @@ func AddOtherIdentifierToMasterTable(symbolName string, symbolEnum enumSymbolTab
 		exprmapTable.AddIdentifierKeyToExprmapTable(symbolName)
 	case enumSymbolTableTypes.Function:
 		funcTable.AddIdentifierKeyToFunctionTable(symbolName)
-	case enumSymbolTableTypes.KVMacro:
-		macroTable.AddIdentifierKeyToKVMacroTable(symbolName)
 	case enumSymbolTableTypes.Macro:
 		macroTable.AddIdentifierKeyToMacroTable(symbolName)
 	case enumSymbolTableTypes.Namespace:
@@ -158,8 +156,6 @@ func RemoveOtherIdentifierFromMasterTable(symbolName string, symbolEnum enumSymb
 
 	removeFromMasterTable(symbolName)
 	switch symbolEnum {
-	case enumSymbolTableTypes.KVMacro:
-		macroTable.RemoveIdentifierKeyFromKVMacroTable(symbolName)
 	case enumSymbolTableTypes.Macro:
 		macroTable.RemoveIdentifierKeyFromMacroTable(symbolName)
 

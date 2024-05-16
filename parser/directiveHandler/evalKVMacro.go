@@ -10,20 +10,22 @@ import (
 )
 
 func evalKVMacro(directiveName string, macroLabel string, operandList *[]Node) error {
+	panic("NO!")
 	blockStack.PushCaptureBlock(directiveName, *operandList)
-	environment.AddOtherIdentifierToMasterTable(macroLabel, enumSymbolTableTypes.KVMacro)
+	environment.AddOtherIdentifierToMasterTable(macroLabel, enumSymbolTableTypes.Macro)
 	return nil
 }
 
 // End the macro definition and add to environment
 func evalEndKVMacro() error {
+	panic("NO!")
 	macroLabel := blockStack.GetCurrentOperationLabel()
 	capturedLines := blockStack.GetCurrentCaptureBlockCapturedLines()
 	if len(*capturedLines) == 0 {
 		errorHandler.AddNew(enumErrorCodes.BlockIsEmpty) // ⚠️ Warns
 	}
 
-	macroTable.AddCapturedLinesToMacro(macroLabel, macroTable.KVMacro, *capturedLines)
+	macroTable.AddCapturedLinesToMacro(macroLabel, *capturedLines)
 	blockStack.ProcessEndLabeledDirective()
 	return nil
 }

@@ -109,6 +109,6 @@ func init() {
 func AddPregensToMacroTable() {
 	for _, m := range macrozzz {
 		environment.AddOtherIdentifierToMasterTable(m.name, enumSymbolTableTypes.Macro)
-		macroTable.AddCapturedLinesToMacro(m.name, macroTable.Macro, preGenMacros[m.name])
+		macroTable.AddCapturedLinesToMacro(m.name, preGenMacros[m.name])
 	}
 }

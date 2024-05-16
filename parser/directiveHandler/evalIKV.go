@@ -9,7 +9,7 @@ import (
 	"misc/nintasm/interpreter/operandFactory"
 )
 
-var ikvKeys map[string]string
+var ikvKeys = map[string]bool{}
 
 func evalIkv(directiveName string, operandList *[]Node) error {
 	macroNameNode := &(*operandList)[0]
@@ -31,6 +31,13 @@ func evalKv(operandList *[]Node) error {
 		return errorHandler.AddNew(enumErrorCodes.NodeTypeNotSubstitutionID) // ❌ Fails
 	}
 	macroValueNode := &(*operandList)[1]
+
+	_, exists := ikvKeys[macroKeyNode.NodeValue]
+	if exists {
+		return errorHandler.AddNew(enumErrorCodes.Other, "Key already exists")
+	}
+	ikvKeys[macroKeyNode.NodeValue] = true
+
 	macroTable.AddToReplacementListOnTopOfStack(macroKeyNode.NodeValue, macroValueNode.NodeValue)
 	symbolAsNodeTable.AddSymbolToTopTableStack(macroKeyNode.NodeValue, operandFactory.CreateBooleanLiteralNode(true))
 
@@ -42,9 +49,10 @@ func evalEndIkv(operandList *[]Node) error {
 	// Get invoking macro name
 	_, originalOperandList := blockStack.GetCurrentCaptureBlockCapturedLinesAndOperandList()
 	macroNameNode := &(*originalOperandList)[0]
+	ikvKeys = map[string]bool{}
 
 	// Get macro's data
-	macroData, _, err := macroTable.LookupAndGetMacroInEnvironment(macroNameNode.NodeValue, macroTable.Macro)
+	macroData, _, err := macroTable.LookupAndGetMacroInEnvironment(macroNameNode.NodeValue)
 	if err != nil {
 		return err
 	}

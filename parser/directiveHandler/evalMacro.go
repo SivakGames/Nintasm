@@ -50,7 +50,7 @@ func evalEndMacro() error {
 		errorHandler.AddNew(enumErrorCodes.BlockIsEmpty) // ⚠️ Warns
 	}
 
-	macroTable.AddCapturedLinesToMacro(macroLabel, macroTable.Macro, *capturedLines)
+	macroTable.AddCapturedLinesToMacro(macroLabel, *capturedLines)
 	blockStack.ProcessEndLabeledDirective()
 	return nil
 }

@@ -19,16 +19,26 @@
 	.org $8000
 
 
-ttt .macro \a2, \a3
-	.db \a2, \a3
+ttt .macro \a3, \a4
+	.db \a3, \a4
 ttt .endm
+
+ggg .macro \a1, \a2
+	.db \a1, \a2
+	.ikv ttt
+	.kv \a3, 23
+	.kv \a4, 24
+	.endikv
+ggg .endm
 
 	ttt 12, 14
 
-	.ikv ttt
-	.kv \a2, 13
-	.kv \a3, 14
+	.ikv ggg
+	.kv \a1, 13
+	.kv \a2, 14
 	.endikv
+
+
 
 ;-----------------------------------------
 RESET:

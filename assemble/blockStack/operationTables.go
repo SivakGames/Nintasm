@@ -32,7 +32,6 @@ var startBlockOperationFlags = map[string]startOpFlags{
 	"IF":        newStartOpFlags(false, false, map[string]bool{}),
 	"IKV":       newStartOpFlags(true, false, map[string]bool{}),
 	"IM":        newStartOpFlags(true, false, map[string]bool{}), //Invoke macro
-	"KVMACRO":   newStartOpFlags(false, true, map[string]bool{}),
 	"MACRO":     newStartOpFlags(false, true, map[string]bool{}),
 	"NAMESPACE": newStartOpFlags(true, false, map[string]bool{}),
 	"REPEAT":    newStartOpFlags(false, true, map[string]bool{"REPEAT": true}),
@@ -58,7 +57,6 @@ var correspondingEndBlockOperations = map[string]string{
 	"IF":        "ENDIF",
 	"IKV":       "ENDIKV",
 	"IM":        "ENDIM",
-	"KVMACRO":   "ENDKVM",
 	"MACRO":     "ENDM",
 	"NAMESPACE": "ENDNAMESPACE",
 	"REPEAT":    "ENDREPEAT",
@@ -125,9 +123,8 @@ var allowedOperationsForParentOps = map[string]captureableOpMap{
 	"IKV": {
 		enumTokenTypes.DIRECTIVE_invokeKeyVal: true,
 	},
-	"IM":      {},
-	"KVMACRO": sharedCapturableMacroOps,
-	"MACRO":   sharedCapturableMacroOps,
+	"IM":    {},
+	"MACRO": sharedCapturableMacroOps,
 	"NAMESPACE": {
 		enumTokenTypes.ASSIGN_simple: true,
 	},
