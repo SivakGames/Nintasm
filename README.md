@@ -81,8 +81,7 @@ There are, however, sample programs included in the repository that can be built
 	- [Macros](#macros)
 		- [Defining and using a simple macro](#defining-and-using-a-simple-macro)
 		- [Using arguments in simple macros](#using-arguments-in-simple-macros)
-		- [Defining and using a key/value macro](#defining-and-using-a-keyvalue-macro)
-		- [Invoking a key/value macro](#invoking-a-keyvalue-macro)
+		- [Defining macros with named arguments](#defining-macros-with-named-arguments)
 	- [Conditional Statements](#conditional-statements)
 		- [If Statements](#if-statements)
 		- [Switch Statements](#switch-statements)
@@ -914,29 +913,9 @@ MyMacroWithVariableArgs .endm
 ;This maco will do different things depending on how many arguments are supplied to it.
 ```
 
-### Defining and using a key/value macro
+### Defining macros with named arguments
 
-Key/value macros are handy for being more explicit and supplying names for the arguments. Like with a macro, a label followed `.macro` directive. After this statement, insert your desired instructions. To terminate the macro, use the same label and then `.endm` directive.
-
-```text
-MyKvMacro .kvmacro
-    LDA \ppu1
-    STA $2006
-    LDA \ppu2
-    STA $2006
-MyKvMacro .endkvm
-```
-
-### Invoking a key/value macro
-
-These can be invoked using the `.IKV` directive followed by a label. Afterwards, a set of `.KV` directives are required which will contain the key names followed by a value. Finally, close with an `.ENDIKV` directive
-
-```text
-    .ikv MyKvMacro
-    .kv \ppu1, #$3f
-    .kv \ppu2, #$00
-    .endikv
-```
+TBW....
 
 ---
 
