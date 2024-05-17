@@ -95,9 +95,10 @@ func EvaluateDirective(operationTokenEnum enumTokenTypes.Def, directiveName stri
 			return evalCase(directiveName, operandList)
 		case "DEFAULT":
 			return evalDefault(directiveName, operandList)
-			//return evalIf(directiveName, operandList)
 		case "IKV":
 			return evalIkv(directiveName, operandList)
+		case "RANGE":
+			return evalRange(directiveName, operandList)
 		case "REPEAT":
 			return evalRepeat(directiveName, operandList)
 		default:
@@ -110,6 +111,8 @@ func EvaluateDirective(operationTokenEnum enumTokenTypes.Def, directiveName stri
 			return evalEndIf(operandList)
 		case "ENDIKV":
 			return evalEndIkv(operandList)
+		case "ENDRANGE":
+			return evalEndRange()
 		case "ENDREPEAT":
 			return evalEndRepeat()
 		case "ENDSWITCH":

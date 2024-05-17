@@ -52,11 +52,11 @@ var (
 		{regexp.MustCompile(generateBoundaries("resetCharMap|resetExprMap")), enumTokenTypes.DIRECTIVE_settingReset},
 		{regexp.MustCompile(generateBoundaries("throw")), enumTokenTypes.DIRECTIVE_throw},
 
-		{regexp.MustCompile(generateBoundaries("if|ikv|repeat|switch|elseif|ifdef|ifndef|else|case|default")), enumTokenTypes.DIRECTIVE_blockStart},
+		{regexp.MustCompile(generateBoundaries("if|ikv|range|repeat|switch|elseif|ifdef|ifndef|else|case|default")), enumTokenTypes.DIRECTIVE_blockStart},
 		{regexp.MustCompile(generateBoundaries("defChar|defCharRange")), enumTokenTypes.DIRECTIVE_defCharMap},
 		{regexp.MustCompile(generateBoundaries("defExpr")), enumTokenTypes.DIRECTIVE_defExprMap},
 		{regexp.MustCompile(generateBoundaries("kv|keyvalue")), enumTokenTypes.DIRECTIVE_invokeKeyVal},
-		{regexp.MustCompile(generateBoundaries("end(?:if|ikv|repeat|switch)")), enumTokenTypes.DIRECTIVE_blockEnd},
+		{regexp.MustCompile(generateBoundaries("end(?:if|ikv|range|repeat|switch)")), enumTokenTypes.DIRECTIVE_blockEnd},
 
 		{regexp.MustCompile(generateBoundaries("func|gnsi|rs")), enumTokenTypes.DIRECTIVE_labeled},
 		{regexp.MustCompile(generateBoundaries("nameSpace|macro|charMap|exprMap")), enumTokenTypes.DIRECTIVE_labeledBlockStart},

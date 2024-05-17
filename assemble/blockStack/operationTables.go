@@ -34,6 +34,7 @@ var startBlockOperationFlags = map[string]startOpFlags{
 	"IM":        newStartOpFlags(true, false, map[string]bool{}), //Invoke macro
 	"MACRO":     newStartOpFlags(false, true, map[string]bool{}),
 	"NAMESPACE": newStartOpFlags(true, false, map[string]bool{}),
+	"RANGE":     newStartOpFlags(false, true, map[string]bool{"RANGE": true}),
 	"REPEAT":    newStartOpFlags(false, true, map[string]bool{"REPEAT": true}),
 	"SWITCH":    newStartOpFlags(false, false, map[string]bool{}),
 }
@@ -42,7 +43,7 @@ var startBlockOperationFlags = map[string]startOpFlags{
 func getStartOperationFlags(directiveName string) startOpFlags {
 	flags, ok := startBlockOperationFlags[directiveName]
 	if !ok {
-		panic(fmt.Sprintf("Bad/undefined start op flag name: %v", directiveName))
+		panic(fmt.Sprintf("🛑 Bad/undefined start op flag name: %v", directiveName))
 	}
 
 	return flags
@@ -59,6 +60,7 @@ var correspondingEndBlockOperations = map[string]string{
 	"IM":        "ENDIM",
 	"MACRO":     "ENDM",
 	"NAMESPACE": "ENDNAMESPACE",
+	"RANGE":     "ENDRANGE",
 	"REPEAT":    "ENDREPEAT",
 	"SWITCH":    "ENDSWITCH",
 }
@@ -128,6 +130,7 @@ var allowedOperationsForParentOps = map[string]captureableOpMap{
 	"NAMESPACE": {
 		enumTokenTypes.ASSIGN_simple: true,
 	},
+	"RANGE":  ifRepeatCapturableOps,
 	"REPEAT": ifRepeatCapturableOps,
 	"SWITCH": {
 		enumTokenTypes.DIRECTIVE_blockStart: true,

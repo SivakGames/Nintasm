@@ -32,6 +32,11 @@ func ValidateNodeIsSubstitutionID(node *Node) bool {
 	return node.NodeType == enumNodeTypes.SubstitutionID
 }
 
+// -----------------------------------1234567890
+func ValidateNodeIsArray(node *Node) bool {
+	return node.NodeType == enumNodeTypes.MultiByte
+}
+
 //-----------------------------------1234567890
 
 func ValidateNodeIsNumeric(node *Node) bool {

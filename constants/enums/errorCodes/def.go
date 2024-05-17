@@ -47,6 +47,7 @@ const (
 	NodeTypeNotString         = "NodeTypeNotString"
 	NodeTypeNotIdentifier     = "NodeTypeNotIdentifier"
 	NodeTypeNotSubstitutionID = "NodeTypeNotSubstitutionID"
+	NodeTypeNotArray          = "NodeTypeNotArray"
 
 	NodeTypeNotNumeric   = "NodeTypeNotNumeric"
 	NodeValueNotPositive = "NodeValueNotPositive"

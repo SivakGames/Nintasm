@@ -112,6 +112,7 @@ var directiveNameMinMaxOperands = map[string][2]int{
 	"MACRO":        {0, 32},
 	"NAMESPACE":    {0, 0},
 	"ORG":          {1, 1},
+	"RANGE":        {2, 3},
 	"REPEAT":       {1, 2},
 	"ROMSEGMENT":   {1, 3},
 	"SWITCH":       {1, 1},

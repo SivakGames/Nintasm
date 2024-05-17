@@ -83,6 +83,7 @@ var errorTable = map[enumErrorCodes.Def]ErrorTableEntry{
 	enumErrorCodes.NodeTypeNotIdentifier:     newErrorTableEntry(enumErrorCodes.Error, "Value must be an identifier!"),
 	enumErrorCodes.NodeTypeNotString:         newErrorTableEntry(enumErrorCodes.Error, "Value must be a string!"),
 	enumErrorCodes.NodeTypeNotSubstitutionID: newErrorTableEntry(enumErrorCodes.Error, "Value must be a substitution ID!"),
+	enumErrorCodes.NodeTypeNotArray:          newErrorTableEntry(enumErrorCodes.Error, "Value must be an array!"),
 
 	enumErrorCodes.NodeTypeNotNumeric:   newErrorTableEntry(enumErrorCodes.Error, "Value must be numeric!"),
 	enumErrorCodes.NodeValueNotPositive: newErrorTableEntry(enumErrorCodes.Error, "Value must be positive!"),
