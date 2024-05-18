@@ -89,6 +89,8 @@ var ifRepeatCapturableOps = captureableOpMap{
 	enumTokenTypes.DIRECTIVE_exitMacro:  true,
 	enumTokenTypes.DIRECTIVE_include:    true,
 	enumTokenTypes.DIRECTIVE_mixedData:  true,
+	enumTokenTypes.DIRECTIVE_blockStart: true,
+	enumTokenTypes.DIRECTIVE_blockEnd:   true,
 	enumTokenTypes.DIRECTIVE_throw:      true,
 	enumTokenTypes.IDENTIFIER:           true,
 	enumTokenTypes.DYNAMIC_LABEL:        true,
