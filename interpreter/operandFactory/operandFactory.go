@@ -57,7 +57,7 @@ func CreateAssemblerReservedWordNode(nodeValue string) Node {
 }
 
 // """Label.label expressions"""
-func CreateMemberExpressionNode(parent string, key string, computed bool, arguments []Node) Node {
+func CreateMemberExpressionNode(parent string, key string, left Node, computed bool, arguments []Node) Node {
 	var parentKey string
 	if !computed {
 		parentKey = fmt.Sprintf("%v.%v", parent, key)
@@ -66,6 +66,7 @@ func CreateMemberExpressionNode(parent string, key string, computed bool, argume
 	}
 
 	node := newNode(parentKey, enumNodeTypes.MemberExpression)
+	node.Left = &left
 	node.ArgumentList = &arguments
 	return node
 }

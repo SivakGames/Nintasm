@@ -4,17 +4,15 @@ import (
 	"misc/nintasm/assemble/errorHandler"
 	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
 	enumNodeTypes "misc/nintasm/constants/enums/nodeTypes"
-	"misc/nintasm/interpreter/environment"
 )
 
 func processComputedMemberExpression(node Node) (Node, error) {
-	resolvedNode, resolved, err := environment.LookupIdentifierInSymbolAsNodeTable(node.NodeValue)
-	if !resolved {
+	parentNode, err := EvaluateNode(*node.Left)
+	if err != nil {
 		return node, err
 	}
 
 	evaluatedArgList := make([]Node, len(*node.ArgumentList))
-
 	for i, n := range *node.ArgumentList {
 		evalN, err := EvaluateNode(n)
 		if err != nil {
@@ -23,9 +21,7 @@ func processComputedMemberExpression(node Node) (Node, error) {
 		evaluatedArgList[i] = evalN
 	}
 
-	parentNode := resolvedNode
 	var result Node
-
 	for _, n := range evaluatedArgList {
 		index := int(n.AsNumber)
 		if parentNode.NodeType != enumNodeTypes.MultiByte {

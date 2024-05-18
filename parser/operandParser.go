@@ -646,14 +646,14 @@ func (p *OperandParser) memberExpression() (Node, error) {
 	//The parent label
 	parent := p.lookaheadValue
 
-	result, err := p.primaryExpression()
+	primaryExpression, err := p.primaryExpression()
 	if err != nil {
-		return result, err // ❌ Fails
+		return primaryExpression, err // ❌ Fails
 	}
 
 	//If nothing else, just exit
 	if p.lookaheadType == enumTokenTypes.None {
-		return result, nil // 🟢 Succeeds
+		return primaryExpression, nil // 🟢 Succeeds
 	}
 
 	if p._isLiteral(p.lookaheadType) {
@@ -685,29 +685,36 @@ func (p *OperandParser) memberExpression() (Node, error) {
 		if err != nil {
 			return operandFactory.ErrorNode(p.lookaheadValue), err // ❌ Fails
 		}
-		return operandFactory.CreateMemberExpressionNode(parent, key, false, nil), nil
+		return operandFactory.CreateMemberExpressionNode(parent, key, primaryExpression, false, nil), nil
 	} else if p.lookaheadType == enumTokenTypes.DELIMITER_leftSquareBracket {
 		indexNodes := []Node{}
-		for p.lookaheadType == enumTokenTypes.DELIMITER_leftSquareBracket {
-			err = p.eatFreelyAndAdvance(enumTokenTypes.DELIMITER_leftSquareBracket)
-			if err != nil {
-				return p.badEat(err) // ❌ Fails
-			}
-			err = p.getArgumentAndAppend(&indexNodes)
-			if err != nil {
-				return result, err // ❌ Fails
-			}
-
-			err = p.eatAndAdvance(enumTokenTypes.DELIMITER_rightSquareBracket)
-			if err != nil {
-				return result, err // ❌ Fails
-			}
+		err := p.computedMemberExpressionIndexes(&indexNodes)
+		if err != nil {
+			return primaryExpression, err // ❌ Fails
 		}
-		return operandFactory.CreateMemberExpressionNode(parent, "_", true, indexNodes), nil
+		return operandFactory.CreateMemberExpressionNode(parent, "_", primaryExpression, true, indexNodes), nil
 	}
 
-	return result, nil
+	return primaryExpression, nil
+}
 
+func (p *OperandParser) computedMemberExpressionIndexes(indexNodes *[]Node) error {
+	for p.lookaheadType == enumTokenTypes.DELIMITER_leftSquareBracket {
+		err := p.eatFreelyAndAdvance(enumTokenTypes.DELIMITER_leftSquareBracket)
+		if err != nil {
+			return err // ❌ Fails
+		}
+		err = p.getArgumentAndAppend(indexNodes)
+		if err != nil {
+			return err // ❌ Fails
+		}
+
+		err = p.eatAndAdvance(enumTokenTypes.DELIMITER_rightSquareBracket)
+		if err != nil {
+			return err // ❌ Fails
+		}
+	}
+	return nil
 }
 
 // !!!!!!!!!!!!!!!!!!!!!!!
@@ -840,7 +847,18 @@ func (p *OperandParser) multiByteExpression() (Node, error) {
 		return p.badEat(err) // ❌ Fails
 	}
 
-	return operandFactory.CreateMultiByteNode(argumentList), nil
+	multiByteNode := operandFactory.CreateMultiByteNode(argumentList)
+
+	if p.lookaheadType == enumTokenTypes.DELIMITER_leftSquareBracket {
+		indexNodes := []Node{}
+		err := p.computedMemberExpressionIndexes(&indexNodes)
+		if err != nil {
+			return multiByteNode, err // ❌ Fails
+		}
+		return operandFactory.CreateMemberExpressionNode("_", "_", multiByteNode, true, indexNodes), nil
+	} else {
+		return multiByteNode, nil
+	}
 
 }
 
