@@ -313,7 +313,12 @@ func (p *OperandParser) macroReplaceStatement() (Node, error) {
 	for len(closingTokenEnum) > 0 && p.lookaheadType != enumTokenTypes.None {
 		topOfStackEnum := closingTokenEnum[len(closingTokenEnum)-1]
 		switch p.lookaheadType {
+
 		case topOfStackEnum:
+			if topOfStackEnum == enumTokenTypes.DELIMITER_rightSquareBracket {
+				replacement += p.lookaheadValue
+			}
+
 			closingTokenEnum = closingTokenEnum[:len(closingTokenEnum)-1]
 			if len(closingTokenEnum) > 0 {
 				err := p.eatFreelyAndAdvance(topOfStackEnum)
@@ -321,6 +326,14 @@ func (p *OperandParser) macroReplaceStatement() (Node, error) {
 					return p.badEat(err) // ❌ Fails
 				}
 			}
+
+		case enumTokenTypes.DELIMITER_leftSquareBracket:
+			replacement += p.lookaheadValue
+			err := p.eatFreelyAndAdvance(enumTokenTypes.DELIMITER_leftSquareBracket)
+			if err != nil {
+				return p.badEat(err) // ❌ Fails
+			}
+			closingTokenEnum = append(closingTokenEnum, enumTokenTypes.DELIMITER_rightSquareBracket)
 
 		case enumTokenTypes.DELIMITER_leftCurlyBrace:
 			if topOfStackEnum == enumTokenTypes.DELIMITER_rightCurlyBrace {
