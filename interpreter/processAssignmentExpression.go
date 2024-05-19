@@ -2,12 +2,15 @@ package interpreter
 
 import (
 	enumNodeTypes "misc/nintasm/constants/enums/nodeTypes"
+	enumSymbolTableTypes "misc/nintasm/constants/enums/symbolTableTypes"
 	"misc/nintasm/interpreter/environment"
 	"misc/nintasm/interpreter/environment/namespaceTable"
 	"strings"
 )
 
 func processAssignmentExpression(node Node) (Node, error) {
+	var symbolType enumSymbolTableTypes.Def
+
 	assignmentTypeIsLabel := node.NodeType == enumNodeTypes.AssignLabelExpression
 	nodeHasResolved := false
 
@@ -35,7 +38,13 @@ func processAssignmentExpression(node Node) (Node, error) {
 		return node, err
 	}
 
-	err = environment.AddIdentifierToSymbolAsNodeTable(symbolName, evaluatedLabelNode)
+	if assignmentTypeIsLabel {
+		symbolType = enumSymbolTableTypes.Label
+	} else {
+		symbolType = enumSymbolTableTypes.SymbolAsNode
+	}
+
+	err = environment.AddIdentifierToSymbolAsNodeTable(symbolName, evaluatedLabelNode, symbolType)
 	if err != nil {
 		return node, err
 	}

@@ -70,7 +70,7 @@ func evalGnsi(operationLabel string, operandList *[]Node) error {
 		}
 
 		newName := operationLabel + "." + isolatedLocalLabel
-		err = environment.AddIdentifierToSymbolAsNodeTable(newName, finalNode)
+		err = environment.AddIdentifierToSymbolAsNodeTable(newName, finalNode, enumSymbolTableTypes.SymbolAsNode)
 		if err != nil {
 			return err
 		}

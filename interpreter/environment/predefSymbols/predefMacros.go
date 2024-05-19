@@ -72,7 +72,7 @@ func newPredefMacro(name string, lines *[]string) predefMacro {
 	}
 }
 
-var macrozzz = []predefMacro{
+var predefinedMacroDefinitions = []predefMacro{
 	newPredefMacro("__resetCode__", &builtInMacro_ResetCode),
 	newPredefMacro("__setPPU__", &builtInMacro_SetPPU),
 }
@@ -82,7 +82,7 @@ var preGenMacros = map[string]macroTable.MacroTableType{}
 // -------------------------------------------------
 
 func init() {
-	for _, m := range macrozzz {
+	for _, m := range predefinedMacroDefinitions {
 		generatedMacro := make(macroTable.MacroTableType, len(*m.lines))
 		lineOperationParser := parser.NewOperationParser()
 
@@ -107,7 +107,7 @@ func init() {
 // ===================================================
 
 func AddPregensToMacroTable() {
-	for _, m := range macrozzz {
+	for _, m := range predefinedMacroDefinitions {
 		environment.AddOtherIdentifierToMasterTable(m.name, enumSymbolTableTypes.Macro)
 		macroTable.AddCapturedLinesToMacro(m.name, preGenMacros[m.name])
 	}

@@ -28,10 +28,10 @@ func CheckIfIdentifierExistsInMasterTable(symbolName string) (enumSymbolTableTyp
 }
 
 func CheckIfAlreadyDefinedInMasterTable(symbolName string) error {
-	var exists bool
-	_, exists = masterLookupTable[symbolName]
+	symbolEnum, exists := masterLookupTable[symbolName]
 	if exists {
-		return errorHandler.AddNew(enumErrorCodes.InterpreterAlreadyDefined, symbolName, "TODO TYPE DESC")
+		description := getSymbolDescriptionFromEnum(symbolEnum)
+		return errorHandler.AddNew(enumErrorCodes.InterpreterAlreadyDefined, symbolName, description)
 	}
 	return nil
 }
@@ -51,12 +51,12 @@ func removeFromMasterTable(symbolName string) error {
 // ============================================================================
 
 // Add identifier to the symbol table
-func AddIdentifierToSymbolAsNodeTable(symbolName string, node Node) error {
+func AddIdentifierToSymbolAsNodeTable(symbolName string, node Node, symbolType enumSymbolTableTypes.Def) error {
 	err := CheckIfAlreadyDefinedInMasterTable(symbolName)
 	if err != nil {
 		return err
 	}
-	addToMasterTable(symbolName, enumSymbolTableTypes.SymbolAsNode)
+	addToMasterTable(symbolName, symbolType)
 	symbolAsNodeTable.AddIdentifierKeyToSymbolAsNodeTable(symbolName, node)
 	return nil
 }
@@ -177,4 +177,25 @@ func SetUnresolvedSilentErrorFlagTo(value bool) {
 }
 func SetUnresolvedSilentErrorFlag() {
 	unresolvedAddsSilentError = true
+}
+
+func getSymbolDescriptionFromEnum(symbolEnum enumSymbolTableTypes.Def) string {
+	switch symbolEnum {
+	case enumSymbolTableTypes.CharMap:
+		return "CHARMAP"
+	case enumSymbolTableTypes.ExprMap:
+		return "EXPRMAP"
+	case enumSymbolTableTypes.Function:
+		return "FUNC"
+	case enumSymbolTableTypes.Label:
+		return "LABEL"
+	case enumSymbolTableTypes.Macro:
+		return "MACRO"
+	case enumSymbolTableTypes.Namespace:
+		return "NAMESPACE"
+	case enumSymbolTableTypes.SymbolAsNode:
+		return "SYMBOL"
+	default:
+		return "??????????"
+	}
 }

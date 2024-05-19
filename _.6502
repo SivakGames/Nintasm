@@ -18,29 +18,7 @@
 	.bank 0
 	.org $8000
 
-	.repeat 12, \i
-	.if \i > 0
-		.db 15
-	.endif
-	.endrepeat
 
-	.range [1,2,3,4,5], \i, \v
-		.db \v
-		.if \i > 0
-			.db 5
-		.endif
-	.endRange
-
-;blah .macro \notes
-;	.range \notes, \i, \n
-;		.if \n[0] > 15 
-;			.throw "Note outside of transposition"
-;		.endif
-;		.db \n[1], \n[0]
-;	.endRange
-;blah .endm
-;
-;	blah [[1,2],[3,4]]
 
 ;-----------------------------------------
 RESET:
