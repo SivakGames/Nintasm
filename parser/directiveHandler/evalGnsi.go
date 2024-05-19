@@ -1,6 +1,7 @@
 package directiveHandler
 
 import (
+	"fmt"
 	"misc/nintasm/assemble/errorHandler"
 	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
 	enumSymbolTableTypes "misc/nintasm/constants/enums/symbolTableTypes"
@@ -23,28 +24,30 @@ func evalGnsi(operationLabel string, operandList *[]Node) error {
 	defer environment.SetUnresolvedSilentErrorFlagTo(unresFlag)
 
 	gnsiLabelNode := (*operandList)[0]
+	fmt.Println(gnsiLabelNode)
+
 	if !operandFactory.ValidateNodeIsIdentifier(&gnsiLabelNode) {
 		return errorHandler.AddNew(enumErrorCodes.NodeTypeNotIdentifier) // ❌ Fails
 	}
 
-	gnsiLabelName := gnsiLabelNode.NodeValue
+	gnsiTargetLabelName := gnsiLabelNode.NodeValue
 
-	symbolTableEnum, exists := environment.CheckIfIdentifierExistsInMasterTable(gnsiLabelName)
+	symbolTableEnum, exists := environment.CheckIfIdentifierExistsInMasterTable(gnsiTargetLabelName)
 	if !exists {
-		return errorHandler.AddNew(enumErrorCodes.Other, "Not found")
+		return errorHandler.AddNew(enumErrorCodes.GNSIparentNotFound, gnsiTargetLabelName)
 	}
-	if symbolTableEnum != enumSymbolTableTypes.SymbolAsNode {
-		return errorHandler.AddNew(enumErrorCodes.Other, "Must be a label")
+	if symbolTableEnum != enumSymbolTableTypes.Label {
+		return errorHandler.AddNew(enumErrorCodes.GNSIparentNotFound, gnsiTargetLabelName)
 	}
-	if strings.Contains(gnsiLabelName, ".") {
+	if strings.Contains(gnsiTargetLabelName, ".") {
 		return errorHandler.AddNew(enumErrorCodes.Other, "No local or parent/locals allowed")
 	}
-	localLabelsFromParent := environment.GetLocalLabelsOfParent(gnsiLabelName)
+	localLabelsFromParent := environment.GetLocalLabelsOfParent(gnsiTargetLabelName)
 	if len(localLabelsFromParent) == 0 {
-		return errorHandler.AddNew(enumErrorCodes.Other, "No local labels...")
+		return errorHandler.AddNew(enumErrorCodes.GNSIparentHasNoLocals, gnsiTargetLabelName)
 	}
 
-	parentNode, _, _ := environment.LookupIdentifierInSymbolAsNodeTable(gnsiLabelName)
+	parentNode, _, _ := environment.LookupIdentifierInSymbolAsNodeTable(gnsiTargetLabelName)
 
 	var gnsiResolveOpNode *Node = nil
 	if len(*operandList) > 1 {

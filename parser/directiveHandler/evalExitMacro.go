@@ -10,7 +10,7 @@ func evalExitMacro() error {
 	currentOpPtr := blockStack.GetCurrentActiveOpPtr()
 	blockEntries := blockStack.GetBlockEntriesWithPtr(currentOpPtr)
 	if len(*blockEntries) == 0 {
-		return errorHandler.AddNew(enumErrorCodes.Other, "Exit Macro without being in a macro")
+		return errorHandler.AddNew(enumErrorCodes.MacroMisplacedExitMacro)
 	}
 	blockStack.SetExitOpName("IM")
 

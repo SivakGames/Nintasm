@@ -87,17 +87,21 @@ const (
 	DirectiveUnmatchedEndBlock = "DirectiveUnmatchedEndBlock"
 	DirectiveNestedLabelBlock  = "DirectiveNestedLabelBlock"
 
-	MacroNotExist                 = "MacroNotExist"
-	MacroInvokeDoubleCurlyBrace   = "MacroInvokeDoubleCurlyBrace"
-	MacroInvokeUnclosedCurlyBrace = "MacroInvokeUnclosedCurlyBrace"
-	MacroInvokeTooFewArgs         = "MacroInvokeTooFewArgs"
-	MacroInvokeTooManyArgs        = "MacroInvokeTooManyArgs"
+	MacroNotExist                  = "MacroNotExist"
+	MacroInvokeDoubleCurlyBrace    = "MacroInvokeDoubleCurlyBrace"
+	MacroInvokeUnclosedCurlyBrace  = "MacroInvokeUnclosedCurlyBrace"
+	MacroInvokeTooFewArgs          = "MacroInvokeTooFewArgs"
+	MacroInvokeTooManyArgs         = "MacroInvokeTooManyArgs"
+	MacroMisplacedExitMacro        = "MacroMisplacedExitMacro"
+	MacroSubstitutionAlreadyExists = "MacroSubstitutionAlreadyExists"
+	SubstitutionNotLabelLike       = "SubstitutionNotLabelLike"
 
 	AssignmentMissingOperand      = "AssignmentMissingOperand"
 	AssignmentLocalNotInNamespace = "AssignmentLocalNotInNamespace"
 	AssignmentNamespaceNotLocal   = "AssignmentNamespaceNotLocal"
 
-	RemovedIdentifierNotFound = "RemovedIdentifierNotFound"
+	RemovedIdentifierNotFound  = "RemovedIdentifierNotFound"
+	RemovedIdentifierWrongType = "RemovedIdentifierWrongType"
 
 	IfStatementElseIfNoParentIf       = "IfStatementElseIfNoParentIf"
 	IfStatementElseIfAfterElse        = "IfStatementElseIfAfterElse"
@@ -112,6 +116,9 @@ const (
 
 	NamespaceNotExist            = "NamespaceNotExist"
 	NamespaceToValuesNotResolved = "NamespaceToValuesNotResolved"
+	GNSIparentNotFound           = "GNSIparentNotFound"
+	GNSIparentNotLabel           = "GNSIparentNotLabel"
+	GNSIparentHasNoLocals        = "GNSIparentHasNoLocals"
 	BytesWithinLabelNoEnd        = "BytesWithinLabelNoEnd"
 
 	SubFuncStartTooBig        = "SubFuncStartTooBig"

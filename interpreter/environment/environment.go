@@ -151,7 +151,7 @@ func RemoveOtherIdentifierFromMasterTable(symbolName string, symbolEnum enumSymb
 		return errorHandler.AddNew(enumErrorCodes.RemovedIdentifierNotFound, symbolName)
 	}
 	if identifierEnum != symbolEnum {
-		return errorHandler.AddNew(enumErrorCodes.Other, "Deleted type is not right")
+		return errorHandler.AddNew(enumErrorCodes.RemovedIdentifierWrongType, symbolName, getSymbolDescriptionFromEnum(identifierEnum), getSymbolDescriptionFromEnum(symbolEnum))
 	}
 
 	removeFromMasterTable(symbolName)

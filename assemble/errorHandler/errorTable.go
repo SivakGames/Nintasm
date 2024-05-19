@@ -126,17 +126,21 @@ var errorTable = map[enumErrorCodes.Def]ErrorTableEntry{
 	enumErrorCodes.DirectiveUnmatchedEndBlock: newErrorTableEntry(enumErrorCodes.Error, "Non-matching closing block with parent operation, %v"),
 	enumErrorCodes.DirectiveNestedLabelBlock:  newErrorTableEntry(enumErrorCodes.Error, "Cannot define a labeled block when in another block statement!"),
 
-	enumErrorCodes.MacroNotExist:                 newErrorTableEntry(enumErrorCodes.Error, fmt.Sprintf("Specified macro %v doesn't exist!", coloredIdentifier("%v"))),
-	enumErrorCodes.MacroInvokeDoubleCurlyBrace:   newErrorTableEntry(enumErrorCodes.Error, "Macro invoking error - Must close curly brace before opening another!"),
-	enumErrorCodes.MacroInvokeUnclosedCurlyBrace: newErrorTableEntry(enumErrorCodes.Error, "Macro invoking error - Unclosed curly brace!"),
-	enumErrorCodes.MacroInvokeTooFewArgs:         newErrorTableEntry(enumErrorCodes.Error, fmt.Sprintf("Macro invoking error - Too few arguments! Received: %v / Min needed: %v", coloredNumber("%d"), coloredNumber("%d"))),
-	enumErrorCodes.MacroInvokeTooManyArgs:        newErrorTableEntry(enumErrorCodes.Error, fmt.Sprintf("Macro invoking error - Too many arguments! Received: %v / Max allowed: %v", coloredNumber("%d"), coloredNumber("%d"))),
+	enumErrorCodes.MacroNotExist:                  newErrorTableEntry(enumErrorCodes.Error, fmt.Sprintf("Specified macro %v doesn't exist!", coloredIdentifier("%v"))),
+	enumErrorCodes.MacroInvokeDoubleCurlyBrace:    newErrorTableEntry(enumErrorCodes.Error, "Macro invoking error - Must close curly brace before opening another!"),
+	enumErrorCodes.MacroInvokeUnclosedCurlyBrace:  newErrorTableEntry(enumErrorCodes.Error, "Macro invoking error - Unclosed curly brace!"),
+	enumErrorCodes.MacroInvokeTooFewArgs:          newErrorTableEntry(enumErrorCodes.Error, fmt.Sprintf("Macro invoking error - Too few arguments! Received: %v / Min needed: %v", coloredNumber("%d"), coloredNumber("%d"))),
+	enumErrorCodes.MacroInvokeTooManyArgs:         newErrorTableEntry(enumErrorCodes.Error, fmt.Sprintf("Macro invoking error - Too many arguments! Received: %v / Max allowed: %v", coloredNumber("%d"), coloredNumber("%d"))),
+	enumErrorCodes.MacroMisplacedExitMacro:        newErrorTableEntry(enumErrorCodes.Error, "Exit macro without actually being in a macro..."),
+	enumErrorCodes.MacroSubstitutionAlreadyExists: newErrorTableEntry(enumErrorCodes.Error, fmt.Sprintf("Substition value %v already exists!", coloredSymbol("%v"))),
+	enumErrorCodes.SubstitutionNotLabelLike:       newErrorTableEntry(enumErrorCodes.Error, fmt.Sprintf("Substition value %v must start with a letter or underscore after the backslash and be followed by numbers, underscores, or numbers", coloredSymbol("%v"))),
 
 	enumErrorCodes.AssignmentMissingOperand:      newErrorTableEntry(enumErrorCodes.Error, "Missing operand for assignment!"),
 	enumErrorCodes.AssignmentLocalNotInNamespace: newErrorTableEntry(enumErrorCodes.Error, "Cannot use local assignment outside of namespace"),
 	enumErrorCodes.AssignmentNamespaceNotLocal:   newErrorTableEntry(enumErrorCodes.Error, "Must use local assignment within namespace"),
 
-	enumErrorCodes.RemovedIdentifierNotFound: newErrorTableEntry(enumErrorCodes.Warning, fmt.Sprintf("Symbol %v not found so deleting nothing...", coloredIdentifier("%v"))),
+	enumErrorCodes.RemovedIdentifierNotFound:  newErrorTableEntry(enumErrorCodes.Warning, fmt.Sprintf("Symbol %v not found so deleting nothing...", coloredIdentifier("%v"))),
+	enumErrorCodes.RemovedIdentifierWrongType: newErrorTableEntry(enumErrorCodes.Error, fmt.Sprintf("Symbol %v is wrong type for deletion. Got: %v / Wanted: %v", coloredIdentifier("%v"), coloredSymbol("%v"), coloredSymbol("%v"))),
 
 	enumErrorCodes.IfStatementElseIfNoParentIf:       newErrorTableEntry(enumErrorCodes.Error, "Cannot use elseif without parent if"),
 	enumErrorCodes.IfStatementElseIfAfterElse:        newErrorTableEntry(enumErrorCodes.Error, "Cannot have elseif after else"),
@@ -150,6 +154,9 @@ var errorTable = map[enumErrorCodes.Def]ErrorTableEntry{
 
 	enumErrorCodes.NamespaceNotExist:            newErrorTableEntry(enumErrorCodes.Error, fmt.Sprintf("Namespace %v does not exist!", coloredIdentifier("%v"))),
 	enumErrorCodes.NamespaceToValuesNotResolved: newErrorTableEntry(enumErrorCodes.Error, "Namespace value %v is not resolved and cannot be converted to a value"),
+	enumErrorCodes.GNSIparentNotFound:           newErrorTableEntry(enumErrorCodes.Error, fmt.Sprintf("GNSI target %v not found", coloredIdentifier("%v"))),
+	enumErrorCodes.GNSIparentNotLabel:           newErrorTableEntry(enumErrorCodes.Error, fmt.Sprintf("GNSI target %v is not a label!", coloredIdentifier("%v"))),
+	enumErrorCodes.GNSIparentHasNoLocals:        newErrorTableEntry(enumErrorCodes.Error, fmt.Sprintf("GNSI target %v has no local labels!", coloredIdentifier("%v"))),
 	enumErrorCodes.BytesWithinLabelNoEnd:        newErrorTableEntry(enumErrorCodes.Error, "No ending label found so range cannot be calculated"),
 
 	enumErrorCodes.SubFuncStartTooBig:        newErrorTableEntry(enumErrorCodes.Error, "Starting index is too big! Highest index possible: %d"),

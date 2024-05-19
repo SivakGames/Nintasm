@@ -19,14 +19,14 @@ func evalMacro(directiveName string, macroLabel string, operandList *[]Node) err
 		definedArguments := map[string]bool{}
 		for _, o := range *operandList {
 			if !operandFactory.ValidateNodeIsSubstitutionID(&o) {
-				return errorHandler.AddNew(enumErrorCodes.Other, "Must use a substitution type value")
+				return errorHandler.AddNew(enumErrorCodes.NodeTypeNotSubstitutionID)
 			}
 			_, exists := definedArguments[o.NodeValue]
 			if exists {
-				return errorHandler.AddNew(enumErrorCodes.Other, "Already exists!")
+				return errorHandler.AddNew(enumErrorCodes.MacroSubstitutionAlreadyExists, o.NodeValue)
 			}
 			if !symbolRegex.MatchString(o.NodeValue) {
-				return errorHandler.AddNew(enumErrorCodes.Other, "Substition value must start with a letter or underscore after the backslash and be followed by numbers, underscores, or numbers")
+				return errorHandler.AddNew(enumErrorCodes.SubstitutionNotLabelLike, o.NodeValue)
 			}
 
 			definedArguments[o.NodeValue] = true
