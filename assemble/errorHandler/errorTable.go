@@ -52,6 +52,7 @@ var errorTable = map[enumErrorCodes.Def]ErrorTableEntry{
 	enumErrorCodes.BinFileSeekAfterEnd:       newErrorTableEntry(enumErrorCodes.Fatal, "Seek value of %d goes beyond the size of file by %d byte(s)"),
 	enumErrorCodes.BinFileReadBeyondFileSize: newErrorTableEntry(enumErrorCodes.Fatal, "Read value of %d goes beyond the size of file by %d byte(s)"),
 
+	enumErrorCodes.OrphanedMultilineBrace:       newErrorTableEntry(enumErrorCodes.Error, "Orphaned multiline brace"),
 	enumErrorCodes.TokenizerUnknownIllegalToken: newErrorTableEntry(enumErrorCodes.Error, "Unknown/Illegal token: %v"),
 
 	enumErrorCodes.ParserEndOfInput:                  newErrorTableEntry(enumErrorCodes.Error, "Parsing error - Unexpected end of input!"),
@@ -96,6 +97,9 @@ var errorTable = map[enumErrorCodes.Def]ErrorTableEntry{
 	enumErrorCodes.NodeValueNotGTE:       newErrorTableEntry(enumErrorCodes.Error, fmt.Sprintf("Value must be %v %v", coloredSymbol(">="), coloredNumber("%d"))),
 	enumErrorCodes.NodeValueNotLTE:       newErrorTableEntry(enumErrorCodes.Error, fmt.Sprintf("Value must be %v %v", coloredSymbol("<="), coloredNumber("%d"))),
 	enumErrorCodes.NodeValueNotGTEandLTE: newErrorTableEntry(enumErrorCodes.Error, fmt.Sprintf("Value must be %v %v and %v %v", coloredSymbol(">="), coloredNumber("%d"), coloredSymbol("<="), coloredNumber("%d"))),
+
+	enumErrorCodes.InterpreterComputedMemberNegativeIndex: newErrorTableEntry(enumErrorCodes.Error, fmt.Sprintf("Array index %v must be positive", coloredNumber("%d"))),
+	enumErrorCodes.InterpreterComputedMemberIndexTooBig:   newErrorTableEntry(enumErrorCodes.Error, fmt.Sprintf("Array index %v is out of range! Max range is: %v", coloredNumber("%d"), coloredNumber("%d"))),
 
 	enumErrorCodes.InvalidValueAlias: newErrorTableEntry(enumErrorCodes.Error, "Invalid value alias!"),
 	enumErrorCodes.UnacceptableAlias: newErrorTableEntry(enumErrorCodes.Error, "Unacceptable value alias!"),
@@ -147,6 +151,8 @@ var errorTable = map[enumErrorCodes.Def]ErrorTableEntry{
 	enumErrorCodes.SubFuncStartTooBig:        newErrorTableEntry(enumErrorCodes.Error, "Starting index is too big! Highest index possible: %d"),
 	enumErrorCodes.SubFuncEndTooBig:          newErrorTableEntry(enumErrorCodes.Error, "Ending index is too big! Highest index possible: %d"),
 	enumErrorCodes.SubFuncEndBiggerThanStart: newErrorTableEntry(enumErrorCodes.Error, "End index must be greater than start!"),
+
+	enumErrorCodes.IndexFuncValueNotFound: newErrorTableEntry(enumErrorCodes.Error, fmt.Sprintf("Value %v not found for index function", coloredIdentifier("%v"))),
 
 	enumErrorCodes.CharMapNoneDefined:     newErrorTableEntry(enumErrorCodes.Error, "No character maps have been defined!"),
 	enumErrorCodes.CharMapNotExist:        newErrorTableEntry(enumErrorCodes.Error, "Specified charmap doesn't exist!"),

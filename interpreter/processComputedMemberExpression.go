@@ -3,7 +3,7 @@ package interpreter
 import (
 	"misc/nintasm/assemble/errorHandler"
 	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
-	enumNodeTypes "misc/nintasm/constants/enums/nodeTypes"
+	"misc/nintasm/interpreter/operandFactory"
 )
 
 func processComputedMemberExpression(node Node) (Node, error) {
@@ -21,17 +21,20 @@ func processComputedMemberExpression(node Node) (Node, error) {
 		evaluatedArgList[i] = evalN
 	}
 
+	if !operandFactory.ValidateNodeIsArray(&parentNode) {
+		return node, errorHandler.AddNew(enumErrorCodes.NodeTypeNotArray)
+	}
+
+	maxRange := len((*parentNode.ArgumentList)) - 1
 	var result Node
+
 	for _, n := range evaluatedArgList {
 		index := int(n.AsNumber)
-		if parentNode.NodeType != enumNodeTypes.MultiByte {
-			return node, errorHandler.AddNew(enumErrorCodes.Other, "Not an array at all!")
-		}
 		if index < 0 {
-			return node, errorHandler.AddNew(enumErrorCodes.Other, "Index must be positive")
+			return node, errorHandler.AddNew(enumErrorCodes.InterpreterComputedMemberNegativeIndex, index)
 		}
-		if index > len((*parentNode.ArgumentList))-1 {
-			return node, errorHandler.AddNew(enumErrorCodes.Other, "NO! Array len")
+		if index > maxRange {
+			return node, errorHandler.AddNew(enumErrorCodes.InterpreterComputedMemberIndexTooBig, index, maxRange)
 		}
 		result = (*parentNode.ArgumentList)[int(n.AsNumber)]
 		parentNode = result

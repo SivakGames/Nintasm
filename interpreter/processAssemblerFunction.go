@@ -216,7 +216,7 @@ func processAssemblerFunction(node *Node) error {
 			}
 		}
 		if foundIndex < 0 {
-			return errorHandler.AddNew(enumErrorCodes.Other, "index function failed and didn't find value")
+			return errorHandler.AddNew(enumErrorCodes.IndexFuncValueNotFound, containValue)
 		}
 
 		node.AsNumber = float64(foundIndex)
@@ -305,7 +305,7 @@ func processAssemblerFunction(node *Node) error {
 			prevLabel = parentLabel + currentLocalLabel
 
 		case "bytesInLocal":
-			return errorHandler.AddNew(enumErrorCodes.Other, "Bytes in local not yet created")
+			return errorHandler.AddNew(enumErrorCodes.OtherFatal, "Bytes in local not yet created")
 		}
 
 		if funcName == "bytesInCurrentLabel" || funcName == "bytesInLabel" {

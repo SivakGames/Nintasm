@@ -83,7 +83,7 @@ func ReadLines(lines *[]string, lineCounter *uint) error {
 
 		if reformattedLine == "{" || reformattedLine == "}" {
 			if (reformattedLine == "{" && accumulatingMultiLine) || (reformattedLine == "}" && !accumulatingMultiLine) {
-				return errorHandler.AddNew(enumErrorCodes.Other, "NO!") // ❌❌ CONTINUES Failing!
+				return errorHandler.AddNew(enumErrorCodes.OrphanedMultilineBrace) // ❌❌ CONTINUES Failing!
 			}
 
 			accumulatingMultiLine = !accumulatingMultiLine

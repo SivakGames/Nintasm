@@ -16,6 +16,7 @@ const (
 	BinFileSeekAfterEnd       = "BinFileSeekAfterEnd"
 	BinFileReadBeyondFileSize = "BinFileReadBeyondFileSize"
 
+	OrphanedMultilineBrace       = "OrphanedMultilineBrace"
 	TokenizerUnknownIllegalToken = "TokenizerUnknownIllegalToken"
 
 	ParserEndOfInput                  = "ParserEndOfInput"
@@ -113,6 +114,8 @@ const (
 	SubFuncEndTooBig          = "SubFuncEndTooBig"
 	SubFuncEndBiggerThanStart = "SubFuncEndBiggerThanStart"
 
+	IndexFuncValueNotFound = "IndexFuncValueNotFound"
+
 	CharMapNoneDefined     = "CharMapNoneDefined"
 	CharMapNotExist        = "CharMapNotExist"
 	CharMapDuplicateKey    = "CharMapDuplicateKey"
@@ -138,6 +141,9 @@ const (
 	InterpreterAlreadyDefined           = "InterpreterAlreadyDefined"
 	InterpreterSymbolNotFound           = "InterpreterSymbolNotFound"
 	InterpreterIdentifierNotValueSymbol = "InterpreterIdentifierNotValueSymbol"
+
+	InterpreterComputedMemberNegativeIndex = "InterpreterComputedMemberNegativeIndex"
+	InterpreterComputedMemberIndexTooBig   = "InterpreterComputedMemberIndexTooBig"
 
 	BlockIsEmpty                = "BlockIsEmpty"
 	BlockOpUncapturableByParent = "BlockOpUncapturableByParent"

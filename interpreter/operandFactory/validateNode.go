@@ -32,7 +32,7 @@ func ValidateNodeIsSubstitutionID(node *Node) bool {
 	return node.NodeType == enumNodeTypes.SubstitutionID
 }
 
-// -----------------------------------1234567890
+// -----------------------------------[1,2,3,4]
 func ValidateNodeIsArray(node *Node) bool {
 	return node.NodeType == enumNodeTypes.MultiByte
 }
