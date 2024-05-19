@@ -129,10 +129,14 @@ var errorTable = map[enumErrorCodes.Def]ErrorTableEntry{
 	enumErrorCodes.MacroNotExist:                 newErrorTableEntry(enumErrorCodes.Error, fmt.Sprintf("Specified macro %v doesn't exist!", coloredIdentifier("%v"))),
 	enumErrorCodes.MacroInvokeDoubleCurlyBrace:   newErrorTableEntry(enumErrorCodes.Error, "Macro invoking error - Must close curly brace before opening another!"),
 	enumErrorCodes.MacroInvokeUnclosedCurlyBrace: newErrorTableEntry(enumErrorCodes.Error, "Macro invoking error - Unclosed curly brace!"),
+	enumErrorCodes.MacroInvokeTooFewArgs:         newErrorTableEntry(enumErrorCodes.Error, fmt.Sprintf("Macro invoking error - Too few arguments! Received: %v / Min needed: %v", coloredNumber("%d"), coloredNumber("%d"))),
+	enumErrorCodes.MacroInvokeTooManyArgs:        newErrorTableEntry(enumErrorCodes.Error, fmt.Sprintf("Macro invoking error - Too many arguments! Received: %v / Max allowed: %v", coloredNumber("%d"), coloredNumber("%d"))),
 
 	enumErrorCodes.AssignmentMissingOperand:      newErrorTableEntry(enumErrorCodes.Error, "Missing operand for assignment!"),
 	enumErrorCodes.AssignmentLocalNotInNamespace: newErrorTableEntry(enumErrorCodes.Error, "Cannot use local assignment outside of namespace"),
 	enumErrorCodes.AssignmentNamespaceNotLocal:   newErrorTableEntry(enumErrorCodes.Error, "Must use local assignment within namespace"),
+
+	enumErrorCodes.RemovedIdentifierNotFound: newErrorTableEntry(enumErrorCodes.Warning, fmt.Sprintf("Symbol %v not found so deleting nothing...", coloredIdentifier("%v"))),
 
 	enumErrorCodes.IfStatementElseIfNoParentIf:       newErrorTableEntry(enumErrorCodes.Error, "Cannot use elseif without parent if"),
 	enumErrorCodes.IfStatementElseIfAfterElse:        newErrorTableEntry(enumErrorCodes.Error, "Cannot have elseif after else"),

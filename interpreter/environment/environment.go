@@ -148,7 +148,7 @@ func RemoveOtherIdentifierFromMasterTable(symbolName string, symbolEnum enumSymb
 	identifierEnum, identifierExists := CheckIfIdentifierExistsInMasterTable(symbolName)
 
 	if !identifierExists {
-		return errorHandler.AddNew(enumErrorCodes.Other, "Symbol not found so deleting nothing...")
+		return errorHandler.AddNew(enumErrorCodes.RemovedIdentifierNotFound, symbolName)
 	}
 	if identifierEnum != symbolEnum {
 		return errorHandler.AddNew(enumErrorCodes.Other, "Deleted type is not right")

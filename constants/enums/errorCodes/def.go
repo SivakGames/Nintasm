@@ -90,10 +90,14 @@ const (
 	MacroNotExist                 = "MacroNotExist"
 	MacroInvokeDoubleCurlyBrace   = "MacroInvokeDoubleCurlyBrace"
 	MacroInvokeUnclosedCurlyBrace = "MacroInvokeUnclosedCurlyBrace"
+	MacroInvokeTooFewArgs         = "MacroInvokeTooFewArgs"
+	MacroInvokeTooManyArgs        = "MacroInvokeTooManyArgs"
 
 	AssignmentMissingOperand      = "AssignmentMissingOperand"
 	AssignmentLocalNotInNamespace = "AssignmentLocalNotInNamespace"
 	AssignmentNamespaceNotLocal   = "AssignmentNamespaceNotLocal"
+
+	RemovedIdentifierNotFound = "RemovedIdentifierNotFound"
 
 	IfStatementElseIfNoParentIf       = "IfStatementElseIfNoParentIf"
 	IfStatementElseIfAfterElse        = "IfStatementElseIfAfterElse"

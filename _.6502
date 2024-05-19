@@ -18,10 +18,12 @@
 	.bank 0
 	.org $8000
 
-BBB = [1,2]
+BBB .macro \rr, \ss
+	.db \rr
+BBB .endm
 
 
-	.db BBB[1]
+	BBB 2
 
 ;-----------------------------------------
 RESET:

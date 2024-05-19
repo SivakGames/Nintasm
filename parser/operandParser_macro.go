@@ -52,11 +52,14 @@ func (mop *MacroOperandParser) Process(macroName string) error {
 	}
 
 	if validArguments != nil {
-		if len(operandList) < len(*validArguments) {
-			return errorHandler.AddNew(enumErrorCodes.Other, "Too few args")
+		suppliedArguments := len(operandList)
+		neededArguments := len(*validArguments)
+
+		if suppliedArguments < neededArguments {
+			return errorHandler.AddNew(enumErrorCodes.MacroInvokeTooFewArgs, suppliedArguments, neededArguments)
 		}
-		if len(operandList) > len(*validArguments) {
-			return errorHandler.AddNew(enumErrorCodes.Other, "Too many args")
+		if suppliedArguments > neededArguments {
+			return errorHandler.AddNew(enumErrorCodes.MacroInvokeTooManyArgs, suppliedArguments, neededArguments)
 		}
 		for i, operand := range operandList {
 			macroTable.AddToReplacementListOnTopOfStack((*validArguments)[i], operand.NodeValue)
