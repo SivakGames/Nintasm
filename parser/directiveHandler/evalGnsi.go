@@ -1,7 +1,6 @@
 package directiveHandler
 
 import (
-	"fmt"
 	"misc/nintasm/assemble/errorHandler"
 	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
 	enumSymbolTableTypes "misc/nintasm/constants/enums/symbolTableTypes"
@@ -24,7 +23,6 @@ func evalGnsi(operationLabel string, operandList *[]Node) error {
 	defer environment.SetUnresolvedSilentErrorFlagTo(unresFlag)
 
 	gnsiLabelNode := (*operandList)[0]
-	fmt.Println(gnsiLabelNode)
 
 	if !operandFactory.ValidateNodeIsIdentifier(&gnsiLabelNode) {
 		return errorHandler.AddNew(enumErrorCodes.NodeTypeNotIdentifier) // ❌ Fails
