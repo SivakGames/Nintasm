@@ -96,12 +96,13 @@ const (
 	MacroSubstitutionAlreadyExists = "MacroSubstitutionAlreadyExists"
 	SubstitutionNotLabelLike       = "SubstitutionNotLabelLike"
 
-	AssignmentMissingOperand      = "AssignmentMissingOperand"
-	AssignmentLocalNotInNamespace = "AssignmentLocalNotInNamespace"
-	AssignmentNamespaceNotLocal   = "AssignmentNamespaceNotLocal"
-
-	RemovedIdentifierNotFound  = "RemovedIdentifierNotFound"
-	RemovedIdentifierWrongType = "RemovedIdentifierWrongType"
+	AssignmentMissingOperand        = "AssignmentMissingOperand"
+	AssignmentLocalNotInNamespace   = "AssignmentLocalNotInNamespace"
+	AssignmentNamespaceNotLocal     = "AssignmentNamespaceNotLocal"
+	ReassignmentIdentifierNotFound  = "ReassignmentIdentifierNotFound"
+	ReassignmentIdentifierNotSymbol = "ReassignmentIdentifierNotSymbol"
+	RemovedIdentifierNotFound       = "RemovedIdentifierNotFound"
+	RemovedIdentifierWrongType      = "RemovedIdentifierWrongType"
 
 	IfStatementElseIfNoParentIf       = "IfStatementElseIfNoParentIf"
 	IfStatementElseIfAfterElse        = "IfStatementElseIfAfterElse"

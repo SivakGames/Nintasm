@@ -139,6 +139,9 @@ var errorTable = map[enumErrorCodes.Def]ErrorTableEntry{
 	enumErrorCodes.AssignmentLocalNotInNamespace: newErrorTableEntry(enumErrorCodes.Error, "Cannot use local assignment outside of namespace"),
 	enumErrorCodes.AssignmentNamespaceNotLocal:   newErrorTableEntry(enumErrorCodes.Error, "Must use local assignment within namespace"),
 
+	enumErrorCodes.ReassignmentIdentifierNotFound:  newErrorTableEntry(enumErrorCodes.Fatal, fmt.Sprintf("Reassigned identifier %v not found and MUST be resolved to proceed", coloredIdentifier("%v"))),
+	enumErrorCodes.ReassignmentIdentifierNotSymbol: newErrorTableEntry(enumErrorCodes.Error, fmt.Sprintf("Reassigned identifier %v must be a symbol. Got: %v", coloredIdentifier("%v"), coloredSymbol("%v"))),
+
 	enumErrorCodes.RemovedIdentifierNotFound:  newErrorTableEntry(enumErrorCodes.Warning, fmt.Sprintf("Symbol %v not found so deleting nothing...", coloredIdentifier("%v"))),
 	enumErrorCodes.RemovedIdentifierWrongType: newErrorTableEntry(enumErrorCodes.Error, fmt.Sprintf("Symbol %v is wrong type for deletion. Got: %v / Wanted: %v", coloredIdentifier("%v"), coloredSymbol("%v"), coloredSymbol("%v"))),
 

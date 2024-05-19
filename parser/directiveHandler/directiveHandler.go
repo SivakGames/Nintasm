@@ -52,6 +52,8 @@ func EvaluateDirective(operationTokenEnum enumTokenTypes.Def, directiveName stri
 		return evalSettingChange(directiveName, operandList)
 	case enumTokenTypes.DIRECTIVE_settingReset:
 		return evalSettingReset(directiveName)
+	case enumTokenTypes.DIRECTIVE_reassign:
+		return evalReassign(operandList)
 	case enumTokenTypes.DIRECTIVE_throw:
 		return evalThrow(operandList)
 	case enumTokenTypes.DIRECTIVE_deleteSymbol:

@@ -30,7 +30,7 @@ func CheckIfIdentifierExistsInMasterTable(symbolName string) (enumSymbolTableTyp
 func CheckIfAlreadyDefinedInMasterTable(symbolName string) error {
 	symbolEnum, exists := masterLookupTable[symbolName]
 	if exists {
-		description := getSymbolDescriptionFromEnum(symbolEnum)
+		description := GetSymbolDescriptionFromEnum(symbolEnum)
 		return errorHandler.AddNew(enumErrorCodes.InterpreterAlreadyDefined, symbolName, description)
 	}
 	return nil
@@ -151,7 +151,7 @@ func RemoveOtherIdentifierFromMasterTable(symbolName string, symbolEnum enumSymb
 		return errorHandler.AddNew(enumErrorCodes.RemovedIdentifierNotFound, symbolName)
 	}
 	if identifierEnum != symbolEnum {
-		return errorHandler.AddNew(enumErrorCodes.RemovedIdentifierWrongType, symbolName, getSymbolDescriptionFromEnum(identifierEnum), getSymbolDescriptionFromEnum(symbolEnum))
+		return errorHandler.AddNew(enumErrorCodes.RemovedIdentifierWrongType, symbolName, GetSymbolDescriptionFromEnum(identifierEnum), GetSymbolDescriptionFromEnum(symbolEnum))
 	}
 
 	removeFromMasterTable(symbolName)
@@ -179,7 +179,7 @@ func SetUnresolvedSilentErrorFlag() {
 	unresolvedAddsSilentError = true
 }
 
-func getSymbolDescriptionFromEnum(symbolEnum enumSymbolTableTypes.Def) string {
+func GetSymbolDescriptionFromEnum(symbolEnum enumSymbolTableTypes.Def) string {
 	switch symbolEnum {
 	case enumSymbolTableTypes.CharMap:
 		return "CHARMAP"

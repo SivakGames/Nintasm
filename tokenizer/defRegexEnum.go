@@ -50,6 +50,7 @@ var (
 		{regexp.MustCompile(generateBoundaries("include|incbin")), enumTokenTypes.DIRECTIVE_include},
 		{regexp.MustCompile(generateBoundaries("autoZP|autoZeroPage|emptyRomFill|rsset|setCharMap|setExprMap")), enumTokenTypes.DIRECTIVE_setting},
 		{regexp.MustCompile(generateBoundaries("resetCharMap|resetExprMap")), enumTokenTypes.DIRECTIVE_settingReset},
+		{regexp.MustCompile(generateBoundaries("reassign")), enumTokenTypes.DIRECTIVE_reassign},
 		{regexp.MustCompile(generateBoundaries("throw")), enumTokenTypes.DIRECTIVE_throw},
 
 		{regexp.MustCompile(generateBoundaries("if|ikv|range|repeat|switch|elseif|ifdef|ifndef|else|case|default")), enumTokenTypes.DIRECTIVE_blockStart},

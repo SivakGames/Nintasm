@@ -33,6 +33,7 @@ const (
 	DIRECTIVE_INES
 	DIRECTIVE_invokeKeyVal
 	DIRECTIVE_mixedData
+	DIRECTIVE_reassign
 	DIRECTIVE_romBuilding
 	DIRECTIVE_setting
 	DIRECTIVE_settingReset

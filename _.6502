@@ -18,6 +18,12 @@
 	.bank 0
 	.org $8000
 
+BBB = 25
+
+	.reassign BBB, 55
+	.db BBB
+
+
 ;-----------------------------------------
 RESET:
 	__resetCode__

@@ -40,6 +40,7 @@ var directiveManuallyEvaluatesOperands = map[string]bool{
 	"GNSI":        true,
 	"KV":          true,
 	"IKV":         true,
+	"REASSIGN":    true,
 	"REPEAT":      true,
 	"SETCHARMAP":  true,
 	"SETEXPRMAP":  true,
@@ -131,6 +132,7 @@ var directiveMinMaxOperands = map[enumTokenTypes.Def][2]int{
 	enumTokenTypes.DIRECTIVE_invokeKeyVal:    {2, 2},
 	enumTokenTypes.DIRECTIVE_setting:         {1, 1},
 	enumTokenTypes.DIRECTIVE_settingReset:    {0, 0},
+	enumTokenTypes.DIRECTIVE_reassign:        {2, 2},
 	enumTokenTypes.DIRECTIVE_throw:           {1, 1},
 }
 
