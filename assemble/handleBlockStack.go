@@ -32,7 +32,7 @@ func handleBlockStack(
 					return err
 				}
 			} else {
-				fmt.Println("NO!!!")
+				fmt.Println("Unmatched ")
 			}
 			return nil
 		}
@@ -57,14 +57,30 @@ func handleBlockStack(
 			interpreter.PopParentLabelWhenBlockOpDone = false
 		}
 	} else {
-		err := blockStack.CheckOperationIsCapturableAndAppend(reformattedLine, lineOperationParsedValues)
+		err := blockStack.CheckOperationIsCapturable(reformattedLine, lineOperationParsedValues)
 		if err != nil {
 			return err
 		}
+
 		isNewStartOp := blockStack.NEW_IsStartOperation(lineOperationParsedValues)
-		if isNewStartOp {
-			nestedBlockOps = append(nestedBlockOps, strings.ToUpper(lineOperationParsedValues.OperationTokenValue))
+
+		if !isNewStartOp || len(nestedBlockOps) > 0 {
+			_ = blockStack.CheckOperationIsCapturableAndAppend(reformattedLine, lineOperationParsedValues)
+		} else {
+			endOpExists := blockStack.NEW_CheckEndOpExistsForStartOp(strings.ToUpper(lineOperationParsedValues.OperationTokenValue))
+			if endOpExists {
+				nestedBlockOps = append(nestedBlockOps, strings.ToUpper(lineOperationParsedValues.OperationTokenValue))
+			} else {
+				err := parseAndProcessOperandString(
+					reformattedLine,
+					lineOperationParsedValues,
+				)
+				if err != nil {
+					return err // ❌ Fails
+				}
+			}
 		}
+
 	}
 
 	//isStartOrEndOperation := blockStack.CheckIfNewStartEndOperation(lineOperationParsedValues)

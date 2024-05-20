@@ -18,23 +18,27 @@
 	.bank 0
 	.org $8000
 
-SSS .macro \i
-	.db 77, \i
-SSS .endm
 
-TTT .macro
-	.repeat 2, \i
-		SSS \i
+	.switch 51
+	.case 2
+		.db 1
+	.case 3
+		.db 2
+	.case 5
 		.db 3
-		.if 5 > 4
-			.repeat 3
-				.db 2
-			.endrepeat
-		.endif 
-	.endrepeat
-TTT .endm
+	.default
+		.db 4
+	.endSwitch
 
-	TTT
+	.if 51 > 121
+		.db 5
+	.elseif 212 > 33
+		.db 6
+	.else
+		.db 99
+	.endif
+
+
 
 ;-----------------------------------------
 ;RESET:

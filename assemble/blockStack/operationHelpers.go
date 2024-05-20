@@ -23,6 +23,11 @@ func NEW_CheckEndOpVsStartOp(providedOpName string, startOpName string) bool {
 	return endOpName == strings.ToUpper(providedOpName)
 }
 
+func NEW_CheckEndOpExistsForStartOp(startOpName string) bool {
+	_, exists := correspondingEndBlockOperations[startOpName]
+	return exists
+}
+
 // Shared method for most ending labeled directives. Clears the label and pops from the capture block stack
 func ProcessEndLabeledDirective() {
 	ClearCurrentOperationLabel()
