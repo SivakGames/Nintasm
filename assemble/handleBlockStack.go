@@ -1,20 +1,43 @@
 package assemble
 
 import (
+	"fmt"
 	"misc/nintasm/assemble/blockStack"
 	"misc/nintasm/assemble/fileStack"
 	"misc/nintasm/interpreter"
 	"misc/nintasm/util"
+	"strings"
 )
 
+var nestedBlockOps []string
+
+// Things are in a block operation of some sort
 func handleBlockStack(
 	reformattedLine string,
 	lineOperationParsedValues *util.LineOperationParsedValues,
 ) error {
-	isStartOrEndOperation := blockStack.CheckIfNewStartEndOperation(lineOperationParsedValues)
+	// End ops close the block
+	// However, blocks can be nested so this also doubles as a "close the nested block"
+	isEndOp := blockStack.NEW_IsEndOperation(lineOperationParsedValues)
 
-	if isStartOrEndOperation {
-		// Operation will always process
+	//End ops will close
+	if isEndOp {
+		if len(nestedBlockOps) > 0 {
+			lastStartOp := nestedBlockOps[len(nestedBlockOps)-1]
+			matches := blockStack.NEW_CheckEndOpVsStartOp(lineOperationParsedValues.OperationTokenValue, lastStartOp)
+			if matches {
+				nestedBlockOps = nestedBlockOps[:len(nestedBlockOps)-1]
+				err := blockStack.CheckOperationIsCapturableAndAppend(reformattedLine, lineOperationParsedValues)
+				if err != nil {
+					return err
+				}
+			} else {
+				fmt.Println("NO!!!")
+			}
+			return nil
+		}
+
+		//Process end op
 		err := parseAndProcessOperandString(
 			reformattedLine,
 			lineOperationParsedValues,
@@ -23,7 +46,42 @@ func handleBlockStack(
 			return err // ❌ Fails
 		}
 
-		//If ending, iterate bottom of stack and parse all captured operations (if any)
+		//Process captured lines
+		err = preProcessBlockStack()
+		if err != nil {
+			return err // ❌ Fails
+		}
+		//Mainly set by namespaces - will clear the overriding parent label
+		if interpreter.PopParentLabelWhenBlockOpDone {
+			interpreter.PopParentLabel()
+			interpreter.PopParentLabelWhenBlockOpDone = false
+		}
+	} else {
+		err := blockStack.CheckOperationIsCapturableAndAppend(reformattedLine, lineOperationParsedValues)
+		if err != nil {
+			return err
+		}
+		isNewStartOp := blockStack.NEW_IsStartOperation(lineOperationParsedValues)
+		if isNewStartOp {
+			nestedBlockOps = append(nestedBlockOps, strings.ToUpper(lineOperationParsedValues.OperationTokenValue))
+		}
+	}
+
+	//isStartOrEndOperation := blockStack.CheckIfNewStartEndOperation(lineOperationParsedValues)
+
+	//	if isStartOrEndOperation {
+
+	// Operation will always process
+	/*err := parseAndProcessOperandString(
+		reformattedLine,
+		lineOperationParsedValues,
+	)
+	if err != nil {
+		return err // ❌ Fails
+	}*/
+
+	//If ending, iterate bottom of stack and parse all captured operations (if any)
+	/*
 		if blockStack.CheckIfEndOperationAndGoesToProcessing(lineOperationParsedValues) {
 			err := preProcessBlockStack()
 			if err != nil {
@@ -34,30 +92,30 @@ func handleBlockStack(
 				interpreter.PopParentLabel()
 				interpreter.PopParentLabelWhenBlockOpDone = false
 			}
+		} */
+
+	//	} else {
+	//If in forced eval mode, evaluate the node right here
+	/* if blockStack.GetCaptureBlockListEvalFlag() {
+		err := blockStack.CheckOperationIsCapturable(reformattedLine, lineOperationParsedValues)
+		if err != nil {
+			return err // ❌ Fails
+		}
+		err = parseAndProcessOperandString(
+			reformattedLine,
+			lineOperationParsedValues,
+		)
+		if err != nil {
+			return err // ❌ Fails
 		}
 
 	} else {
-		//If in forced eval mode, evaluate the node right here
-		if blockStack.GetCaptureBlockListEvalFlag() {
-			err := blockStack.CheckOperationIsCapturable(reformattedLine, lineOperationParsedValues)
-			if err != nil {
-				return err // ❌ Fails
-			}
-			err = parseAndProcessOperandString(
-				reformattedLine,
-				lineOperationParsedValues,
-			)
-			if err != nil {
-				return err // ❌ Fails
-			}
-
-		} else {
-			err := blockStack.CheckOperationIsCapturableAndAppend(reformattedLine, lineOperationParsedValues)
-			if err != nil {
-				return err
-			}
+		err := blockStack.CheckOperationIsCapturableAndAppend(reformattedLine, lineOperationParsedValues)
+		if err != nil {
+			return err
 		}
-	}
+	} */
+	//	}
 
 	return nil
 }
@@ -65,6 +123,12 @@ func handleBlockStack(
 func preProcessBlockStack() error {
 	currentOp := blockStack.GetCurrentOpPtr()
 	blockStack.AddNewCaptureBlockListNode() //Create new temp stack
+
+	currentBlockEntries := blockStack.GetBlockEntriesWithPtr(currentOp)
+	if len(*currentBlockEntries) == 0 {
+		return nil
+	}
+
 	tempNewOp := blockStack.GetCurrentOpPtr()
 	currentOpName := blockStack.GetCapturedLinesOpNameWithPtr(currentOp)
 	err := readCapturedLines(currentOp, tempNewOp)

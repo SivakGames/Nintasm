@@ -18,34 +18,52 @@
 	.bank 0
 	.org $8000
 
+SSS .macro \i
+	.db 77, \i
+SSS .endm
+
+TTT .macro
+	.repeat 2, \i
+		SSS \i
+		.db 3
+		.if 5 > 4
+			.repeat 3
+				.db 2
+			.endrepeat
+		.endif 
+	.endrepeat
+TTT .endm
+
+	TTT
+
 ;-----------------------------------------
-RESET:
-	__resetCode__
-
-RESET_end:
-	;Enable NMI
-	LDA #(PPUCTRL.enableNMI | PPUCTRL.spritePatternTable)
-	STA PPUCTRL
-
-	__setPPU__ PPUADDR.palBg0
-
-	;Let the whole screen be PINK!
-	LDA #$25
-	STA $2007
-
-Forever:
-	JMP Forever
-
-;-----------------------------------------
-NMI:
-	LDA #0
-	STA $2006 
-	STA $2006
-	RTI
-
-
-	.org $fffa
-	.dw NMI, RESET, 0
+;RESET:
+;	__resetCode__
+;
+;RESET_end:
+;	;Enable NMI
+;	LDA #(PPUCTRL.enableNMI | PPUCTRL.spritePatternTable)
+;	STA PPUCTRL
+;
+;	__setPPU__ PPUADDR.palBg0
+;
+;	;Let the whole screen be PINK!
+;	LDA #$25
+;	STA $2007
+;
+;Forever:
+;	JMP Forever
+;
+;;-----------------------------------------
+;NMI:
+;	LDA #0
+;	STA $2006 
+;	STA $2006
+;	RTI
+;
+;
+;	.org $fffa
+;	.dw NMI, RESET, 0
 
 ;==========================================
 ; CHR start

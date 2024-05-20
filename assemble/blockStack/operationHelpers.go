@@ -18,6 +18,11 @@ func CheckIfEndOpMatchesOpeningOp(desiredEndOpName string) bool {
 	return endOpName == strings.ToUpper(desiredEndOpName)
 }
 
+func NEW_CheckEndOpVsStartOp(providedOpName string, startOpName string) bool {
+	endOpName, _ := correspondingEndBlockOperations[startOpName]
+	return endOpName == strings.ToUpper(providedOpName)
+}
+
 // Shared method for most ending labeled directives. Clears the label and pops from the capture block stack
 func ProcessEndLabeledDirective() {
 	ClearCurrentOperationLabel()
@@ -25,6 +30,16 @@ func ProcessEndLabeledDirective() {
 }
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++
+
+func NEW_IsStartOperation(lineOperationParsedValues *util.LineOperationParsedValues) bool {
+	return lineOperationParsedValues.OperationTokenEnum == enumTokenTypes.DIRECTIVE_blockStart ||
+		lineOperationParsedValues.OperationTokenEnum == enumTokenTypes.DIRECTIVE_labeledBlockStart
+}
+
+func NEW_IsEndOperation(lineOperationParsedValues *util.LineOperationParsedValues) bool {
+	return lineOperationParsedValues.OperationTokenEnum == enumTokenTypes.DIRECTIVE_blockEnd ||
+		lineOperationParsedValues.OperationTokenEnum == enumTokenTypes.DIRECTIVE_labeledBlockEnd
+}
 
 func CheckIfNewStartEndOperation(lineOperationParsedValues *util.LineOperationParsedValues) bool {
 	isStartEndEnum := (lineOperationParsedValues.OperationTokenEnum == enumTokenTypes.DIRECTIVE_blockStart ||
