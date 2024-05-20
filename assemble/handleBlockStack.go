@@ -57,9 +57,10 @@ func handleBlockStack(
 			interpreter.PopParentLabelWhenBlockOpDone = false
 		}
 	} else {
+		//See if parent allows capturing this block
 		err := blockStack.CheckOperationIsCapturable(reformattedLine, lineOperationParsedValues)
 		if err != nil {
-			return err
+			return err // ❌ Fails
 		}
 
 		isNewStartOp := blockStack.NEW_IsStartOperation(lineOperationParsedValues)
@@ -69,6 +70,7 @@ func handleBlockStack(
 		} else {
 			endOpExists := blockStack.NEW_CheckEndOpExistsForStartOp(strings.ToUpper(lineOperationParsedValues.OperationTokenValue))
 			if endOpExists {
+				_ = blockStack.CheckOperationIsCapturableAndAppend(reformattedLine, lineOperationParsedValues)
 				nestedBlockOps = append(nestedBlockOps, strings.ToUpper(lineOperationParsedValues.OperationTokenValue))
 			} else {
 				err := parseAndProcessOperandString(
@@ -80,7 +82,6 @@ func handleBlockStack(
 				}
 			}
 		}
-
 	}
 
 	//isStartOrEndOperation := blockStack.CheckIfNewStartEndOperation(lineOperationParsedValues)

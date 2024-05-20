@@ -18,26 +18,12 @@
 	.bank 0
 	.org $8000
 
-
-	.switch 51
-	.case 2
-		.db 1
-	.case 3
-		.db 2
-	.case 5
-		.db 3
-	.default
-		.db 4
-	.endSwitch
-
-	.if 51 > 121
-		.db 5
-	.elseif 212 > 33
-		.db 6
-	.else
-		.db 99
-	.endif
-
+	.repeat 2, \i
+		.db \i, \i+2
+		.repeat 2, \j
+			.db 44, \j
+		.endRepeat
+	.endRepeat
 
 
 ;-----------------------------------------
