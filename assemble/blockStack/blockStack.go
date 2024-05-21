@@ -33,12 +33,12 @@ func getActiveCaptureBlockListNode() *CaptureBlockListNode {
 }
 
 //Get the entire capture block stack for the current node
-func getCurrentCaptureBlockListNodeCaptureBlockStack() *[]captureBlock {
+func getCurrentCaptureBlockListNodeCaptureBlockStack() *[]CaptureBlock {
 	listNode := getCurrentCaptureBlockListNode()
 	return &listNode.captureBlockStack
 }
 
-func getCurrentCaptureBlockListNodeCaptureBlockStackTopEntry() *captureBlock {
+func getCurrentCaptureBlockListNodeCaptureBlockStackTopEntry() *CaptureBlock {
 	blockStack := getCurrentCaptureBlockListNodeCaptureBlockStack()
 	if len(*blockStack) > 0 {
 		return &(*blockStack)[len(*blockStack)-1]
@@ -46,7 +46,7 @@ func getCurrentCaptureBlockListNodeCaptureBlockStackTopEntry() *captureBlock {
 	panic("🛑 Block stack has no length!")
 }
 
-func getCurrentCaptureBlockListNodeCaptureBlockStackTopEntryFurthestAlternate() *captureBlock {
+func getCurrentCaptureBlockListNodeCaptureBlockStackTopEntryFurthestAlternate() *CaptureBlock {
 	block := getCurrentCaptureBlockListNodeCaptureBlockStackTopEntry()
 	for block.AlternateCaptureBlock != nil {
 		block = block.AlternateCaptureBlock

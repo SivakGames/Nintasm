@@ -5,6 +5,7 @@ import (
 	"misc/nintasm/assemble/blockStack"
 	"misc/nintasm/assemble/fileStack"
 	"misc/nintasm/interpreter"
+	"misc/nintasm/interpreter/environment/symbolAsNodeTable"
 	"misc/nintasm/util"
 	"strings"
 )
@@ -165,13 +166,68 @@ func preProcessBlockStack() error {
 func readCapturedLines(
 	currentOp *blockStack.CaptureBlockListNode,
 	tempNewOp *blockStack.CaptureBlockListNode) error {
-	var processCapturedErr error
 
-	lines := blockStack.GetCapturedLinesWithPtr(currentOp)
+	//lines := blockStack.GetCapturedLinesWithPtr(currentOp)
+	processedLines := blockStack.GetProcessedLinesWithPtr(currentOp)
 	monitorStack := blockStack.GetBlockEntriesWithPtr(tempNewOp)
 
+	for _, pl := range *processedLines {
+		lines := &pl.CapturedLines
+		scope := pl.Scope
+		processInner(lines, scope, monitorStack)
+	}
+
 	//Iterate over captured lines
-	for i, b := range *lines {
+	/*
+		for i, b := range *lines {
+			if len(*monitorStack) > 0 {
+				newlyEvaluatedParsedValues := util.LineOperationParsedValues{
+					OperandStartPosition: b.OperandStartPosition,
+					OperationLabel:       b.OperationLabel,
+					OperationTokenEnum:   b.OperationTokenEnum,
+					OperationTokenValue:  b.OperationTokenValue,
+					ParentParserEnum:     b.ParentParserEnum,
+				}
+				processCapturedErr = handleBlockStack(b.OriginalLine, &newlyEvaluatedParsedValues)
+				if processCapturedErr != nil {
+					return processCapturedErr // ❌ Fails
+				}
+				if blockStack.GetExitOpName() != "" {
+					break
+				}
+				continue
+			}
+
+			fileStack.AddSubOp(uint(i+1), b.OriginalLine)
+
+			processOperandArguments := util.NewLineOperationParsedValues(b.OperandStartPosition,
+				b.OperationLabel,
+				b.OperationTokenEnum,
+				b.OperationTokenValue,
+				b.ParentParserEnum,
+			)
+			processCapturedErr = parseAndProcessOperandString(
+				b.OriginalLine,
+				&processOperandArguments,
+			)
+			if processCapturedErr != nil {
+				return processCapturedErr // ❌ Fails
+			}
+			if blockStack.GetExitOpName() != "" {
+				break
+			}
+		}*/
+
+	return nil
+}
+
+func processInner(lines *[]blockStack.CapturedLine, scope blockStack.ProcessLineScope, monitorStack *[]blockStack.CaptureBlock) error {
+	var processCapturedErr error
+
+	symbolAsNodeTable.AddChildBlockScope(scope)
+	defer symbolAsNodeTable.PopChildBlockScope()
+
+	for j, b := range *lines {
 		if len(*monitorStack) > 0 {
 			newlyEvaluatedParsedValues := util.LineOperationParsedValues{
 				OperandStartPosition: b.OperandStartPosition,
@@ -190,7 +246,7 @@ func readCapturedLines(
 			continue
 		}
 
-		fileStack.AddSubOp(uint(i+1), b.OriginalLine)
+		fileStack.AddSubOp(uint(j+1), b.OriginalLine)
 
 		processOperandArguments := util.NewLineOperationParsedValues(b.OperandStartPosition,
 			b.OperationLabel,

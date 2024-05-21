@@ -37,15 +37,32 @@ func newCapturedLine(originalLine string,
 
 // ++++++++++++++++++++++++++++++++++++
 
-type captureBlock struct {
-	BlockOperationName    string
-	CapturedLines         []CapturedLine
-	OperandList           []Node
-	AlternateCaptureBlock *captureBlock
+type ProcessLineScope map[string]Node
+
+type ProcessLine struct {
+	Scope         ProcessLineScope
+	CapturedLines []CapturedLine
 }
 
-func newCaptureBlock(blockOperationName string, operandList []Node) captureBlock {
-	return captureBlock{
+func newProcessLine(scope ProcessLineScope, capturedLines []CapturedLine) ProcessLine {
+	return ProcessLine{
+		Scope:         scope,
+		CapturedLines: capturedLines,
+	}
+}
+
+// ++++++++++++++++++++++++++++++++++++
+
+type CaptureBlock struct {
+	BlockOperationName    string
+	CapturedLines         []CapturedLine
+	ProcessLines          []ProcessLine
+	OperandList           []Node
+	AlternateCaptureBlock *CaptureBlock
+}
+
+func newCaptureBlock(blockOperationName string, operandList []Node) CaptureBlock {
+	return CaptureBlock{
 		BlockOperationName:    blockOperationName,
 		CapturedLines:         []CapturedLine{},
 		OperandList:           operandList,
@@ -56,7 +73,7 @@ func newCaptureBlock(blockOperationName string, operandList []Node) captureBlock
 // ++++++++++++++++++++++++++++++++++++
 
 type CaptureBlockListNode struct {
-	captureBlockStack []captureBlock
+	captureBlockStack []CaptureBlock
 	//Setting where the operation evaluates things while capturing
 	evalutesInsteadOfCapturing bool
 	//Mainly for macros - Will always capture nodes except for a corresponding ending block
@@ -67,7 +84,7 @@ type CaptureBlockListNode struct {
 
 func newCaptureBlockListNode() CaptureBlockListNode {
 	return CaptureBlockListNode{
-		captureBlockStack:          []captureBlock{},
+		captureBlockStack:          []CaptureBlock{},
 		evalutesInsteadOfCapturing: false,
 		forcedCapturing:            false,
 		nextNode:                   nil,

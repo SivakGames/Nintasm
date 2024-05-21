@@ -22,6 +22,11 @@ var prevLocalLabelNextLocalLabelTable = map[string]string{}
 
 type symbolTableType = map[string]Node
 
+// When in block ops, certain things can be scoped to the block
+var localBlockScopes []*symbolTableType
+
+// ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 // Used when doing function calls
 var symbolTableStack = []symbolTableType{}
 
@@ -117,6 +122,14 @@ func AddIdentifierKeyToPrevLocalLabelNextLocalLabelTable(prevLabel string, nextL
 }
 
 func GetNodeFromSymbolAsNodeTable(symbolName string) (Node, bool) {
+	for lsi := len(localBlockScopes) - 1; lsi >= 0; lsi-- {
+		scope := localBlockScopes[lsi]
+		node, exists := (*scope)[symbolName]
+		if exists {
+			return node, exists
+		}
+	}
+
 	node, exists := symbolTable[symbolName]
 	return node, exists
 }
@@ -182,4 +195,14 @@ func generateAssemblerReservedWordNode(funcName string) Node {
 
 func generateNumericNodeForEnvironment(number int) Node {
 	return operandFactory.CreateNumericLiteralNode(float64(number))
+}
+
+// ------------------------------------------
+
+func AddChildBlockScope(scope symbolTableType) {
+	localBlockScopes = append(localBlockScopes, &scope)
+}
+
+func PopChildBlockScope() {
+	localBlockScopes = localBlockScopes[:len(localBlockScopes)-1]
 }

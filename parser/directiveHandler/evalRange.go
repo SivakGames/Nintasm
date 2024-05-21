@@ -8,8 +8,6 @@ import (
 	enumNodeTypes "misc/nintasm/constants/enums/nodeTypes"
 	"misc/nintasm/interpreter"
 	"misc/nintasm/interpreter/operandFactory"
-	"regexp"
-	"strconv"
 )
 
 func evalRange(directiveName string, operandList *[]Node) error {
@@ -23,7 +21,7 @@ func evalRange(directiveName string, operandList *[]Node) error {
 	}
 
 	indexNameNode := (*operandList)[1]
-	if !operandFactory.ValidateNodeIsSubstitutionID(&indexNameNode) {
+	if !operandFactory.ValidateNodeIsIdentifier(&indexNameNode) {
 		return errorHandler.AddNew(enumErrorCodes.NodeTypeNotSubstitutionID) // ❌ Fails
 	}
 
@@ -32,7 +30,7 @@ func evalRange(directiveName string, operandList *[]Node) error {
 	// Check if iterator node was set
 	if len(*operandList) > 2 {
 		valueNameNode := (*operandList)[2]
-		if !operandFactory.ValidateNodeIsSubstitutionID(&valueNameNode) {
+		if !operandFactory.ValidateNodeIsIdentifier(&valueNameNode) {
 			return errorHandler.AddNew(enumErrorCodes.NodeTypeNotSubstitutionID) // ❌ Fails
 		}
 		evaluatedNodes = append(evaluatedNodes, (*operandList)[2])
@@ -57,41 +55,57 @@ func evalEndRange() error {
 		valueName = (*operandList)[2].NodeValue
 	}
 
-	replacedLines := make([]blockStack.CapturedLine, len(*capturedLines)*len(*rangeArray))
-	replacedIndex := 0
-
-	indexNameAsRegex := regexp.MustCompile(`\` + indexName + `\b`)
-	var valueNameAsRegex *regexp.Regexp
-	if len(valueName) > 0 {
-		valueNameAsRegex = regexp.MustCompile(`\` + valueName + `\b`)
-	}
+	processedLines := []blockStack.ProcessLine{}
 
 	for i, v := range *rangeArray {
-		replaceIndex := strconv.Itoa(i)
-		replaceValue := ""
-		if valueNameAsRegex != nil {
-			replaceValue = getReplaceValueAsString(&v)
+		repeatScope := blockStack.ProcessLineScope{}
+		repeatScope[indexName] = operandFactory.CreateNumericLiteralNode(float64(i))
+		if valueName != "" {
+			repeatScope[valueName] = v
 		}
-		for _, j := range *capturedLines {
-			replacedOriginalLine := indexNameAsRegex.ReplaceAllString(j.OriginalLine, replaceIndex)
-			replacedOperationLabel := indexNameAsRegex.ReplaceAllString(j.OperationLabel, replaceIndex)
+
+		pl := blockStack.GenerateProcessedLine(repeatScope, *capturedLines)
+		processedLines = append(processedLines, pl)
+	}
+
+	/*
+		replacedLines := make([]blockStack.CapturedLine, len(*capturedLines)*len(*rangeArray))
+		replacedIndex := 0
+
+		indexNameAsRegex := regexp.MustCompile(`\` + indexName + `\b`)
+		var valueNameAsRegex *regexp.Regexp
+		if len(valueName) > 0 {
+			valueNameAsRegex = regexp.MustCompile(`\` + valueName + `\b`)
+		}
+
+		for i, v := range *rangeArray {
+			replaceIndex := strconv.Itoa(i)
+			replaceValue := ""
 			if valueNameAsRegex != nil {
-				replacedOriginalLine = valueNameAsRegex.ReplaceAllString(replacedOriginalLine, replaceValue)
-				replacedOperationLabel = valueNameAsRegex.ReplaceAllString(replacedOperationLabel, replaceValue)
+				replaceValue = getReplaceValueAsString(&v)
 			}
-			j.OriginalLine = replacedOriginalLine
-			j.OperationLabel = replacedOperationLabel
-			replacedLines[replacedIndex] = j
-			replacedIndex++
+			for _, j := range *capturedLines {
+				replacedOriginalLine := indexNameAsRegex.ReplaceAllString(j.OriginalLine, replaceIndex)
+				replacedOperationLabel := indexNameAsRegex.ReplaceAllString(j.OperationLabel, replaceIndex)
+				if valueNameAsRegex != nil {
+					replacedOriginalLine = valueNameAsRegex.ReplaceAllString(replacedOriginalLine, replaceValue)
+					replacedOperationLabel = valueNameAsRegex.ReplaceAllString(replacedOperationLabel, replaceValue)
+				}
+				j.OriginalLine = replacedOriginalLine
+				j.OperationLabel = replacedOperationLabel
+				replacedLines[replacedIndex] = j
+				replacedIndex++
+			}
+
 		}
 
-	}
+		if len(replacedLines) == 0 {
+			errorHandler.AddNew(enumErrorCodes.BlockIsEmpty) // ⚠️ Warns
+		}
+	*/
+	blockStack.NEW_PopCaptureBlockPrepProcessBlock(processedLines)
 
-	if len(replacedLines) == 0 {
-		errorHandler.AddNew(enumErrorCodes.BlockIsEmpty) // ⚠️ Warns
-	}
-
-	blockStack.PopCaptureBlockThenExtendCapturedLines(replacedLines)
+	//blockStack.PopCaptureBlockThenExtendCapturedLines(replacedLines)
 	return nil
 }
 

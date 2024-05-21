@@ -6,8 +6,6 @@ import (
 	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
 	"misc/nintasm/interpreter"
 	"misc/nintasm/interpreter/operandFactory"
-	"regexp"
-	"strconv"
 )
 
 func evalRepeat(directiveName string, operandList *[]Node) error {
@@ -27,7 +25,7 @@ func evalRepeat(directiveName string, operandList *[]Node) error {
 	// Check if iterator node was set
 	if len(*operandList) > 1 {
 		iterNameNode := (*operandList)[1]
-		if !operandFactory.ValidateNodeIsSubstitutionID(&iterNameNode) {
+		if !operandFactory.ValidateNodeIsIdentifier(&iterNameNode) {
 			return errorHandler.AddNew(enumErrorCodes.NodeTypeNotSubstitutionID) // ❌ Fails
 		}
 		evaluatedNodes = append(evaluatedNodes, (*operandList)[1])
@@ -51,34 +49,49 @@ func evalEndRepeat() error {
 		iteratorName = (*operandList)[1].NodeValue
 	}
 
-	replacedLines := make([]blockStack.CapturedLine, len(*capturedLines)*repeatAmount)
-	replacedIndex := 0
+	processedLines := []blockStack.ProcessLine{}
 
-	if iteratorName == "" {
-		for i := 0; i < repeatAmount; i++ {
-			for _, j := range *capturedLines {
-				replacedLines[replacedIndex] = j
-				replacedIndex++
-			}
+	for i := 0; i < repeatAmount; i++ {
+		repeatScope := blockStack.ProcessLineScope{}
+		if iteratorName != "" {
+			repeatScope[iteratorName] = operandFactory.CreateNumericLiteralNode(float64(i))
 		}
-	} else {
-		iterNameAsRegex := regexp.MustCompile(`\` + iteratorName + `\b`)
-		for i := 0; i < repeatAmount; i++ {
-			replaceNum := strconv.Itoa(i)
-			for _, j := range *capturedLines {
-				replacedOriginalLine := iterNameAsRegex.ReplaceAllString(j.OriginalLine, replaceNum)
-				replacedOperationLabel := iterNameAsRegex.ReplaceAllString(j.OperationLabel, replaceNum)
-				j.OriginalLine = replacedOriginalLine
-				j.OperationLabel = replacedOperationLabel
-				replacedLines[replacedIndex] = j
-				replacedIndex++
-			}
-		}
-	}
-	if len(replacedLines) == 0 {
-		errorHandler.AddNew(enumErrorCodes.BlockIsEmpty) // ⚠️ Warns
+
+		pl := blockStack.GenerateProcessedLine(repeatScope, *capturedLines)
+		processedLines = append(processedLines, pl)
 	}
 
-	blockStack.PopCaptureBlockThenExtendCapturedLines(replacedLines)
+	/*
+		replacedLines := make([]blockStack.CapturedLine, len(*capturedLines)*repeatAmount)
+		replacedIndex := 0
+
+		if iteratorName == "" {
+			for i := 0; i < repeatAmount; i++ {
+				for _, j := range *capturedLines {
+					replacedLines[replacedIndex] = j
+					replacedIndex++
+				}
+			}
+		} else {
+			iterNameAsRegex := regexp.MustCompile(`\` + iteratorName + `\b`)
+			for i := 0; i < repeatAmount; i++ {
+				replaceNum := strconv.Itoa(i)
+				for _, j := range *capturedLines {
+					replacedOriginalLine := iterNameAsRegex.ReplaceAllString(j.OriginalLine, replaceNum)
+					replacedOperationLabel := iterNameAsRegex.ReplaceAllString(j.OperationLabel, replaceNum)
+					j.OriginalLine = replacedOriginalLine
+					j.OperationLabel = replacedOperationLabel
+					replacedLines[replacedIndex] = j
+					replacedIndex++
+				}
+			}
+		}
+		if len(replacedLines) == 0 {
+			errorHandler.AddNew(enumErrorCodes.BlockIsEmpty) // ⚠️ Warns
+		}
+	*/
+	blockStack.NEW_PopCaptureBlockPrepProcessBlock(processedLines)
+
+	//blockStack.PopCaptureBlockThenExtendCapturedLines(replacedLines)
 	return nil
 }

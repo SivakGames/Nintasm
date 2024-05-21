@@ -57,7 +57,7 @@ func PushCaptureBlock(blockOperationName string, operandList []Node) {
 func PopCaptureBlockThenExtendCapturedLines(extendedLines []CapturedLine) {
 	blockStack := getCurrentCaptureBlockListNodeCaptureBlockStack()
 
-	// More than 1 will
+	// More than 1 will put the lines on the next level down
 	if len(*blockStack) > 1 {
 		popFromCurrentCaptureBlockListCaptureBlockStack()
 		captureBlock := getCurrentCaptureBlockListNodeCaptureBlockStackTopEntryFurthestAlternate()
@@ -65,6 +65,7 @@ func PopCaptureBlockThenExtendCapturedLines(extendedLines []CapturedLine) {
 			captureBlock.CapturedLines = append(captureBlock.CapturedLines, line)
 		}
 
+		// On the lowest level, these are replaced...
 	} else if len(*blockStack) == 1 {
 		captureBlock := getCurrentCaptureBlockListNodeCaptureBlockStackTopEntryFurthestAlternate()
 		captureBlock.CapturedLines = extendedLines
@@ -75,6 +76,18 @@ func PopCaptureBlockThenExtendCapturedLines(extendedLines []CapturedLine) {
 	}
 }
 
+// **************************
+func NEW_PopCaptureBlockPrepProcessBlock(processedLine []ProcessLine) {
+	captureBlock := getCurrentCaptureBlockListNodeCaptureBlockStackTopEntryFurthestAlternate()
+	captureBlock.ProcessLines = processedLine
+}
+
+func GenerateProcessedLine(scope ProcessLineScope, finalCapturedLines []CapturedLine) ProcessLine {
+	return newProcessLine(scope, finalCapturedLines)
+}
+
+// **************************
+
 func CreateNewAlternateForCaptureBlock(blockOperationName string, operandList []Node) {
 	captureBlock := getCurrentCaptureBlockListNodeCaptureBlockStackTopEntryFurthestAlternate()
 	altCaptureBlock := newCaptureBlock(blockOperationName, operandList)
@@ -83,7 +96,7 @@ func CreateNewAlternateForCaptureBlock(blockOperationName string, operandList []
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++
 
-func GetCurrentCaptureBlockStack() *[]captureBlock {
+func GetCurrentCaptureBlockStack() *[]CaptureBlock {
 	return getCurrentCaptureBlockListNodeCaptureBlockStack()
 }
 
@@ -92,7 +105,7 @@ func GetCurrentCaptureBlockStackLen() int {
 	return len(*blockStack)
 }
 
-func GetCurrentCaptureBlock() *captureBlock {
+func GetCurrentCaptureBlock() *CaptureBlock {
 	return getCurrentCaptureBlockListNodeCaptureBlockStackTopEntry()
 }
 
@@ -123,7 +136,7 @@ func GetCurrentOpPtr() *CaptureBlockListNode {
 func GetCurrentActiveOpPtr() *CaptureBlockListNode {
 	return getActiveCaptureBlockListNode()
 }
-func GetBlockEntriesWithPtr(pointer *CaptureBlockListNode) *[]captureBlock {
+func GetBlockEntriesWithPtr(pointer *CaptureBlockListNode) *[]CaptureBlock {
 	return &pointer.captureBlockStack
 }
 func GetCapturedLinesWithPtr(pointer *CaptureBlockListNode) *[]CapturedLine {
@@ -131,6 +144,9 @@ func GetCapturedLinesWithPtr(pointer *CaptureBlockListNode) *[]CapturedLine {
 }
 func GetCapturedLinesOpNameWithPtr(pointer *CaptureBlockListNode) string {
 	return (&pointer.captureBlockStack[0]).BlockOperationName
+}
+func GetProcessedLinesWithPtr(pointer *CaptureBlockListNode) *[]ProcessLine {
+	return &pointer.captureBlockStack[0].ProcessLines
 }
 func ClearBlockEntriesWithPtr(pointer *CaptureBlockListNode) {
 	pointer.captureBlockStack = (*pointer).captureBlockStack[:0]

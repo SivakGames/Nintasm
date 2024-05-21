@@ -18,12 +18,17 @@
 	.bank 0
 	.org $8000
 
-	.repeat 2, \i
-		.db \i, \i+2
-		.repeat 2, \j
-			.db 44, \j
-		.endRepeat
-	.endRepeat
+;	.repeat 5, i
+;		.repeat 2, j
+;			.db i * (j+1)
+;		.endrepeat
+;	.endRepeat
+
+	.range [[1,2],[11,21],[111,211]], i1, v1
+		.range v1, i2, v2
+			.db v2
+		.endRange
+	.endRange
 
 
 ;-----------------------------------------
