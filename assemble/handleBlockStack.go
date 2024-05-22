@@ -33,7 +33,7 @@ func handleBlockStack(
 					return err
 				}
 			} else {
-				fmt.Println("Unmatched ")
+				fmt.Println("Unmatched end op", lineOperationParsedValues.OperationTokenValue)
 			}
 			return nil
 		}
@@ -66,14 +66,20 @@ func handleBlockStack(
 
 		isNewStartOp := blockStack.NEW_IsStartOperation(lineOperationParsedValues)
 
-		if !isNewStartOp || len(nestedBlockOps) > 0 {
+		if !isNewStartOp {
 			_ = blockStack.CheckOperationIsCapturableAndAppend(reformattedLine, lineOperationParsedValues)
 		} else {
 			endOpExists := blockStack.NEW_CheckEndOpExistsForStartOp(strings.ToUpper(lineOperationParsedValues.OperationTokenValue))
+			//Capture new block opener
 			if endOpExists {
 				_ = blockStack.CheckOperationIsCapturableAndAppend(reformattedLine, lineOperationParsedValues)
 				nestedBlockOps = append(nestedBlockOps, strings.ToUpper(lineOperationParsedValues.OperationTokenValue))
 			} else {
+				if len(nestedBlockOps) > 0 {
+					_ = blockStack.CheckOperationIsCapturableAndAppend(reformattedLine, lineOperationParsedValues)
+					return nil
+				}
+
 				err := parseAndProcessOperandString(
 					reformattedLine,
 					lineOperationParsedValues,
@@ -149,6 +155,7 @@ func preProcessBlockStack() error {
 
 	tempNewOp := blockStack.GetCurrentOpPtr()
 	currentOpName := blockStack.GetCapturedLinesOpNameWithPtr(currentOp)
+
 	err := readCapturedLines(currentOp, tempNewOp)
 	if err != nil {
 		return err

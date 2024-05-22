@@ -147,7 +147,7 @@ var errorTable = map[enumErrorCodes.Def]ErrorTableEntry{
 
 	enumErrorCodes.IfStatementElseIfNoParentIf:       newErrorTableEntry(enumErrorCodes.Error, "Cannot use elseif without parent if"),
 	enumErrorCodes.IfStatementElseIfAfterElse:        newErrorTableEntry(enumErrorCodes.Error, "Cannot have elseif after else"),
-	enumErrorCodes.IfStatementDuplicateElse:          newErrorTableEntry(enumErrorCodes.Error, "Cannot only have 1 else in this block"),
+	enumErrorCodes.IfStatementDuplicateElse:          newErrorTableEntry(enumErrorCodes.Error, "Can only have 1 else in this block"),
 	enumErrorCodes.SwitchStatementBadOperand:         newErrorTableEntry(enumErrorCodes.Error, "Switch operand type must be or resolve to a number or string"),
 	enumErrorCodes.SwitchStatementCaseAfterDefault:   newErrorTableEntry(enumErrorCodes.Error, "Cannot have case after default"),
 	enumErrorCodes.SwitchStatementMismatchedCaseType: newErrorTableEntry(enumErrorCodes.Error, "Case's type mismatched from original switch's type"),

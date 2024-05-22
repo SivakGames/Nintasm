@@ -67,17 +67,23 @@ func evalEndIf(operandList *[]Node) error {
 		trueStatementCapturedLines = &emptyCapturedLines
 	}
 
-	blockStack.PopCaptureBlockThenExtendCapturedLines(*trueStatementCapturedLines)
+	processedLines := []blockStack.ProcessLine{}
+	pl := blockStack.GenerateProcessedLine(blockStack.ProcessLineScope{}, *trueStatementCapturedLines)
+	processedLines = append(processedLines, pl)
 
-	currentStack := blockStack.GetCurrentCaptureBlockStack()
-	if blockStack.GoToProcessingFlag {
-		if currentStackOperation != nil {
-			(*currentStack)[0] = *currentStackOperation
-			(*currentStack)[0].AlternateCaptureBlock = nil
-		} else {
-			blockStack.SetBottomOfStackToEmptyBlock()
-		}
-	}
+	blockStack.NEW_PopCaptureBlockPrepProcessBlock(processedLines)
+
+	//blockStack.PopCaptureBlockThenExtendCapturedLines(*trueStatementCapturedLines)
+
+	//currentStack := blockStack.GetCurrentCaptureBlockStack()
+	//if blockStack.GoToProcessingFlag {
+	//	if currentStackOperation != nil {
+	//		(*currentStack)[0] = *currentStackOperation
+	//		(*currentStack)[0].AlternateCaptureBlock = nil
+	//	} else {
+	//		blockStack.SetBottomOfStackToEmptyBlock()
+	//	}
+	//}
 
 	return nil
 }

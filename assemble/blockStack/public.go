@@ -78,7 +78,7 @@ func PopCaptureBlockThenExtendCapturedLines(extendedLines []CapturedLine) {
 
 // **************************
 func NEW_PopCaptureBlockPrepProcessBlock(processedLine []ProcessLine) {
-	captureBlock := getCurrentCaptureBlockListNodeCaptureBlockStackTopEntryFurthestAlternate()
+	captureBlock := getCurrentCaptureBlockListNodeCaptureBlockStackTopEntry()
 	captureBlock.ProcessLines = processedLine
 }
 

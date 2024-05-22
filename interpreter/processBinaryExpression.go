@@ -60,7 +60,7 @@ func processBinaryExpression(node Node) (Node, error) {
 	case ">":
 		node.AsBool = left.AsNumber > right.AsNumber
 	case ">=":
-		node.AsBool = left.AsNumber > right.AsNumber
+		node.AsBool = left.AsNumber >= right.AsNumber
 	case "==":
 		node.AsBool = left.AsNumber == right.AsNumber
 	case "!=":
