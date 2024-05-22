@@ -18,35 +18,25 @@
 	.bank 0
 	.org $8000
 
+temp = 21
 
-;	.range [[1,2],[11,21],[111,211]], i1, v1
-;		.range v1, i2, v2
-;			.repeat 5, j
-;				.db v2 + i2
-;			.endRepeat
-;			.db 5
-;		.endRange
-;	.endRange
 
-	.if 5 > 6
+	.switch 12
+	.case 1
+		.db 1
+	.case 2
 		.db 2
-	.elseif 1 > 4
-		.db 3
-	.else
-		.if 0 > 0
-			.db 80
-		.elseif 5 == 4
-			.db 70, "ABA"
-		.else
-			.range [$11,$22,$33,$44], i1, e1
-				.db i1
-				.if i1 >= 1
-					.db e1 ^ $ff
-				.endif
-				.db e1
-			.endRange
-		.endif
-	.endif
+	.default
+		.db 5
+		.switch temp
+		.case 2
+		.db 22
+		.default
+		.db 77
+		.endSwitch
+
+	.endSwitch
+
 
 ;-----------------------------------------
 ;RESET:

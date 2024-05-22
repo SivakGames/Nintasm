@@ -70,7 +70,13 @@ func evalEndIkv(operandList *[]Node) error {
 	}
 
 	macroTable.PopFromReplacementStack()
-	blockStack.ClearCaptureBlockListEvalFlag()
-	blockStack.PopCaptureBlockThenExtendCapturedLines(modifiedCapturedLines)
+
+	processedLines := []blockStack.ProcessLine{}
+	pl := blockStack.GenerateProcessedLine(blockStack.ProcessLineScope{}, modifiedCapturedLines)
+	processedLines = append(processedLines, pl)
+	blockStack.NEW_PopCaptureBlockPrepProcessBlock(processedLines)
+
+	//blockStack.ClearCaptureBlockListEvalFlag()
+	//blockStack.PopCaptureBlockThenExtendCapturedLines(modifiedCapturedLines)
 	return nil
 }

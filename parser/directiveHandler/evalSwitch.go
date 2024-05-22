@@ -78,17 +78,22 @@ func evalEndSwitch() error {
 		trueStatementCapturedLines = &emptyCapturedLines
 	}
 
-	blockStack.PopCaptureBlockThenExtendCapturedLines(*trueStatementCapturedLines)
+	processedLines := []blockStack.ProcessLine{}
+	pl := blockStack.GenerateProcessedLine(blockStack.ProcessLineScope{}, *trueStatementCapturedLines)
+	processedLines = append(processedLines, pl)
+	blockStack.NEW_PopCaptureBlockPrepProcessBlock(processedLines)
 
-	currentStack := blockStack.GetCurrentCaptureBlockStack()
-	if blockStack.GoToProcessingFlag {
-		if currentStackOperation != nil {
-			(*currentStack)[0] = *currentStackOperation
-			(*currentStack)[0].AlternateCaptureBlock = nil
-		} else {
-			blockStack.SetBottomOfStackToEmptyBlock()
-		}
-	}
+	//blockStack.PopCaptureBlockThenExtendCapturedLines(*trueStatementCapturedLines)
+	//
+	//currentStack := blockStack.GetCurrentCaptureBlockStack()
+	//if blockStack.GoToProcessingFlag {
+	//	if currentStackOperation != nil {
+	//		(*currentStack)[0] = *currentStackOperation
+	//		(*currentStack)[0].AlternateCaptureBlock = nil
+	//	} else {
+	//		blockStack.SetBottomOfStackToEmptyBlock()
+	//	}
+	//}
 
 	return nil
 }
