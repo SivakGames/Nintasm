@@ -67,10 +67,7 @@ func evalEndIf(operandList *[]Node) error {
 		trueStatementCapturedLines = &emptyCapturedLines
 	}
 
-	processedLines := []blockStack.ProcessLine{}
-	pl := blockStack.GenerateProcessedLine(blockStack.ProcessLineScope{}, *trueStatementCapturedLines)
-	processedLines = append(processedLines, pl)
-	blockStack.NEW_PopCaptureBlockPrepProcessBlock(processedLines)
+	blockStack.CopyPresetCapturedLinesToProcessedWithEmptyScope(trueStatementCapturedLines)
 
 	//blockStack.PopCaptureBlockThenExtendCapturedLines(*trueStatementCapturedLines)
 

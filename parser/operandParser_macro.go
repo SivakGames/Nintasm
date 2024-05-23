@@ -79,10 +79,7 @@ func (mop *MacroOperandParser) Process(macroName string) error {
 
 	blockStack.PushCaptureBlock("IM", operandList)
 
-	processedLines := []blockStack.ProcessLine{}
-	pl := blockStack.GenerateProcessedLine(blockStack.ProcessLineScope{}, capturedLinesToProcess)
-	processedLines = append(processedLines, pl)
-	blockStack.NEW_PopCaptureBlockPrepProcessBlock(processedLines)
+	blockStack.CopyPresetCapturedLinesToProcessedWithEmptyScope(&capturedLinesToProcess)
 
 	//currentStackOp := blockStack.GetCurrentCaptureBlock()
 	//currentStackOp.CapturedLines = capturedLinesToProcess

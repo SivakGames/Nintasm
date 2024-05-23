@@ -18,8 +18,13 @@ func evalNamespace(directiveName string, namespaceLabel string, operandList *[]N
 
 // End the Namespace definition and add to environment
 func evalEndNamespace() error {
-	blockStack.ProcessEndLabeledDirective()
+	blockStack.SetCurrentCaptureBlockPostFn(endNamespaceCleanup)
+	blockStack.CopyCapturedLinesToProcessedWithEmptyScope()
+	return nil
+}
+
+func endNamespaceCleanup() {
+	//blockStack.ProcessEndLabeledDirective()
 	interpreter.PopParentLabel()
 	namespaceTable.IsDefiningNamespace = false
-	return nil
 }

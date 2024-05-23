@@ -177,11 +177,18 @@ func readCapturedLines(
 	//lines := blockStack.GetCapturedLinesWithPtr(currentOp)
 	processedLines := blockStack.GetProcessedLinesWithPtr(currentOp)
 	monitorStack := blockStack.GetBlockEntriesWithPtr(tempNewOp)
+	postFn := blockStack.GetPostFnWithPtr(currentOp)
+	if postFn != nil {
+		defer postFn()
+	}
 
 	for _, pl := range *processedLines {
 		lines := &pl.CapturedLines
 		scope := pl.Scope
-		processInner(lines, scope, monitorStack)
+		err := processInner(lines, scope, monitorStack)
+		if err != nil {
+			return err
+		}
 	}
 
 	//Iterate over captured lines

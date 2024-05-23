@@ -129,6 +129,28 @@ func SetBottomOfStackToEmptyBlock() {
 	(*blockStack)[0] = newCaptureBlock("nil", nil)
 }
 
+func SetCurrentCaptureBlockPostFn(postFn func()) {
+	captureBlock := getCurrentCaptureBlockListNodeCaptureBlockStackTopEntry()
+	captureBlock.ProcessPostFn = postFn
+}
+
+// ***************************************************
+
+func CopyCapturedLinesToProcessedWithEmptyScope() {
+	capturedLines := GetCurrentCaptureBlockCapturedLines()
+	processedLines := []ProcessLine{}
+	pl := GenerateProcessedLine(ProcessLineScope{}, *capturedLines)
+	processedLines = append(processedLines, pl)
+	NEW_PopCaptureBlockPrepProcessBlock(processedLines)
+}
+
+func CopyPresetCapturedLinesToProcessedWithEmptyScope(capturedLines *[]CapturedLine) {
+	processedLines := []ProcessLine{}
+	pl := GenerateProcessedLine(ProcessLineScope{}, *capturedLines)
+	processedLines = append(processedLines, pl)
+	NEW_PopCaptureBlockPrepProcessBlock(processedLines)
+}
+
 // ***************************************************
 func GetCurrentOpPtr() *CaptureBlockListNode {
 	return getCurrentCaptureBlockListNode()
@@ -150,6 +172,9 @@ func GetProcessedLinesWithPtr(pointer *CaptureBlockListNode) *[]ProcessLine {
 }
 func ClearBlockEntriesWithPtr(pointer *CaptureBlockListNode) {
 	pointer.captureBlockStack = (*pointer).captureBlockStack[:0]
+}
+func GetPostFnWithPtr(pointer *CaptureBlockListNode) func() {
+	return pointer.captureBlockStack[0].ProcessPostFn
 }
 
 // -------------------------------------------------

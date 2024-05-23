@@ -17,10 +17,15 @@ func evalExprmap(directiveName string, exprmapLabel string, operandList *[]Node)
 }
 
 func evalEndExprmap() error {
-	capturedLines := blockStack.GetCurrentCaptureBlockCapturedLines()
-	blockStack.PopCaptureBlockThenExtendCapturedLines(*capturedLines)
-	blockStack.ClearCurrentOperationLabel()
+	blockStack.SetCurrentCaptureBlockPostFn(endExprmapCleanup)
+	blockStack.CopyCapturedLinesToProcessedWithEmptyScope()
+	//capturedLines := blockStack.GetCurrentCaptureBlockCapturedLines()
+	//blockStack.PopCaptureBlockThenExtendCapturedLines(*capturedLines)
 	return nil
+}
+
+func endExprmapCleanup() {
+	blockStack.ClearCurrentOperationLabel()
 }
 
 func evalDefExpr(directiveName string, operandList *[]Node) error {

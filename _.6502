@@ -18,25 +18,11 @@
 	.bank 0
 	.org $8000
 
-temp = 21
+TTT .exprmap
+	.defexpr "2a", 55
+TTT .endexprmap
 
-
-	.switch 12
-	.case 1
-		.db 1
-	.case 2
-		.db 2
-	.default
-		.db 5
-		.switch temp
-		.case 2
-		.db 22
-		.default
-		.db 77
-		.endSwitch
-
-	.endSwitch
-
+	.db `2a`
 
 ;-----------------------------------------
 ;RESET:

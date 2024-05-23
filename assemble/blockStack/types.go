@@ -57,6 +57,7 @@ type CaptureBlock struct {
 	BlockOperationName    string
 	CapturedLines         []CapturedLine
 	ProcessLines          []ProcessLine
+	ProcessPostFn         func()
 	OperandList           []Node
 	AlternateCaptureBlock *CaptureBlock
 }
