@@ -40,7 +40,7 @@ func evalElse(directiveName string, operandList *[]Node) error {
 	return nil
 }
 
-func evalEndIf(operandList *[]Node) error {
+func evalEndIf() error {
 	currentStackOperation := blockStack.GetCurrentCaptureBlock()
 	var trueStatementCapturedLines *[]blockStack.CapturedLine
 

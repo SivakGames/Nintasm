@@ -45,7 +45,7 @@ func evalKv(operandList *[]Node) error {
 }
 
 // Final operation
-func evalEndIkv(operandList *[]Node) error {
+func evalEndIkv() error {
 	// Get invoking macro name
 	_, originalOperandList := blockStack.GetCurrentCaptureBlockCapturedLinesAndOperandList()
 	macroNameNode := &(*originalOperandList)[0]
@@ -77,3 +77,5 @@ func evalEndIkv(operandList *[]Node) error {
 	//blockStack.PopCaptureBlockThenExtendCapturedLines(modifiedCapturedLines)
 	return nil
 }
+
+func buildIkvMacro() {}

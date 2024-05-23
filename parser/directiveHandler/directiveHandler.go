@@ -110,9 +110,9 @@ func EvaluateDirective(operationTokenEnum enumTokenTypes.Def, directiveName stri
 	case enumTokenTypes.DIRECTIVE_blockEnd:
 		switch directiveName {
 		case "ENDIF":
-			return evalEndIf(operandList)
+			return evalEndIf()
 		case "ENDIKV":
-			return evalEndIkv(operandList)
+			return evalEndIkv()
 		case "ENDRANGE":
 			return evalEndRange()
 		case "ENDREPEAT":
