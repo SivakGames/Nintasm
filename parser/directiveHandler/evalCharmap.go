@@ -18,8 +18,14 @@ func evalCharmap(directiveName string, charmapLabel string, operandList *[]Node)
 }
 
 func evalEndCharmap() error {
-	blockStack.ProcessEndLabeledDirective()
+	//blockStack.ProcessEndLabeledDirective()
+	blockStack.SetCurrentCaptureBlockPostFn(endCharmapCleanup)
+	blockStack.CopyCapturedLinesToProcessedWithEmptyScope()
 	return nil
+}
+
+func endCharmapCleanup() {
+	blockStack.ClearCurrentOperationLabel()
 }
 
 // -----------------------------------------
