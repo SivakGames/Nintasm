@@ -61,7 +61,7 @@ func AddIdentifierToSymbolAsNodeTable(symbolName string, node Node, symbolType e
 	return nil
 }
 
-// See if identifier has a value in the symbol table
+// See if identifier has a value in the symbol table.
 // Returns node, resolved, err
 func LookupIdentifierInSymbolAsNodeTable(symbolName string) (Node, bool, error) {
 	node, exists := symbolAsNodeTable.GetNodeFromSymbolAsNodeTable(symbolName)

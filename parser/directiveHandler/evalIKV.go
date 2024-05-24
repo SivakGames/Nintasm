@@ -20,6 +20,7 @@ func evalIkv(directiveName string, operandList *[]Node) error {
 	blockStack.PushCaptureBlock(directiveName, *operandList)
 	macroTable.AppendToReplacementStack()
 	symbolAsNodeTable.PushToSymbolTableStack()
+	blockStack.SetInlineEval()
 
 	return nil
 }
@@ -69,7 +70,7 @@ func evalEndIkv() error {
 		modifiedCapturedLines = append(modifiedCapturedLines, md)
 	}
 
-	macroTable.PopFromReplacementStack()
+	//macroTable.PopFromReplacementStack()
 
 	blockStack.CopyPresetCapturedLinesToProcessedWithEmptyScope(&modifiedCapturedLines)
 
@@ -78,4 +79,6 @@ func evalEndIkv() error {
 	return nil
 }
 
-func buildIkvMacro() {}
+func buildIkvMacro() {
+	macroTable.PopFromReplacementStack()
+}

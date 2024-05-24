@@ -20,17 +20,17 @@ var prevLocalLabelNextLocalLabelTable = map[string]string{}
 
 // ++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-type symbolTableType = map[string]Node
+type SymbolTableType = map[string]Node
 
 // When in block ops, certain things can be scoped to the block
-var localBlockScopes []*symbolTableType
+var localBlockScopes []*SymbolTableType
 
 // ++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 // Used when doing function calls
-var symbolTableStack = []symbolTableType{}
+var symbolTableStack = []SymbolTableType{}
 
-var symbolTable = symbolTableType{
+var symbolTable = SymbolTableType{
 	"CTRLBTN.right":  generateNumericNodeForEnvironment(0x01),
 	"CTRLBTN.left":   generateNumericNodeForEnvironment(0x02),
 	"CTRLBTN.down":   generateNumericNodeForEnvironment(0x04),
@@ -121,6 +121,9 @@ func AddIdentifierKeyToPrevLocalLabelNextLocalLabelTable(prevLabel string, nextL
 	prevLocalLabelNextLocalLabelTable[prevLabel] = nextLabel
 }
 
+// -----------------------------------------
+
+// Go through the symbol as node table and check sub-scopes before checking the global scope
 func GetNodeFromSymbolAsNodeTable(symbolName string) (Node, bool) {
 	for lsi := len(localBlockScopes) - 1; lsi >= 0; lsi-- {
 		scope := localBlockScopes[lsi]
@@ -133,6 +136,9 @@ func GetNodeFromSymbolAsNodeTable(symbolName string) (Node, bool) {
 	node, exists := symbolTable[symbolName]
 	return node, exists
 }
+
+// -----------------------------------------
+
 func GetValueFromLabelAsBankTable(symbolName string) (int, bool) {
 	bankValue, exists := labalAsBankTable[symbolName]
 	return bankValue, exists
@@ -149,7 +155,7 @@ func GetValueFromPrevLocalLabelNextLocalLabelTable(symbolName string) (string, b
 // ------------------------------------------
 
 func PushToSymbolTableStack() {
-	symbolTableStack = append(symbolTableStack, symbolTableType{})
+	symbolTableStack = append(symbolTableStack, SymbolTableType{})
 }
 
 func PopFromSymbolTableStack() {
@@ -160,7 +166,7 @@ func CheckTopOfSymbolTableStackHasLength() bool {
 	return len(symbolTableStack) > 0
 }
 
-func GetTopOfSymbolTableStack() *symbolTableType {
+func GetTopOfSymbolTableStack() *SymbolTableType {
 	if len(symbolTableStack) > 0 {
 		return &symbolTableStack[len(symbolTableStack)-1]
 	}
@@ -199,10 +205,22 @@ func generateNumericNodeForEnvironment(number int) Node {
 
 // ------------------------------------------
 
-func AddChildBlockScope(scope symbolTableType) {
+func GetCurrentLocalBlockScopes() []*SymbolTableType {
+	return localBlockScopes
+}
+
+func AddChildBlockScope(scope SymbolTableType) {
 	localBlockScopes = append(localBlockScopes, &scope)
 }
 
 func PopChildBlockScope() {
 	localBlockScopes = localBlockScopes[:len(localBlockScopes)-1]
+}
+
+func SetCurrentLocalBlockScopes(blockScopes []*SymbolTableType) {
+	localBlockScopes = blockScopes
+}
+
+func ClearCurrentLocalBlockScopes() {
+	localBlockScopes = localBlockScopes[:0]
 }

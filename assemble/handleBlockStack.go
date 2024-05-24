@@ -64,6 +64,18 @@ func handleBlockStack(
 			return err // ❌ Fails
 		}
 
+		isInlineEval := blockStack.CheckInlineEval()
+
+		if isInlineEval {
+			err := parseAndProcessOperandString(
+				reformattedLine,
+				lineOperationParsedValues,
+			)
+			if err != nil {
+				return err // ❌ Fails
+			}
+		}
+
 		isNewStartOp := blockStack.NEW_IsStartOperation(lineOperationParsedValues)
 
 		if !isNewStartOp {

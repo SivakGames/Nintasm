@@ -23,10 +23,11 @@ TTT .macro \tt, \yy
 TTT .endm
 
 
-	.ikv TTT
-	.kv \tt, 2
-	.kv \yy, 3
-	.endikv
+	.repeat 2, musAddrIter
+	.dw Somewhere + musAddrIter * $10
+	.endrepeat
+
+Somewhere:
 
 ;-----------------------------------------
 ;RESET:

@@ -6,12 +6,15 @@ import (
 	enumErrorCodes "misc/nintasm/constants/enums/errorCodes"
 	"misc/nintasm/interpreter"
 	"misc/nintasm/interpreter/environment"
+	"misc/nintasm/interpreter/environment/symbolAsNodeTable"
 	"misc/nintasm/interpreter/operandFactory"
 	"misc/nintasm/romBuilder"
 	"misc/nintasm/romBuilder/nodesToBytes"
 )
 
 type Node = operandFactory.Node
+
+type childScopesType []*symbolAsNodeTable.SymbolTableType
 
 type unresolvedEntry struct {
 	originalRomSegment int
@@ -26,12 +29,14 @@ type unresolvedEntry struct {
 	lineContent        string
 	isBranch           bool
 	isBigEndian        bool
+	childScopes        childScopesType
 }
 
 var unresolvedSymbolTable = []unresolvedEntry{}
 var unresolvedRomTable = []unresolvedEntry{}
 
 func newUnresolvedEntry(node Node, neededBytes int, isBranch bool, isBigEndian bool) unresolvedEntry {
+	currentChildScopes := symbolAsNodeTable.GetCurrentLocalBlockScopes()
 	fileData := fileStack.GetTopOfFileStack()
 	return unresolvedEntry{
 		originalRomSegment: romBuilder.GetRomSegmentIndex(),
@@ -46,6 +51,7 @@ func newUnresolvedEntry(node Node, neededBytes int, isBranch bool, isBigEndian b
 		lineContent:        fileData.ProcessedLines[fileData.CurrentLineNumber-1],
 		isBranch:           isBranch,
 		isBigEndian:        isBigEndian,
+		childScopes:        currentChildScopes,
 	}
 }
 
@@ -76,6 +82,8 @@ func ResolvedUnresolvedSymbols() error {
 			errorHandler.OverwriteNoFileDefaults(entry.fileName, uint(entry.lineNumber), entry.lineContent)
 			interpreter.OverwriteParentLabel(entry.parentLabel)
 			interpreter.SetLocalLabel(entry.localLabel)
+			symbolAsNodeTable.SetCurrentLocalBlockScopes(entry.childScopes)
+
 			evaluatedNode, err := interpreter.EvaluateNode(entry.originalNode)
 			if err != nil {
 				err := errorHandler.CheckErrorContinuesUpwardPropagation(err, enumErrorCodes.UnresolvedIdentifier)
@@ -91,6 +99,7 @@ func ResolvedUnresolvedSymbols() error {
 			}
 			interpreter.ClearLocalLabel()
 			interpreter.ClearParentLabel()
+			symbolAsNodeTable.ClearCurrentLocalBlockScopes()
 		}
 
 		//If equal, then no more resolving can be done
@@ -119,6 +128,7 @@ func ResolvedUnresolvedRomEntries() error {
 	for _, entry := range unresolvedRomTable {
 		interpreter.OverwriteParentLabel(entry.parentLabel)
 		interpreter.SetLocalLabel(entry.localLabel)
+		symbolAsNodeTable.SetCurrentLocalBlockScopes(entry.childScopes)
 		errorHandler.OverwriteNoFileDefaults(entry.fileName, uint(entry.lineNumber), entry.lineContent)
 		evaluatedNode, err := interpreter.EvaluateNode(entry.originalNode)
 		if err != nil {
@@ -136,6 +146,7 @@ func ResolvedUnresolvedRomEntries() error {
 		romBuilder.OverwriteResolvedBytesInRom(entry.originalRomSegment, entry.originalBank, entry.originalOffset, asRomData)
 		interpreter.ClearParentLabel()
 		interpreter.ClearLocalLabel()
+		symbolAsNodeTable.ClearCurrentLocalBlockScopes()
 		totalSuccessfullyResolved++
 	}
 

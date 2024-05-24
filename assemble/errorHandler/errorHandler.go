@@ -12,7 +12,7 @@ import (
 // ++++++++++++++++++++++++++++++++++++++++
 
 const ERROR_CAPTION_MIN_WIDTH = 7
-const ERROR_STACK_CAPACITY = 100
+const ERROR_STACK_CAPACITY = 10000
 
 // For underlining parts of the line
 var highlightStart int = -1

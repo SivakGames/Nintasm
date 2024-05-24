@@ -136,6 +136,18 @@ func SetCurrentCaptureBlockPostFn(postFn func()) {
 
 // ***************************************************
 
+func SetInlineEval() {
+	captureBlock := GetCurrentCaptureBlock()
+	captureBlock.IsInlineEval = true
+}
+
+func CheckInlineEval() bool {
+	captureBlock := GetCurrentCaptureBlock()
+	return captureBlock.IsInlineEval
+}
+
+// ***************************************************
+
 func CopyCapturedLinesToProcessedWithEmptyScope() {
 	capturedLines := GetCurrentCaptureBlockCapturedLines()
 	processedLines := []ProcessLine{}

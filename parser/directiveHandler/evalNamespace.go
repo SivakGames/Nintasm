@@ -26,5 +26,6 @@ func evalEndNamespace() error {
 func endNamespaceCleanup() {
 	//blockStack.ProcessEndLabeledDirective()
 	interpreter.PopParentLabel()
+	blockStack.ClearCurrentOperationLabel()
 	namespaceTable.IsDefiningNamespace = false
 }

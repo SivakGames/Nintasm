@@ -58,6 +58,7 @@ type CaptureBlock struct {
 	CapturedLines         []CapturedLine
 	ProcessLines          []ProcessLine
 	ProcessPostFn         func()
+	IsInlineEval          bool
 	OperandList           []Node
 	AlternateCaptureBlock *CaptureBlock
 }
