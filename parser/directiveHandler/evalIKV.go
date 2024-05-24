@@ -70,12 +70,7 @@ func evalEndIkv() error {
 		modifiedCapturedLines = append(modifiedCapturedLines, md)
 	}
 
-	//macroTable.PopFromReplacementStack()
-
 	blockStack.CopyPresetCapturedLinesToProcessedWithEmptyScope(&modifiedCapturedLines)
-
-	//blockStack.ClearCaptureBlockListEvalFlag()
-	//blockStack.PopCaptureBlockThenExtendCapturedLines(modifiedCapturedLines)
 	return nil
 }
 
