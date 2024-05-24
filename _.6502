@@ -22,12 +22,17 @@ TTT .macro \tt, \yy
 	.db \tt, \yy
 TTT .endm
 
-
 	.repeat 2, musAddrIter
 	.dw Somewhere + musAddrIter * $10
 	.endrepeat
 
+	.repeat 2, musAddrIter1
+	.dw Somewhere + musAddrIter1 * $10
+	.endrepeat
+
+
 Somewhere:
+	.db 2
 
 ;-----------------------------------------
 ;RESET:

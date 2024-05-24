@@ -36,8 +36,9 @@ var unresolvedSymbolTable = []unresolvedEntry{}
 var unresolvedRomTable = []unresolvedEntry{}
 
 func newUnresolvedEntry(node Node, neededBytes int, isBranch bool, isBigEndian bool) unresolvedEntry {
-	currentChildScopes := symbolAsNodeTable.GetCurrentLocalBlockScopes()
+	currentChildScopes := symbolAsNodeTable.DeepCopyLocalBlockScopes()
 	fileData := fileStack.GetTopOfFileStack()
+
 	return unresolvedEntry{
 		originalRomSegment: romBuilder.GetRomSegmentIndex(),
 		originalBank:       romBuilder.GetBankIndex(),
@@ -129,6 +130,7 @@ func ResolvedUnresolvedRomEntries() error {
 		interpreter.OverwriteParentLabel(entry.parentLabel)
 		interpreter.SetLocalLabel(entry.localLabel)
 		symbolAsNodeTable.SetCurrentLocalBlockScopes(entry.childScopes)
+
 		errorHandler.OverwriteNoFileDefaults(entry.fileName, uint(entry.lineNumber), entry.lineContent)
 		evaluatedNode, err := interpreter.EvaluateNode(entry.originalNode)
 		if err != nil {

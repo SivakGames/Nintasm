@@ -205,8 +205,16 @@ func generateNumericNodeForEnvironment(number int) Node {
 
 // ------------------------------------------
 
-func GetCurrentLocalBlockScopes() []*SymbolTableType {
-	return localBlockScopes
+func DeepCopyLocalBlockScopes() []*SymbolTableType {
+	copyScopes := make([]*SymbolTableType, len(localBlockScopes))
+	for i, scope := range localBlockScopes {
+		copyScope := make(SymbolTableType)
+		for key, value := range *scope {
+			copyScope[key] = value
+		}
+		copyScopes[i] = &copyScope
+	}
+	return copyScopes
 }
 
 func AddChildBlockScope(scope SymbolTableType) {
