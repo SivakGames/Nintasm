@@ -1,0 +1,13 @@
+PPUMASK_ON_BaseSetting = PPUMASK.showSprites | PPUMASK.showBg | PPUMASK.disableBgClip | PPUMASK.disableSpriteClip
+
+;=======================================
+COMMON_DisableRendering:
+	LDA #%00000000
+	STA PPUMASK
+	RTS
+
+;=======================================
+COMMON_EnableRendering:
+	LDA #PPUMASK_ON_BaseSetting
+	STA PPUMASK
+	RTS

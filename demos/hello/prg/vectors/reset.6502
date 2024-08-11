@@ -1,0 +1,14 @@
+RESET:
+	__resetCode__
+
+;Enable NMI
+	LDA #(PPUCTRL.enableNMI | PPUCTRL.spritePatternTable) ;%10001000
+	STA PPUCTRL
+	STA ppuControl
+
+	LDA #$FF
+	STA canExecuteNmi
+
+;Jump back to Forever, infinite loop
+.forever:
+	JMP .forever

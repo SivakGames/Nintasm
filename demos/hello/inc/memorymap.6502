@@ -1,0 +1,18 @@
+;==================================================================
+;Memory map
+;==================================================================
+	.rsset $0000
+temp .rs 16
+tempPointer .rs 8
+canExecuteNmi .rs 1
+gameNmiState .rs 1
+gameNmiSubstate .rs 1
+ppuControl .rs 1
+
+	.rsset $0200
+SpriteMemory .rs 256
+
+SpriteYPos = SpriteMemory
+SpriteTile = SpriteMemory + 1 
+SpriteAttr = SpriteMemory + 2
+SpriteXPos = SpriteMemory + 3

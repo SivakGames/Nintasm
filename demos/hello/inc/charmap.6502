@@ -1,0 +1,28 @@
+;==================================================================
+;Char map
+;==================================================================
+NUM_BASIS = $10
+ALPHA_BASIS = $1A
+alpha_BASIS = $40
+
+DEFAULT_CHARMAP .charmap
+	.defchar " ", $00
+	.defcharRange "0", "9", NUM_BASIS
+	.defcharRange "A", "Z", ALPHA_BASIS
+	.defcharRange "a", "z", alpha_BASIS
+
+	.defchar ".", $34
+	.defchar "#", $35
+	.defchar "!", $36
+	.defchar "?", $37
+	.defchar "-", $38
+	.defchar "'", $39
+	.defchar ":", $3a
+	.defchar ",", $3b
+	.defchar '"', $3c
+	.defchar "(", $3d
+	.defchar ")", $3e
+	.defchar "&", $3f
+	.defchar "@", $5e
+	.defchar "$", $5f
+DEFAULT_CHARMAP .endcharmap

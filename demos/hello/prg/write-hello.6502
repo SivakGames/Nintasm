@@ -1,0 +1,143 @@
+;````````````````````````````````````````````````````````````````````
+; Helper function for positionally centering things on a PPU line
+; A line is 32 tiles, so subtract the width of content to write
+;  from 32 and halve it for centering.
+;````````````````````````````````````````````````````````````````````
+offsetValToCenterOfPPU .func (32 - \1) >> 1
+
+;````````````````````````````````````````````````````````````````````
+; Namespace setting up data
+;````````````````````````````````````````````````````````````````````
+NS_DisplayHello .nameSpace
+;Palette for the background
+.bgPalette = [$0f,$22,$35,$13]
+;Palette for the sprites
+.spritePalette = [$0f,$18,$28,$38]
+;Sprite data
+.spriteData = [$80,$00,$00,$7c]
+;The text that will be written to the screen
+.message = toCharmap("Hello was written!!")
+;Where on the screen the text should start 
+; In this case, it's on nametable 0, line 12 (or $2180)
+; with a helper function to calculate values to center it
+.ADDR_message = PPUADDR.nt0line12 + offsetValToCenterOfPPU(arrayLen(.message))
+;Where on the screen the underline releative to the text should start
+; In this case it's 2 lines ($40) below the message
+.ADDR_underline = .ADDR_message + $40
+NS_DisplayHello .endNameSpace
+
+;++++++++++++++++++++++++++++++++++++++++++++++++++++
+; Put the actual data bytes in ROM
+;++++++++++++++++++++++++++++++++++++++++++++++++++++
+DATA_DisplayHello:
+.bgPalette:
+	.db NS_DisplayHello.bgPalette
+.spritePalette:
+	.db NS_DisplayHello.spritePalette
+.textData:
+	.db NS_DisplayHello.message
+.spritePositions:
+	.db NS_DisplayHello.spriteData
+
+;++++++++++++++++++++++++++++++++++++++++++++++++++++
+; Address table for jumping based on current state
+;++++++++++++++++++++++++++++++++++++++++++++++++++++
+ADDRTBL_GAMESTATE_DisplayHello:
+	.dw COMMON_ClearScreen
+	.dw DisplayHello_WritePalette
+	.dw DisplayHello_WriteMessage
+	.dw DisplayHello_DrawSprites
+	.dw DisplayHello_EnableRendering
+	.dw DisplayHello_Finished
+
+;================================================================
+;================================================================
+; Main state handler
+;================================================================
+;================================================================
+GAMESTATE_DisplayHello:
+	LDA gameNmiSubstate
+	ASL A
+	TAX
+	LDA ADDRTBL_GAMESTATE_DisplayHello, X
+	STA tempPointer
+	LDA ADDRTBL_GAMESTATE_DisplayHello + 1, X 
+	STA tempPointer + 1
+	JMP [tempPointer]
+
+;================================================================
+; Write the palette for the screen
+;================================================================
+DisplayHello_WritePalette:
+	__setPPU__ PPUADDR.palBg0
+	LDX #0
+.loop1:
+	LDA DATA_DisplayHello.bgPalette, X
+	STA PPUDATA
+	INX
+	CPX #arrayLen(NS_DisplayHello.bgPalette)
+		BCC .loop1
+
+	__setPPU__ PPUADDR.palSprite0
+	LDX #0
+.loop2:
+	LDA DATA_DisplayHello.spritePalette, X
+	STA PPUDATA
+	INX
+	CPX #arrayLen(NS_DisplayHello.spritePalette)
+		BCC .loop2
+	JMP COMMON_GoToNextGameSubstate
+
+;=================================================================
+; After clearing the screen will write the text message to the PPU, centered
+; Will also write dashes underneath to underline it
+;=================================================================
+DisplayHello_WriteMessage:
+
+;Write the actual text
+	__setPPU__ NS_DisplayHello.ADDR_message
+	LDX #0
+.loop1:
+	LDA DATA_DisplayHello.textData, X
+	STA PPUDATA
+	INX
+	CPX #arrayLen(NS_DisplayHello.message)
+		BCC .loop1
+
+;Write the underline
+	__setPPU__ NS_DisplayHello.ADDR_underline
+	LDX #arrayLen(NS_DisplayHello.message) - 1
+	LDA #toCharmap("-")
+.loop2:
+	STA PPUDATA
+	DEX
+		BPL .loop2
+
+	JMP COMMON_GoToNextGameSubstate
+
+;=================================================================
+; After clearing the screen will write 
+; the text message to the PPU, centered
+;=================================================================
+DisplayHello_DrawSprites:
+	LDX #arrayLen(NS_DisplayHello.spriteData) - 1
+.loop:
+	LDA DATA_DisplayHello.spritePositions, X
+	STA SpriteMemory, X
+	DEX
+		BPL .loop
+
+	JMP COMMON_GoToNextGameSubstate
+
+;=================================================================
+;Enable rendering so we can see the results
+;=================================================================
+DisplayHello_EnableRendering:
+	JSR COMMON_EnableRendering
+	JMP COMMON_GoToNextGameSubstate
+
+;=================================================================
+;End of everything. Just do nothing
+;=================================================================
+DisplayHello_Finished:
+	RTS

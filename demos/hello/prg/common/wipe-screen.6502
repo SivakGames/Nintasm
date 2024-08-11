@@ -1,0 +1,42 @@
+COMMON_ClearScreen:
+	JSR COMMON_DisableRendering
+	JSR .clearNameTable1
+	JSR .clearNameTable2
+	JSR COMMON_HideAllSprites
+	JMP COMMON_GoToNextGameSubstate
+
+;=======================================
+.clearNameTable2:
+	__setPPU__ #$28, #$00
+	JMP .do
+
+.clearNameTable1:
+	__setPPU__ #$20, #$00
+
+;=======================================
+;Will write 0 to the PPU data however many times are set
+
+.do:
+	LDX #4
+	LDY #0
+	LDA #$00
+
+.loop:
+	STA PPUDATA
+	DEY
+	BNE .loop
+	DEX
+	BNE .loop
+	RTS
+
+;=======================================
+COMMON_BlackenPalette:
+	__setPPU__ #$3f, #$00
+	LDX #31
+	LDA #$0F
+
+.loop:
+	STA PPUDATA
+	DEX
+	BPL .loop
+	RTS

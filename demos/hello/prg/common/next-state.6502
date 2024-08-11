@@ -1,0 +1,8 @@
+;=======================================
+COMMON_GoToNextGameState:
+	INC gameNmiState
+	RTS
+
+COMMON_GoToNextGameSubstate:
+	INC gameNmiSubstate
+	RTS

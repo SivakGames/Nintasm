@@ -1,0 +1,8 @@
+COMMON_HideAllSprites:
+	LDX #0
+	LDA #$F8
+.loop:
+	STA $0200, X
+	INX
+		BNE .loop
+	RTS

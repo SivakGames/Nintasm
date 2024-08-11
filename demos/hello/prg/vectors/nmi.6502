@@ -1,0 +1,47 @@
+NMI:
+	BIT canExecuteNmi
+	BMI .ok
+		RTI
+
+.ok:
+	__backupAXY__
+
+	LDA #0
+	STA canExecuteNmi
+
+	LDA #2
+	STA $4014
+
+	JSR NMI_ProcessGameState
+
+	LDA #0
+	STA $2006
+	STA $2006
+
+	LDA ppuControl
+	STA PPUCTRL
+
+	LDA $2002
+	LDA #0
+	STA $2005
+	STA $2005
+
+	LDA #$FF
+	STA canExecuteNmi
+
+	__restoreAXY__
+	RTI
+
+;=======================================
+ADDRTBL_NMI_ProcessGameState:
+	.dw GAMESTATE_DisplayHello
+
+NMI_ProcessGameState:
+	LDA gameNmiState
+	ASL A
+	TAX
+	LDA ADDRTBL_NMI_ProcessGameState, X
+	STA tempPointer
+	LDA ADDRTBL_NMI_ProcessGameState + 1, X
+	STA tempPointer + 1
+	JMP [tempPointer]
