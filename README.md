@@ -109,13 +109,12 @@ There are, however, sample programs included in the repository that can be built
 - There may be situations where error output may be that from Golang involving unanticipated operations instead of the standard assembler error output.
 - On the second pass, if there are errors, the line number display is sometimes off
 - Currently there are no safeguards for circular `.include` statements, function calling, or macro invoking.
-
-[] TODO: Allow iNES header version 2.0 format
-[] TODO: Implement the ines battery flag
-[] TODO: Add support for escaped characters in strings
-[] TODO: (low priority) Support illegal 6502 opcodes
-[] TODO: (low priority) Clean up the readability of the block stack handler
-[] TODO: (low priority) Implement rom segment description parameter
+- TODO: Allow iNES header version 2.0 format
+- TODO: Implement the ines battery flag
+- TODO: Add support for escaped characters in strings
+- TODO: (low priority) Support illegal 6502 opcodes
+- TODO: (low priority) Clean up the readability of the block stack handler
+- TODO: (low priority) Implement rom segment description parameter
 
 ## Major Issues Fixed/Rectified from NESASM
 
